@@ -3,7 +3,6 @@ class DataSpecificationException(Exception):
         wrong when interacting with a Data Specification
     """
     
-    
     def __init__(self):
         pass
 
@@ -12,7 +11,6 @@ class DataSpecificationWriteException(DataSpecificationException):
     """ An exception that indicates that there was an error writing\
         part of the specification to the underlying medium
     """
-    
     
     def __init__(self, message):
         """
@@ -27,7 +25,6 @@ class DataSpecificationRegionInUseException(DataSpecificationException):
         allocated
     """
     
-    
     def __init__(self, region):
         """
         :param region: The region that was already allocated
@@ -40,7 +37,6 @@ class DataSpecificationRegionUnfilledException(DataSpecificationException):
     """ An exception that indicates that a memory region is being used\
         that was originally requested to be unfilled
     """
-    
     
     def __init__(self, region, command):
         """
@@ -56,7 +52,6 @@ class DataSpecificationNoRegionSelectedException(DataSpecificationException):
     """ An exception that indicates that a memory region has not been selected
     """
     
-    
     def __init__(self, command):
         """
         :param command: The command being executed
@@ -68,7 +63,6 @@ class DataSpecificationRegionExhaustedException(DataSpecificationException):
     """ An exception that indicates that a region has run out of memory\
         whilst some data is being written
     """
-    
     
     def __init__(self, region, region_size, allocated_size, command):
         """
@@ -91,7 +85,6 @@ class DataSpecificationRegionOutOfBoundsException(DataSpecificationException):
         of bounds for that region
     """
 
-    
     def __init__(self, region, region_size, requested_offset, command):
         """
         :param region: The region that was being offset into 
@@ -113,7 +106,6 @@ class DataSpecificationParameterOutOfBoundsException(
         allowed bounds
     """
 
-    
     def __init__(self, parameter, value, range_min, range_max, command):
         """
         :param paramter: The parameter that is out of bounds
@@ -135,7 +127,6 @@ class DataSpecificationNotAllocatedException(DataSpecificationException):
         that has not been allocated
     """
 
-    
     def __init__(self, item_type, item_id, command):
         """
         :param item_type: The type of the item being used
@@ -153,7 +144,6 @@ class DataSpecificationNoMoreException(DataSpecificationException):
         requested item
     """
 
-    
     def __init__(self, item_type, items_allocated):
         """
         :param item_type: The type of item being requested
@@ -169,7 +159,6 @@ class DataSpecificationUnknownTypeException(DataSpecificationException):
         is unknown
     """
 
-    
     def __init__(self, type_name, requested_value, command):
         """
         :param type_name: The name of the requested type
@@ -189,6 +178,25 @@ class DataSpecificationInvalidCommandException(DataSpecificationException):
     
     def __init__(self, command):
         """
+        :param command: The command being executed
+        :type command: str
+        """
+        pass
+
+
+class DataSpecificationInvalidTypeException(DataSpecificationException):
+    """ An exception that indicates that the value of the type given does not\
+        match that expected
+    """
+
+    def __init__(self, type_name, requested_value, expected_value, command):
+        """
+        :param type_name: The name of the requested type
+        :type type_name: str
+        :param requested_value: The requested value
+        :type requested_value: int
+        :param expected_value: The expected value
+        :type expected_value: int
         :param command: The command being executed
         :type command: str
         """

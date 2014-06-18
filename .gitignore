@@ -1,4 +1,5 @@
 /.project
 /.pydevproject
+/.idea
 /.settings
 *.pyc

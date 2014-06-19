@@ -103,8 +103,8 @@ class DataSpecificationGenerator(object):
     def __init__(self, spec_writer, app_id, magic=None, write_text=False):
         """
         :param spec_writer: The object to write the specification to
-        :type spec_writer:\
-                data_allocation.abstract_data_specification_writer.AbstractDataSpecificationWriter
+        :type spec_writer: Implementation of\
+                data_allocation.abstract_data_specification_writer.AbstractDataWriter
         :param app_id: The id of the application
         :type app_id: int
         :param magic: Magic number to write to the header or None to use default
@@ -112,7 +112,8 @@ class DataSpecificationGenerator(object):
         :param write_text: Determines if a text version of the specification\
                     is to be written
         :type write_text: bool
-        :raise None: No exceptions are raised
+        :raise data_allocation.exceptions.DataWriteException:\
+                    If a write to external storage fails
         """
         pass
     
@@ -123,7 +124,7 @@ class DataSpecificationGenerator(object):
         :param comment: The comment to write
         :type comment: str
         :return: Nothing is returned
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -133,7 +134,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -143,7 +144,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -161,7 +162,7 @@ class DataSpecificationGenerator(object):
         :type empty: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationRegionInUseException:\
                     If the region was already reserved
@@ -178,7 +179,7 @@ class DataSpecificationGenerator(object):
         :type region: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
                     If the region was not reserved
@@ -196,7 +197,7 @@ class DataSpecificationGenerator(object):
         :type seed: int
         :return: The id of the created random number generator, between 0 and 15
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
                     If there is no more space for a new generator
@@ -221,7 +222,7 @@ class DataSpecificationGenerator(object):
         :return: The id of the created uniform random distribution to be used\
                     in future calls of the distribution between 0 and 63
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
                     If there is no more space for a new random distribution
@@ -245,7 +246,7 @@ class DataSpecificationGenerator(object):
         :type register_id: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
                     If the random distribution id was not previously declared
@@ -267,7 +268,7 @@ class DataSpecificationGenerator(object):
         :type parameters: list of (str, DATA_TYPE, float)
         :return: The id of the new structure, between 0 and 15
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
                     If there are no more spaces for new structures
@@ -306,7 +307,7 @@ class DataSpecificationGenerator(object):
         :type value: float
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If structure_id is not in the allowed range
@@ -348,7 +349,7 @@ class DataSpecificationGenerator(object):
         :return: The position of the write pointer within the current region,\
                     in bytes from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If repeats_is_register is False and structure_id is not\
@@ -381,7 +382,7 @@ class DataSpecificationGenerator(object):
         :type argument_by_value: list of bool
         :return: The id of the function, between 0 and 31
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
                     If there are no more spaces for new functions
@@ -397,7 +398,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no function being defined at this point
@@ -415,7 +416,7 @@ class DataSpecificationGenerator(object):
         :type structure_ids: list of int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If the function id is not valid
@@ -457,7 +458,7 @@ class DataSpecificationGenerator(object):
         :return: The position of the write pointer within the current region,
                     in bytes from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If repeats_is_register is False, and repeats is out\
@@ -488,7 +489,7 @@ class DataSpecificationGenerator(object):
         :return: The position of the write pointer within the current region,\
                     in bytes from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\
                     If no region has been selected to write to
@@ -504,7 +505,7 @@ class DataSpecificationGenerator(object):
         :type region: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the region identifier is not valid
@@ -553,7 +554,7 @@ class DataSpecificationGenerator(object):
         :type increment_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If counter_register_id is not a valid register id
@@ -577,7 +578,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no loop in operation at this point
@@ -591,7 +592,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no loop in operation at this point
@@ -620,7 +621,7 @@ class DataSpecificationGenerator(object):
         :type value_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If the register_id is not a valid register id
@@ -640,7 +641,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no conditional in operation at this point
@@ -652,7 +653,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no conditional in operation at this point
@@ -676,7 +677,7 @@ class DataSpecificationGenerator(object):
         :type data_type: DATA_TYPE
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If register_id is not a valid register_id
@@ -698,7 +699,7 @@ class DataSpecificationGenerator(object):
         :type register_id: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the register_id is not a valid register id
@@ -727,7 +728,7 @@ class DataSpecificationGenerator(object):
         :type relative_to_current: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the address_is_register is True and address is not\
@@ -763,7 +764,7 @@ class DataSpecificationGenerator(object):
         :return: The current write pointer within the current region, in bytes\
                     from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If log_block_size_is_register is False, and\
@@ -804,7 +805,7 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If operand_1_is_register is True and operand_1 is not a\
@@ -840,7 +841,7 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If operand_1_is_register is True and operand_1 is not a\
@@ -880,7 +881,7 @@ class DataSpecificationGenerator(object):
         :type destination_id_is_register: bool
         :return: The id of the copied structure, between 0 and 15
         :rtype: int
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If source_id_is_register is True and source_structure_id\
@@ -922,7 +923,7 @@ class DataSpecificationGenerator(object):
         :type destination_parameter_index: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If source_struture_id is not a valid struture id
@@ -957,7 +958,7 @@ class DataSpecificationGenerator(object):
         :type data_type: DATA_TYPE
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If value_is_register is True and value is not a valid\
@@ -978,7 +979,7 @@ class DataSpecificationGenerator(object):
         :type text: str
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -998,7 +999,7 @@ class DataSpecificationGenerator(object):
         :type structure_id_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If structure_id_is_register is True and structure_id is\
@@ -1019,7 +1020,7 @@ class DataSpecificationGenerator(object):
         :type close_writer: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataSpecificationWriteException:\
+        :raise data_allocation.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass

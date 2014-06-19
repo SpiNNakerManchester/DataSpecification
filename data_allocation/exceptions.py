@@ -1,15 +1,19 @@
-class DataSpecificationException(Exception):
-    """ A general purpose exception indicating that something went\
-        wrong when interacting with a Data Specification
+
+class DataWriteException():
+    """ An exception that indicates that there was an error writing\
+        to the underlying medium
     """
     
-    def __init__(self):
+    def __init__(self, message):
+        """
+        :param message: A message to indicate what when wrong
+        :type message: str
+        """
         pass
-
-
-class DataSpecificationWriteException(DataSpecificationException):
-    """ An exception that indicates that there was an error writing\
-        part of the specification to the underlying medium
+    
+class DataReadException():
+    """ An exception that indicates that there was an error reading\
+        from the underlying medium
     """
     
     def __init__(self, message):
@@ -19,6 +23,13 @@ class DataSpecificationWriteException(DataSpecificationException):
         """
         pass
 
+class DataSpecificationException(Exception):
+    """ A general purpose exception indicating that something went\
+        wrong when interacting with a Data Specification
+    """
+    
+    def __init__(self):
+        pass
 
 class DataSpecificationRegionInUseException(DataSpecificationException):
     """ An exception that indicates that a region has already been\

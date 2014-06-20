@@ -69,15 +69,18 @@
 <span class="sd">        image</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">mem_writer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">mem_writer</span><span class="p">,</span> <span class="n">space</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param spec_reader: The object to read the specification language file\</span>
 <span class="sd">                    from</span>
 <span class="sd">        :type spec_reader: Implementation of\</span>
-<span class="sd">                data_allocation.abstract_data_specification_writer.AbstractDataReader</span>
+<span class="sd">                    data_allocation.abstract_data_specification_writer.AbstractDataReader</span>
 <span class="sd">        :param mem_writer: The object to write the memory image to</span>
 <span class="sd">        :type mem_writer: Implementation of\</span>
-<span class="sd">                data_allocation.abstract_data_specification_writer.AbstractDataWriter</span>
+<span class="sd">                    data_allocation.abstract_data_specification_writer.AbstractDataWriter</span>
+<span class="sd">        :param space: The amount of space into which the final image must fit,\</span>
+<span class="sd">                    in bytes</span>
+<span class="sd">        :type space: int</span>
 <span class="sd">        :raise data_allocation.exceptions.DataReadException:\</span>
 <span class="sd">                    If a read from external storage fails</span>
 <span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
@@ -88,8 +91,8 @@
 <div class="viewcode-block" id="DataSpecificationExecutor.execute"><a class="viewcode-back" href="../../data_allocation.data_specification_executor.html#data_allocation.data_specification_executor.DataSpecificationExecutor.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Executes the specification</span>
 <span class="sd">        </span>
-<span class="sd">        :return: Nothing is returned</span>
-<span class="sd">        :rtype: None</span>
+<span class="sd">        :return: The number of bytes used by the image</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        :raise data_allocation.exceptions.DataReadException:\</span>
 <span class="sd">                    If a read from external storage fails</span>
 <span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>

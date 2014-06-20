@@ -86,7 +86,7 @@
 <span id="data-allocation-data-specification-executor-module"></span><h1>data_allocation.data_specification_executor module<a class="headerlink" href="#module-data_allocation.data_specification_executor" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="data_allocation.data_specification_executor.DataSpecificationExecutor">
-<em class="property">class </em><tt class="descclassname">data_allocation.data_specification_executor.</tt><tt class="descname">DataSpecificationExecutor</tt><big>(</big><em>spec_reader</em>, <em>mem_writer</em><big>)</big><a class="reference internal" href="_modules/data_allocation/data_specification_executor.html#DataSpecificationExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.data_specification_executor.DataSpecificationExecutor" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">data_allocation.data_specification_executor.</tt><tt class="descname">DataSpecificationExecutor</tt><big>(</big><em>spec_reader</em>, <em>mem_writer</em>, <em>space</em><big>)</big><a class="reference internal" href="_modules/data_allocation/data_specification_executor.html#DataSpecificationExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.data_specification_executor.DataSpecificationExecutor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
 <p>Used to execute a data specification language file to produce a memory        image</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -94,8 +94,9 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec_reader</strong> (<em>Implementation of                data_allocation.abstract_data_specification_writer.AbstractDataReader</em>) &#8211; The object to read the specification language file                    from</li>
-<li><strong>mem_writer</strong> (<em>Implementation of                data_allocation.abstract_data_specification_writer.AbstractDataWriter</em>) &#8211; The object to write the memory image to</li>
+<li><strong>spec_reader</strong> (<em>Implementation of                    data_allocation.abstract_data_specification_writer.AbstractDataReader</em>) &#8211; The object to read the specification language file                    from</li>
+<li><strong>mem_writer</strong> (<em>Implementation of                    data_allocation.abstract_data_specification_writer.AbstractDataWriter</em>) &#8211; The object to write the memory image to</li>
+<li><strong>space</strong> (<em>int</em>) &#8211; The amount of space into which the final image must fit,                    in bytes</li>
 </ul>
 </td>
 </tr>
@@ -115,10 +116,10 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Nothing is returned</p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The number of bytes used by the image</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">None</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">int</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">

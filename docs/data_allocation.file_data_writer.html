@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>data_allocation.file_data_writer module &mdash; data_allocation  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="data_allocation  documentation" href="index.html" />
+    <link rel="up" title="data_allocation package" href="data_allocation.html" />
+    <link rel="next" title="data_allocation.exceptions module" href="data_allocation.exceptions.html" />
+    <link rel="prev" title="data_allocation.file_data_reader module" href="data_allocation.file_data_reader.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.exceptions.html" title="data_allocation.exceptions module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.file_data_reader.html" title="data_allocation.file_data_reader module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
+          <li><a href="data_allocation.html" accesskey="U">data_allocation package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="data_allocation.file_data_reader.html"
+                        title="previous chapter">data_allocation.file_data_reader module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="data_allocation.exceptions.html"
+                        title="next chapter">data_allocation.exceptions module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/data_allocation.file_data_writer.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-data_allocation.file_data_writer">
+<span id="data-allocation-file-data-writer-module"></span><h1>data_allocation.file_data_writer module<a class="headerlink" href="#module-data_allocation.file_data_writer" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="data_allocation.file_data_writer.FileDataWriter">
+<em class="property">class </em><tt class="descclassname">data_allocation.file_data_writer.</tt><tt class="descname">FileDataWriter</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_writer.html#FileDataWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_writer.FileDataWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_allocation.abstract_data_writer.html#data_allocation.abstract_data_writer.AbstractDataWriter" title="data_allocation.abstract_data_writer.AbstractDataWriter"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.abstract_data_writer.AbstractDataWriter</span></tt></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; The file to write to</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_allocation.exceptions.html#data_allocation.exceptions.DataWriteException" title="data_allocation.exceptions.DataWriteException">data_allocation.exceptions.DataWriteException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the file cannot
+found or opened for writing</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="data_allocation.file_data_writer.FileDataWriter.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_writer.html#FileDataWriter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_writer.FileDataWriter.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="data_allocation.abstract_data_writer.html#data_allocation.abstract_data_writer.AbstractDataWriter.close" title="data_allocation.abstract_data_writer.AbstractDataWriter.close"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_writer.AbstractDataWriter.close()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data_allocation.file_data_writer.FileDataWriter.write_bytes">
+<tt class="descname">write_bytes</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_writer.html#FileDataWriter.write_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_writer.FileDataWriter.write_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="data_allocation.abstract_data_writer.html#data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes" title="data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes()</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.exceptions.html" title="data_allocation.exceptions module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.file_data_reader.html" title="data_allocation.file_data_reader module"
+             >previous</a> |</li>
+        <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
+          <li><a href="data_allocation.html" >data_allocation package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>data_allocation.file_data_reader module &mdash; data_allocation  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="data_allocation  documentation" href="index.html" />
+    <link rel="up" title="data_allocation package" href="data_allocation.html" />
+    <link rel="next" title="data_allocation.file_data_writer module" href="data_allocation.file_data_writer.html" />
+    <link rel="prev" title="data_allocation.data_specification_generator module" href="data_allocation.data_specification_generator.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.file_data_writer.html" title="data_allocation.file_data_writer module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.data_specification_generator.html" title="data_allocation.data_specification_generator module"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
+          <li><a href="data_allocation.html" accesskey="U">data_allocation package</a> &raquo;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="data_allocation.data_specification_generator.html"
+                        title="previous chapter">data_allocation.data_specification_generator module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="data_allocation.file_data_writer.html"
+                        title="next chapter">data_allocation.file_data_writer module</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/data_allocation.file_data_reader.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-data_allocation.file_data_reader">
+<span id="data-allocation-file-data-reader-module"></span><h1>data_allocation.file_data_reader module<a class="headerlink" href="#module-data_allocation.file_data_reader" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="data_allocation.file_data_reader.FileDataReader">
+<em class="property">class </em><tt class="descclassname">data_allocation.file_data_reader.</tt><tt class="descname">FileDataReader</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_reader.html#FileDataReader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_reader.FileDataReader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader" title="data_allocation.abstract_data_reader.AbstractDataReader"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader</span></tt></a></p>
+<p>A reader that can read data from a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; The file to read</td>
+</tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_allocation.exceptions.html#data_allocation.exceptions.DataReadException" title="data_allocation.exceptions.DataReadException">data_allocation.exceptions.DataReadException</a>:</th></tr>
+<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If the file cannot
+found or opened for reading</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="data_allocation.file_data_reader.FileDataReader.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_reader.html#FileDataReader.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_reader.FileDataReader.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader.close" title="data_allocation.abstract_data_reader.AbstractDataReader.close"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader.close()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data_allocation.file_data_reader.FileDataReader.read_bytes">
+<tt class="descname">read_bytes</tt><big>(</big><em>n_bytes</em><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_reader.html#FileDataReader.read_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_reader.FileDataReader.read_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader.read_bytes" title="data_allocation.abstract_data_reader.AbstractDataReader.read_bytes"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader.read_bytes()</span></tt></a></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="data_allocation.file_data_reader.FileDataReader.read_bytes_into">
+<tt class="descname">read_bytes_into</tt><big>(</big><em>data</em>, <em>offset=0</em>, <em>length=None</em><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_reader.html#FileDataReader.read_bytes_into"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_reader.FileDataReader.read_bytes_into" title="Permalink to this definition">¶</a></dt>
+<dd><p>See <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader.read_bytes_into" title="data_allocation.abstract_data_reader.AbstractDataReader.read_bytes_into"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader.read_bytes_into()</span></tt></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.file_data_writer.html" title="data_allocation.file_data_writer module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.data_specification_generator.html" title="data_allocation.data_specification_generator module"
+             >previous</a> |</li>
+        <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
+          <li><a href="data_allocation.html" >data_allocation package</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Author.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

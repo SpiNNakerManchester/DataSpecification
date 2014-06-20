@@ -11,5 +11,13 @@ class FileDataWriter(AbstractDataWriter):
         """
     
     def write_bytes(self, data):
+        """ See :py:meth:`data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes`
+        """
+        # TODO
+        pass
+    
+    def close(self):
+        """ See :py:meth:`data_allocation.abstract_data_writer.AbstractDataWriter.close`
+        """
         # TODO
         pass

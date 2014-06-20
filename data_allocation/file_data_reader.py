@@ -14,9 +14,19 @@ class FileDataReader(AbstractDataReader):
         pass
     
     def read_bytes(self, n_bytes):
+        """ See :py:meth:`data_allocation.abstract_data_reader.AbstractDataReader.read_bytes`
+        """
         # TODO
         return None
     
     def read_bytes_into(self, data, offset=0, length=None):
+        """ See :py:meth:`data_allocation.abstract_data_reader.AbstractDataReader.read_bytes_into`
+        """
         # TODO
         return 0
+    
+    def close(self):
+        """ See :py:meth:`data_allocation.abstract_data_reader.AbstractDataReader.close`
+        """
+        # TODO
+        pass

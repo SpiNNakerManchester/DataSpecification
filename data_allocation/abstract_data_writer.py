@@ -22,7 +22,7 @@ class AbstractDataWriter(object):
     
     @abstractmethod
     def close(self):
-        """ Closes the writer, flushing any outstanding data to the underlying
+        """ Closes the writer, flushing any outstanding data to the underlying\
             storage.  Does not return until all data has been written.
         
         :return: Nothing is returned

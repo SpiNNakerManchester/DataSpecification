@@ -1,5 +1,5 @@
 
-class DataWriteException():
+class DataWriteException(Exception):
     """ An exception that indicates that there was an error writing\
         to the underlying medium
     """
@@ -11,7 +11,7 @@ class DataWriteException():
         """
         pass
     
-class DataReadException():
+class DataReadException(Exception):
     """ An exception that indicates that there was an error reading\
         from the underlying medium
     """

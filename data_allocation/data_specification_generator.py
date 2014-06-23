@@ -104,7 +104,7 @@ class DataSpecificationGenerator(object):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
-                data_allocation.abstract_data_specification_writer.AbstractDataWriter
+                :py:class:`data_allocation.abstract_data_writer.AbstractDataWriter`
         :param app_id: The id of the application
         :type app_id: int
         :param magic: Magic number to write to the header or None to use default

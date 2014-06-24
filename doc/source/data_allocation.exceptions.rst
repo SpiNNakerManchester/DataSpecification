@@ -23,6 +23,24 @@ data_allocation.exceptions module
     DataSpecificationUnknownTypeException
     DataWriteException
 
+.. rubric:: Classes
+
+.. autosummary::
+    DataReadException
+    DataSpecificationException
+    DataSpecificationInvalidCommandException
+    DataSpecificationInvalidTypeException
+    DataSpecificationNoMoreException
+    DataSpecificationNoRegionSelectedException
+    DataSpecificationNotAllocatedException
+    DataSpecificationParameterOutOfBoundsException
+    DataSpecificationRegionExhaustedException
+    DataSpecificationRegionInUseException
+    DataSpecificationRegionOutOfBoundsException
+    DataSpecificationRegionUnfilledException
+    DataSpecificationUnknownTypeException
+    DataWriteException
+
 .. autoexception:: DataReadException
 .. autoexception:: DataSpecificationException
 .. autoexception:: DataSpecificationInvalidCommandException

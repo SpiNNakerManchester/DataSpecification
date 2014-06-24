@@ -1,9 +1,6 @@
 data_allocation package
 =======================
 
-.. automodule:: data_allocation
-    :members:
-
 Submodules
 ----------
 

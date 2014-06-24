@@ -7,11 +7,13 @@ data_allocation.abstract_data_writer module
 
 .. autoclass:: AbstractDataWriter
 
-    .. rubric:: Methods
+    .. rubric:: Abstract Methods
 
     .. autosummary::
-        ~AbstractDataWriter.close
-        ~AbstractDataWriter.write_bytes
+        close
+        write_bytes
+
+    .. rubric:: Detailed Methods
 
     .. automethod:: close
     .. automethod:: write_bytes

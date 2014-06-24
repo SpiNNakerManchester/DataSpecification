@@ -10,7 +10,9 @@ data_allocation.data_specification_executor module
     .. rubric:: Methods
 
     .. autosummary::
-        ~DataSpecificationExecutor.execute
+        execute
+
+    .. rubric:: Detailed Methods
 
     .. automethod:: execute
 

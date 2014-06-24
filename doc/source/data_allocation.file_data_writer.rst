@@ -10,8 +10,10 @@ data_allocation.file_data_writer module
     .. rubric:: Methods
 
     .. autosummary::
-        ~FileDataWriter.close
-        ~FileDataWriter.write_bytes
+        close
+        write_bytes
+
+    .. rubric:: Detailed Methods
 
     .. automethod:: close
     .. automethod:: write_bytes

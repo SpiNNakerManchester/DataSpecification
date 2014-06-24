@@ -10,41 +10,50 @@ data_allocation.data_specification_generator module
     .. rubric:: Methods
 
     .. autosummary::
-        ~DataSpecificationGenerator.align_write_pointer
-        ~DataSpecificationGenerator.break_loop
-        ~DataSpecificationGenerator.call_arithmetic_operation
-        ~DataSpecificationGenerator.call_function
-        ~DataSpecificationGenerator.call_logic_operation
-        ~DataSpecificationGenerator.call_random_distribution
-        ~DataSpecificationGenerator.comment
-        ~DataSpecificationGenerator.copy_structure
-        ~DataSpecificationGenerator.copy_structure_parameter
-        ~DataSpecificationGenerator.declare_random_number_generator
-        ~DataSpecificationGenerator.declare_uniform_random_distribution
-        ~DataSpecificationGenerator.define_struture
-        ~DataSpecificationGenerator.else_conditional
-        ~DataSpecificationGenerator.end_conditional
-        ~DataSpecificationGenerator.end_function
-        ~DataSpecificationGenerator.end_loop
-        ~DataSpecificationGenerator.end_specification
-        ~DataSpecificationGenerator.execute_break
-        ~DataSpecificationGenerator.execute_no_operation
-        ~DataSpecificationGenerator.free_memory_region
-        ~DataSpecificationGenerator.print_struct
-        ~DataSpecificationGenerator.print_text
-        ~DataSpecificationGenerator.print_value
-        ~DataSpecificationGenerator.reserve_memory_region
-        ~DataSpecificationGenerator.save_write_pointer
-        ~DataSpecificationGenerator.set_register_value
-        ~DataSpecificationGenerator.set_structure_value
-        ~DataSpecificationGenerator.set_write_pointer
-        ~DataSpecificationGenerator.start_conditional
-        ~DataSpecificationGenerator.start_function
-        ~DataSpecificationGenerator.start_loop
-        ~DataSpecificationGenerator.switch_write_focus
-        ~DataSpecificationGenerator.write_array
-        ~DataSpecificationGenerator.write_structure
-        ~DataSpecificationGenerator.write_value
+        align_write_pointer
+        break_loop
+        call_arithmetic_operation
+        call_function
+        call_logic_operation
+        call_random_distribution
+        comment
+        copy_structure
+        copy_structure_parameter
+        declare_random_number_generator
+        declare_uniform_random_distribution
+        define_struture
+        else_conditional
+        end_conditional
+        end_function
+        end_loop
+        end_specification
+        execute_break
+        execute_no_operation
+        free_memory_region
+        print_struct
+        print_text
+        print_value
+        reserve_memory_region
+        save_write_pointer
+        set_register_value
+        set_structure_value
+        set_write_pointer
+        start_conditional
+        start_function
+        start_loop
+        switch_write_focus
+        write_array
+        write_structure
+        write_value
+
+    .. rubric:: Detailed Types
+
+    .. autoattribute:: ARITHMETIC_OPERATION
+    .. autoattribute:: CONDITION
+    .. autoattribute:: DATA_TYPE
+    .. autoattribute:: LOGIC_OPERATION
+    .. autoattribute:: RANDOM_NUMBER_GENERATOR_TYPE
+    .. rubric:: Detailed Methods
 
     .. automethod:: align_write_pointer
     .. automethod:: break_loop

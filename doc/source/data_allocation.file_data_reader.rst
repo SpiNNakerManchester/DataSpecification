@@ -10,9 +10,11 @@ data_allocation.file_data_reader module
     .. rubric:: Methods
 
     .. autosummary::
-        ~FileDataReader.close
-        ~FileDataReader.read_bytes
-        ~FileDataReader.read_bytes_into
+        close
+        read_bytes
+        read_bytes_into
+
+    .. rubric:: Detailed Methods
 
     .. automethod:: close
     .. automethod:: read_bytes

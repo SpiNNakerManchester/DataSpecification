@@ -104,6 +104,27 @@ def get_private_superclass_public_members(cls, typ):
                 items.extend(get_private_superclass_public_members(base, typ))
     return items
 
+def get_summary(items, title, indent, min_items=0):
+    directive = ''
+    if len(items) > min_items:
+        directive += '%s.. rubric:: %s\n\n' % (indent, title)
+        directive += '%s.. autosummary::\n' % indent
+        for item in items:
+            directive += '%s    %s\n' % (indent, item)
+        directive += '\n'
+    return directive
+
+def split_into_abstract_and_non_abstract(cls, items, abstract_property):
+    abstract = []
+    non_abstract = []
+    for item in items:
+        obj = getattr(cls, item)
+        if hasattr(obj, abstract_property):
+            abstract.append(item)
+        else:
+            non_abstract.append(item)
+    return abstract, non_abstract
+
 def format_directive(module, package=None):
     """Create the automodule directive and add the options."""
     name, obj, parent = import_by_name(makename(package, module))
@@ -118,30 +139,11 @@ def format_directive(module, package=None):
     
     directive += '.. currentmodule:: %s\n\n' % makename(package, module)
     
-    if len(functions) > 0:
-        directive += '.. rubric:: Functions\n\n'
-        directive += '.. autosummary::\n'
-        for function in functions:
-            directive += '    %s\n' % function
-        directive += '\n'
-        
-    if len(exceptions) > 0:
-        if (len(exceptions) > 1):
-            directive += '.. rubric:: Exceptions\n\n'
-            directive += '.. autosummary::\n'
-        
-            for exception in exceptions:
-                directive += '    %s\n' % exception
-            directive += '\n'
+    directive += get_summary(functions, "Functions", "")
     
-    if len(classes) > 0:
-        if (len(classes) > 1):
-            directive += '.. rubric:: Classes\n\n'
-            directive += '.. autosummary::\n'
-        
-            for cls in classes:
-                directive += '    %s\n' % cls
-            directive += '\n'
+    directive += get_summary(exceptions, "Exceptions", "", min_items=1)
+    
+    directive += get_summary(exceptions, "Classes", "", min_items=1)
             
     for function in functions:
         directive += '.. autofunction:: %s\n' % function
@@ -156,29 +158,34 @@ def format_directive(module, package=None):
                 "%s.%s" % (module, cls)))
         attributes = get_public_members(cls_obj, 'attribute')
         methods = get_public_members(cls_obj, 'method')
+        subclasses = get_public_members(cls_obj, 'class')
         attributes.extend(get_private_superclass_public_members(cls_obj, 
                 'attribute'))
         methods.extend(get_private_superclass_public_members(cls_obj, 'method'))
         
-        if len(attributes) > 0:
-            directive += '    .. rubric:: Attributes\n\n'
-            directive += '    .. autosummary::\n'
-            
-            for attribute in attributes:
-                directive += '        %s\n' % attribute
-            directive += '\n'
+        abstract_attrs, real_attrs = split_into_abstract_and_non_abstract(
+                cls_obj, attributes, "__isabstractattribute__")
+        abstract_methods, real_methods = split_into_abstract_and_non_abstract(
+                cls_obj, methods, "__isabstractmethod__")
+        
+        directive += get_summary(abstract_attrs, "Abstract Attributes", "    ")
+        
+        directive += get_summary(real_attrs, "Attributes", "    ")
+        
+        directive += get_summary(abstract_methods, "Abstract Methods", "    ")
+        
+        directive += get_summary(real_methods, "Methods", "    ")
+        
+        if len(subclasses) > 0:
+            directive += '    .. rubric:: Detailed Types\n\n'
+            for subcls in subclasses:
+                directive += '    .. autoattribute:: %s\n' % subcls
         
         if len(methods) > 0:
-            directive += '    .. rubric:: Methods\n\n'
-            directive += '    .. autosummary::\n'
-            
+            directive += '    .. rubric:: Detailed Methods\n\n'
             for method in methods:
-                directive += '        ~%s.%s\n' % (cls, method)
+                directive += '    .. automethod:: %s\n' % method
             directive += '\n'
-        
-        for method in methods:
-            directive += '    .. automethod:: %s\n' % method
-        directive += '\n'
     
     return directive
 

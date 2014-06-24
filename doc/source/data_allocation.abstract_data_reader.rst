@@ -7,12 +7,14 @@ data_allocation.abstract_data_reader module
 
 .. autoclass:: AbstractDataReader
 
-    .. rubric:: Methods
+    .. rubric:: Abstract Methods
 
     .. autosummary::
-        ~AbstractDataReader.close
-        ~AbstractDataReader.read_bytes
-        ~AbstractDataReader.read_bytes_into
+        close
+        read_bytes
+        read_bytes_into
+
+    .. rubric:: Detailed Methods
 
     .. automethod:: close
     .. automethod:: read_bytes

@@ -87,8 +87,23 @@
 <dl class="class">
 <dt id="data_allocation.abstract_data_writer.AbstractDataWriter">
 <em class="property">class </em><tt class="descclassname">data_allocation.abstract_data_writer.</tt><tt class="descname">AbstractDataWriter</tt><a class="reference internal" href="_modules/data_allocation/abstract_data_writer.html#AbstractDataWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.abstract_data_writer.AbstractDataWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Abstract writer used to write data somewhere</p>
+<dd><p>Abstract writer used to write data somewhere</p>
+<p class="rubric">Abstract Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.abstract_data_writer.AbstractDataWriter.close" title="data_allocation.abstract_data_writer.AbstractDataWriter.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<td>Closes the writer, flushing any outstanding data to the underlying            storage.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes" title="data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes"><tt class="xref py py-obj docutils literal"><span class="pre">write_bytes</span></tt></a>(data)</td>
+<td>Write some bytes of data to the underlying storage.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
 <dl class="method">
 <dt id="data_allocation.abstract_data_writer.AbstractDataWriter.close">
 <tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_allocation/abstract_data_writer.html#AbstractDataWriter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.abstract_data_writer.AbstractDataWriter.close" title="Permalink to this definition">¶</a></dt>

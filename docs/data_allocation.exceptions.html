@@ -25,7 +25,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="data_allocation  documentation" href="index.html" />
     <link rel="up" title="data_allocation package" href="data_allocation.html" />
-    <link rel="prev" title="data_allocation.file_data_writer module" href="data_allocation.file_data_writer.html" /> 
+    <link rel="next" title="data_allocation.file_data_reader module" href="data_allocation.file_data_reader.html" />
+    <link rel="prev" title="data_allocation.data_specification_generator module" href="data_allocation.data_specification_generator.html" /> 
   </head>
   <body>
     <div class="related">
@@ -38,7 +39,10 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_allocation.file_data_writer.html" title="data_allocation.file_data_writer module"
+          <a href="data_allocation.file_data_reader.html" title="data_allocation.file_data_reader module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.data_specification_generator.html" title="data_allocation.data_specification_generator module"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
           <li><a href="data_allocation.html" accesskey="U">data_allocation package</a> &raquo;</li> 
@@ -47,8 +51,11 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="data_allocation.file_data_writer.html"
-                        title="previous chapter">data_allocation.file_data_writer module</a></p>
+  <p class="topless"><a href="data_allocation.data_specification_generator.html"
+                        title="previous chapter">data_allocation.data_specification_generator module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="data_allocation.file_data_reader.html"
+                        title="next chapter">data_allocation.file_data_reader module</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/data_allocation.exceptions.txt"
@@ -77,9 +84,111 @@
             
   <div class="section" id="module-data_allocation.exceptions">
 <span id="data-allocation-exceptions-module"></span><h1>data_allocation.exceptions module<a class="headerlink" href="#module-data_allocation.exceptions" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
+<p class="rubric">Exceptions</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataReadException" title="data_allocation.exceptions.DataReadException"><tt class="xref py py-obj docutils literal"><span class="pre">DataReadException</span></tt></a>(message)</td>
+<td>An exception that indicates that there was an error reading        from the underlying medium</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationException</span></tt></a>()</td>
+<td>A general purpose exception indicating that something went        wrong when interacting with a Data Specification</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationInvalidCommandException" title="data_allocation.exceptions.DataSpecificationInvalidCommandException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationInvalidCommandException</span></tt></a>(command)</td>
+<td>An exception that indicates that the command being requested cannot be</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationInvalidTypeException" title="data_allocation.exceptions.DataSpecificationInvalidTypeException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationInvalidTypeException</span></tt></a>(...)</td>
+<td>An exception that indicates that the value of the type given does not        match that expected</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationNoMoreException" title="data_allocation.exceptions.DataSpecificationNoMoreException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationNoMoreException</span></tt></a>(item_type,&nbsp;...)</td>
+<td>An exception that indicates that there is no more space for the        requested item</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationNoRegionSelectedException" title="data_allocation.exceptions.DataSpecificationNoRegionSelectedException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationNoRegionSelectedException</span></tt></a>(command)</td>
+<td>An exception that indicates that a memory region has not been selected</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationNotAllocatedException" title="data_allocation.exceptions.DataSpecificationNotAllocatedException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationNotAllocatedException</span></tt></a>(...)</td>
+<td>An exception that indicates that an item is being used        that has not been allocated</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException" title="data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationParameterOutOfBoundsException</span></tt></a>(...)</td>
+<td>An exception that indicates that a parameter value was outside of the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionExhaustedException" title="data_allocation.exceptions.DataSpecificationRegionExhaustedException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionExhaustedException</span></tt></a>(...)</td>
+<td>An exception that indicates that a region has run out of memory        whilst some data is being written</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionInUseException" title="data_allocation.exceptions.DataSpecificationRegionInUseException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionInUseException</span></tt></a>(region)</td>
+<td>An exception that indicates that a region has already been        allocated</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException" title="data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionOutOfBoundsException</span></tt></a>(...)</td>
+<td>An exception that indicates that an offset into a region is out        of bounds for that region</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionUnfilledException" title="data_allocation.exceptions.DataSpecificationRegionUnfilledException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionUnfilledException</span></tt></a>(...)</td>
+<td>An exception that indicates that a memory region is being used        that was originally requested to be unfilled</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationUnknownTypeException" title="data_allocation.exceptions.DataSpecificationUnknownTypeException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationUnknownTypeException</span></tt></a>(...)</td>
+<td>An exception that indicates that the value of the requested type        is unknown</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataWriteException" title="data_allocation.exceptions.DataWriteException"><tt class="xref py py-obj docutils literal"><span class="pre">DataWriteException</span></tt></a>(message)</td>
+<td>An exception that indicates that there was an error writing        to the underlying medium</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataReadException" title="data_allocation.exceptions.DataReadException"><tt class="xref py py-obj docutils literal"><span class="pre">DataReadException</span></tt></a>(message)</td>
+<td>An exception that indicates that there was an error reading        from the underlying medium</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationException</span></tt></a>()</td>
+<td>A general purpose exception indicating that something went        wrong when interacting with a Data Specification</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationInvalidCommandException" title="data_allocation.exceptions.DataSpecificationInvalidCommandException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationInvalidCommandException</span></tt></a>(command)</td>
+<td>An exception that indicates that the command being requested cannot be</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationInvalidTypeException" title="data_allocation.exceptions.DataSpecificationInvalidTypeException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationInvalidTypeException</span></tt></a>(...)</td>
+<td>An exception that indicates that the value of the type given does not        match that expected</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationNoMoreException" title="data_allocation.exceptions.DataSpecificationNoMoreException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationNoMoreException</span></tt></a>(item_type,&nbsp;...)</td>
+<td>An exception that indicates that there is no more space for the        requested item</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationNoRegionSelectedException" title="data_allocation.exceptions.DataSpecificationNoRegionSelectedException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationNoRegionSelectedException</span></tt></a>(command)</td>
+<td>An exception that indicates that a memory region has not been selected</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationNotAllocatedException" title="data_allocation.exceptions.DataSpecificationNotAllocatedException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationNotAllocatedException</span></tt></a>(...)</td>
+<td>An exception that indicates that an item is being used        that has not been allocated</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException" title="data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationParameterOutOfBoundsException</span></tt></a>(...)</td>
+<td>An exception that indicates that a parameter value was outside of the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionExhaustedException" title="data_allocation.exceptions.DataSpecificationRegionExhaustedException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionExhaustedException</span></tt></a>(...)</td>
+<td>An exception that indicates that a region has run out of memory        whilst some data is being written</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionInUseException" title="data_allocation.exceptions.DataSpecificationRegionInUseException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionInUseException</span></tt></a>(region)</td>
+<td>An exception that indicates that a region has already been        allocated</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException" title="data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionOutOfBoundsException</span></tt></a>(...)</td>
+<td>An exception that indicates that an offset into a region is out        of bounds for that region</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationRegionUnfilledException" title="data_allocation.exceptions.DataSpecificationRegionUnfilledException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationRegionUnfilledException</span></tt></a>(...)</td>
+<td>An exception that indicates that a memory region is being used        that was originally requested to be unfilled</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.exceptions.DataSpecificationUnknownTypeException" title="data_allocation.exceptions.DataSpecificationUnknownTypeException"><tt class="xref py py-obj docutils literal"><span class="pre">DataSpecificationUnknownTypeException</span></tt></a>(...)</td>
+<td>An exception that indicates that the value of the requested type        is unknown</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.exceptions.DataWriteException" title="data_allocation.exceptions.DataWriteException"><tt class="xref py py-obj docutils literal"><span class="pre">DataWriteException</span></tt></a>(message)</td>
+<td>An exception that indicates that there was an error writing        to the underlying medium</td>
+</tr>
+</tbody>
+</table>
+<dl class="exception">
 <dt id="data_allocation.exceptions.DataReadException">
-<em class="property">class </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataReadException</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataReadException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataReadException" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataReadException</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataReadException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataReadException" title="Permalink to this definition">¶</a></dt>
 <dd><p>An exception that indicates that there was an error reading        from the underlying medium</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -94,15 +203,13 @@
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationException</tt><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">exceptions.Exception</span></tt></p>
-<p>A general purpose exception indicating that something went        wrong when interacting with a Data Specification</p>
+<dd><p>A general purpose exception indicating that something went        wrong when interacting with a Data Specification</p>
 </dd></dl>
 
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationInvalidCommandException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationInvalidCommandException</tt><big>(</big><em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationInvalidCommandException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationInvalidCommandException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that the command being requested cannot be
+<dd><p>An exception that indicates that the command being requested cannot be
 executed at this point in the specification</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -117,8 +224,7 @@ executed at this point in the specification</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationInvalidTypeException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationInvalidTypeException</tt><big>(</big><em>type_name</em>, <em>requested_value</em>, <em>expected_value</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationInvalidTypeException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationInvalidTypeException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that the value of the type given does not        match that expected</p>
+<dd><p>An exception that indicates that the value of the type given does not        match that expected</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -138,8 +244,7 @@ executed at this point in the specification</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationNoMoreException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationNoMoreException</tt><big>(</big><em>item_type</em>, <em>items_allocated</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationNoMoreException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationNoMoreException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that there is no more space for the        requested item</p>
+<dd><p>An exception that indicates that there is no more space for the        requested item</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -157,8 +262,7 @@ executed at this point in the specification</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationNoRegionSelectedException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationNoRegionSelectedException</tt><big>(</big><em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationNoRegionSelectedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationNoRegionSelectedException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that a memory region has not been selected</p>
+<dd><p>An exception that indicates that a memory region has not been selected</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -172,8 +276,7 @@ executed at this point in the specification</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationNotAllocatedException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationNotAllocatedException</tt><big>(</big><em>item_type</em>, <em>item_id</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationNotAllocatedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationNotAllocatedException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that an item is being used        that has not been allocated</p>
+<dd><p>An exception that indicates that an item is being used        that has not been allocated</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -192,8 +295,7 @@ executed at this point in the specification</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationParameterOutOfBoundsException</tt><big>(</big><em>parameter</em>, <em>value</em>, <em>range_min</em>, <em>range_max</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationParameterOutOfBoundsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that a parameter value was outside of the
+<dd><p>An exception that indicates that a parameter value was outside of the
 allowed bounds</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -215,8 +317,7 @@ allowed bounds</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationRegionExhaustedException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationRegionExhaustedException</tt><big>(</big><em>region</em>, <em>region_size</em>, <em>allocated_size</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationRegionExhaustedException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationRegionExhaustedException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that a region has run out of memory        whilst some data is being written</p>
+<dd><p>An exception that indicates that a region has run out of memory        whilst some data is being written</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -236,8 +337,7 @@ allowed bounds</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationRegionInUseException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationRegionInUseException</tt><big>(</big><em>region</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationRegionInUseException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationRegionInUseException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that a region has already been        allocated</p>
+<dd><p>An exception that indicates that a region has already been        allocated</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -251,8 +351,7 @@ allowed bounds</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationRegionOutOfBoundsException</tt><big>(</big><em>region</em>, <em>region_size</em>, <em>requested_offset</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationRegionOutOfBoundsException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that an offset into a region is out        of bounds for that region</p>
+<dd><p>An exception that indicates that an offset into a region is out        of bounds for that region</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -272,8 +371,7 @@ allowed bounds</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationRegionUnfilledException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationRegionUnfilledException</tt><big>(</big><em>region</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationRegionUnfilledException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationRegionUnfilledException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that a memory region is being used        that was originally requested to be unfilled</p>
+<dd><p>An exception that indicates that a memory region is being used        that was originally requested to be unfilled</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -291,8 +389,7 @@ allowed bounds</p>
 <dl class="exception">
 <dt id="data_allocation.exceptions.DataSpecificationUnknownTypeException">
 <em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataSpecificationUnknownTypeException</tt><big>(</big><em>type_name</em>, <em>requested_value</em>, <em>command</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataSpecificationUnknownTypeException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataSpecificationUnknownTypeException" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#data_allocation.exceptions.DataSpecificationException" title="data_allocation.exceptions.DataSpecificationException"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.exceptions.DataSpecificationException</span></tt></a></p>
-<p>An exception that indicates that the value of the requested type        is unknown</p>
+<dd><p>An exception that indicates that the value of the requested type        is unknown</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -308,9 +405,9 @@ allowed bounds</p>
 </table>
 </dd></dl>
 
-<dl class="class">
+<dl class="exception">
 <dt id="data_allocation.exceptions.DataWriteException">
-<em class="property">class </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataWriteException</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataWriteException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataWriteException" title="Permalink to this definition">¶</a></dt>
+<em class="property">exception </em><tt class="descclassname">data_allocation.exceptions.</tt><tt class="descname">DataWriteException</tt><big>(</big><em>message</em><big>)</big><a class="reference internal" href="_modules/data_allocation/exceptions.html#DataWriteException"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.exceptions.DataWriteException" title="Permalink to this definition">¶</a></dt>
 <dd><p>An exception that indicates that there was an error writing        to the underlying medium</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -340,7 +437,10 @@ allowed bounds</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_allocation.file_data_writer.html" title="data_allocation.file_data_writer module"
+          <a href="data_allocation.file_data_reader.html" title="data_allocation.file_data_reader module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data_allocation.data_specification_generator.html" title="data_allocation.data_specification_generator module"
              >previous</a> |</li>
         <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
           <li><a href="data_allocation.html" >data_allocation package</a> &raquo;</li> 

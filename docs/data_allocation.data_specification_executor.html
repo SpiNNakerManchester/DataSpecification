@@ -87,15 +87,14 @@
 <dl class="class">
 <dt id="data_allocation.data_specification_executor.DataSpecificationExecutor">
 <em class="property">class </em><tt class="descclassname">data_allocation.data_specification_executor.</tt><tt class="descname">DataSpecificationExecutor</tt><big>(</big><em>spec_reader</em>, <em>mem_writer</em>, <em>space</em><big>)</big><a class="reference internal" href="_modules/data_allocation/data_specification_executor.html#DataSpecificationExecutor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.data_specification_executor.DataSpecificationExecutor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Used to execute a data specification language file to produce a memory        image</p>
+<dd><p>Used to execute a data specification language file to produce a memory        image</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec_reader</strong> (<em>Implementation of                    data_allocation.abstract_data_specification_writer.AbstractDataReader</em>) &#8211; The object to read the specification language file                    from</li>
-<li><strong>mem_writer</strong> (<em>Implementation of                    data_allocation.abstract_data_specification_writer.AbstractDataWriter</em>) &#8211; The object to write the memory image to</li>
+<li><strong>spec_reader</strong> (Implementation of                    <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader" title="data_allocation.abstract_data_reader.AbstractDataReader"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader</span></tt></a>) &#8211; The object to read the specification language file                    from</li>
+<li><strong>mem_writer</strong> (Implementation of                    <a class="reference internal" href="data_allocation.abstract_data_writer.html#data_allocation.abstract_data_writer.AbstractDataWriter" title="data_allocation.abstract_data_writer.AbstractDataWriter"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.abstract_data_writer.AbstractDataWriter</span></tt></a>) &#8211; The object to write the memory image to</li>
 <li><strong>space</strong> (<em>int</em>) &#8211; The amount of space into which the final image must fit,                    in bytes</li>
 </ul>
 </td>
@@ -108,6 +107,19 @@
 </tr>
 </tbody>
 </table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_executor.DataSpecificationExecutor.execute" title="data_allocation.data_specification_executor.DataSpecificationExecutor.execute"><tt class="xref py py-obj docutils literal"><span class="pre">execute</span></tt></a>()</td>
+<td>Executes the specification</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
 <dl class="method">
 <dt id="data_allocation.data_specification_executor.DataSpecificationExecutor.execute">
 <tt class="descname">execute</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_allocation/data_specification_executor.html#DataSpecificationExecutor.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.data_specification_executor.DataSpecificationExecutor.execute" title="Permalink to this definition">¶</a></dt>

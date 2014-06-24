@@ -64,7 +64,7 @@
           <div class="body">
             
   <h1>Source code for data_allocation.exceptions</h1><div class="highlight"><pre>
-<span class="k">class</span> <span class="nc">DataWriteException</span><span class="p">():</span>
+<span class="k">class</span> <span class="nc">DataWriteException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
 <div class="viewcode-block" id="DataWriteException"><a class="viewcode-back" href="../../data_allocation.exceptions.html#data_allocation.exceptions.DataWriteException">[docs]</a>    <span class="sd">&quot;&quot;&quot; An exception that indicates that there was an error writing\</span>
 <span class="sd">        to the underlying medium</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -76,7 +76,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     
-<span class="k">class</span> <span class="nc">DataReadException</span><span class="p">():</span></div>
+<span class="k">class</span> <span class="nc">DataReadException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span></div>
 <div class="viewcode-block" id="DataReadException"><a class="viewcode-back" href="../../data_allocation.exceptions.html#data_allocation.exceptions.DataReadException">[docs]</a>    <span class="sd">&quot;&quot;&quot; An exception that indicates that there was an error reading\</span>
 <span class="sd">        from the underlying medium</span>
 <span class="sd">    &quot;&quot;&quot;</span>

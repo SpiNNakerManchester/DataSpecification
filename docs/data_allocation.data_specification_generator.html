@@ -25,7 +25,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="data_allocation  documentation" href="index.html" />
     <link rel="up" title="data_allocation package" href="data_allocation.html" />
-    <link rel="next" title="data_allocation.file_data_reader module" href="data_allocation.file_data_reader.html" />
+    <link rel="next" title="data_allocation.exceptions module" href="data_allocation.exceptions.html" />
     <link rel="prev" title="data_allocation.data_specification_executor module" href="data_allocation.data_specification_executor.html" /> 
   </head>
   <body>
@@ -39,7 +39,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_allocation.file_data_reader.html" title="data_allocation.file_data_reader module"
+          <a href="data_allocation.exceptions.html" title="data_allocation.exceptions module"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="data_allocation.data_specification_executor.html" title="data_allocation.data_specification_executor module"
@@ -54,8 +54,8 @@
   <p class="topless"><a href="data_allocation.data_specification_executor.html"
                         title="previous chapter">data_allocation.data_specification_executor module</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="data_allocation.file_data_reader.html"
-                        title="next chapter">data_allocation.file_data_reader module</a></p>
+  <p class="topless"><a href="data_allocation.exceptions.html"
+                        title="next chapter">data_allocation.exceptions module</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/data_allocation.data_specification_generator.txt"
@@ -87,14 +87,13 @@
 <dl class="class">
 <dt id="data_allocation.data_specification_generator.DataSpecificationGenerator">
 <em class="property">class </em><tt class="descclassname">data_allocation.data_specification_generator.</tt><tt class="descname">DataSpecificationGenerator</tt><big>(</big><em>spec_writer</em>, <em>app_id</em>, <em>magic=None</em>, <em>write_text=False</em><big>)</big><a class="reference internal" href="_modules/data_allocation/data_specification_generator.html#DataSpecificationGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
-<p>Used to generate a data specification language file that can be        executed to produce a memory image</p>
+<dd><p>Used to generate a data specification language file that can be        executed to produce a memory image</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec_writer</strong> (<em>Implementation of                data_allocation.abstract_data_specification_writer.AbstractDataWriter</em>) &#8211; The object to write the specification to</li>
+<li><strong>spec_writer</strong> (Implementation of                <a class="reference internal" href="data_allocation.abstract_data_writer.html#data_allocation.abstract_data_writer.AbstractDataWriter" title="data_allocation.abstract_data_writer.AbstractDataWriter"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.abstract_data_writer.AbstractDataWriter</span></tt></a>) &#8211; The object to write the specification to</li>
 <li><strong>app_id</strong> (<em>int</em>) &#8211; The id of the application</li>
 <li><strong>magic</strong> (<em>int</em>) &#8211; Magic number to write to the header or None to use default</li>
 <li><strong>write_text</strong> (<em>bool</em>) &#8211; Determines if a text version of the specification                    is to be written</li>
@@ -107,9 +106,124 @@
 </tr>
 </tbody>
 </table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.align_write_pointer" title="data_allocation.data_specification_generator.DataSpecificationGenerator.align_write_pointer"><tt class="xref py py-obj docutils literal"><span class="pre">align_write_pointer</span></tt></a>(log_block_size[,&nbsp;...])</td>
+<td>Insert command to align the write pointer against a power-of-2            block size in bytes.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.break_loop" title="data_allocation.data_specification_generator.DataSpecificationGenerator.break_loop"><tt class="xref py py-obj docutils literal"><span class="pre">break_loop</span></tt></a>()</td>
+<td>Insert command to break out of a loop before it has completed</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.call_arithmetic_operation" title="data_allocation.data_specification_generator.DataSpecificationGenerator.call_arithmetic_operation"><tt class="xref py py-obj docutils literal"><span class="pre">call_arithmetic_operation</span></tt></a>(register_id,&nbsp;...)</td>
+<td>Insert command to perform an arithmetic operation on two signed or            unsigned values and store the result in a register</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.call_function" title="data_allocation.data_specification_generator.DataSpecificationGenerator.call_function"><tt class="xref py py-obj docutils literal"><span class="pre">call_function</span></tt></a>(function_id,&nbsp;structure_ids)</td>
+<td>Insert command to call a function</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.call_logic_operation" title="data_allocation.data_specification_generator.DataSpecificationGenerator.call_logic_operation"><tt class="xref py py-obj docutils literal"><span class="pre">call_logic_operation</span></tt></a>(register_id,&nbsp;operand_1,&nbsp;...)</td>
+<td>Insert command to perform a logic operation on two signed or            unsigned values and store the result in a register</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.call_random_distribution" title="data_allocation.data_specification_generator.DataSpecificationGenerator.call_random_distribution"><tt class="xref py py-obj docutils literal"><span class="pre">call_random_distribution</span></tt></a>(distribution_id,&nbsp;...)</td>
+<td>Insert command to get the next random number from  a random            distribution, placing the result in a register to be used in a</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.comment" title="data_allocation.data_specification_generator.DataSpecificationGenerator.comment"><tt class="xref py py-obj docutils literal"><span class="pre">comment</span></tt></a>(comment)</td>
+<td>Write a comment to the text version of the specification.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.copy_structure" title="data_allocation.data_specification_generator.DataSpecificationGenerator.copy_structure"><tt class="xref py py-obj docutils literal"><span class="pre">copy_structure</span></tt></a>(source_structure_id[,&nbsp;...])</td>
+<td>Insert command to copy a structure, possibly overwriting another            structure</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.copy_structure_parameter" title="data_allocation.data_specification_generator.DataSpecificationGenerator.copy_structure_parameter"><tt class="xref py py-obj docutils literal"><span class="pre">copy_structure_parameter</span></tt></a>(...)</td>
+<td>Insert command to copy the value of a parameter from one structure</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.declare_random_number_generator" title="data_allocation.data_specification_generator.DataSpecificationGenerator.declare_random_number_generator"><tt class="xref py py-obj docutils literal"><span class="pre">declare_random_number_generator</span></tt></a>(rng_type,&nbsp;seed)</td>
+<td>Insert command to declare a random number generator</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.declare_uniform_random_distribution" title="data_allocation.data_specification_generator.DataSpecificationGenerator.declare_uniform_random_distribution"><tt class="xref py py-obj docutils literal"><span class="pre">declare_uniform_random_distribution</span></tt></a>(rng_id,&nbsp;...)</td>
+<td>Insert commands to declare a uniform random distribution</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.define_struture" title="data_allocation.data_specification_generator.DataSpecificationGenerator.define_struture"><tt class="xref py py-obj docutils literal"><span class="pre">define_struture</span></tt></a>(parameters)</td>
+<td>Insert commands to define a data structure</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.else_conditional" title="data_allocation.data_specification_generator.DataSpecificationGenerator.else_conditional"><tt class="xref py py-obj docutils literal"><span class="pre">else_conditional</span></tt></a>()</td>
+<td>Insert command for the else of an if...then...else construct.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.end_conditional" title="data_allocation.data_specification_generator.DataSpecificationGenerator.end_conditional"><tt class="xref py py-obj docutils literal"><span class="pre">end_conditional</span></tt></a>()</td>
+<td>Insert command to mark the end of an if...then...else construct</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.end_function" title="data_allocation.data_specification_generator.DataSpecificationGenerator.end_function"><tt class="xref py py-obj docutils literal"><span class="pre">end_function</span></tt></a>()</td>
+<td>Insert command to mark the end of a function definition</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.end_loop" title="data_allocation.data_specification_generator.DataSpecificationGenerator.end_loop"><tt class="xref py py-obj docutils literal"><span class="pre">end_loop</span></tt></a>()</td>
+<td>Insert command to indicate that this is the end of the loop.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.end_specification" title="data_allocation.data_specification_generator.DataSpecificationGenerator.end_specification"><tt class="xref py py-obj docutils literal"><span class="pre">end_specification</span></tt></a>([close_writer])</td>
+<td>Insert a command to indicate that the specification has finished            and finish writing</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.execute_break" title="data_allocation.data_specification_generator.DataSpecificationGenerator.execute_break"><tt class="xref py py-obj docutils literal"><span class="pre">execute_break</span></tt></a>()</td>
+<td>Insert command to stop execution with an exception (for debugging)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.execute_no_operation" title="data_allocation.data_specification_generator.DataSpecificationGenerator.execute_no_operation"><tt class="xref py py-obj docutils literal"><span class="pre">execute_no_operation</span></tt></a>()</td>
+<td>Insert command to execute nothing</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.free_memory_region" title="data_allocation.data_specification_generator.DataSpecificationGenerator.free_memory_region"><tt class="xref py py-obj docutils literal"><span class="pre">free_memory_region</span></tt></a>(region)</td>
+<td>Insert command to free a previously reserved memory region</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.print_struct" title="data_allocation.data_specification_generator.DataSpecificationGenerator.print_struct"><tt class="xref py py-obj docutils literal"><span class="pre">print_struct</span></tt></a>(structure_id[,&nbsp;...])</td>
+<td>Insert command to print out a structure (for debugging)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.print_text" title="data_allocation.data_specification_generator.DataSpecificationGenerator.print_text"><tt class="xref py py-obj docutils literal"><span class="pre">print_text</span></tt></a>(text)</td>
+<td>Insert command to print some text (for debugging)</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.print_value" title="data_allocation.data_specification_generator.DataSpecificationGenerator.print_value"><tt class="xref py py-obj docutils literal"><span class="pre">print_value</span></tt></a>(value[,&nbsp;value_is_register,&nbsp;...])</td>
+<td>Insert command to print out a value (for debugging)</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.reserve_memory_region" title="data_allocation.data_specification_generator.DataSpecificationGenerator.reserve_memory_region"><tt class="xref py py-obj docutils literal"><span class="pre">reserve_memory_region</span></tt></a>(region,&nbsp;size[,&nbsp;label,&nbsp;...])</td>
+<td>Insert command to reserve a memory region</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.save_write_pointer" title="data_allocation.data_specification_generator.DataSpecificationGenerator.save_write_pointer"><tt class="xref py py-obj docutils literal"><span class="pre">save_write_pointer</span></tt></a>(register_id)</td>
+<td>Insert command to save the write pointer to a register</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.set_register_value" title="data_allocation.data_specification_generator.DataSpecificationGenerator.set_register_value"><tt class="xref py py-obj docutils literal"><span class="pre">set_register_value</span></tt></a>(register_id,&nbsp;data[,&nbsp;...])</td>
+<td>Insert command to set the value of a register</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.set_structure_value" title="data_allocation.data_specification_generator.DataSpecificationGenerator.set_structure_value"><tt class="xref py py-obj docutils literal"><span class="pre">set_structure_value</span></tt></a>(structure_id,&nbsp;...[,&nbsp;...])</td>
+<td>Insert command to set a value in a structure</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.set_write_pointer" title="data_allocation.data_specification_generator.DataSpecificationGenerator.set_write_pointer"><tt class="xref py py-obj docutils literal"><span class="pre">set_write_pointer</span></tt></a>(address[,&nbsp;...])</td>
+<td>Insert command to set the position of the write pointer within the</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.start_conditional" title="data_allocation.data_specification_generator.DataSpecificationGenerator.start_conditional"><tt class="xref py py-obj docutils literal"><span class="pre">start_conditional</span></tt></a>(register_id,&nbsp;condition,&nbsp;value)</td>
+<td>Insert command to start a conditional if...then...else construct.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.start_function" title="data_allocation.data_specification_generator.DataSpecificationGenerator.start_function"><tt class="xref py py-obj docutils literal"><span class="pre">start_function</span></tt></a>(argument_by_value)</td>
+<td>Insert command to start a function definition, with up to 5            arguments, which are the ids of structures to be used within the            function, each of which can be passed by reference or by value.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.start_loop" title="data_allocation.data_specification_generator.DataSpecificationGenerator.start_loop"><tt class="xref py py-obj docutils literal"><span class="pre">start_loop</span></tt></a>(counter_register_id,&nbsp;start,&nbsp;end)</td>
+<td>Insert command to start a loop</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.switch_write_focus" title="data_allocation.data_specification_generator.DataSpecificationGenerator.switch_write_focus"><tt class="xref py py-obj docutils literal"><span class="pre">switch_write_focus</span></tt></a>(region)</td>
+<td>Insert command to switch the region being written to</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.write_array" title="data_allocation.data_specification_generator.DataSpecificationGenerator.write_array"><tt class="xref py py-obj docutils literal"><span class="pre">write_array</span></tt></a>(array)</td>
+<td>Insert command to write an array of words, causing the write pointer</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.write_structure" title="data_allocation.data_specification_generator.DataSpecificationGenerator.write_structure"><tt class="xref py py-obj docutils literal"><span class="pre">write_structure</span></tt></a>(structure_id[,&nbsp;repeats,&nbsp;...])</td>
+<td>Insert command to write a structure to the current write pointer,</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.write_value" title="data_allocation.data_specification_generator.DataSpecificationGenerator.write_value"><tt class="xref py py-obj docutils literal"><span class="pre">write_value</span></tt></a>(data[,&nbsp;data_is_register,&nbsp;...])</td>
+<td>Insert command to write a value one or more times to the current</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Types</p>
 <dl class="attribute">
 <dt id="data_allocation.data_specification_generator.DataSpecificationGenerator.ARITHMETIC_OPERATION">
-<tt class="descname">ARITHMETIC_OPERATION</tt><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.ARITHMETIC_OPERATION" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">ARITHMETIC_OPERATION</tt><em class="property"> = &lt;class 'data_allocation.data_specification_generator.Enum'&gt;</em><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.ARITHMETIC_OPERATION" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumeration of possible arithmentic operations:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -133,12 +247,11 @@
 </tr>
 </tbody>
 </table>
-<p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Enum</span></tt></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="data_allocation.data_specification_generator.DataSpecificationGenerator.CONDITION">
-<tt class="descname">CONDITION</tt><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.CONDITION" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">CONDITION</tt><em class="property"> = &lt;class 'data_allocation.data_specification_generator.Enum'&gt;</em><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.CONDITION" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumeration of possible random conditionals:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -171,12 +284,11 @@
 </tr>
 </tbody>
 </table>
-<p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Enum</span></tt></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="data_allocation.data_specification_generator.DataSpecificationGenerator.DATA_TYPE">
-<tt class="descname">DATA_TYPE</tt><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.DATA_TYPE" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">DATA_TYPE</tt><em class="property"> = &lt;class 'data_allocation.data_specification_generator.Enum'&gt;</em><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.DATA_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumeration of possible data types:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -257,12 +369,11 @@
 </tr>
 </tbody>
 </table>
-<p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Enum</span></tt></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="data_allocation.data_specification_generator.DataSpecificationGenerator.LOGIC_OPERATION">
-<tt class="descname">LOGIC_OPERATION</tt><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.LOGIC_OPERATION" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">LOGIC_OPERATION</tt><em class="property"> = &lt;class 'data_allocation.data_specification_generator.Enum'&gt;</em><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.LOGIC_OPERATION" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumeration of possible logical operations:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -295,12 +406,11 @@
 </tr>
 </tbody>
 </table>
-<p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Enum</span></tt></p>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="data_allocation.data_specification_generator.DataSpecificationGenerator.RANDOM_NUMBER_GENERATOR_TYPE">
-<tt class="descname">RANDOM_NUMBER_GENERATOR_TYPE</tt><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.RANDOM_NUMBER_GENERATOR_TYPE" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">RANDOM_NUMBER_GENERATOR_TYPE</tt><em class="property"> = &lt;class 'data_allocation.data_specification_generator.Enum'&gt;</em><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.RANDOM_NUMBER_GENERATOR_TYPE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumeration of possible random number generator types:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -318,9 +428,9 @@
 </tr>
 </tbody>
 </table>
-<p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Enum</span></tt></p>
 </dd></dl>
 
+<p class="rubric">Detailed Methods</p>
 <dl class="method">
 <dt id="data_allocation.data_specification_generator.DataSpecificationGenerator.align_write_pointer">
 <tt class="descname">align_write_pointer</tt><big>(</big><em>log_block_size</em>, <em>log_block_size_is_register=False</em>, <em>return_register_id=None</em><big>)</big><a class="reference internal" href="_modules/data_allocation/data_specification_generator.html#DataSpecificationGenerator.align_write_pointer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.data_specification_generator.DataSpecificationGenerator.align_write_pointer" title="Permalink to this definition">¶</a></dt>
@@ -1576,7 +1686,7 @@ If repeats_is_register is True, and repeats is not a                      valid 
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_allocation.file_data_reader.html" title="data_allocation.file_data_reader module"
+          <a href="data_allocation.exceptions.html" title="data_allocation.exceptions module"
              >next</a> |</li>
         <li class="right" >
           <a href="data_allocation.data_specification_executor.html" title="data_allocation.data_specification_executor module"

@@ -26,7 +26,7 @@
     <link rel="top" title="data_allocation  documentation" href="index.html" />
     <link rel="up" title="data_allocation package" href="data_allocation.html" />
     <link rel="next" title="data_allocation.file_data_writer module" href="data_allocation.file_data_writer.html" />
-    <link rel="prev" title="data_allocation.data_specification_generator module" href="data_allocation.data_specification_generator.html" /> 
+    <link rel="prev" title="data_allocation.exceptions module" href="data_allocation.exceptions.html" /> 
   </head>
   <body>
     <div class="related">
@@ -42,7 +42,7 @@
           <a href="data_allocation.file_data_writer.html" title="data_allocation.file_data_writer module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="data_allocation.data_specification_generator.html" title="data_allocation.data_specification_generator module"
+          <a href="data_allocation.exceptions.html" title="data_allocation.exceptions module"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
           <li><a href="data_allocation.html" accesskey="U">data_allocation package</a> &raquo;</li> 
@@ -51,8 +51,8 @@
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="data_allocation.data_specification_generator.html"
-                        title="previous chapter">data_allocation.data_specification_generator module</a></p>
+  <p class="topless"><a href="data_allocation.exceptions.html"
+                        title="previous chapter">data_allocation.exceptions module</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="data_allocation.file_data_writer.html"
                         title="next chapter">data_allocation.file_data_writer module</a></p>
@@ -87,8 +87,7 @@
 <dl class="class">
 <dt id="data_allocation.file_data_reader.FileDataReader">
 <em class="property">class </em><tt class="descclassname">data_allocation.file_data_reader.</tt><tt class="descname">FileDataReader</tt><big>(</big><em>filename</em><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_reader.html#FileDataReader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_reader.FileDataReader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader" title="data_allocation.abstract_data_reader.AbstractDataReader"><tt class="xref py py-class docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader</span></tt></a></p>
-<p>A reader that can read data from a file</p>
+<dd><p>A reader that can read data from a file</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -101,6 +100,25 @@ found or opened for reading</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.file_data_reader.FileDataReader.close" title="data_allocation.file_data_reader.FileDataReader.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<td>See <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader.close" title="data_allocation.abstract_data_reader.AbstractDataReader.close"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader.close()</span></tt></a></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#data_allocation.file_data_reader.FileDataReader.read_bytes" title="data_allocation.file_data_reader.FileDataReader.read_bytes"><tt class="xref py py-obj docutils literal"><span class="pre">read_bytes</span></tt></a>(n_bytes)</td>
+<td>See <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader.read_bytes" title="data_allocation.abstract_data_reader.AbstractDataReader.read_bytes"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader.read_bytes()</span></tt></a></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.file_data_reader.FileDataReader.read_bytes_into" title="data_allocation.file_data_reader.FileDataReader.read_bytes_into"><tt class="xref py py-obj docutils literal"><span class="pre">read_bytes_into</span></tt></a>(data[,&nbsp;offset,&nbsp;length])</td>
+<td>See <a class="reference internal" href="data_allocation.abstract_data_reader.html#data_allocation.abstract_data_reader.AbstractDataReader.read_bytes_into" title="data_allocation.abstract_data_reader.AbstractDataReader.read_bytes_into"><tt class="xref py py-meth docutils literal"><span class="pre">data_allocation.abstract_data_reader.AbstractDataReader.read_bytes_into()</span></tt></a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Detailed Methods</p>
 <dl class="method">
 <dt id="data_allocation.file_data_reader.FileDataReader.close">
 <tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_allocation/file_data_reader.html#FileDataReader.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.file_data_reader.FileDataReader.close" title="Permalink to this definition">¶</a></dt>
@@ -142,7 +160,7 @@ found or opened for reading</td>
           <a href="data_allocation.file_data_writer.html" title="data_allocation.file_data_writer module"
              >next</a> |</li>
         <li class="right" >
-          <a href="data_allocation.data_specification_generator.html" title="data_allocation.data_specification_generator module"
+          <a href="data_allocation.exceptions.html" title="data_allocation.exceptions module"
              >previous</a> |</li>
         <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
           <li><a href="data_allocation.html" >data_allocation package</a> &raquo;</li> 

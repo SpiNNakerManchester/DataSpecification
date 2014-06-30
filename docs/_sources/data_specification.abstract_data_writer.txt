@@ -1,11 +1,12 @@
-data_allocation.abstract_data_writer module
-===========================================
+data_specification.abstract_data_writer module
+==============================================
 
-.. automodule:: data_allocation.abstract_data_writer
+.. automodule:: data_specification.abstract_data_writer
 
-.. currentmodule:: data_allocation.abstract_data_writer
+.. currentmodule:: data_specification.abstract_data_writer
 
 .. autoclass:: AbstractDataWriter
+    :show-inheritance:
 
     .. rubric:: Abstract Methods
 

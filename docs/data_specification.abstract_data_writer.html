@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>data_allocation.abstract_data_writer module &mdash; data_allocation  documentation</title>
+    <title>data_specification.abstract_data_writer module &mdash; data_allocation  documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -24,9 +24,9 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="data_allocation  documentation" href="index.html" />
-    <link rel="up" title="data_allocation package" href="data_allocation.html" />
-    <link rel="next" title="data_allocation.data_specification_executor module" href="data_allocation.data_specification_executor.html" />
-    <link rel="prev" title="data_allocation.abstract_data_reader module" href="data_allocation.abstract_data_reader.html" /> 
+    <link rel="up" title="data_specification package" href="data_specification.html" />
+    <link rel="next" title="data_specification.data_specification_executor module" href="data_specification.data_specification_executor.html" />
+    <link rel="prev" title="data_specification.abstract_data_reader module" href="data_specification.abstract_data_reader.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,26 +39,26 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_allocation.data_specification_executor.html" title="data_allocation.data_specification_executor module"
+          <a href="data_specification.data_specification_executor.html" title="data_specification.data_specification_executor module"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="data_allocation.abstract_data_reader.html" title="data_allocation.abstract_data_reader module"
+          <a href="data_specification.abstract_data_reader.html" title="data_specification.abstract_data_reader module"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
-          <li><a href="data_allocation.html" accesskey="U">data_allocation package</a> &raquo;</li> 
+          <li><a href="data_specification.html" accesskey="U">data_specification package</a> &raquo;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="data_allocation.abstract_data_reader.html"
-                        title="previous chapter">data_allocation.abstract_data_reader module</a></p>
+  <p class="topless"><a href="data_specification.abstract_data_reader.html"
+                        title="previous chapter">data_specification.abstract_data_reader module</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="data_allocation.data_specification_executor.html"
-                        title="next chapter">data_allocation.data_specification_executor module</a></p>
+  <p class="topless"><a href="data_specification.data_specification_executor.html"
+                        title="next chapter">data_specification.data_specification_executor module</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
-    <li><a href="_sources/data_allocation.abstract_data_writer.txt"
+    <li><a href="_sources/data_specification.abstract_data_writer.txt"
            rel="nofollow">Show Source</a></li>
   </ul>
 <div id="searchbox" style="display: none">
@@ -82,12 +82,13 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-data_allocation.abstract_data_writer">
-<span id="data-allocation-abstract-data-writer-module"></span><h1>data_allocation.abstract_data_writer module<a class="headerlink" href="#module-data_allocation.abstract_data_writer" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-data_specification.abstract_data_writer">
+<span id="data-specification-abstract-data-writer-module"></span><h1>data_specification.abstract_data_writer module<a class="headerlink" href="#module-data_specification.abstract_data_writer" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="data_allocation.abstract_data_writer.AbstractDataWriter">
-<em class="property">class </em><tt class="descclassname">data_allocation.abstract_data_writer.</tt><tt class="descname">AbstractDataWriter</tt><a class="reference internal" href="_modules/data_allocation/abstract_data_writer.html#AbstractDataWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.abstract_data_writer.AbstractDataWriter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Abstract writer used to write data somewhere</p>
+<dt id="data_specification.abstract_data_writer.AbstractDataWriter">
+<em class="property">class </em><tt class="descclassname">data_specification.abstract_data_writer.</tt><tt class="descname">AbstractDataWriter</tt><a class="reference internal" href="_modules/data_specification/abstract_data_writer.html#AbstractDataWriter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_specification.abstract_data_writer.AbstractDataWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref py py-class docutils literal"><span class="pre">object</span></tt></p>
+<p>Abstract writer used to write data somewhere</p>
 <p class="rubric">Abstract Methods</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -95,18 +96,18 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#data_allocation.abstract_data_writer.AbstractDataWriter.close" title="data_allocation.abstract_data_writer.AbstractDataWriter.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
+<tr class="row-odd"><td><a class="reference internal" href="#data_specification.abstract_data_writer.AbstractDataWriter.close" title="data_specification.abstract_data_writer.AbstractDataWriter.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
 <td>Closes the writer, flushing any outstanding data to the underlying            storage.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes" title="data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes"><tt class="xref py py-obj docutils literal"><span class="pre">write_bytes</span></tt></a>(data)</td>
+<tr class="row-even"><td><a class="reference internal" href="#data_specification.abstract_data_writer.AbstractDataWriter.write_bytes" title="data_specification.abstract_data_writer.AbstractDataWriter.write_bytes"><tt class="xref py py-obj docutils literal"><span class="pre">write_bytes</span></tt></a>(data)</td>
 <td>Write some bytes of data to the underlying storage.</td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Detailed Methods</p>
 <dl class="method">
-<dt id="data_allocation.abstract_data_writer.AbstractDataWriter.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_allocation/abstract_data_writer.html#AbstractDataWriter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.abstract_data_writer.AbstractDataWriter.close" title="Permalink to this definition">¶</a></dt>
+<dt id="data_specification.abstract_data_writer.AbstractDataWriter.close">
+<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_specification/abstract_data_writer.html#AbstractDataWriter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_specification.abstract_data_writer.AbstractDataWriter.close" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closes the writer, flushing any outstanding data to the underlying            storage.  Does not return until all data has been written.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -116,7 +117,7 @@
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
-<tr class="field-odd field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_allocation.exceptions.html#data_allocation.exceptions.DataWriteException" title="data_allocation.exceptions.DataWriteException">data_allocation.exceptions.DataWriteException</a>:</th></tr>
+<tr class="field-odd field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_specification.exceptions.html#data_specification.exceptions.DataWriteException" title="data_specification.exceptions.DataWriteException">data_specification.exceptions.DataWriteException</a>:</th></tr>
 <tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occurs writing to the underlying storage</td>
 </tr>
 </tbody>
@@ -124,20 +125,20 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes">
-<tt class="descname">write_bytes</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/data_allocation/abstract_data_writer.html#AbstractDataWriter.write_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_allocation.abstract_data_writer.AbstractDataWriter.write_bytes" title="Permalink to this definition">¶</a></dt>
+<dt id="data_specification.abstract_data_writer.AbstractDataWriter.write_bytes">
+<tt class="descname">write_bytes</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/data_specification/abstract_data_writer.html#AbstractDataWriter.write_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_specification.abstract_data_writer.AbstractDataWriter.write_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write some bytes of data to the underlying storage.            Does not return until all the bytes have been written.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>iterable of bytes</em>) &#8211; The data to write</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>bytearray</em>) &#8211; The data to write</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing is returned</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_allocation.exceptions.html#data_allocation.exceptions.DataWriteException" title="data_allocation.exceptions.DataWriteException">data_allocation.exceptions.DataWriteException</a>:</th></tr>
+<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_specification.exceptions.html#data_specification.exceptions.DataWriteException" title="data_specification.exceptions.DataWriteException">data_specification.exceptions.DataWriteException</a>:</th></tr>
 <tr class="field-even field"><td>&nbsp;</td><td class="field-body">If an error occurs writing to the underlying storage</td>
 </tr>
 </tbody>
@@ -164,13 +165,13 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="data_allocation.data_specification_executor.html" title="data_allocation.data_specification_executor module"
+          <a href="data_specification.data_specification_executor.html" title="data_specification.data_specification_executor module"
              >next</a> |</li>
         <li class="right" >
-          <a href="data_allocation.abstract_data_reader.html" title="data_allocation.abstract_data_reader module"
+          <a href="data_specification.abstract_data_reader.html" title="data_specification.abstract_data_reader module"
              >previous</a> |</li>
         <li><a href="index.html">data_allocation  documentation</a> &raquo;</li>
-          <li><a href="data_allocation.html" >data_allocation package</a> &raquo;</li> 
+          <li><a href="data_specification.html" >data_specification package</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

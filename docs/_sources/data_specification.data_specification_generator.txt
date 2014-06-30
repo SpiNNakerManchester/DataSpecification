@@ -1,11 +1,45 @@
-data_allocation.data_specification_generator module
-===================================================
+data_specification.data_specification_generator module
+======================================================
 
-.. automodule:: data_allocation.data_specification_generator
+.. automodule:: data_specification.data_specification_generator
 
-.. currentmodule:: data_allocation.data_specification_generator
+.. currentmodule:: data_specification.data_specification_generator
+
+.. rubric:: Classes
+
+.. autosummary::
+    ArithmeticOperation
+    Condition
+    DataSpecificationGenerator
+    DataType
+    LogicOperation
+    RandomNumberGenerator
+
+.. autoclass:: ArithmeticOperation
+    :show-inheritance:
+
+    .. rubric:: Attributes
+
+    .. autosummary::
+        ADD
+        MULTIPLY
+        SUBTRACT
+
+.. autoclass:: Condition
+    :show-inheritance:
+
+    .. rubric:: Attributes
+
+    .. autosummary::
+        EQUAL
+        GREATER_THAN
+        GREATER_THAN_OR_EQUAL
+        LESS_THAN
+        LESS_THAN_OR_EQUAL
+        NOT_EQUAL
 
 .. autoclass:: DataSpecificationGenerator
+    :show-inheritance:
 
     .. rubric:: Methods
 
@@ -46,13 +80,6 @@ data_allocation.data_specification_generator module
         write_structure
         write_value
 
-    .. rubric:: Detailed Types
-
-    .. autoattribute:: ARITHMETIC_OPERATION
-    .. autoattribute:: CONDITION
-    .. autoattribute:: DATA_TYPE
-    .. autoattribute:: LOGIC_OPERATION
-    .. autoattribute:: RANDOM_NUMBER_GENERATOR_TYPE
     .. rubric:: Detailed Methods
 
     .. automethod:: align_write_pointer
@@ -90,4 +117,54 @@ data_allocation.data_specification_generator module
     .. automethod:: write_array
     .. automethod:: write_structure
     .. automethod:: write_value
+
+.. autoclass:: DataType
+    :show-inheritance:
+
+    .. rubric:: Attributes
+
+    .. autosummary::
+        INT16
+        INT32
+        INT64
+        INT8
+        S015
+        S031
+        S063
+        S07
+        S1615
+        S3231
+        S87
+        U016
+        U032
+        U064
+        U08
+        U1616
+        U3232
+        U88
+        UINT16
+        UINT32
+        UINT64
+        UINT8
+
+.. autoclass:: LogicOperation
+    :show-inheritance:
+
+    .. rubric:: Attributes
+
+    .. autosummary::
+        AND
+        LEFT_SHIFT
+        NOT
+        OR
+        RIGHT_SHIFT
+        XOR
+
+.. autoclass:: RandomNumberGenerator
+    :show-inheritance:
+
+    .. rubric:: Attributes
+
+    .. autosummary::
+        MERSENNE_TWISTER
 

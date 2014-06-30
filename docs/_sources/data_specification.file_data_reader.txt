@@ -1,11 +1,12 @@
-data_allocation.file_data_reader module
-=======================================
+data_specification.file_data_reader module
+==========================================
 
-.. automodule:: data_allocation.file_data_reader
+.. automodule:: data_specification.file_data_reader
 
-.. currentmodule:: data_allocation.file_data_reader
+.. currentmodule:: data_specification.file_data_reader
 
 .. autoclass:: FileDataReader
+    :show-inheritance:
 
     .. rubric:: Methods
 

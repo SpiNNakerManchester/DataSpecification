@@ -1,29 +1,11 @@
-data_allocation.exceptions module
-=================================
+data_specification.exceptions module
+====================================
 
-.. automodule:: data_allocation.exceptions
+.. automodule:: data_specification.exceptions
 
-.. currentmodule:: data_allocation.exceptions
+.. currentmodule:: data_specification.exceptions
 
 .. rubric:: Exceptions
-
-.. autosummary::
-    DataReadException
-    DataSpecificationException
-    DataSpecificationInvalidCommandException
-    DataSpecificationInvalidTypeException
-    DataSpecificationNoMoreException
-    DataSpecificationNoRegionSelectedException
-    DataSpecificationNotAllocatedException
-    DataSpecificationParameterOutOfBoundsException
-    DataSpecificationRegionExhaustedException
-    DataSpecificationRegionInUseException
-    DataSpecificationRegionOutOfBoundsException
-    DataSpecificationRegionUnfilledException
-    DataSpecificationUnknownTypeException
-    DataWriteException
-
-.. rubric:: Classes
 
 .. autosummary::
     DataReadException

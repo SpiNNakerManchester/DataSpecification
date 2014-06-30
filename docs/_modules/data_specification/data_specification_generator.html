@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>data_allocation.data_specification_generator &mdash; data_allocation  documentation</title>
+    <title>data_specification.data_specification_generator &mdash; data_allocation  documentation</title>
     
     <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -63,114 +63,106 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <h1>Source code for data_allocation.data_specification_generator</h1><div class="highlight"><pre>
-<span class="k">def</span> <span class="nf">_enum</span><span class="p">(</span><span class="o">*</span><span class="n">sequential</span><span class="p">,</span> <span class="o">**</span><span class="n">named</span><span class="p">):</span>
-    <span class="n">enums</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">,</span> 
-            <span class="nb">zip</span><span class="p">(</span><span class="n">sequential</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequential</span><span class="p">)))),</span> <span class="o">**</span><span class="n">named</span><span class="p">)</span>
-    <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="s">&#39;Enum&#39;</span><span class="p">,</span> <span class="p">(),</span> <span class="n">enums</span><span class="p">)</span>
+  <h1>Source code for data_specification.data_specification_generator</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 
-<div class="viewcode-block" id="DataSpecificationGenerator"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="DataType"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataType">[docs]</a><span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Supported data types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">UINT8</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;8-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="n">UINT16</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;16-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="n">UINT32</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&quot;32-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="n">UINT64</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s">&quot;64-bit unsigned integer&quot;</span><span class="p">)</span>
+    <span class="n">INT8</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s">&quot;8-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="n">INT16</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s">&quot;16-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="n">INT32</span> <span class="o">=</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="s">&quot;32-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="n">INT64</span> <span class="o">=</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="s">&quot;64-bit signed integer&quot;</span><span class="p">)</span>
+    <span class="n">U88</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="s">&quot;8.8 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">U1616</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="s">&quot;16.16 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">U3232</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s">&quot;32.32 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">S87</span> <span class="o">=</span> <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="s">&quot;8.7 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">S1615</span> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="s">&quot;16.15 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">S3231</span> <span class="o">=</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="s">&quot;32.31 signed fixed point number&quot;</span><span class="p">)</span> 
+    <span class="n">U08</span> <span class="o">=</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="s">&quot;0.8 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">U016</span> <span class="o">=</span> <span class="p">(</span><span class="mi">17</span><span class="p">,</span> <span class="s">&quot;0.16 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">U032</span> <span class="o">=</span> <span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="s">&quot;0.32 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">U064</span> <span class="o">=</span> <span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="s">&quot;0.64 unsigned fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">S07</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="s">&quot;0.7 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">S015</span> <span class="o">=</span> <span class="p">(</span><span class="mi">21</span><span class="p">,</span> <span class="s">&quot;0.15 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">S031</span> <span class="o">=</span> <span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="s">&quot;0.32 signed fixed point number&quot;</span><span class="p">)</span>
+    <span class="n">S063</span> <span class="o">=</span> <span class="p">(</span><span class="mi">23</span><span class="p">,</span> <span class="s">&quot;0.63 signed fixed point number&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+   
+     </div>
+<div class="viewcode-block" id="RandomNumberGenerator"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.RandomNumberGenerator">[docs]</a><span class="k">class</span> <span class="nc">RandomNumberGenerator</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Random number generator types</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">MERSENNE_TWISTER</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;The well-known Mercenne Twister PRNG&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+
+</div>
+<div class="viewcode-block" id="Condition"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.Condition">[docs]</a><span class="k">class</span> <span class="nc">Condition</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Comparison Operations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">EQUAL</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Compare the operands for equality&quot;</span><span class="p">)</span>
+    <span class="n">NOT_EQUAL</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Compare the operands for inequality&quot;</span><span class="p">)</span>
+    <span class="n">LESS_THAN_OR_EQUAL</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&quot;True if the first operand is &lt;= the second&quot;</span><span class="p">)</span>
+    <span class="n">LESS_THAN</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s">&quot;True if the first operand is &lt;  the second&quot;</span><span class="p">)</span>
+    <span class="n">GREATER_THAN_OR_EQUAL</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s">&quot;True if the first operand is &gt;= the second&quot;</span><span class="p">)</span>
+    <span class="n">GREATER_THAN</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s">&quot;True if the first operand is &gt;  the second&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+
+</div>
+<div class="viewcode-block" id="ArithmeticOperation"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.ArithmeticOperation">[docs]</a><span class="k">class</span> <span class="nc">ArithmeticOperation</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Arithmetic Operations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">ADD</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Perform addition&quot;</span><span class="p">)</span>
+    <span class="n">SUBTRACT</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Perform subtraction&quot;</span><span class="p">)</span>
+    <span class="n">MULTIPLY</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&quot;Perform multiplication&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+    
+</div>
+<div class="viewcode-block" id="LogicOperation"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.LogicOperation">[docs]</a><span class="k">class</span> <span class="nc">LogicOperation</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Logic Operations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">LEFT_SHIFT</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Shift left&quot;</span><span class="p">)</span>
+    <span class="n">RIGHT_SHIFT</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s">&quot;Shift right&quot;</span><span class="p">)</span>
+    <span class="n">OR</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s">&quot;Logical OR&quot;</span><span class="p">)</span>
+    <span class="n">AND</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s">&quot;Logical AND&quot;</span><span class="p">)</span>
+    <span class="n">XOR</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s">&quot;Logical XOR&quot;</span><span class="p">)</span>
+    <span class="n">NOT</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s">&quot;Logical NOT&quot;</span><span class="p">)</span>
+            
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+
+</div>
+<div class="viewcode-block" id="DataSpecificationGenerator"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Used to generate a data specification language file that can be\</span>
 <span class="sd">        executed to produce a memory image</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">DATA_TYPE</span> <span class="o">=</span> <span class="n">_enum</span><span class="p">(</span><span class="s">&quot;uint8&quot;</span><span class="p">,</span> <span class="s">&quot;uint16&quot;</span><span class="p">,</span> <span class="s">&quot;uint32&quot;</span><span class="p">,</span> <span class="s">&quot;uint64&quot;</span><span class="p">,</span> 
-                       <span class="s">&quot;int8&quot;</span><span class="p">,</span> <span class="s">&quot;int16&quot;</span><span class="p">,</span> <span class="s">&quot;int32&quot;</span><span class="p">,</span> <span class="s">&quot;int64&quot;</span><span class="p">,</span> 
-                       <span class="s">&quot;u88&quot;</span><span class="p">,</span> <span class="s">&quot;u1616&quot;</span><span class="p">,</span> <span class="s">&quot;u3232&quot;</span><span class="p">,</span> 
-                       <span class="s">&quot;s87&quot;</span><span class="p">,</span> <span class="s">&quot;s1615&quot;</span><span class="p">,</span> <span class="s">&quot;s3231&quot;</span><span class="p">,</span> 
-                       <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> 
-                       <span class="s">&quot;u08&quot;</span><span class="p">,</span> <span class="s">&quot;u016&quot;</span><span class="p">,</span> <span class="s">&quot;u032&quot;</span><span class="p">,</span> <span class="s">&quot;u064&quot;</span><span class="p">,</span> 
-                       <span class="s">&quot;s07&quot;</span><span class="p">,</span> <span class="s">&quot;s015&quot;</span><span class="p">,</span> <span class="s">&quot;s031&quot;</span><span class="p">,</span> <span class="s">&quot;s063&quot;</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot;  Enumeration of possible data types:</span>
-<span class="sd">        </span>
-<span class="sd">            ====== ===============================================</span>
-<span class="sd">            Type   Description</span>
-<span class="sd">            ====== ===============================================</span>
-<span class="sd">            uint8  8-bit unsigned integer</span>
-<span class="sd">            uint16 16-bit unsigned integer</span>
-<span class="sd">            uint32 32-bit unsigned integer</span>
-<span class="sd">            unit64 64-bit unsigned integer</span>
-<span class="sd">            int8   8-bit signed integer</span>
-<span class="sd">            int16  16-bit signed integer</span>
-<span class="sd">            int32  32-bit signed integer</span>
-<span class="sd">            int64  64-bit signed integer</span>
-<span class="sd">            u88    8.8 unsigned fixed point number</span>
-<span class="sd">            u1616  16.16 unsigned fixed point number</span>
-<span class="sd">            u3232  32.32 unsigned fixed point number</span>
-<span class="sd">            s87    8.7 signed fixed point number</span>
-<span class="sd">            s1615  16.15 signed fixed point number</span>
-<span class="sd">            s3231  32.31 signed fixed point number</span>
-<span class="sd">            u08    0.8 unsigned fixed point number</span>
-<span class="sd">            u016   0.16 unsigned fixed point number</span>
-<span class="sd">            u032   0.32 unsigned fixed point number</span>
-<span class="sd">            u064   0.64 unsigned fixed point number</span>
-<span class="sd">            s07    0.7 signed fixed point number</span>
-<span class="sd">            s015   0.15 signed fixed point number</span>
-<span class="sd">            s031   0.31 signed fixed point number</span>
-<span class="sd">            s063   0.63 signed fixed point number</span>
-<span class="sd">            ====== ===============================================</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">RANDOM_NUMBER_GENERATOR_TYPE</span> <span class="o">=</span> <span class="n">_enum</span><span class="p">(</span><span class="s">&quot;MERSENNE_TWISTER&quot;</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot; Enumeration of possible random number generator types:</span>
-<span class="sd">            </span>
-<span class="sd">            ================ ===============================================</span>
-<span class="sd">            Type             Description</span>
-<span class="sd">            ================ ===============================================</span>
-<span class="sd">            MERSENNE_TWISTER The well-known Mercenne Twister PRNG</span>
-<span class="sd">            ================ ===============================================</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">CONDITION</span> <span class="o">=</span> <span class="n">_enum</span><span class="p">(</span><span class="s">&quot;EQUAL&quot;</span><span class="p">,</span> <span class="s">&quot;NOT_EQUAL&quot;</span><span class="p">,</span> <span class="s">&quot;LESS_THAN_OR_EQUAL&quot;</span><span class="p">,</span> <span class="s">&quot;LESS_THAN&quot;</span><span class="p">,</span>
-            <span class="s">&quot;GREATER_THAN_OR_EQUAL&quot;</span><span class="p">,</span> <span class="s">&quot;GREATER_THAN&quot;</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot; Enumeration of possible random conditionals:</span>
-<span class="sd">            </span>
-<span class="sd">            ===================== ==============================================</span>
-<span class="sd">            Type                  Description</span>
-<span class="sd">            ===================== ==============================================</span>
-<span class="sd">            EQUAL                 Compare the operands for equality</span>
-<span class="sd">            NOT_EQUAL             Compare the operands for inequality</span>
-<span class="sd">            LESS_THAN_OR_EQUAL    True if the first operand is &lt;= the second</span>
-<span class="sd">            LESS_THAN             True if the first operand is &lt;  the second</span>
-<span class="sd">            GREATER_THAN_OR_EQUAL True if the first operand is &gt;= the second</span>
-<span class="sd">            GREATER_THAN          True if the first operand is &gt;  the second</span>
-<span class="sd">            ===================== ==============================================</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">ARITHMETIC_OPERATION</span> <span class="o">=</span> <span class="n">_enum</span><span class="p">(</span><span class="s">&quot;ADD&quot;</span><span class="p">,</span> <span class="s">&quot;SUBTRACT&quot;</span><span class="p">,</span> <span class="s">&quot;MULTIPLY&quot;</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot; Enumeration of possible arithmentic operations:</span>
-<span class="sd">            </span>
-<span class="sd">            ======== ======================</span>
-<span class="sd">            Type     Description</span>
-<span class="sd">            ======== ======================</span>
-<span class="sd">            ADD      Perform addition</span>
-<span class="sd">            SUBTRACT Perform subtraction</span>
-<span class="sd">            MULTIPLY Perform multiplication</span>
-<span class="sd">            ======== ======================</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    
-    <span class="n">LOGIC_OPERATION</span> <span class="o">=</span> <span class="n">_enum</span><span class="p">(</span><span class="s">&quot;LEFT_SHIFT&quot;</span><span class="p">,</span> <span class="s">&quot;RIGHT_SHIFT&quot;</span><span class="p">,</span> <span class="s">&quot;OR&quot;</span><span class="p">,</span> <span class="s">&quot;AND&quot;</span><span class="p">,</span> <span class="s">&quot;XOR&quot;</span><span class="p">,</span>
-            <span class="s">&quot;NOT&quot;</span><span class="p">)</span>
-    <span class="sd">&quot;&quot;&quot; Enumeration of possible logical operations:</span>
-<span class="sd">            </span>
-<span class="sd">            =========== ======================</span>
-<span class="sd">            Type        Description</span>
-<span class="sd">            =========== ======================</span>
-<span class="sd">            LEFT_SHIFT  Shift left</span>
-<span class="sd">            RIGHT_SHIFT Shift right</span>
-<span class="sd">            OR          Logical OR</span>
-<span class="sd">            AND         Logical AND</span>
-<span class="sd">            XOR         Logical XOR</span>
-<span class="sd">            NOT         Logical NOT</span>
-<span class="sd">            =========== ======================</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_writer</span><span class="p">,</span> <span class="n">app_id</span><span class="p">,</span> <span class="n">magic</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">write_text</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param spec_writer: The object to write the specification to</span>
 <span class="sd">        :type spec_writer: Implementation of\</span>
-<span class="sd">                :py:class:`data_allocation.abstract_data_writer.AbstractDataWriter`</span>
+<span class="sd">                :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`</span>
 <span class="sd">        :param app_id: The id of the application</span>
 <span class="sd">        :type app_id: int</span>
 <span class="sd">        :param magic: Magic number to write to the header or None to use default</span>
@@ -178,44 +170,44 @@
 <span class="sd">        :param write_text: Determines if a text version of the specification\</span>
 <span class="sd">                    is to be written</span>
 <span class="sd">        :type write_text: bool</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     
-<div class="viewcode-block" id="DataSpecificationGenerator.comment"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.comment">[docs]</a>    <span class="k">def</span> <span class="nf">comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.comment"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.comment">[docs]</a>    <span class="k">def</span> <span class="nf">comment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comment</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write a comment to the text version of the specification.\</span>
 <span class="sd">            Note that this is ignored by the binary file</span>
 <span class="sd">        </span>
 <span class="sd">        :param comment: The comment to write</span>
 <span class="sd">        :type comment: str</span>
 <span class="sd">        :return: Nothing is returned</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.execute_break"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.execute_break">[docs]</a>    <span class="k">def</span> <span class="nf">execute_break</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.execute_break"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.execute_break">[docs]</a>    <span class="k">def</span> <span class="nf">execute_break</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to stop execution with an exception (for debugging)</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
         </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.execute_no_operation"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.execute_no_operation">[docs]</a>    <span class="k">def</span> <span class="nf">execute_no_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.execute_no_operation"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.execute_no_operation">[docs]</a>    <span class="k">def</span> <span class="nf">execute_no_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to execute nothing</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.reserve_memory_region"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.reserve_memory_region">[docs]</a>    <span class="k">def</span> <span class="nf">reserve_memory_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">empty</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.reserve_memory_region"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.reserve_memory_region">[docs]</a>    <span class="k">def</span> <span class="nf">reserve_memory_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">empty</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to reserve a memory region</span>
 <span class="sd">        </span>
 <span class="sd">        :param region: The number of the region to reserve, from 0 to 15</span>
@@ -228,53 +220,53 @@
 <span class="sd">        :type empty: bool</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationRegionInUseException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationRegionInUseException:\</span>
 <span class="sd">                    If the region was already reserved</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If the region requested was out of the allowed range, or</span>
 <span class="sd">                    that the size was too big to fit in SDRAM</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.free_memory_region"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.free_memory_region">[docs]</a>    <span class="k">def</span> <span class="nf">free_memory_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.free_memory_region"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.free_memory_region">[docs]</a>    <span class="k">def</span> <span class="nf">free_memory_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to free a previously reserved memory region</span>
 <span class="sd">        </span>
 <span class="sd">        :param region: The number of the region to free, from 0 to 15</span>
 <span class="sd">        :type region: int</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    If the region was not reserved</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If the region requested was out of the allowed range</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.declare_random_number_generator"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.declare_random_number_generator">[docs]</a>    <span class="k">def</span> <span class="nf">declare_random_number_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_type</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.declare_random_number_generator"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.declare_random_number_generator">[docs]</a>    <span class="k">def</span> <span class="nf">declare_random_number_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_type</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to declare a random number generator</span>
 <span class="sd">        </span>
 <span class="sd">        :param rng_type: The type of the random number generator </span>
-<span class="sd">        :type rng_type: RANDOM_NUMBER_GENERATOR_TYPE</span>
+<span class="sd">        :type rng_type: :py:class:`RandomNumberGenerator`</span>
 <span class="sd">        :param seed: The seed of the random number generator &gt;= 0</span>
 <span class="sd">        :type seed: int</span>
 <span class="sd">        :return: The id of the created random number generator, between 0 and 15</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoMoreException:\</span>
 <span class="sd">                    If there is no more space for a new generator</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    If the rng_type is not one of the allowed values</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If the seed is too big or too small</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.declare_uniform_random_distribution"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.declare_uniform_random_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">declare_uniform_random_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_id</span><span class="p">,</span> <span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.declare_uniform_random_distribution"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.declare_uniform_random_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">declare_uniform_random_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_id</span><span class="p">,</span> <span class="n">min_value</span><span class="p">,</span> <span class="n">max_value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert commands to declare a uniform random distribution</span>
 <span class="sd">        </span>
 <span class="sd">        :param rng_id: The id of the random number generator, between 0 and 15</span>
@@ -288,18 +280,18 @@
 <span class="sd">        :return: The id of the created uniform random distribution to be used\</span>
 <span class="sd">                    in future calls of the distribution between 0 and 63</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoMoreException:\</span>
 <span class="sd">                    If there is no more space for a new random distribution</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    If the requested rng_id has not been allocated</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If rng_id, min_value or max_value is out of range</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.call_random_distribution"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.call_random_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">call_random_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_id</span><span class="p">,</span> <span class="n">register_id</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.call_random_distribution"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.call_random_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">call_random_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distribution_id</span><span class="p">,</span> <span class="n">register_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to get the next random number from  a random\</span>
 <span class="sd">            distribution, placing the result in a register to be used in a\ </span>
 <span class="sd">            future call</span>
@@ -312,17 +304,17 @@
 <span class="sd">        :type register_id: int</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    If the random distribution id was not previously declared</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If the distribution_id or register_id specified was out of\</span>
 <span class="sd">                    range</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.define_struture"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.define_struture">[docs]</a>    <span class="k">def</span> <span class="nf">define_struture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.define_struture"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.define_struture">[docs]</a>    <span class="k">def</span> <span class="nf">define_struture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert commands to define a data structure</span>
 <span class="sd">        </span>
 <span class="sd">        :param parameters: A list of between 1 and 255 tuples of\</span>
@@ -331,26 +323,26 @@
 <span class="sd">                    * data_type is the data type of the element</span>
 <span class="sd">                    * value is the value of the element,\</span>
 <span class="sd">                      or None if no value is to be assigned</span>
-<span class="sd">        :type parameters: list of (str, DATA_TYPE, float)</span>
+<span class="sd">        :type parameters: list of (str, :py:class:`DataType`, float)</span>
 <span class="sd">        :return: The id of the new structure, between 0 and 15</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoMoreException:\</span>
 <span class="sd">                    If there are no more spaces for new structures</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If there are an incorrect number of parameters</span>
 <span class="sd">                    * If the size of one of the tuples is incorrect</span>
 <span class="sd">                    * If one of the values to be assigned has an integer\</span>
 <span class="sd">                      data_type but has a fractional part</span>
 <span class="sd">                    * If one of the values to be assigned would overflow its\</span>
 <span class="sd">                      data_type</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    If one of the data types in the structure is unknown</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.set_structure_value"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.set_structure_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_structure_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">parameter_index</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.set_structure_value"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.set_structure_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_structure_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">parameter_index</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> 
             <span class="n">value_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to set a value in a structure</span>
 <span class="sd">        </span>
@@ -373,9 +365,9 @@
 <span class="sd">        :type value: float</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If structure_id is not in the allowed range</span>
 <span class="sd">                    * If parameter_index is larger than the number of\</span>
 <span class="sd">                      parameters declared in the original structure</span>
@@ -386,12 +378,12 @@
 <span class="sd">                      the position in the structure</span>
 <span class="sd">                    * If value_is_register is True, and value is not a valid\</span>
 <span class="sd">                      register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    If the structure requested has not been declared</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.write_structure"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.write_structure">[docs]</a>    <span class="k">def</span> <span class="nf">write_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.write_structure"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.write_structure">[docs]</a>    <span class="k">def</span> <span class="nf">write_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
             <span class="n">repeats_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to write a structure to the current write pointer,</span>
 <span class="sd">            causing the current write pointer to move on by the number of</span>
@@ -415,23 +407,23 @@
 <span class="sd">        :return: The position of the write pointer within the current region,\</span>
 <span class="sd">                    in bytes from the start of the region</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If repeats_is_register is False and structure_id is not\</span>
 <span class="sd">                      a valid id</span>
 <span class="sd">                    * If repeats_is_register is True and structure_id</span>
 <span class="sd">                    * If the number of repeats is out of range</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    If the structure requested has not been declared</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\</span>
 <span class="sd">                    If no region has been selected to write to</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationRegionExhaustedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\</span>
 <span class="sd">                    If the selected region has no more space</span>
 <span class="sd">        &quot;&quot;&quot;</span> 
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.start_function"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.start_function">[docs]</a>    <span class="k">def</span> <span class="nf">start_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argument_by_value</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.start_function"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.start_function">[docs]</a>    <span class="k">def</span> <span class="nf">start_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argument_by_value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to start a function definition, with up to 5\</span>
 <span class="sd">            arguments, which are the ids of structures to be used within the\</span>
 <span class="sd">            function, each of which can be passed by reference or by value.\</span>
@@ -448,30 +440,30 @@
 <span class="sd">        :type argument_by_value: list of bool</span>
 <span class="sd">        :return: The id of the function, between 0 and 31</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoMoreException:\</span>
 <span class="sd">                    If there are no more spaces for new functions</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If there are too many items in the list of arguments</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\</span>
 <span class="sd">                    If there is already a function being defined at this point</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.end_function"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.end_function">[docs]</a>    <span class="k">def</span> <span class="nf">end_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.end_function"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.end_function">[docs]</a>    <span class="k">def</span> <span class="nf">end_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to mark the end of a function definition</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\</span>
 <span class="sd">                    If there is no function being defined at this point</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.call_function"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.call_function">[docs]</a>    <span class="k">def</span> <span class="nf">call_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_id</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.call_function"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.call_function">[docs]</a>    <span class="k">def</span> <span class="nf">call_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_id</span><span class="p">,</span> <span class="n">structure_ids</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to call a function</span>
 <span class="sd">        </span>
 <span class="sd">        :param function_id: The id of a previously defined function, between 0</span>
@@ -482,20 +474,20 @@
 <span class="sd">        :type structure_ids: list of int</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If the function id is not valid</span>
 <span class="sd">                    * If any of the structure ids are not valid</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    * If a function has not been defined with the given id</span>
 <span class="sd">                    * If no structure has been defined with one of the ids in\</span>
 <span class="sd">                      structure_ids</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.write_value"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.write_value">[docs]</a>    <span class="k">def</span> <span class="nf">write_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-            <span class="n">repeats_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DATA_TYPE</span><span class="o">.</span><span class="n">uint32</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.write_value"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.write_value">[docs]</a>    <span class="k">def</span> <span class="nf">write_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">repeats</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
+            <span class="n">repeats_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to write a value one or more times to the current</span>
 <span class="sd">            write pointer, causing the write pointer to move on by the number</span>
 <span class="sd">            of bytes required to represent the data type</span>
@@ -520,13 +512,13 @@
 <span class="sd">                    * If data_is_register is True, the type of the data held</span>
 <span class="sd">                      in the register</span>
 <span class="sd">                    * If data_is_register is False, the type to convert data to</span>
-<span class="sd">        :type data_type: DATA_TYPE</span>
+<span class="sd">        :type data_type: :py:class:`DataType`</span>
 <span class="sd">        :return: The position of the write pointer within the current region,</span>
 <span class="sd">                    in bytes from the start of the region</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If repeats_is_register is False, and repeats is out\</span>
 <span class="sd">                      of range</span>
 <span class="sd">                      If repeats_is_register is True, and repeats is not a\</span>
@@ -537,16 +529,16 @@
 <span class="sd">                      data type</span>
 <span class="sd">                    * If data_is_register is True and data is not a valid\</span>
 <span class="sd">                      register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    If the data type is not known</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\</span>
 <span class="sd">                    If no region has been selected to write to</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationRegionExhaustedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\</span>
 <span class="sd">                    If the selected region has no more space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.write_array"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.write_array">[docs]</a>    <span class="k">def</span> <span class="nf">write_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.write_array"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.write_array">[docs]</a>    <span class="k">def</span> <span class="nf">write_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to write an array of words, causing the write pointer</span>
 <span class="sd">            to move on by (4 * the array size), in bytes</span>
 <span class="sd">        </span>
@@ -555,34 +547,34 @@
 <span class="sd">        :return: The position of the write pointer within the current region,\</span>
 <span class="sd">                    in bytes from the start of the region</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\</span>
 <span class="sd">                    If no region has been selected to write to</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationRegionExhaustedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\</span>
 <span class="sd">                    If the selected region has no more space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.switch_write_focus"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.switch_write_focus">[docs]</a>    <span class="k">def</span> <span class="nf">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.switch_write_focus"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.switch_write_focus">[docs]</a>    <span class="k">def</span> <span class="nf">switch_write_focus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to switch the region being written to</span>
 <span class="sd">        </span>
 <span class="sd">        :param region: The id of the region to switch to, between 0 and 15</span>
 <span class="sd">        :type region: int</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If the region identifier is not valid</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    If the region has not been allocated</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationRegionUnfilledException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationRegionUnfilledException:\</span>
 <span class="sd">                    If the selected region should not be filled</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.start_loop"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.start_loop">[docs]</a>    <span class="k">def</span> <span class="nf">start_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_register_id</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.start_loop"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.start_loop">[docs]</a>    <span class="k">def</span> <span class="nf">start_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counter_register_id</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">increment</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">start_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">end_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
             <span class="n">increment_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to start a loop</span>
@@ -620,9 +612,9 @@
 <span class="sd">        :type increment_is_register: bool</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If counter_register_id is not a valid register id</span>
 <span class="sd">                    * If start_is_register is True and increment is not a valid\</span>
 <span class="sd">                      register_id</span>
@@ -639,33 +631,33 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.break_loop"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.break_loop">[docs]</a>    <span class="k">def</span> <span class="nf">break_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.break_loop"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.break_loop">[docs]</a>    <span class="k">def</span> <span class="nf">break_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to break out of a loop before it has completed</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\</span>
 <span class="sd">                    If there is no loop in operation at this point</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.end_loop"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.end_loop">[docs]</a>    <span class="k">def</span> <span class="nf">end_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.end_loop"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.end_loop">[docs]</a>    <span class="k">def</span> <span class="nf">end_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to indicate that this is the end of the loop.\</span>
 <span class="sd">            Commands between the start of the loop and this command will be\ </span>
 <span class="sd">            repeated.</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\</span>
 <span class="sd">                    If there is no loop in operation at this point</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.start_conditional"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.start_conditional">[docs]</a>    <span class="k">def</span> <span class="nf">start_conditional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.start_conditional"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.start_conditional">[docs]</a>    <span class="k">def</span> <span class="nf">start_conditional</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">condition</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> 
             <span class="n">value_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to start a conditional if...then...else construct.\</span>
 <span class="sd">            If the condition evaluates to true, the statement is executed up to\</span>
@@ -676,7 +668,7 @@
 <span class="sd">        :type register_id: int</span>
 <span class="sd">        :param condition: The condition which must be true to execute the\</span>
 <span class="sd">                    following commands</span>
-<span class="sd">        :type condition: CONDITION</span>
+<span class="sd">        :type condition: :py:class:`Condition`</span>
 <span class="sd">        :param value: </span>
 <span class="sd">                    * If value_is_register is False, the value to compare to\</span>
 <span class="sd">                      the value in the register</span>
@@ -687,18 +679,18 @@
 <span class="sd">        :type value_is_register: bool</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If the register_id is not a valid register id</span>
 <span class="sd">                    * if value_is_register is True and value is not a valid\</span>
 <span class="sd">                      register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    If the condition is not a valid condition</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.else_conditional"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.else_conditional">[docs]</a>    <span class="k">def</span> <span class="nf">else_conditional</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.else_conditional"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.else_conditional">[docs]</a>    <span class="k">def</span> <span class="nf">else_conditional</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command for the else of an if...then...else construct.\</span>
 <span class="sd">            If the condition of the conditional evaluates to false, the\</span>
 <span class="sd">            statements up between the conditional and the insertion of this\</span>
@@ -707,27 +699,27 @@
 <span class="sd">        </span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\</span>
 <span class="sd">                    If there is no conditional in operation at this point</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.end_conditional"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.end_conditional">[docs]</a>    <span class="k">def</span> <span class="nf">end_conditional</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.end_conditional"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.end_conditional">[docs]</a>    <span class="k">def</span> <span class="nf">end_conditional</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to mark the end of an if...then...else construct</span>
 <span class="sd">        </span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\</span>
 <span class="sd">                    If there is no conditional in operation at this point</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.set_register_value"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.set_register_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_register_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
-            <span class="n">data_type</span><span class="o">=</span><span class="n">DATA_TYPE</span><span class="o">.</span><span class="n">uint32</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.set_register_value"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.set_register_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_register_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
+            <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to set the value of a register</span>
 <span class="sd">        </span>
 <span class="sd">        :param register_id: The id of the register to assign, between 0 and 15</span>
@@ -740,12 +732,12 @@
 <span class="sd">        :param data_is_register: Indicates if data is a register id</span>
 <span class="sd">        :type data_is_register: bool</span>
 <span class="sd">        :param data_type: The type of the data to be assigned</span>
-<span class="sd">        :type data_type: DATA_TYPE</span>
+<span class="sd">        :type data_type: :py:class:`DataType`</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If register_id is not a valid register_id</span>
 <span class="sd">                    * If data_is_register is True, and data is not a valid\</span>
 <span class="sd">                      register id</span>
@@ -753,28 +745,28 @@
 <span class="sd">                      type and data has a fractional part</span>
 <span class="sd">                    * If data_is_register if False, and data would overflow the\</span>
 <span class="sd">                      data type</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    If the data type is not known</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.save_write_pointer"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.save_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">save_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.save_write_pointer"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.save_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">save_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to save the write pointer to a register</span>
 <span class="sd">        </span>
 <span class="sd">        :param register_id: The id of the register to assign, between 0 and 15</span>
 <span class="sd">        :type register_id: int</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If the register_id is not a valid register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\</span>
 <span class="sd">                    If no region has been selected</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.set_write_pointer"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.set_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">set_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">address_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.set_write_pointer"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.set_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">set_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">address_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
             <span class="n">relative_to_current</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to set the position of the write pointer within the</span>
 <span class="sd">            current region</span>
@@ -794,19 +786,19 @@
 <span class="sd">        :type relative_to_current: bool</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    If the address_is_register is True and address is not\</span>
 <span class="sd">                    a valid register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationRegionOutOfBoundsException:\</span>
 <span class="sd">                    If the move of the pointer would put it outside of the\</span>
 <span class="sd">                    current region</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\</span>
 <span class="sd">                    If no region has been selected</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.align_write_pointer"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.align_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">align_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_block_size</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.align_write_pointer"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.align_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">align_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_block_size</span><span class="p">,</span> 
             <span class="n">log_block_size_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">return_register_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to align the write pointer against a power-of-2\</span>
 <span class="sd">            block size in bytes.  Zeros are inserted in the intervening space</span>
@@ -830,22 +822,22 @@
 <span class="sd">        :return: The current write pointer within the current region, in bytes\</span>
 <span class="sd">                    from the start of the region</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If log_block_size_is_register is False, and\</span>
 <span class="sd">                      log_block_size is not within the allowed range</span>
 <span class="sd">                    * If log_block_size_is_register is True and log_block_size\</span>
 <span class="sd">                      is not a valid register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationRegionOutOfBoundsException:\</span>
 <span class="sd">                    If the move of the pointer would put it outside of the\</span>
 <span class="sd">                    current region</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\</span>
 <span class="sd">                    If no region has been selected</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.call_arithmetic_operation"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.call_arithmetic_operation">[docs]</a>    <span class="k">def</span> <span class="nf">call_arithmetic_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">operand_1</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.call_arithmetic_operation"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.call_arithmetic_operation">[docs]</a>    <span class="k">def</span> <span class="nf">call_arithmetic_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">operand_1</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> 
             <span class="n">operand_2</span><span class="p">,</span> <span class="n">signed</span><span class="p">,</span> <span class="n">operand_1_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
             <span class="n">operand_2_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to perform an arithmetic operation on two signed or\</span>
@@ -859,7 +851,7 @@
 <span class="sd">                    * If operand_1_is_register is False, a 32-bit value</span>
 <span class="sd">        :type operand_1: int</span>
 <span class="sd">        :param operation: The operation to perform</span>
-<span class="sd">        :type operation: ARITHMETIC_OPERATION</span>
+<span class="sd">        :type operation: :py:class:`ArithmeticOperation`</span>
 <span class="sd">        :param operand_2:</span>
 <span class="sd">                    * If operand_2_is_register is True, the id of a register\</span>
 <span class="sd">                      where the second operand can be found, between 0 and 15</span>
@@ -871,19 +863,19 @@
 <span class="sd">        :type operand_1_is_register: bool</span>
 <span class="sd">        :param operand_2_is_register: Indicates if operand_2 is a register id</span>
 <span class="sd">        :type operand_2_is_register: bool</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If operand_1_is_register is True and operand_1 is not a\</span>
 <span class="sd">                      valid register id</span>
 <span class="sd">                    * If operand_2_is_register is True and operand_2 is not a\</span>
 <span class="sd">                      valid register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    If operation is not a known operation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.call_logic_operation"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.call_logic_operation">[docs]</a>    <span class="k">def</span> <span class="nf">call_logic_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">operand_1</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.call_logic_operation"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.call_logic_operation">[docs]</a>    <span class="k">def</span> <span class="nf">call_logic_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">register_id</span><span class="p">,</span> <span class="n">operand_1</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> 
             <span class="n">operand_2</span><span class="p">,</span> <span class="n">operand_1_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
             <span class="n">operand_2_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to perform a logic operation on two signed or\</span>
@@ -897,7 +889,7 @@
 <span class="sd">                    * If operand_1_is_register is False, a 32-bit value</span>
 <span class="sd">        :type operand_1: int</span>
 <span class="sd">        :param operation: The operation to perform</span>
-<span class="sd">        :type operation: LOGIC_OPERATION</span>
+<span class="sd">        :type operation: :py:class:`LogicOperation`</span>
 <span class="sd">        :param operand_2:</span>
 <span class="sd">                    * If operand_2_is_register is True, the id of a register\</span>
 <span class="sd">                      where the second operand can be found. between 0 and 15</span>
@@ -907,19 +899,19 @@
 <span class="sd">        :type operand_1_is_register: bool</span>
 <span class="sd">        :param operand_2_is_register: Indicates if operand_2 is a register id</span>
 <span class="sd">        :type operand_2_is_register: bool</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If operand_1_is_register is True and operand_1 is not a\</span>
 <span class="sd">                      valid register id</span>
 <span class="sd">                    * If operand_2_is_register is True and operand_2 is not a\</span>
 <span class="sd">                      valid register id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    If operation is not a known operation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.copy_structure"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.copy_structure">[docs]</a>    <span class="k">def</span> <span class="nf">copy_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_structure_id</span><span class="p">,</span> <span class="n">destination_structure_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.copy_structure"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.copy_structure">[docs]</a>    <span class="k">def</span> <span class="nf">copy_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_structure_id</span><span class="p">,</span> <span class="n">destination_structure_id</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
             <span class="n">source_id_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">destination_id_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to copy a structure, possibly overwriting another\</span>
 <span class="sd">            structure</span>
@@ -947,9 +939,9 @@
 <span class="sd">        :type destination_id_is_register: bool</span>
 <span class="sd">        :return: The id of the copied structure, between 0 and 15</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If source_id_is_register is True and source_structure_id\</span>
 <span class="sd">                      is not a valid register id</span>
 <span class="sd">                    * If destination_id_is_register is True and\</span>
@@ -958,10 +950,10 @@
 <span class="sd">                      is not a valid struture id</span>
 <span class="sd">                    * If destination_id_is_register is False and\</span>
 <span class="sd">                      destination_structure_id is not a valid structure id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNoMoreException:\</span>
 <span class="sd">                    If destination_structure_id is None and there are no more\</span>
 <span class="sd">                    structure ids</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    * If destination_structure_id is not None and no structure\</span>
 <span class="sd">                      with id destination_structure_id has been allocated</span>
 <span class="sd">                    * If no structure with id source_structure_id has been\</span>
@@ -969,7 +961,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.copy_structure_parameter"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.copy_structure_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">copy_structure_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_structure_id</span><span class="p">,</span> 
+<div class="viewcode-block" id="DataSpecificationGenerator.copy_structure_parameter"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.copy_structure_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">copy_structure_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_structure_id</span><span class="p">,</span> 
             <span class="n">source_parameter_index</span><span class="p">,</span> <span class="n">destination_structure_id</span><span class="p">,</span> 
             <span class="n">destination_parameter_index</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to copy the value of a parameter from one structure</span>
@@ -989,18 +981,18 @@
 <span class="sd">        :type destination_parameter_index: int</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If source_struture_id is not a valid struture id</span>
 <span class="sd">                    * If ddestination_structure_id is not a valid structure id</span>
 <span class="sd">                    * If source_parameter_index is not a valid parameter index\</span>
 <span class="sd">                      in the source structure</span>
 <span class="sd">                    * If destination_parameter_index is not a valid parmater\</span>
 <span class="sd">                      index in the destination structure</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationInvalidTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationInvalidTypeException:\</span>
 <span class="sd">                    If the source and destination data types do not match</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    * If no structure with id destination_structure_id has been\</span>
 <span class="sd">                      allocated</span>
 <span class="sd">                    * If no structure with id source_structure_id has been</span>
@@ -1008,8 +1000,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.print_value"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.print_value">[docs]</a>    <span class="k">def</span> <span class="nf">print_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
-            <span class="n">data_type</span><span class="o">=</span><span class="n">DATA_TYPE</span><span class="o">.</span><span class="n">uint32</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.print_value"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.print_value">[docs]</a>    <span class="k">def</span> <span class="nf">print_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">value_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> 
+            <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT32</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to print out a value (for debugging)</span>
 <span class="sd">        </span>
 <span class="sd">        :param value:</span>
@@ -1021,36 +1013,36 @@
 <span class="sd">        :param value_is_register: Indicates if the value is a register</span>
 <span class="sd">        :type value_is_register: bool</span>
 <span class="sd">        :param data_type: The type of the data to be printed</span>
-<span class="sd">        :type data_type: DATA_TYPE</span>
+<span class="sd">        :type data_type: :py:class:`DataType`</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If value_is_register is True and value is not a valid\</span>
 <span class="sd">                      register id</span>
 <span class="sd">                    * If value_is_register is False, the data_type is an</span>
 <span class="sd">                      integer type and value has a fractional part</span>
 <span class="sd">                    * If value_is_register is False and the value would</span>
 <span class="sd">                      overflow the data type</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\</span>
 <span class="sd">                    * If data_type is not a vaild data type</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.print_text"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.print_text">[docs]</a>    <span class="k">def</span> <span class="nf">print_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.print_text"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.print_text">[docs]</a>    <span class="k">def</span> <span class="nf">print_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to print some text (for debugging)</span>
 <span class="sd">        </span>
 <span class="sd">        :param text: The text to write</span>
 <span class="sd">        :type text: str</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.print_struct"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.print_struct">[docs]</a>    <span class="k">def</span> <span class="nf">print_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">structure_id_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.print_struct"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.print_struct">[docs]</a>    <span class="k">def</span> <span class="nf">print_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_id</span><span class="p">,</span> <span class="n">structure_id_is_register</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert command to print out a structure (for debugging)</span>
 <span class="sd">        </span>
 <span class="sd">        :param structure_id:</span>
@@ -1065,20 +1057,20 @@
 <span class="sd">        :type structure_id_is_register: bool</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\</span>
 <span class="sd">                    * If structure_id_is_register is True and structure_id is\</span>
 <span class="sd">                      not a valid register id</span>
 <span class="sd">                    * If structure_id_is_register is False and structure_id is\</span>
 <span class="sd">                      not a valid structure id</span>
-<span class="sd">        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\</span>
 <span class="sd">                    If structure_id_is_register is False and structure_id is\</span>
 <span class="sd">                    is the id of a structure that has not been allocated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
-<div class="viewcode-block" id="DataSpecificationGenerator.end_specification"><a class="viewcode-back" href="../../data_allocation.data_specification_generator.html#data_allocation.data_specification_generator.DataSpecificationGenerator.end_specification">[docs]</a>    <span class="k">def</span> <span class="nf">end_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close_writer</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationGenerator.end_specification"><a class="viewcode-back" href="../../data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator.end_specification">[docs]</a>    <span class="k">def</span> <span class="nf">end_specification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">close_writer</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Insert a command to indicate that the specification has finished\</span>
 <span class="sd">            and finish writing</span>
 <span class="sd">        </span>
@@ -1086,7 +1078,7 @@
 <span class="sd">        :type close_writer: bool</span>
 <span class="sd">        :return: Nothing is returned</span>
 <span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_allocation.exceptions.DataWriteException:\</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException:\</span>
 <span class="sd">                    If a write to external storage fails</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>

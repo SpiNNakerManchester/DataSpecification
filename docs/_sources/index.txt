@@ -6,14 +6,14 @@
 SpiNNaker Data Allocation
 =========================
 
-.. automodule:: data_allocation
+.. automodule:: data_specification
 
 Contents:
 
 .. toctree::
    :maxdepth: 4
 
-   data_allocation
+   data_specification
 
 
 Indices and tables

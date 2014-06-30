@@ -1,7 +1,7 @@
-data_allocation
-===============
+data_specification
+==================
 
 .. toctree::
    :maxdepth: 4
 
-   data_allocation
+   data_specification

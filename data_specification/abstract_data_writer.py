@@ -1,10 +1,11 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
 
-
+@add_metaclass(ABCMeta)
 class AbstractDataWriter(object):
     """ Abstract writer used to write data somewhere
     """
-    __metaclass__ = ABCMeta
     
     @abstractmethod
     def write_bytes(self, data):
@@ -12,10 +13,10 @@ class AbstractDataWriter(object):
             Does not return until all the bytes have been written.
         
         :param data: The data to write
-        :type data: iterable of bytes
+        :type data: bytearray
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
             If an error occurs writing to the underlying storage
         """
         pass
@@ -27,6 +28,7 @@ class AbstractDataWriter(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
             If an error occurs writing to the underlying storage
         """
+        pass

@@ -1,11 +1,12 @@
-data_allocation.abstract_data_reader module
-===========================================
+data_specification.abstract_data_reader module
+==============================================
 
-.. automodule:: data_allocation.abstract_data_reader
+.. automodule:: data_specification.abstract_data_reader
 
-.. currentmodule:: data_allocation.abstract_data_reader
+.. currentmodule:: data_specification.abstract_data_reader
 
 .. autoclass:: AbstractDataReader
+    :show-inheritance:
 
     .. rubric:: Abstract Methods
 

@@ -7,17 +7,17 @@ class DataSpecificationExecutor(object):
         """
         :param spec_reader: The object to read the specification language file\
                     from
-        :type spec_reader: Implementation of\
-                    :py:class:`data_allocation.abstract_data_reader.AbstractDataReader`
+        :type spec_reader:\
+                    :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
         :param mem_writer: The object to write the memory image to
-        :type mem_writer: Implementation of\
-                    :py:class:`data_allocation.abstract_data_writer.AbstractDataWriter`
+        :type mem_writer:\
+                    :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
         :param space: The amount of space into which the final image must fit,\
                     in bytes
         :type space: int
-        :raise data_allocation.exceptions.DataReadException:\
+        :raise data_specification.exceptions.DataReadException:\
                     If a read from external storage fails
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -27,11 +27,11 @@ class DataSpecificationExecutor(object):
         
         :return: The number of bytes used by the image
         :rtype: int
-        :raise data_allocation.exceptions.DataReadException:\
+        :raise data_specification.exceptions.DataReadException:\
                     If a read from external storage fails
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationException:\
+        :raise data_specification.exceptions.DataSpecificationException:\
                     If there is an error when executing the specification
         """
         pass

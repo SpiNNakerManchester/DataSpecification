@@ -1,7 +1,90 @@
-def _enum(*sequential, **named):
-    enums = dict(filter(lambda x: x[0] is not None, 
-            zip(sequential, range(len(sequential)))), **named)
-    return type('Enum', (), enums)
+from enum import Enum
+
+
+class DataType(Enum):
+    """ Supported data types
+    """
+    UINT8 = (0, "8-bit unsigned integer")
+    UINT16 = (1, "16-bit unsigned integer")
+    UINT32 = (2, "32-bit unsigned integer")
+    UINT64 = (3, "64-bit unsigned integer")
+    INT8 = (4, "8-bit signed integer")
+    INT16 = (5, "16-bit signed integer")
+    INT32 = (6, "32-bit signed integer")
+    INT64 = (7, "64-bit signed integer")
+    U88 = (8, "8.8 unsigned fixed point number")
+    U1616 = (9, "16.16 unsigned fixed point number")
+    U3232 = (10, "32.32 unsigned fixed point number")
+    S87 = (11, "8.7 signed fixed point number")
+    S1615 = (12, "16.15 signed fixed point number")
+    S3231 = (13, "32.31 signed fixed point number") 
+    U08 = (16, "0.8 unsigned fixed point number")
+    U016 = (17, "0.16 unsigned fixed point number")
+    U032 = (18, "0.32 unsigned fixed point number")
+    U064 = (19, "0.64 unsigned fixed point number")
+    S07 = (20, "0.7 signed fixed point number")
+    S015 = (21, "0.15 signed fixed point number")
+    S031 = (22, "0.32 signed fixed point number")
+    S063 = (23, "0.63 signed fixed point number")
+    
+    def __init__(self, value, doc=""):
+        self._value_ = value
+        self.__doc__ = doc
+   
+     
+class RandomNumberGenerator(Enum):
+    """ Random number generator types
+    """
+    
+    MERSENNE_TWISTER = (0, "The well-known Mercenne Twister PRNG")
+    
+    def __init__(self, value, doc=""):
+        self._value_ = value
+        self.__doc__ = doc
+
+
+class Condition(Enum):
+    """ Comparison Operations
+    """
+    
+    EQUAL = (0, "Compare the operands for equality")
+    NOT_EQUAL = (1, "Compare the operands for inequality")
+    LESS_THAN_OR_EQUAL = (2, "True if the first operand is <= the second")
+    LESS_THAN = (3, "True if the first operand is <  the second")
+    GREATER_THAN_OR_EQUAL = (4, "True if the first operand is >= the second")
+    GREATER_THAN = (5, "True if the first operand is >  the second")
+    
+    def __init__(self, value, doc=""):
+        self._value_ = value
+        self.__doc__ = doc
+
+
+class ArithmeticOperation(Enum):
+    """ Arithmetic Operations
+    """
+    
+    ADD = (0, "Perform addition")
+    SUBTRACT = (1, "Perform subtraction")
+    MULTIPLY = (2, "Perform multiplication")
+    
+    def __init__(self, value, doc=""):
+        self._value_ = value
+        self.__doc__ = doc
+    
+
+class LogicOperation(Enum):
+    """ Logic Operations
+    """
+    LEFT_SHIFT = (0, "Shift left")
+    RIGHT_SHIFT = (1, "Shift right")
+    OR = (2, "Logical OR")
+    AND = (3, "Logical AND")
+    XOR = (4, "Logical XOR")
+    NOT = (5, "Logical NOT")
+            
+    def __init__(self, value, doc=""):
+        self._value_ = value
+        self.__doc__ = doc
 
 
 class DataSpecificationGenerator(object):
@@ -9,102 +92,11 @@ class DataSpecificationGenerator(object):
         executed to produce a memory image
     """
     
-    DATA_TYPE = _enum("uint8", "uint16", "uint32", "uint64", 
-                       "int8", "int16", "int32", "int64", 
-                       "u88", "u1616", "u3232", 
-                       "s87", "s1615", "s3231", 
-                       None, None, 
-                       "u08", "u016", "u032", "u064", 
-                       "s07", "s015", "s031", "s063")
-    """  Enumeration of possible data types:
-        
-            ====== ===============================================
-            Type   Description
-            ====== ===============================================
-            uint8  8-bit unsigned integer
-            uint16 16-bit unsigned integer
-            uint32 32-bit unsigned integer
-            unit64 64-bit unsigned integer
-            int8   8-bit signed integer
-            int16  16-bit signed integer
-            int32  32-bit signed integer
-            int64  64-bit signed integer
-            u88    8.8 unsigned fixed point number
-            u1616  16.16 unsigned fixed point number
-            u3232  32.32 unsigned fixed point number
-            s87    8.7 signed fixed point number
-            s1615  16.15 signed fixed point number
-            s3231  32.31 signed fixed point number
-            u08    0.8 unsigned fixed point number
-            u016   0.16 unsigned fixed point number
-            u032   0.32 unsigned fixed point number
-            u064   0.64 unsigned fixed point number
-            s07    0.7 signed fixed point number
-            s015   0.15 signed fixed point number
-            s031   0.31 signed fixed point number
-            s063   0.63 signed fixed point number
-            ====== ===============================================
-    """
-    
-    RANDOM_NUMBER_GENERATOR_TYPE = _enum("MERSENNE_TWISTER")
-    """ Enumeration of possible random number generator types:
-            
-            ================ ===============================================
-            Type             Description
-            ================ ===============================================
-            MERSENNE_TWISTER The well-known Mercenne Twister PRNG
-            ================ ===============================================
-    """
-    
-    CONDITION = _enum("EQUAL", "NOT_EQUAL", "LESS_THAN_OR_EQUAL", "LESS_THAN",
-            "GREATER_THAN_OR_EQUAL", "GREATER_THAN")
-    """ Enumeration of possible random conditionals:
-            
-            ===================== ==============================================
-            Type                  Description
-            ===================== ==============================================
-            EQUAL                 Compare the operands for equality
-            NOT_EQUAL             Compare the operands for inequality
-            LESS_THAN_OR_EQUAL    True if the first operand is <= the second
-            LESS_THAN             True if the first operand is <  the second
-            GREATER_THAN_OR_EQUAL True if the first operand is >= the second
-            GREATER_THAN          True if the first operand is >  the second
-            ===================== ==============================================
-    """
-    
-    ARITHMETIC_OPERATION = _enum("ADD", "SUBTRACT", "MULTIPLY")
-    """ Enumeration of possible arithmentic operations:
-            
-            ======== ======================
-            Type     Description
-            ======== ======================
-            ADD      Perform addition
-            SUBTRACT Perform subtraction
-            MULTIPLY Perform multiplication
-            ======== ======================
-    """
-    
-    LOGIC_OPERATION = _enum("LEFT_SHIFT", "RIGHT_SHIFT", "OR", "AND", "XOR",
-            "NOT")
-    """ Enumeration of possible logical operations:
-            
-            =========== ======================
-            Type        Description
-            =========== ======================
-            LEFT_SHIFT  Shift left
-            RIGHT_SHIFT Shift right
-            OR          Logical OR
-            AND         Logical AND
-            XOR         Logical XOR
-            NOT         Logical NOT
-            =========== ======================
-    """
-    
     def __init__(self, spec_writer, app_id, magic=None, write_text=False):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
-                :py:class:`data_allocation.abstract_data_writer.AbstractDataWriter`
+                :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
         :param app_id: The id of the application
         :type app_id: int
         :param magic: Magic number to write to the header or None to use default
@@ -112,7 +104,7 @@ class DataSpecificationGenerator(object):
         :param write_text: Determines if a text version of the specification\
                     is to be written
         :type write_text: bool
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -124,7 +116,7 @@ class DataSpecificationGenerator(object):
         :param comment: The comment to write
         :type comment: str
         :return: Nothing is returned
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -134,7 +126,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -144,7 +136,7 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -162,11 +154,11 @@ class DataSpecificationGenerator(object):
         :type empty: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationRegionInUseException:\
+        :raise data_specification.exceptions.DataSpecificationRegionInUseException:\
                     If the region was already reserved
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the region requested was out of the allowed range, or
                     that the size was too big to fit in SDRAM
         """
@@ -179,11 +171,11 @@ class DataSpecificationGenerator(object):
         :type region: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     If the region was not reserved
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the region requested was out of the allowed range
         """
         pass
@@ -192,18 +184,18 @@ class DataSpecificationGenerator(object):
         """ Insert command to declare a random number generator
         
         :param rng_type: The type of the random number generator 
-        :type rng_type: RANDOM_NUMBER_GENERATOR_TYPE
+        :type rng_type: :py:class:`RandomNumberGenerator`
         :param seed: The seed of the random number generator >= 0
         :type seed: int
         :return: The id of the created random number generator, between 0 and 15
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
                     If there is no more space for a new generator
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     If the rng_type is not one of the allowed values
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the seed is too big or too small
         """
         pass
@@ -222,13 +214,13 @@ class DataSpecificationGenerator(object):
         :return: The id of the created uniform random distribution to be used\
                     in future calls of the distribution between 0 and 63
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
                     If there is no more space for a new random distribution
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     If the requested rng_id has not been allocated
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If rng_id, min_value or max_value is out of range
         """
         pass
@@ -246,11 +238,11 @@ class DataSpecificationGenerator(object):
         :type register_id: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     If the random distribution id was not previously declared
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the distribution_id or register_id specified was out of\
                     range
         """
@@ -265,21 +257,21 @@ class DataSpecificationGenerator(object):
                     * data_type is the data type of the element
                     * value is the value of the element,\
                       or None if no value is to be assigned
-        :type parameters: list of (str, DATA_TYPE, float)
+        :type parameters: list of (str, :py:class:`DataType`, float)
         :return: The id of the new structure, between 0 and 15
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
                     If there are no more spaces for new structures
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If there are an incorrect number of parameters
                     * If the size of one of the tuples is incorrect
                     * If one of the values to be assigned has an integer\
                       data_type but has a fractional part
                     * If one of the values to be assigned would overflow its\
                       data_type
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     If one of the data types in the structure is unknown
         """
         pass
@@ -307,9 +299,9 @@ class DataSpecificationGenerator(object):
         :type value: float
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If structure_id is not in the allowed range
                     * If parameter_index is larger than the number of\
                       parameters declared in the original structure
@@ -320,7 +312,7 @@ class DataSpecificationGenerator(object):
                       the position in the structure
                     * If value_is_register is True, and value is not a valid\
                       register id
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     If the structure requested has not been declared
         """
         pass
@@ -349,18 +341,18 @@ class DataSpecificationGenerator(object):
         :return: The position of the write pointer within the current region,\
                     in bytes from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If repeats_is_register is False and structure_id is not\
                       a valid id
                     * If repeats_is_register is True and structure_id
                     * If the number of repeats is out of range
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     If the structure requested has not been declared
-        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
                     If no region has been selected to write to
-        :raise data_allocation.exceptions.DataSpecificationRegionExhaustedException:\
+        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
                     If the selected region has no more space
         """ 
         pass
@@ -382,13 +374,13 @@ class DataSpecificationGenerator(object):
         :type argument_by_value: list of bool
         :return: The id of the function, between 0 and 31
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
                     If there are no more spaces for new functions
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If there are too many items in the list of arguments
-        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
+        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
                     If there is already a function being defined at this point
         """
         pass
@@ -398,9 +390,9 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
+        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no function being defined at this point
         """
         pass
@@ -416,12 +408,12 @@ class DataSpecificationGenerator(object):
         :type structure_ids: list of int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If the function id is not valid
                     * If any of the structure ids are not valid
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     * If a function has not been defined with the given id
                     * If no structure has been defined with one of the ids in\
                       structure_ids
@@ -429,7 +421,7 @@ class DataSpecificationGenerator(object):
         pass
     
     def write_value(self, data, data_is_register=False, repeats=1, 
-            repeats_is_register=False, data_type=DATA_TYPE.uint32):
+            repeats_is_register=False, data_type=DataType.UINT32):
         """ Insert command to write a value one or more times to the current
             write pointer, causing the write pointer to move on by the number
             of bytes required to represent the data type
@@ -454,13 +446,13 @@ class DataSpecificationGenerator(object):
                     * If data_is_register is True, the type of the data held
                       in the register
                     * If data_is_register is False, the type to convert data to
-        :type data_type: DATA_TYPE
+        :type data_type: :py:class:`DataType`
         :return: The position of the write pointer within the current region,
                     in bytes from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If repeats_is_register is False, and repeats is out\
                       of range
                       If repeats_is_register is True, and repeats is not a\
@@ -471,11 +463,11 @@ class DataSpecificationGenerator(object):
                       data type
                     * If data_is_register is True and data is not a valid\
                       register id
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     If the data type is not known
-        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
                     If no region has been selected to write to
-        :raise data_allocation.exceptions.DataSpecificationRegionExhaustedException:\
+        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
                     If the selected region has no more space
         """
         pass
@@ -489,11 +481,11 @@ class DataSpecificationGenerator(object):
         :return: The position of the write pointer within the current region,\
                     in bytes from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
                     If no region has been selected to write to
-        :raise data_allocation.exceptions.DataSpecificationRegionExhaustedException:\
+        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
                     If the selected region has no more space
         """
         pass
@@ -505,13 +497,13 @@ class DataSpecificationGenerator(object):
         :type region: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the region identifier is not valid
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     If the region has not been allocated
-        :raise data_allocation.exceptions.DataSpecificationRegionUnfilledException:\
+        :raise data_specification.exceptions.DataSpecificationRegionUnfilledException:\
                     If the selected region should not be filled
         """
         pass
@@ -554,9 +546,9 @@ class DataSpecificationGenerator(object):
         :type increment_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If counter_register_id is not a valid register id
                     * If start_is_register is True and increment is not a valid\
                       register_id
@@ -578,9 +570,9 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
+        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no loop in operation at this point
         """
         pass
@@ -592,9 +584,9 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
+        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no loop in operation at this point
         """
         pass
@@ -610,7 +602,7 @@ class DataSpecificationGenerator(object):
         :type register_id: int
         :param condition: The condition which must be true to execute the\
                     following commands
-        :type condition: CONDITION
+        :type condition: :py:class:`Condition`
         :param value: 
                     * If value_is_register is False, the value to compare to\
                       the value in the register
@@ -621,13 +613,13 @@ class DataSpecificationGenerator(object):
         :type value_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If the register_id is not a valid register id
                     * if value_is_register is True and value is not a valid\
                       register id
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     If the condition is not a valid condition
         """
         pass
@@ -641,9 +633,9 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
+        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no conditional in operation at this point
         """
         pass
@@ -653,15 +645,15 @@ class DataSpecificationGenerator(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationInvalidCommandException:\
+        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
                     If there is no conditional in operation at this point
         """
         pass
     
     def set_register_value(self, register_id, data, data_is_register=False, 
-            data_type=DATA_TYPE.uint32):
+            data_type=DataType.UINT32):
         """ Insert command to set the value of a register
         
         :param register_id: The id of the register to assign, between 0 and 15
@@ -674,12 +666,12 @@ class DataSpecificationGenerator(object):
         :param data_is_register: Indicates if data is a register id
         :type data_is_register: bool
         :param data_type: The type of the data to be assigned
-        :type data_type: DATA_TYPE
+        :type data_type: :py:class:`DataType`
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If register_id is not a valid register_id
                     * If data_is_register is True, and data is not a valid\
                       register id
@@ -687,7 +679,7 @@ class DataSpecificationGenerator(object):
                       type and data has a fractional part
                     * If data_is_register if False, and data would overflow the\
                       data type
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     If the data type is not known
         """
         pass
@@ -699,11 +691,11 @@ class DataSpecificationGenerator(object):
         :type register_id: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the register_id is not a valid register id
-        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
                     If no region has been selected
         """
         pass
@@ -728,15 +720,15 @@ class DataSpecificationGenerator(object):
         :type relative_to_current: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     If the address_is_register is True and address is not\
                     a valid register id
-        :raise data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationRegionOutOfBoundsException:\
                     If the move of the pointer would put it outside of the\
                     current region
-        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
                     If no region has been selected
         """
         
@@ -764,17 +756,17 @@ class DataSpecificationGenerator(object):
         :return: The current write pointer within the current region, in bytes\
                     from the start of the region
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If log_block_size_is_register is False, and\
                       log_block_size is not within the allowed range
                     * If log_block_size_is_register is True and log_block_size\
                       is not a valid register id
-        :raise data_allocation.exceptions.DataSpecificationRegionOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationRegionOutOfBoundsException:\
                     If the move of the pointer would put it outside of the\
                     current region
-        :raise data_allocation.exceptions.DataSpecificationNoRegionSelectedException:\
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
                     If no region has been selected
         """
         pass
@@ -793,7 +785,7 @@ class DataSpecificationGenerator(object):
                     * If operand_1_is_register is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
-        :type operation: ARITHMETIC_OPERATION
+        :type operation: :py:class:`ArithmeticOperation`
         :param operand_2:
                     * If operand_2_is_register is True, the id of a register\
                       where the second operand can be found, between 0 and 15
@@ -805,14 +797,14 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If operand_1_is_register is True and operand_1 is not a\
                       valid register id
                     * If operand_2_is_register is True and operand_2 is not a\
                       valid register id
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     If operation is not a known operation
         """
         pass
@@ -831,7 +823,7 @@ class DataSpecificationGenerator(object):
                     * If operand_1_is_register is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
-        :type operation: LOGIC_OPERATION
+        :type operation: :py:class:`LogicOperation`
         :param operand_2:
                     * If operand_2_is_register is True, the id of a register\
                       where the second operand can be found. between 0 and 15
@@ -841,14 +833,14 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If operand_1_is_register is True and operand_1 is not a\
                       valid register id
                     * If operand_2_is_register is True and operand_2 is not a\
                       valid register id
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     If operation is not a known operation
         """
         pass
@@ -881,9 +873,9 @@ class DataSpecificationGenerator(object):
         :type destination_id_is_register: bool
         :return: The id of the copied structure, between 0 and 15
         :rtype: int
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If source_id_is_register is True and source_structure_id\
                       is not a valid register id
                     * If destination_id_is_register is True and\
@@ -892,10 +884,10 @@ class DataSpecificationGenerator(object):
                       is not a valid struture id
                     * If destination_id_is_register is False and\
                       destination_structure_id is not a valid structure id
-        :raise data_allocation.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
                     If destination_structure_id is None and there are no more\
                     structure ids
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     * If destination_structure_id is not None and no structure\
                       with id destination_structure_id has been allocated
                     * If no structure with id source_structure_id has been\
@@ -923,18 +915,18 @@ class DataSpecificationGenerator(object):
         :type destination_parameter_index: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If source_struture_id is not a valid struture id
                     * If ddestination_structure_id is not a valid structure id
                     * If source_parameter_index is not a valid parameter index\
                       in the source structure
                     * If destination_parameter_index is not a valid parmater\
                       index in the destination structure
-        :raise data_allocation.exceptions.DataSpecificationInvalidTypeException:\
+        :raise data_specification.exceptions.DataSpecificationInvalidTypeException:\
                     If the source and destination data types do not match
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     * If no structure with id destination_structure_id has been\
                       allocated
                     * If no structure with id source_structure_id has been
@@ -943,7 +935,7 @@ class DataSpecificationGenerator(object):
         pass
     
     def print_value(self, value, value_is_register=False, 
-            data_type=DATA_TYPE.uint32):
+            data_type=DataType.UINT32):
         """ Insert command to print out a value (for debugging)
         
         :param value:
@@ -955,19 +947,19 @@ class DataSpecificationGenerator(object):
         :param value_is_register: Indicates if the value is a register
         :type value_is_register: bool
         :param data_type: The type of the data to be printed
-        :type data_type: DATA_TYPE
+        :type data_type: :py:class:`DataType`
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If value_is_register is True and value is not a valid\
                       register id
                     * If value_is_register is False, the data_type is an
                       integer type and value has a fractional part
                     * If value_is_register is False and the value would
                       overflow the data type
-        :raise data_allocation.exceptions.DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
                     * If data_type is not a vaild data type
         """
         pass
@@ -979,7 +971,7 @@ class DataSpecificationGenerator(object):
         :type text: str
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
@@ -999,14 +991,14 @@ class DataSpecificationGenerator(object):
         :type structure_id_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
-        :raise data_allocation.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
                     * If structure_id_is_register is True and structure_id is\
                       not a valid register id
                     * If structure_id_is_register is False and structure_id is\
                       not a valid structure id
-        :raise data_allocation.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
                     If structure_id_is_register is False and structure_id is\
                     is the id of a structure that has not been allocated
         """
@@ -1020,7 +1012,7 @@ class DataSpecificationGenerator(object):
         :type close_writer: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataWriteException:\
+        :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass

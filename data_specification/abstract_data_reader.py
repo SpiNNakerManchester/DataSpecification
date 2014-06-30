@@ -1,10 +1,11 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
+from abc import abstractmethod
+from six import add_metaclass
 
-
+@add_metaclass(ABCMeta)
 class AbstractDataReader(object):
     """ Abstract reader used to read data from somewhere
     """
-    __metaclass__ = ABCMeta
     
     @abstractmethod
     def read_bytes(self, n_bytes):
@@ -16,8 +17,8 @@ class AbstractDataReader(object):
         :param n_bytes: The number of bytes to read
         :type n_bytes: int
         :return: An array of bytes
-        :rtype: array of bytes
-        :raise data_allocation.exceptions.DataReadException:\
+        :rtype: bytearray
+        :raise data_specification.exceptions.DataReadException:\
             If an error occurs reading from the underlying storage
         """
         pass
@@ -29,10 +30,10 @@ class AbstractDataReader(object):
             but may not fill the array completely.
         
         :param data: The place where the data is to be stored
-        :type data: array of bytes
+        :type data: bytearray
         :return: The number of bytes stored in data
         :rtype: int
-        :raise data_allocation.exceptions.DataReadException:\
+        :raise data_specification.exceptions.DataReadException:\
             If an error occurs reading from the underlying storage
         """
         pass
@@ -43,6 +44,7 @@ class AbstractDataReader(object):
         
         :return: Nothing is returned
         :rtype: None
-        :raise data_allocation.exceptions.DataReadException:\
+        :raise data_specification.exceptions.DataReadException:\
             If an error occurs closing the underlying storage
         """
+        pass

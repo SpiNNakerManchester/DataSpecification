@@ -96,37 +96,15 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#data_specification.abstract_data_writer.AbstractDataWriter.close" title="data_specification.abstract_data_writer.AbstractDataWriter.close"><tt class="xref py py-obj docutils literal"><span class="pre">close</span></tt></a>()</td>
-<td>Closes the writer, flushing any outstanding data to the underlying            storage.</td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#data_specification.abstract_data_writer.AbstractDataWriter.write_bytes" title="data_specification.abstract_data_writer.AbstractDataWriter.write_bytes"><tt class="xref py py-obj docutils literal"><span class="pre">write_bytes</span></tt></a>(data)</td>
+<tr class="row-odd"><td><a class="reference internal" href="#data_specification.abstract_data_writer.AbstractDataWriter.write" title="data_specification.abstract_data_writer.AbstractDataWriter.write"><tt class="xref py py-obj docutils literal"><span class="pre">write</span></tt></a>(data)</td>
 <td>Write some bytes of data to the underlying storage.</td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Detailed Methods</p>
 <dl class="method">
-<dt id="data_specification.abstract_data_writer.AbstractDataWriter.close">
-<tt class="descname">close</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/data_specification/abstract_data_writer.html#AbstractDataWriter.close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_specification.abstract_data_writer.AbstractDataWriter.close" title="Permalink to this definition">¶</a></dt>
-<dd><p>Closes the writer, flushing any outstanding data to the underlying            storage.  Does not return until all data has been written.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Nothing is returned</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
-</tr>
-<tr class="field-odd field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_specification.exceptions.html#data_specification.exceptions.DataWriteException" title="data_specification.exceptions.DataWriteException">data_specification.exceptions.DataWriteException</a>:</th></tr>
-<tr class="field-odd field"><td>&nbsp;</td><td class="field-body">If an error occurs writing to the underlying storage</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="data_specification.abstract_data_writer.AbstractDataWriter.write_bytes">
-<tt class="descname">write_bytes</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/data_specification/abstract_data_writer.html#AbstractDataWriter.write_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_specification.abstract_data_writer.AbstractDataWriter.write_bytes" title="Permalink to this definition">¶</a></dt>
+<dt id="data_specification.abstract_data_writer.AbstractDataWriter.write">
+<tt class="descname">write</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/data_specification/abstract_data_writer.html#AbstractDataWriter.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#data_specification.abstract_data_writer.AbstractDataWriter.write" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write some bytes of data to the underlying storage.            Does not return until all the bytes have been written.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -138,8 +116,7 @@
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
-<tr class="field-even field"><th class="field-name" colspan="2">Raises <a class="reference internal" href="data_specification.exceptions.html#data_specification.exceptions.DataWriteException" title="data_specification.exceptions.DataWriteException">data_specification.exceptions.DataWriteException</a>:</th></tr>
-<tr class="field-even field"><td>&nbsp;</td><td class="field-body">If an error occurs writing to the underlying storage</td>
+<tr class="field-even field"><th class="field-name">Raises IOError:</th><td class="field-body">If an error occurs writing to the underlying storage</td>
 </tr>
 </tbody>
 </table>

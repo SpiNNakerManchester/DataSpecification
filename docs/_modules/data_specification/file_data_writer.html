@@ -72,18 +72,23 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param filename: The file to write to</span>
 <span class="sd">        :type filename: str</span>
-<span class="sd">        :raise data_specification.exceptions.DataWriteException: If the file cannot</span>
-<span class="sd">                    found or opened for writing</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException: If the file\</span>
+<span class="sd">                    cannot found or opened for writing</span>
 <span class="sd">        &quot;&quot;&quot;</span>
     
-<div class="viewcode-block" id="FileDataWriter.write_bytes"><a class="viewcode-back" href="../../data_specification.file_data_writer.html#data_specification.file_data_writer.FileDataWriter.write_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">write_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write_bytes`</span>
+<div class="viewcode-block" id="FileDataWriter.write"><a class="viewcode-back" href="../../data_specification.file_data_writer.html#data_specification.file_data_writer.FileDataWriter.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># TODO</span>
         <span class="k">pass</span>
     </div>
 <div class="viewcode-block" id="FileDataWriter.close"><a class="viewcode-back" href="../../data_specification.file_data_writer.html#data_specification.file_data_writer.FileDataWriter.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.close`</span>
+        <span class="sd">&quot;&quot;&quot; Closes the file</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Nothing is returned</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise data_specification.exceptions.DataWriteException: If the file\</span>
+<span class="sd">                    cannot be closed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># TODO</span>
         <span class="k">pass</span></div></div>

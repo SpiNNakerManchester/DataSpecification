@@ -4,11 +4,12 @@
    contain the root `toctree` directive.
 
 Data Specification
-=========================
+==================
 
 .. automodule:: data_specification
 
-Contents:
+Contents
+--------
 
 .. toctree::
    :maxdepth: 4
@@ -17,7 +18,7 @@ Contents:
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

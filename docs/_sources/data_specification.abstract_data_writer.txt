@@ -11,11 +11,9 @@ data_specification.abstract_data_writer module
     .. rubric:: Abstract Methods
 
     .. autosummary::
-        close
-        write_bytes
+        write
 
     .. rubric:: Detailed Methods
 
-    .. automethod:: close
-    .. automethod:: write_bytes
+    .. automethod:: write
 

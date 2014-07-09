@@ -74,25 +74,30 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param filename: The file to read</span>
 <span class="sd">        :type filename: str</span>
-<span class="sd">        :raise data_specification.exceptions.DataReadException: If the file cannot</span>
-<span class="sd">                    found or opened for reading</span>
+<span class="sd">        :raise data_specification.exceptions.DataReadException: If the file\</span>
+<span class="sd">                    cannot found or opened for reading</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     
-<div class="viewcode-block" id="FileDataReader.read_bytes"><a class="viewcode-back" href="../../data_specification.file_data_reader.html#data_specification.file_data_reader.FileDataReader.read_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">read_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">):</span>
+<div class="viewcode-block" id="FileDataReader.read"><a class="viewcode-back" href="../../data_specification.file_data_reader.html#data_specification.file_data_reader.FileDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; See :py:meth:`data_specification.abstract_data_reader.AbstractDataReader.read_bytes`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># TODO</span>
         <span class="k">return</span> <span class="bp">None</span>
     </div>
-<div class="viewcode-block" id="FileDataReader.read_bytes_into"><a class="viewcode-back" href="../../data_specification.file_data_reader.html#data_specification.file_data_reader.FileDataReader.read_bytes_into">[docs]</a>    <span class="k">def</span> <span class="nf">read_bytes_into</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FileDataReader.readinto"><a class="viewcode-back" href="../../data_specification.file_data_reader.html#data_specification.file_data_reader.FileDataReader.readinto">[docs]</a>    <span class="k">def</span> <span class="nf">readinto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; See :py:meth:`data_specification.abstract_data_reader.AbstractDataReader.read_bytes_into`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># TODO</span>
         <span class="k">return</span> <span class="mi">0</span>
     </div>
 <div class="viewcode-block" id="FileDataReader.close"><a class="viewcode-back" href="../../data_specification.file_data_reader.html#data_specification.file_data_reader.FileDataReader.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; See :py:meth:`data_specification.abstract_data_reader.AbstractDataReader.close`</span>
+        <span class="sd">&quot;&quot;&quot; Closes the file</span>
+<span class="sd">        </span>
+<span class="sd">        :return: Nothing is returned:</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        :raise data_specification.exceptions.DataReadException: If the file\</span>
+<span class="sd">                    cannot be closed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c"># TODO</span>
         <span class="k">pass</span></div></div>

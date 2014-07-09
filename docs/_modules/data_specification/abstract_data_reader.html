@@ -73,8 +73,20 @@
     <span class="sd">&quot;&quot;&quot; Abstract reader used to read data from somewhere</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">__subclasshook__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">othercls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Checks if all the abstract methods are present on the subclass</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">C</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">__mro__</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">C</span><span class="o">.</span><span class="n">__dict__</span><span class="p">:</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">C</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s">&quot;__isabstractmethod__&quot;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">key</span> <span class="ow">in</span> <span class="n">B</span><span class="o">.</span><span class="n">__dict__</span> <span class="k">for</span> <span class="n">B</span> <span class="ow">in</span> <span class="n">othercls</span><span class="o">.</span><span class="n">__mro__</span><span class="p">):</span>
+                        <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractDataReader.read_bytes"><a class="viewcode-back" href="../../data_specification.abstract_data_reader.html#data_specification.abstract_data_reader.AbstractDataReader.read_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">read_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractDataReader.read"><a class="viewcode-back" href="../../data_specification.abstract_data_reader.html#data_specification.abstract_data_reader.AbstractDataReader.read">[docs]</a>    <span class="k">def</span> <span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read some bytes of data from the underlying storage.  Will block\</span>
 <span class="sd">            until some bytes are available, but might not return the full\</span>
 <span class="sd">            n_bytes.  The size of the returned array indicates how many\</span>
@@ -84,13 +96,12 @@
 <span class="sd">        :type n_bytes: int</span>
 <span class="sd">        :return: An array of bytes</span>
 <span class="sd">        :rtype: bytearray</span>
-<span class="sd">        :raise data_specification.exceptions.DataReadException:\</span>
-<span class="sd">            If an error occurs reading from the underlying storage</span>
+<span class="sd">        :raise IOError: If an error occurs reading from the underlying storage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     </div>
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractDataReader.read_bytes_into"><a class="viewcode-back" href="../../data_specification.abstract_data_reader.html#data_specification.abstract_data_reader.AbstractDataReader.read_bytes_into">[docs]</a>    <span class="k">def</span> <span class="nf">read_bytes_into</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractDataReader.readinto"><a class="viewcode-back" href="../../data_specification.abstract_data_reader.html#data_specification.abstract_data_reader.AbstractDataReader.readinto">[docs]</a>    <span class="k">def</span> <span class="nf">readinto</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read some bytes of data from the underlying storage into a\</span>
 <span class="sd">            pre-defined array.  Will block until some bytes are available,\</span>
 <span class="sd">            but may not fill the array completely.</span>
@@ -99,19 +110,7 @@
 <span class="sd">        :type data: bytearray</span>
 <span class="sd">        :return: The number of bytes stored in data</span>
 <span class="sd">        :rtype: int</span>
-<span class="sd">        :raise data_specification.exceptions.DataReadException:\</span>
-<span class="sd">            If an error occurs reading from the underlying storage</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span>
-    </div>
-    <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractDataReader.close"><a class="viewcode-back" href="../../data_specification.abstract_data_reader.html#data_specification.abstract_data_reader.AbstractDataReader.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Closes the reader</span>
-<span class="sd">        </span>
-<span class="sd">        :return: Nothing is returned</span>
-<span class="sd">        :rtype: None</span>
-<span class="sd">        :raise data_specification.exceptions.DataReadException:\</span>
-<span class="sd">            If an error occurs closing the underlying storage</span>
+<span class="sd">        :raise IOError: If an error occurs reading from the underlying storage</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div></div>
 </pre></div>

@@ -46,8 +46,13 @@
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Data Specification</a></li>
+<li><a class="reference internal" href="#">Data Specification</a><ul>
+<li><a class="reference internal" href="#functional-requirements">Functional Requirements</a></li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#contents">Contents</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
 </ul>
 
   <h4>Next topic</h4>
@@ -84,7 +89,43 @@
 <p>Used to generate memory images from a set of instructions.</p>
 <p>The main part of this package is the
 <a class="reference internal" href="data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator" title="data_specification.data_specification_generator.DataSpecificationGenerator"><tt class="xref py py-class docutils literal"><span class="pre">data_specification.data_specification_generator.DataSpecificationGenerator</span></tt></a>    class. This is used to generate a &#8220;Data Specification&#8221;, which can then be    executed to produce a memory image.  This package also handles this function    if required, through the    <a class="reference internal" href="data_specification.data_specification_executor.html#data_specification.data_specification_executor.DataSpecificationExecutor" title="data_specification.data_specification_executor.DataSpecificationExecutor"><tt class="xref py py-class docutils literal"><span class="pre">data_specification.data_specification_executor.DataSpecificationExecutor</span></tt></a>    class.</p>
-<p>Contents:</p>
+<div class="section" id="functional-requirements">
+<h2>Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul>
+<li><p class="first">Creation of a Data Specification Language file which can be executed          to produce a memory image.</p>
+<blockquote>
+<div><ul class="simple">
+<li>Any errors that can be checked during the creation of the              specification should throw an exception.</li>
+<li>It will be impossible to detect all errors at creation time.</li>
+<li>There should be no assumption of where the data specification is              be stored, although a default provision of a way to write the              specification to a file is acceptable.</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Execution of a Data Specification Language file, producing a          memory image.</p>
+<blockquote>
+<div><ul class="simple">
+<li>This should detect any errors during execution and report them,              halting the execution.</li>
+<li>There should be no assumption of where the data specification is              read from, although a default provision of a way to read the              specification from a file is acceptable.</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt>There are a number of use-cases of this library:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="data_specification.data_specification_generator.html#data_specification.data_specification_generator.DataSpecificationGenerator" title="data_specification.data_specification_generator.DataSpecificationGenerator"><tt class="xref py py-class docutils literal"><span class="pre">DataSpecificationGenerator</span></tt></a>          is used to create a compressed memory image which can be expanded          later, to reduce the amount of data that needs to be transferred over          a slow connection</li>
+<li><a class="reference internal" href="data_specification.data_specification_executor.html#data_specification.data_specification_executor.DataSpecificationExecutor" title="data_specification.data_specification_executor.DataSpecificationExecutor"><tt class="xref py py-class docutils literal"><span class="pre">DataSpecificationExecutor</span></tt></a>          is used to execute a previously generated specification at the          receiving end of a slow connection.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="data_specification.html">data_specification package</a><ul>
@@ -104,12 +145,13 @@
 </div>
 </div>
 <div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
+</div>
 </div>
 
 

@@ -7,8 +7,20 @@ class AbstractDataReader(object):
     """ Abstract reader used to read data from somewhere
     """
     
+    @classmethod
+    def __subclasshook__(cls, othercls):
+        """ Checks if all the abstract methods are present on the subclass
+        """
+        for C in cls.__mro__:
+            for key in C.__dict__:
+                item = C.__dict__[key]
+                if hasattr(item, "__isabstractmethod__"):
+                    if not any(key in B.__dict__ for B in othercls.__mro__):
+                        return NotImplemented
+        return True
+    
     @abstractmethod
-    def read_bytes(self, n_bytes):
+    def read(self, n_bytes):
         """ Read some bytes of data from the underlying storage.  Will block\
             until some bytes are available, but might not return the full\
             n_bytes.  The size of the returned array indicates how many\
@@ -18,13 +30,12 @@ class AbstractDataReader(object):
         :type n_bytes: int
         :return: An array of bytes
         :rtype: bytearray
-        :raise data_specification.exceptions.DataReadException:\
-            If an error occurs reading from the underlying storage
+        :raise IOError: If an error occurs reading from the underlying storage
         """
         pass
     
     @abstractmethod
-    def read_bytes_into(self, data, offset=0, length=None):
+    def readinto(self, data):
         """ Read some bytes of data from the underlying storage into a\
             pre-defined array.  Will block until some bytes are available,\
             but may not fill the array completely.
@@ -33,18 +44,6 @@ class AbstractDataReader(object):
         :type data: bytearray
         :return: The number of bytes stored in data
         :rtype: int
-        :raise data_specification.exceptions.DataReadException:\
-            If an error occurs reading from the underlying storage
-        """
-        pass
-    
-    @abstractmethod
-    def close(self):
-        """ Closes the reader
-        
-        :return: Nothing is returned
-        :rtype: None
-        :raise data_specification.exceptions.DataReadException:\
-            If an error occurs closing the underlying storage
+        :raise IOError: If an error occurs reading from the underlying storage
         """
         pass

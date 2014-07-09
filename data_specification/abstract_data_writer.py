@@ -7,8 +7,20 @@ class AbstractDataWriter(object):
     """ Abstract writer used to write data somewhere
     """
     
+    @classmethod
+    def __subclasshook__(cls, othercls):
+        """ Checks if all the abstract methods are present on the subclass
+        """
+        for C in cls.__mro__:
+            for key in C.__dict__:
+                item = C.__dict__[key]
+                if hasattr(item, "__isabstractmethod__"):
+                    if not any(key in B.__dict__ for B in othercls.__mro__):
+                        return NotImplemented
+        return True
+    
     @abstractmethod
-    def write_bytes(self, data):
+    def write(self, data):
         """ Write some bytes of data to the underlying storage.\
             Does not return until all the bytes have been written.
         
@@ -16,19 +28,6 @@ class AbstractDataWriter(object):
         :type data: bytearray
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataWriteException:\
-            If an error occurs writing to the underlying storage
-        """
-        pass
-    
-    @abstractmethod
-    def close(self):
-        """ Closes the writer, flushing any outstanding data to the underlying\
-            storage.  Does not return until all data has been written.
-        
-        :return: Nothing is returned
-        :rtype: None
-        :raise data_specification.exceptions.DataWriteException:\
-            If an error occurs writing to the underlying storage
+        :raise IOError: If an error occurs writing to the underlying storage
         """
         pass

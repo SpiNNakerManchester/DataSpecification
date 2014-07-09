@@ -6,18 +6,23 @@ class FileDataWriter(AbstractDataWriter):
         """
         :param filename: The file to write to
         :type filename: str
-        :raise data_specification.exceptions.DataWriteException: If the file cannot
-                    found or opened for writing
+        :raise data_specification.exceptions.DataWriteException: If the file\
+                    cannot found or opened for writing
         """
     
-    def write_bytes(self, data):
-        """ See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write_bytes`
+    def write(self, data):
+        """ See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write`
         """
         # TODO
         pass
     
     def close(self):
-        """ See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.close`
+        """ Closes the file
+        
+        :return: Nothing is returned
+        :rtype: None
+        :raise data_specification.exceptions.DataWriteException: If the file\
+                    cannot be closed
         """
         # TODO
         pass

@@ -12,12 +12,12 @@ data_specification.file_data_reader module
 
     .. autosummary::
         close
-        read_bytes
-        read_bytes_into
+        read
+        readinto
 
     .. rubric:: Detailed Methods
 
     .. automethod:: close
-    .. automethod:: read_bytes
-    .. automethod:: read_bytes_into
+    .. automethod:: read
+    .. automethod:: readinto
 

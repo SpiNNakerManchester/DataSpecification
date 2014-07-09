@@ -12,10 +12,10 @@ data_specification.file_data_writer module
 
     .. autosummary::
         close
-        write_bytes
+        write
 
     .. rubric:: Detailed Methods
 
     .. automethod:: close
-    .. automethod:: write_bytes
+    .. automethod:: write
 

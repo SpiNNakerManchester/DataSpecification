@@ -340,4 +340,5 @@ if os.environ.get('READTHEDOCS', None) == 'True':
         if (os.path.isfile(f) and f.endswith(".rst")
                 and f != "index.rst" and f != "modules.rst"):
             os.remove(f)
-    subprocess.call("python ../make_rst.py -f -e -o . ../../spinnman")
+    subprocess.call("python ../make_rst.py -f -e -o . ../../spinnman", 
+            script=True)

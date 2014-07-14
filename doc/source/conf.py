@@ -332,3 +332,12 @@ epub_exclude_files = ['search.html']
 #epub_use_index = True
 
 autoclass_content = 'both'
+
+# Do the rst generation if in READ_THE_DOCS
+import subprocess
+if os.environ.get('READTHEDOCS', None) == 'True':
+    for f in os.listdir("."):
+        if (os.path.isfile(f) and f.endswith(".rst")
+                and f != "index.rst" and f != "modules.rst"):
+            os.remove(f)
+    subprocess.call("python ../make_rst.py -f -e -o . ../../spinnman")

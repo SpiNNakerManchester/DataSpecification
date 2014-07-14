@@ -9,5 +9,5 @@ setup(
     description="Specification of Memory Images",
     url="https://github.com/SpiNNakerManchester/DataSpecification",
     packages=['data_specification'],
-    install_requires=['six', 'enum34'],
+    install_requires=['six', 'enum34']
 )

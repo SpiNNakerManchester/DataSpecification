@@ -92,13 +92,11 @@ class DataSpecificationGenerator(object):
         executed to produce a memory image
     """
     
-    def __init__(self, spec_writer, app_id, magic=None, write_text=False):
+    def __init__(self, spec_writer, magic=None, write_text=False):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
                 :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
-        :param app_id: The id of the application
-        :type app_id: int
         :param magic: Magic number to write to the header or None to use default
         :type magic: int
         :param write_text: Determines if a text version of the specification\
@@ -317,8 +315,8 @@ class DataSpecificationGenerator(object):
         """
         pass
     
-    def write_structure(self, structure_id, repeats=1, 
-            repeats_is_register=False):
+    def write_structure(
+            self, structure_id, repeats=1, repeats_is_register=False):
         """ Insert command to write a structure to the current write pointer,
             causing the current write pointer to move on by the number of
             bytes needed to represent the structure

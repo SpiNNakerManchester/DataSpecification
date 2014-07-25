@@ -24,7 +24,7 @@ class DataType(Enum):
     U064 = (19, "0.64 unsigned fixed point number")
     S07 = (20, "0.7 signed fixed point number")
     S015 = (21, "0.15 signed fixed point number")
-    S031 = (22, "0.32 signed fixed point number")
+    S031 = (22, "0.31 signed fixed point number")
     S063 = (23, "0.63 signed fixed point number")
     
     def __init__(self, value, doc=""):
@@ -92,21 +92,24 @@ class DataSpecificationGenerator(object):
         executed to produce a memory image
     """
     
-    def __init__(self, spec_writer, magic=None, write_text=False):
+    def __init__(self, spec_writer, magic=None, report_writer=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
                 :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
         :param magic: Magic number to write to the header or None to use default
         :type magic: int
-        :param write_text: Determines if a text version of the specification\
+        :param report_writer: Determines if a text version of the specification\
                     is to be written
-        :type write_text: bool
+        :type report_writer: Implementation of\
+                :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
         :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
-        pass
-    
+        self.spec_writer = spec_writer
+        self.report_writer = report_writer
+        self.magic_number = magic
+
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\
             Note that this is ignored by the binary file
@@ -117,19 +120,20 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
-        pass
-    
-    def execute_break(self):
+        if self.report_writer is not None:
+            self.report_writer.write(comment)
+
+    def define_break(self):
         """ Insert command to stop execution with an exception (for debugging)
-        
+
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         pass
-        
-    def execute_no_operation(self):
+
+    def no_operation(self):
         """ Insert command to execute nothing
         
         :return: Nothing is returned
@@ -246,7 +250,7 @@ class DataSpecificationGenerator(object):
         """
         pass
     
-    def define_struture(self, parameters):
+    def define_structure(self, parameters):
         """ Insert commands to define a data structure
         
         :param parameters: A list of between 1 and 255 tuples of\

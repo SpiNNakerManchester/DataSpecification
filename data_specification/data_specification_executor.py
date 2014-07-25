@@ -3,7 +3,7 @@ class DataSpecificationExecutor(object):
         image
     """
     
-    def __init__(self, spec_reader, mem_writer, space):
+    def __init__(self, spec_reader, mem_writer, machine):
         """
         :param spec_reader: The object to read the specification language file\
                     from
@@ -12,9 +12,9 @@ class DataSpecificationExecutor(object):
         :param mem_writer: The object to write the memory image to
         :type mem_writer:\
                     :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
-        :param space: The amount of space into which the final image must fit,\
-                    in bytes
-        :type space: int
+        :param machine: The machine object to which the data is targeted
+        :type machine:\
+                    ==insert here machine object pointer==
         :raise data_specification.exceptions.DataReadException:\
                     If a read from external storage fails
         :raise data_specification.exceptions.DataWriteException:\

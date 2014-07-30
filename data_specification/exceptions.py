@@ -11,6 +11,19 @@ class DataWriteException(Exception):
         print message
 
 
+class DataUndefinedWriterException(Exception):
+    """an exception that indicates that the file data writer has not been\
+       initialised
+    """
+
+    def __init__(self, message):
+        """
+        :param message: A message to indicate what when wrong
+        :type message: str
+        """
+        print message
+
+
 class DataReadException(Exception):
     """ An exception that indicates that there was an error reading\
         from the underlying medium

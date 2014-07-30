@@ -448,32 +448,27 @@ class DataSpecificationGenerator(object):
         """
         pass
 
-    def write_value(self, data, data_is_register=False, repeats=1,
-                repeats_is_register=False, data_type=DataType.UINT32):
+    def write_value(
+            self, data, repeats=1, repeats_register=None,
+            data_type=DataType.UINT32):
         """ Insert command to write a value one or more times to the current
         write pointer, causing the write pointer to move on by the number
-        of bytes required to represent the data type
+        of bytes required to represent the data type. The data is passed as a
+        parameter to this function
 
-        :param data:
-            * If data_is_register is True, the id of the register
-              containing the data, between 0 and 15
-            * If data_is_register is False, the data to write as a float
+        :param data: the data to write as a float.
         :type data: float
-        :param data_is_register: Identifies if data is a register id
-        :type data_is_register: bool
         :param repeats:
-            * If repeats_is_register is True, the id of the register
-              containing the number of times to repeat the data,
-              between 0 and 15
-            * If repeats_is_register is False, the number of times to\
-              repeat the data, between 1 and 255
+            * If repeats_register is None, this parameter identifies the\
+              number of times to repeat the data, between 1 and 255\
+              (default 1)
+            * If repeats_register is not None (i.e. has an integer value), the
+              content of this parameter is disregarded
         :type repeats: int
-        :param repeats_is_register: Identifies if repeats is a register id
-        :type repeats_is_register: bool
-        :param data_type:
-            * If data_is_register is True, the type of the data held
-              in the register
-            * If data_is_register is False, the type to convert data to
+        :param repeats_register: Identifies the register containing the number\
+                                 of repeats of the value to write
+        :type repeats_register: None or int
+        :param data_type: the type to convert data to
         :type data_type: :py:class:`DataType`
         :return: The position of the write pointer within the current region,
             in bytes from the start of the region
@@ -483,14 +478,106 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            * If repeats_is_register is False, and repeats is out of range
-              If repeats_is_register is True, and repeats is not a valid\
-              register id
-            * If data_is_register is False, and data_type is an integer\
-              type, and data has a fractional part
-            * If data_is_register is False and data would overflow the\
-              data type
-            * If data_is_register is True and data is not a valid register id
+            * If repeats_register is None, and repeats is out of range
+            * If repeats_register is not a valid register id
+            * If data_type is an integer type, and data has a fractional part
+            * If data would overflow the data type
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
+            If the data type is not known
+        :raise data_specification.exceptions.DataSpecificationInvalidSizeException:\
+            If the data size is invalid
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
+            If no region has been selected to write to
+        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
+            If the selected region has no more space
+        """
+        if data_type not in DataType:
+            raise exceptions.DataSpecificationUnknownTypeException(
+                data_type, data, Commands.WRITE.name)
+
+        data_size = data_type.size
+        if data_size == 1:
+            cmd_data_len = 0
+        elif data_size == 2:
+            cmd_data_len = 1
+        elif data_size == 4:
+            cmd_data_len = 2
+        elif data_size == 8:
+            cmd_data_len = 3
+        else:
+            raise exceptions.DataSpecificationInvalidSizeException(
+                data_type.name, data_size, Commands.WRITE.name)
+
+        if repeats_register is None:
+            if (repeats < 0) or (repeats > 255):
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "repeats", repeats, 0, 255, Commands.WRITE.name)
+        else:
+            if (repeats_register < 0) or (repeats_register >= constants.MAX_REGISTERS):
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "repeats_register", repeats_register, 0,
+                    (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
+
+        if (data < data_type.min) or (data > data_type.max):
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "data", data, data_type.min, data_type.max,
+                    Commands.WRITE.name)
+
+        cmd_len = 1
+        parameters = 0
+        cmd_string = "WRITE data=0x{0:X}".format(data)
+
+        if repeats_register is not None:
+            repeat_reg_usage = 1
+            parameters |= (repeats_register << 4)
+            cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
+                                                            repeats_register)
+        else:
+            repeat_reg_usage = 0
+            parameters |= repeats
+            cmd_string = "{0:s}, repeats={1:u}".format(cmd_string, repeats)
+
+        cmd_word = (cmd_len << 28) | (Commands.WRITE.value << 20) | \
+                   (repeat_reg_usage << 16) | (cmd_data_len << 12) | parameters
+
+        cmd_word_list = [cmd_word, data]
+        cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
+    def write_value_from_register(
+            self, data_register, repeats=1, repeats_register=None,
+            data_type=DataType.UINT32):
+        """ Insert command to write a value one or more times to the current
+        write pointer, causing the write pointer to move on by the number
+        of bytes required to represent the data type. The data is contained in
+        a register whose id is passed to the function
+
+        :param data_register: Identifies the register in which the data is\
+                              stored.
+        :type data_register: int
+        :param repeats:
+            * If repeats_register is None, this parameter identifies the\
+              number of times to repeat the data, between 1 and 255\
+              (default 1)
+            * If repeats_register is not None (i.e. has an integer value), the\
+              content of this parameter is disregarded
+        :type repeats: int
+        :param repeats_register: Identifies the register containing the number\
+            of repeats of the value to write
+        :type repeats_register: None or int
+        :param data_type: the type of the data held in the register
+        :type data_type: :py:class:`DataType`
+        :return: The position of the write pointer within the current region,\
+            in bytes from the start of the region
+        :rtype: int
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+            * If repeats_register is None, and repeats is out of range
+            * If repeats_register is not a valid register id
+            * If data_register is not a valid register id
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             If the data type is not known
         :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
@@ -498,7 +585,61 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
             If the selected region has no more space
         """
-        pass
+        if data_type not in DataType:
+            raise exceptions.DataSpecificationUnknownTypeException(
+                data_type, data, Commands.WRITE.name)
+
+        data_size = data_type.size
+        if data_size == 1:
+            cmd_data_len = 0
+        elif data_size == 2:
+            cmd_data_len = 1
+        elif data_size == 4:
+            cmd_data_len = 2
+        elif data_size == 8:
+            cmd_data_len = 3
+        else:
+            raise exceptions.DataSpecificationInvalidSizeException(
+                data_type.name, data_size, Commands.WRITE.name)
+
+        if repeats_register is None:
+            if (repeats < 0) or (repeats > 255):
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "repeats", repeats, 0, 255, Commands.WRITE.name)
+        else:
+            if (repeats_register < 0) or (repeats_register >= constants.MAX_REGISTERS):
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "repeats_register", repeats_register, 0,
+                    (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
+
+        if (data_register < 0) or (data_register >= constants.MAX_REGISTERS):
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "data_register", data_register, 0,
+                (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
+
+        cmd_len = 0
+        parameters = 0
+        data_reg = 1
+        cmd_string = "WRITE data=reg[{0:d}]".format(data_register)
+
+        if repeats_register is not None:
+            repeat_reg_usage = 1
+            parameters |= (repeats_register << 4)
+            cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
+                                                            repeats_register)
+        else:
+            repeat_reg_usage = 0
+            parameters |= repeats
+            cmd_string = "{0:s}, repeats={1:u}".format(cmd_string, repeats)
+
+        cmd_word = (cmd_len << 28) | (Commands.WRITE.value << 20) | \
+                   (data_reg << 17) | (repeat_reg_usage << 16) | \
+                   (cmd_data_len << 12) | (data_register << 8) | parameters
+
+        cmd_word_list = [cmd_word]
+        cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
 
     def write_array(self, array):
         """ Insert command to write an array of words, causing the write pointer

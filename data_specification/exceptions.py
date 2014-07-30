@@ -56,7 +56,7 @@ class DataSpecificationRegionInUseException(DataSpecificationException):
         :param region: The region that was already allocated
         :type message: int
         """
-        print "Region {%d} was already allocated".format(region)
+        print "Region {0:d} was already allocated".format(region)
 
 
 class DataSpecificationRegionUnfilledException(DataSpecificationException):
@@ -71,7 +71,7 @@ class DataSpecificationRegionUnfilledException(DataSpecificationException):
         :param command: The command being executed
         :type command: str
         """
-        print "Region {%d} was requested unfilled, but command {} requests its use".format(
+        print "Region {0:d} was requested unfilled, but command {1:s} requests its use".format(
             region, command)
 
 
@@ -84,7 +84,7 @@ class DataSpecificationNoRegionSelectedException(DataSpecificationException):
         :param command: The command being executed
         :type command: str
         """
-        print "Command {} tries to operate on an unspecified memory region".format(
+        print "Command {0:s} tries to operate on an unspecified memory region".format(
             command)
 
 
@@ -106,7 +106,7 @@ class DataSpecificationRegionExhaustedException(DataSpecificationException):
         :param command: The command being executed
         :type command: str
         """
-        print "Region {%d} with size {%d} ran out of allocated memory (space already occupied {%d}) during command {}".format(
+        print "Region {0:d} with size {1:d} ran out of allocated memory (space already occupied {2:d}) during command {3:s}".format(
             region, region_size, allocated_size, command)
 
 
@@ -127,7 +127,7 @@ class DataSpecificationRegionOutOfBoundsException(DataSpecificationException):
         :param command: The command being executed
         :type command: str
         """
-        print "Requesting offset {%d} into region {%d} with size {%d} during command {}".format(
+        print "Requesting offset {0:d} into region {1:d} with size {2:d} during command {3:s}".format(
             requested_offset, region, region_size, command)
 
 
@@ -150,7 +150,7 @@ class DataSpecificationParameterOutOfBoundsException(
         :param command: The command being executed
         :type command: str
         """
-        print "Requesting value {%d} for parameter {} whose allowed range is from {%d} to {%d} during command {%s}".format(
+        print "Requesting value {0:d} for parameter {1:s} whose allowed range is from {2:d} to {3:d} during command {4:s}".format(
             value, parameter, range_min, range_max, command)
 
 
@@ -168,7 +168,7 @@ class DataSpecificationNotAllocatedException(DataSpecificationException):
         :param command: The command being executed
         :type command: str
         """
-        print "Using unallocated item with type {} and id {%d} during command {%s}".format(
+        print "Using unallocated item with type {0:s} and id {1:d} during command {2:s}".format(
             item_type, item_id, command)
 
 
@@ -184,7 +184,7 @@ class DataSpecificationNoMoreException(DataSpecificationException):
         :param items_allocated: The number of items that have been allocated
         :type item_type: int
         """
-        print "Unavailable space for requested item type {%s}. Items already allocated: {%d}".format(
+        print "Unavailable space for requested item type {0:s}. Items already allocated: {1:d}".format(
             item_type, items_allocated)
 
 
@@ -198,13 +198,30 @@ class DataSpecificationUnknownTypeException(DataSpecificationException):
         :param type_name: The name of the requested type
         :type type_name: str
         :param requested_value: The requested value
-        :type requested_value: int
+        :type requested_value: float
         :param command: The command being executed
         :type command: str
         """
-        print "Unknown value {%d} of the requested type {%s} during command {%s}".format(
+        print "Unknown value {0:f} of the requested type {1:s} during command {2:s}".format(
             type_name, requested_value, command)
 
+
+class DataSpecificationInvalidSizeException(DataSpecificationException):
+    """ An exception that indicates that the size of the requested type is\
+        invalid
+    """
+
+    def __init__(self, type_name, type_size, command):
+        """
+        :param type_name: The name of the requested type
+        :type type_name: str
+        :param type_size: The size of the requested variable
+        :type type_size: int
+        :param command: The command being executed
+        :type command: str
+        """
+        print "Invalid size {0:d} of the requested type {1:s} during command {%s}".format(
+            type_size, type_name, command)
 
 class DataSpecificationInvalidCommandException(DataSpecificationException):
     """ An exception that indicates that the command being requested cannot be
@@ -216,7 +233,7 @@ class DataSpecificationInvalidCommandException(DataSpecificationException):
         :param command: The command being executed
         :type command: str
         """
-        print "The requested command {%s} cannot be executed at this point in the specification".format(
+        print "The requested command {0:s} cannot be executed at this point in the specification".format(
             command)
 
 
@@ -236,5 +253,5 @@ class DataSpecificationInvalidTypeException(DataSpecificationException):
         :param command: The command being executed
         :type command: str
         """
-        print "The value assigned {%d} does not match the value expected {%d} for type {%s} during command {%s}".format(
+        print "The value assigned {0:d} does not match the value expected {1:d} for type {2:s} during command {3:s}".format(
             requested_value, expected_value, type_name, command)

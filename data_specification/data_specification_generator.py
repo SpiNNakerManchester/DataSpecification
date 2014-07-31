@@ -470,9 +470,8 @@ class DataSpecificationGenerator(object):
         :type repeats_register: None or int
         :param data_type: the type to convert data to
         :type data_type: :py:class:`DataType`
-        :return: The position of the write pointer within the current region,
-            in bytes from the start of the region
-        :rtype: int
+        :return: Nothing is returned
+        :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
@@ -567,9 +566,8 @@ class DataSpecificationGenerator(object):
         :type repeats_register: None or int
         :param data_type: the type of the data held in the register
         :type data_type: :py:class:`DataType`
-        :return: The position of the write pointer within the current region,\
-            in bytes from the start of the region
-        :rtype: int
+        :return: Nothing is returned
+        :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
@@ -587,7 +585,7 @@ class DataSpecificationGenerator(object):
         """
         if data_type not in DataType:
             raise exceptions.DataSpecificationUnknownTypeException(
-                data_type, data, Commands.WRITE.name)
+                data_type, 0, Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:

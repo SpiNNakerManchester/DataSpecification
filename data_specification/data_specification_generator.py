@@ -47,7 +47,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        self.write_command_to_files([], comment)
+        self.write_command_to_files([], comment, no_instruction_number=True)
 
     def define_break(self):
         """ Insert command to stop execution with an exception (for debugging)
@@ -1246,7 +1246,7 @@ class DataSpecificationGenerator(object):
         """ Insert a command to indicate that the specification has finished\
         and finish writing
         
-        :param close_writer: Indicates whether to close the underlying writer
+        :param close_writer: Indicates whether to close the underlying writer(s)
         :type close_writer: bool
         :return: Nothing is returned
         :rtype: None
@@ -1255,7 +1255,18 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        pass
+        self.comment("\nEnd of specification:")
+
+        cmd_word = (constants.LEN1 << 28) | \
+                  (Commands.END_SPEC.value << 20)
+        cmd_word_list = [cmd_word, -1]
+        cmd_string = "END_SPEC"
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
+        if close_writer:
+            self.spec_writer.close()
+            if self.report_writer is not None:
+                self.report_writer.close()
 
     def write_command_to_files(self, cmd_word_list, cmd_string, indent=False,
                            outdent=False, no_instruction_number=False):

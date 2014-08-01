@@ -5,7 +5,9 @@ class DataType(Enum):
     """ Supported data types
         The first value is an identifier for the enum class;
         The second value is the size in bytes of the type;
-        The third value is the text description of the type.
+        The third value is the minimum possible value for the type;
+        The fourth value is the maximum possible value for the type;
+        The fifth value is the text description of the type.
     """
     UINT8 = (0, 1, 0, 255, "8-bit unsigned integer")
     UINT16 = (1, 2, 0, 65535, "16-bit unsigned integer")

@@ -15,7 +15,7 @@ class FileDataWriter(AbstractDataWriter):
             self.file_handle = open(self.filename, "wb")
         except:
             raise DataWriteException(
-                "Unable to open file %s for writing\n".format(filename))
+                "Unable to open file {0:s} for writing\n".format(filename))
 
     def write(self, data):
         """ See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write`
@@ -24,7 +24,7 @@ class FileDataWriter(AbstractDataWriter):
             self.file_handle.write(data)
         except:
             raise IOError(
-                "FileDataWriter.write: unable to write %d bytes to file %s".format(
+                "FileDataWriter.write: unable to write {0:d} bytes to file {1:s}".format(
                     len(data), self.filename))
 
     def close(self):
@@ -41,5 +41,5 @@ class FileDataWriter(AbstractDataWriter):
             self.file_handle.close()
         except:
             raise IOError(
-                "FileDataWriter.close: unable to close file %s".format(
+                "FileDataWriter.close: unable to close file {0:s}".format(
                     self.filename))

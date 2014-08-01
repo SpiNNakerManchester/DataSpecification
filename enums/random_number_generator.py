@@ -5,7 +5,7 @@ class RandomNumberGenerator(Enum):
     """ Random number generator types
     """
 
-    MERSENNE_TWISTER = (0, "The well-known Mercenne Twister PRNG")
+    MERSENNE_TWISTER = (0, "The well-known Mersenne Twister PRNG")
 
     def __new__(cls, value, doc=""):
         obj = object.__new__(cls)

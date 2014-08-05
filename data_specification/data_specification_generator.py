@@ -133,11 +133,8 @@ class DataSpecificationGenerator(object):
         # Length [29:28], command[27:20], field_use[18:16], unfilled[7],
         # region ID [4:0]:
 
-        cmd_word = (constants.LEN2 << 28) | \
-                   (Commands.RESERVE << 20) | \
-                   (constants.NO_REGS << 16) | \
-                   (unfilled << 7) | \
-                   region
+        cmd_word = (constants.LEN2 << 28) | (Commands.RESERVE << 20) \
+                   | (constants.NO_REGS << 16) | (unfilled << 7) | region
         cmd_word_list = [cmd_word, size]
 
         if unfilled:
@@ -192,7 +189,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If the seed is too big or too small
         """
-        if rng_type <0 or rng_type >= constants.MAX_RNGS:
+        if rng_type < 0 or rng_type >= constants.MAX_RNGS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "random number generator type", rng_type, 0,
                 (constants.MAX_RNGS - 1), Commands.DECLARE_RNG.name)
@@ -232,16 +229,17 @@ class DataSpecificationGenerator(object):
             If rng_id, min_value or max_value is out of range
         """
         pass
-#        if self.distribution_id > 63:
-#            raise exceptions.DataSpecificationNoMoreException(
-#                "Random distribution", self.distribution_id)
-#        cmd_word = (constants.LEN1 << 28) | \
-#                   (Commands.DECLARE_RANDOM_DIST.value << 20)
-#        cmd_word = cmd_word | (self.distribution_id << 8) | paramList
-#        cmd_word_list = [cmd_word]
-#        cmd_string= "DECLARE_RANDOM_DIST distId=%d, paramList=%d" \
-#               % (distId, paramList)
-#        self.writeCommandToFiles(cmd_word_list, cmd_string)
+
+        # if self.distribution_id > 63:
+        # raise exceptions.DataSpecificationNoMoreException(
+        #                "Random distribution", self.distribution_id)
+        #        cmd_word = (constants.LEN1 << 28) | \
+        #                   (Commands.DECLARE_RANDOM_DIST.value << 20)
+        #        cmd_word = cmd_word | (self.distribution_id << 8) | paramList
+        #        cmd_word_list = [cmd_word]
+        #        cmd_string= "DECLARE_RANDOM_DIST distId=%d, paramList=%d" \
+        #               % (distId, paramList)
+        #        self.writeCommandToFiles(cmd_word_list, cmd_string)
 
     def call_random_distribution(self, distribution_id, register_id):
         """ Insert command to get the next random number from  a random\
@@ -298,7 +296,7 @@ class DataSpecificationGenerator(object):
         pass
 
     def set_structure_value(self, structure_id, parameter_index, value,
-                        value_is_register=False):
+                            value_is_register=False):
         """ Insert command to set a value in a structure
 
         :param structure_id:
@@ -337,9 +335,8 @@ class DataSpecificationGenerator(object):
         """
         pass
 
-
     def write_structure(
-        self, structure_id, repeats=1, repeats_is_register=False):
+            self, structure_id, repeats=1, repeats_is_register=False):
         """ Insert command to write a structure to the current write pointer,
         causing the current write pointer to move on by the number of
         bytes needed to represent the structure
@@ -512,15 +509,16 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats_register < 0) or (repeats_register >= constants.MAX_REGISTERS):
+            if (repeats_register < 0) or (
+                        repeats_register >= constants.MAX_REGISTERS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats_register", repeats_register, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
 
         if (data < data_type.min) or (data > data_type.max):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                    "data", data, data_type.min, data_type.max,
-                    Commands.WRITE.name)
+                "data", data, data_type.min, data_type.max,
+                Commands.WRITE.name)
 
         cmd_len = 1
         parameters = 0
@@ -605,7 +603,8 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats_register < 0) or (repeats_register >= constants.MAX_REGISTERS):
+            if (repeats_register < 0) or (
+                        repeats_register >= constants.MAX_REGISTERS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats_register", repeats_register, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
@@ -637,7 +636,6 @@ class DataSpecificationGenerator(object):
         cmd_word_list = [cmd_word]
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
-
 
     def write_array(self, array):
         """ Insert command to write an array of words, causing the write pointer
@@ -700,11 +698,11 @@ class DataSpecificationGenerator(object):
                    (reg_usage << 16) | \
                    (parameters << 8)
         cmd_word_string = [cmd_word]
-        self.write_command_to_files(cmd_word_string , cmd_string)
+        self.write_command_to_files(cmd_word_string, cmd_string)
 
     def start_loop(self, counter_register_id, start, end, increment=1,
-               start_is_register=False, end_is_register=False,
-               increment_is_register=False):
+                   start_is_register=False, end_is_register=False,
+                   increment_is_register=False):
         """ Insert command to start a loop
 
         :param counter_register_id: The id of the register to use as the loop\
@@ -792,7 +790,7 @@ class DataSpecificationGenerator(object):
         pass
 
     def start_conditional(self, register_id, condition, value,
-                      value_is_register=False):
+                          value_is_register=False):
         """ Insert command to start a conditional if...then...else construct.\
         If the condition evaluates to true, the statement is executed up to\
         the next else statement, or the end of the conditional, whichever\
@@ -825,7 +823,6 @@ class DataSpecificationGenerator(object):
             If the condition is not a valid condition
         """
         pass
-
 
     def else_conditional(self):
         """ Insert command for the else of an if...then...else construct.\
@@ -860,7 +857,7 @@ class DataSpecificationGenerator(object):
         pass
 
     def set_register_value(self, register_id, data, data_is_register=False,
-                       data_type=DataType.UINT32):
+                           data_type=DataType.UINT32):
         """ Insert command to set the value of a register
 
         :param register_id: The id of the register to assign, between 0 and 15
@@ -912,7 +909,7 @@ class DataSpecificationGenerator(object):
         pass
 
     def set_write_pointer(self, address, address_is_register=False,
-                      relative_to_current=False):
+                          relative_to_current=False):
         """ Insert command to set the position of the write pointer within the
         current region
 
@@ -947,8 +944,8 @@ class DataSpecificationGenerator(object):
         pass
 
     def align_write_pointer(self, log_block_size,
-                        log_block_size_is_register=False,
-                        return_register_id=None):
+                            log_block_size_is_register=False,
+                            return_register_id=None):
         """ Insert command to align the write pointer against a power-of-2\
         block size in bytes.  Zeros are inserted in the intervening space
 
@@ -989,9 +986,9 @@ class DataSpecificationGenerator(object):
         pass
 
     def call_arithmetic_operation(self, register_id, operand_1, operation,
-                              operand_2, signed,
-                              operand_1_is_register=False,
-                              operand_2_is_register=False):
+                                  operand_2, signed,
+                                  operand_1_is_register=False,
+                                  operand_2_is_register=False):
         """ Insert command to perform an arithmetic operation on two signed or\
         unsigned values and store the result in a register
             
@@ -1031,8 +1028,8 @@ class DataSpecificationGenerator(object):
         pass
 
     def call_logic_operation(self, register_id, operand_1, operation,
-                         operand_2, operand_1_is_register=False,
-                         operand_2_is_register=False):
+                             operand_2, operand_1_is_register=False,
+                             operand_2_is_register=False):
         """ Insert command to perform a logic operation on two signed or\
         unsigned values and store the result in a register
             
@@ -1069,8 +1066,8 @@ class DataSpecificationGenerator(object):
         pass
 
     def copy_structure(self, source_structure_id, destination_structure_id=None,
-                   source_id_is_register=False,
-                   destination_id_is_register=False):
+                       source_id_is_register=False,
+                       destination_id_is_register=False):
         """ Insert command to copy a structure, possibly overwriting another\
         structure
         
@@ -1122,9 +1119,9 @@ class DataSpecificationGenerator(object):
         pass
 
     def copy_structure_parameter(self, source_structure_id,
-                             source_parameter_index,
-                             destination_structure_id,
-                             destination_parameter_index):
+                                 source_parameter_index,
+                                 destination_structure_id,
+                                 destination_parameter_index):
         """ Insert command to copy the value of a parameter from one structure
         to another
         
@@ -1164,7 +1161,7 @@ class DataSpecificationGenerator(object):
         pass
 
     def print_value(self, value, value_is_register=False,
-                data_type=DataType.UINT32):
+                    data_type=DataType.UINT32):
         """ Insert command to print out a value (for debugging)
         
         :param value:
@@ -1256,7 +1253,7 @@ class DataSpecificationGenerator(object):
         self.comment("\nEnd of specification:")
 
         cmd_word = (constants.LEN1 << 28) | \
-                  (Commands.END_SPEC.value << 20)
+                   (Commands.END_SPEC.value << 20)
         cmd_word_list = [cmd_word, -1]
         cmd_string = "END_SPEC"
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -1267,7 +1264,7 @@ class DataSpecificationGenerator(object):
                 self.report_writer.close()
 
     def write_command_to_files(self, cmd_word_list, cmd_string, indent=False,
-                           outdent=False, no_instruction_number=False):
+                               outdent=False, no_instruction_number=False):
         """
         Writes the binary command to the binary output file and, if the
         user has requested a text output for debug purposes, also write the

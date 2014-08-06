@@ -286,9 +286,10 @@ class DataSpecificationExecutorFunctions:
         elif n_bytes == 4:
             encoded_value = struct.pack("<I", value)
         elif n_bytes == 8:
-            encoded_value = struct.pack("<I", value)
+            encoded_value = struct.pack("<Q", value)
         else:
-            raise
+            raise exceptions.DataSpecificationUnknownTypeLengthException(
+                n_bytes, command)
 
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]

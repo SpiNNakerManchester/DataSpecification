@@ -210,6 +210,22 @@ class DataSpecificationUnknownTypeException(DataSpecificationException):
               "command {2:s}".format(type_name, requested_value, command)
 
 
+class DataSpecificationUnknownTypeLengthException(DataSpecificationException):
+    """ An exception that indicates that the value of the requested type\
+        is unknown
+    """
+
+    def __init__(self, data_length, command):
+        """
+        :param data_length: the length of the requested type
+        :type data_length: int
+        :param command: The command being executed
+        :type command: str
+        """
+        print "Unknown data length {0:d} during command {1:s}".format(
+            data_length, command)
+
+
 class DataSpecificationInvalidSizeException(DataSpecificationException):
     """ An exception that indicates that the size of the requested type is\
         invalid

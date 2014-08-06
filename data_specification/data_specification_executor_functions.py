@@ -1,5 +1,6 @@
-from data_specification import constants
-
+from data_specification import constants, exceptions, memory_region_collection
+from enums import commands
+import struct
 
 class DataSpecificationExecutorFunctions:
     """
@@ -7,7 +8,7 @@ class DataSpecificationExecutorFunctions:
     of the data specification file.
     """
 
-    def __init__(self, spec_reader, mem_writer):
+    def __init__(self, spec_reader, mem_writer, space_available):
         """
 
         :param spec_reader: The object to read the specification language file\
@@ -20,29 +21,79 @@ class DataSpecificationExecutorFunctions:
         """
         self.spec_reader = spec_reader
         self.mem_writer = mem_writer
+        self.space_available = space_available
+
+        self.space_allocated = 0
+        self.current_region = None
 
         self.registers = [0] * constants.MAX_REGISTERS
-        self.mem_slots = [0] * constants.MAX_MEM_REGIONS
+        self.mem_regions = memory_region_collection.MemoryRegionCollection(
+            constants.MAX_MEM_REGIONS)
         self.struct_slots = [0] * constants.MAX_STRUCT_SLOTS
+        self.wr_ptr = [None] * constants.MAX_MEM_REGIONS
 
-    def __unpack_cmd(self, cmd):
-        opcode = (cmd >> 20) & 0xFF
-        use_dest_reg = (cmd >> 18) & 0x1 == 0x1
-        use_src1_reg = (cmd >> 17) & 0x1 == 0x1
-        use_src2_reg = (cmd >> 16) & 0x1 == 0x1
-        dest_reg = (cmd >> 12) & 0xF
-        src1_reg = (cmd >> 8) & 0xF
-        src2_reg = (cmd >> 4) & 0xF
-        return [opcode, use_dest_reg, use_src1_reg, use_src2_reg, dest_reg, src1_reg, src2_reg]
+    def __unpack_cmd__(self, cmd):
+        size = (cmd >> 28) & 0x3
+        self._cmd_size = size + 1
+        self.opcode = (cmd >> 20) & 0xFF
+        self.use_dest_reg = (cmd >> 18) & 0x1 == 0x1
+        self.use_src1_reg = (cmd >> 17) & 0x1 == 0x1
+        self.use_src2_reg = (cmd >> 16) & 0x1 == 0x1
+        self.dest_reg = (cmd >> 12) & 0xF
+        self.src1_reg = (cmd >> 8) & 0xF
+        self.src2_reg = (cmd >> 4) & 0xF
+        self.data_len = (cmd >> 12) & 0x3
 
     def execute_break(self, cmd):
-        pass
+        raise exceptions.ExecuteBreakInstruction(
+            self.spec_reader.tell(), self.spec_reader.filename)
 
     def execute_nop(self, cmd):
         pass
 
     def execute_reserve(self, cmd):
-        pass
+        """
+
+        :param cmd:
+        :return:
+        :raise data_specification.exceptions.DataSpecificationException:\
+            If there is an error when executing the specification
+        """
+        self.__unpack_cmd__(cmd)
+        region = cmd & 0x1F  # cmd[4:0]
+
+        if self._cmd_size == constants.LEN1:
+            size = self.spec_reader.read(4)
+        else:
+            raise exceptions.DataSpecificationSyntaxError(
+                "Command {0:s} requires a word as an argument (total 2 words), "
+                "but the current encoding ({1:X}) is specified to be {2:d} "
+                "words long".format(
+                    commands.Commands.RESERVE.name, cmd, self._cmd_size))
+
+        unfilled = (cmd >> 7) & 0x1 == 0x1
+
+        if not self.mem_regions.is_empty(region):
+            raise exceptions.DataSpecificationRegionInUseException(region)
+
+        if size & 0x3 != 0:
+            size = (size + 4) - (size & 0x3)
+
+        if (size <= 0) or size > (self.space_available - self.space_allocated):
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "region size", size, 1,
+                (self.space_available-self.space_allocated),
+                commands.Commands.RESERVE.name
+            )
+
+        self.mem_regions[region] = bytearray(size)
+        if unfilled:
+            self.mem_regions.set_unfilled(region)
+        else:
+            self.mem_regions.set_filled(region)
+
+        self.wr_ptr[region] = 0
+        self.space_allocated += size
 
     def execute_free(self, cmd):
         pass
@@ -75,7 +126,44 @@ class DataSpecificationExecutorFunctions:
         pass
 
     def execute_write(self, cmd):
-        pass
+        self.__unpack_cmd__(cmd)
+
+        if self.use_src2_reg:
+            n_repeats = self.registers[self.src2_reg]
+        else:
+            n_repeats = cmd & 0xFF
+
+        data_len = 0
+        if self.data_len == 0:
+            data_len = 1
+        elif self.data_len == 1:
+            data_len = 2
+        elif self.data_len == 2:
+            data_len = 4
+        elif self.data_len == 3:
+            data_len = 8
+
+        if self.use_src1_reg:
+            value = self.registers[self.src1_reg]
+        else:
+            if self._cmd_size == constants.LEN1 and data_len != 8:
+                read_data = self.spec_reader.read(4)
+                value = struct.unpack("<I", read_data)
+            elif self._cmd_size == constants.LEN2 and data_len == 8:
+                read_data = self.spec_reader.read(8)
+                value = struct.unpack("<Q", read_data)
+            else:
+                raise exceptions.DataSpecificationSyntaxError(
+                    "Command {0:s} requires a value as an argument, but the "
+                    "current encoding ({1:X}) is specified to be {2:d} words "
+                    "long and the data length command argument is specified to "
+                    "be {3:d} bytes long".format(
+                        commands.Commands.WRITE.name, cmd, self._cmd_size,
+                        data_len))
+
+        # Perform the writes
+        self._write_to_mem(
+            value, data_len, n_repeats, commands.Commands.WRITE.name)
 
     def execute_write_array(self, cmd):
         pass
@@ -87,12 +175,23 @@ class DataSpecificationExecutorFunctions:
         pass
 
     def execute_switch_focus(self, cmd):
-        pass
+        self.__unpack_cmd__(cmd)
+
+        if not self.use_src1_reg:
+            region = (cmd >> 8) & 0xF
+        else:
+            region = self.registers[self.src1_reg]
+
+        if self.mem_regions.is_empty(region):
+            raise exceptions.DataSpecificationRegionUnfilledException(
+                region, commands.Commands.SWITCH_FOCUS.name)
+        else:
+            self.current_region = region
 
     def execute_loop(self, cmd):
         pass
 
-    def execute_brak_loop(self, cmd):
+    def execute_break_loop(self, cmd):
         pass
 
     def execute_end_loop(self, cmd):
@@ -151,3 +250,47 @@ class DataSpecificationExecutorFunctions:
 
     def execute_end_spec(self, cmd):
         pass
+
+    def _write_to_mem(self, value, n_bytes, repeat, command):
+        """Write to a memory array.
+
+        If a memory slot is not assigned the current memory slot is used.
+        Likewise, if neither the aligned or offset pointers are provided the
+        next free space in memory is used.
+
+        The resultant pointers are returned and may need writing back to the
+        memory slot.
+        """
+
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                command)
+
+        if self.mem_regions[self.current_region] is None:
+            raise exceptions.DataSpecificationRegionNotAllocated(
+                self.current_region, command)
+
+        space_allocated = len(self.mem_regions[self.current_region])
+        space_used = self.wr_ptr[self.current_region]
+        space_available = space_allocated - space_used
+        space_required = n_bytes * repeat
+
+        if space_available < space_required:
+            raise exceptions.DataSpecificationNoMoreException(
+                space_available, space_required)
+
+        if n_bytes == 1:
+            encoded_value = struct.pack("<B", value)
+        elif n_bytes == 2:
+            encoded_value = struct.pack("<H", value)
+        elif n_bytes == 4:
+            encoded_value = struct.pack("<I", value)
+        elif n_bytes == 8:
+            encoded_value = struct.pack("<I", value)
+        else:
+            raise
+
+        encoded_array = encoded_value * repeat
+        current_write_ptr = self.wr_ptr[self.current_region]
+        self.mem_regions[self.current_region][current_write_ptr:current_write_ptr + len(encoded_array)] = encoded_array
+        self.wr_ptr += len(encoded_array)

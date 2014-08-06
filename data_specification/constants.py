@@ -23,3 +23,6 @@ APP_PTR_TABLE_BYTES_SZ = APP_PTR_TABLE_WORDS_SZ * 4
 # Constants used by DSG command encoding:
 LEN1, LEN2, LEN3, LEN4 = 0, 1, 2, 3
 NO_REGS, DEST_ONLY, SRC1_ONLY, DEST_AND_SRC1, ALL_REGS = 0, 4, 2, 6, 7
+
+# return values from functions of the data spec executor
+END_SPEC_EXECUTOR = -1

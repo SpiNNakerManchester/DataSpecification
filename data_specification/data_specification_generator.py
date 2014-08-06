@@ -3,6 +3,9 @@ from enums.commands import Commands
 from data_specification import constants, exceptions
 from spinn_machine import sdram
 import logging
+import struct
+import math
+import decimal
 
 
 logger = logging.getLogger(__name__)
@@ -493,13 +496,17 @@ class DataSpecificationGenerator(object):
 
         data_size = data_type.size
         if data_size == 1:
-            cmd_data_len = 0
+            cmd_data_len = constants.LEN1
+            data_len = 0
         elif data_size == 2:
-            cmd_data_len = 1
+            cmd_data_len = constants.LEN1
+            data_len = 1
         elif data_size == 4:
-            cmd_data_len = 2
+            cmd_data_len = constants.LEN1
+            data_len = 2
         elif data_size == 8:
-            cmd_data_len = 3
+            cmd_data_len = constants.LEN2
+            data_len = 3
         else:
             raise exceptions.DataSpecificationInvalidSizeException(
                 data_type.name, data_size, Commands.WRITE.name)
@@ -515,12 +522,11 @@ class DataSpecificationGenerator(object):
                     "repeats_register", repeats_register, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
 
-        if (data < data_type.min) or (data > data_type.max):
+        if (data_type.min > data) or (data_type.max < data):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "data", data, data_type.min, data_type.max,
                 Commands.WRITE.name)
 
-        cmd_len = 1
         parameters = 0
         cmd_string = "WRITE data=0x{0:X}".format(data)
 
@@ -534,10 +540,19 @@ class DataSpecificationGenerator(object):
             parameters |= repeats
             cmd_string = "{0:s}, repeats={1:u}".format(cmd_string, repeats)
 
-        cmd_word = (cmd_len << 28) | (Commands.WRITE.value << 20) | \
-                   (repeat_reg_usage << 16) | (cmd_data_len << 12) | parameters
+        cmd_word = (cmd_data_len << 28) | (Commands.WRITE.value << 20) | \
+                   (repeat_reg_usage << 16) | (data_len << 12) | parameters
 
-        cmd_word_list = [cmd_word, data]
+        data_format = "<{0:c}".format(data_type.struct_encoding)
+        data_value = decimal.Decimal(data) * data_type.scale
+        data_encoded = bytearray(struct.pack(data_format, data_value))
+
+        if data_type.size == 1:
+            data_encoded.append([0,0,0])
+        elif data_type.size == 2:
+            data_encoded.append([0,0])
+
+        cmd_word_list = [cmd_word, data_encoded]
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 

@@ -46,6 +46,9 @@ class FileDataReader(AbstractDataReader):
 
         return length
 
+    def tell(self):
+        return self.file_handle.tell()
+
     def close(self):
         """ Closes the file
         

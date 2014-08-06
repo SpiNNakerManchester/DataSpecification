@@ -25,7 +25,7 @@ class Commands(Enum):
     BLOCK_COPY              = (0x44, dsef.execute_block_copy, "Copies a block of data from one area to another")
     SWITCH_FOCUS            = (0x50, dsef.execute_switch_focus, "Swap between different reserved memory regions to work on several at the same time")
     LOOP                    = (0x51, dsef.execute_loop, "Set-up a loop")
-    BREAK_LOOP              = (0x52, dsef.execute_brak_loop, "Early exit from a loop")
+    BREAK_LOOP              = (0x52, dsef.execute_break_loop, "Early exit from a loop")
     END_LOOP                = (0x53, dsef.execute_end_loop, "End of a loop")
     IF                      = (0x55, dsef.execute_if, "Perform a condition and execute the following instructions only if the condition is true")
     ELSE                    = (0x56, dsef.execute_else, "Else clause for associated IF statement")

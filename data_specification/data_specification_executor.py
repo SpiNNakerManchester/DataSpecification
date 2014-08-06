@@ -30,7 +30,8 @@ class DataSpecificationExecutor(object):
         self.mem_writer = mem_writer
         self.space_available = space_available
         self.space_used = 0
-        self.dsef = dsef(self.spec_reader, self.mem_writer, self.space_available)
+        self.dsef = dsef(
+            self.spec_reader, self.mem_writer, self.space_available)
     
     def execute(self):
         """ Executes the specification
@@ -46,15 +47,17 @@ class DataSpecificationExecutor(object):
         """
         for instruction_spec in iter(lambda: self.spec_reader.read(4), ''):
             #process the received command
-            cmd = struct.unpack(">I", instruction_spec)[0]
+            cmd = struct.unpack("<I", instruction_spec)[0]
 
             opcode = (cmd >> 20) & 0xFF
+            print "command: ", hex(cmd), "opcode: ", hex(opcode)
 
             try:
-                return_value = commands.Commands(opcode).exec_function(dsef, cmd)
+                return_value = commands.Commands(opcode).exec_function(
+                    self.dsef, cmd)
             except ValueError:
                 raise exceptions.DataSpecificationException(
-                    "Invalid command 0x{0:X} while reading file {2:s}".format(
+                    "Invalid command 0x{0:X} while reading file {1:s}".format(
                         cmd, self.spec_reader.filename))
 
             if return_value == constants.END_SPEC_EXECUTOR:

@@ -1,6 +1,6 @@
 from data_specification import constants, exceptions, memory_region_collection
-from enums import commands
 import struct
+
 
 class DataSpecificationExecutorFunctions:
     """
@@ -33,8 +33,7 @@ class DataSpecificationExecutorFunctions:
         self.wr_ptr = [None] * constants.MAX_MEM_REGIONS
 
     def __unpack_cmd__(self, cmd):
-        size = (cmd >> 28) & 0x3
-        self._cmd_size = size + 1
+        self._cmd_size = (cmd >> 28) & 0x3
         self.opcode = (cmd >> 20) & 0xFF
         self.use_dest_reg = (cmd >> 18) & 0x1 == 0x1
         self.use_src1_reg = (cmd >> 17) & 0x1 == 0x1
@@ -62,20 +61,20 @@ class DataSpecificationExecutorFunctions:
         self.__unpack_cmd__(cmd)
         region = cmd & 0x1F  # cmd[4:0]
 
-        if self._cmd_size == constants.LEN1:
-            size = self.spec_reader.read(4)
-        else:
+        if self._cmd_size != constants.LEN2:
             raise exceptions.DataSpecificationSyntaxError(
-                "Command {0:s} requires a word as an argument (total 2 words), "
+                "Command {0:s} requires one word as argument (total 2 words), "
                 "but the current encoding ({1:X}) is specified to be {2:d} "
                 "words long".format(
-                    commands.Commands.RESERVE.name, cmd, self._cmd_size))
+                    "RESERVE", cmd, self._cmd_size))
 
         unfilled = (cmd >> 7) & 0x1 == 0x1
 
         if not self.mem_regions.is_empty(region):
             raise exceptions.DataSpecificationRegionInUseException(region)
 
+        size_encoded = self.spec_reader.read(4)
+        size = struct.unpack("<I", size_encoded)[0]
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
@@ -83,7 +82,7 @@ class DataSpecificationExecutorFunctions:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "region size", size, 1,
                 (self.space_available-self.space_allocated),
-                commands.Commands.RESERVE.name
+                "RESERVE"
             )
 
         self.mem_regions[region] = bytearray(size)
@@ -146,24 +145,24 @@ class DataSpecificationExecutorFunctions:
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
         else:
-            if self._cmd_size == constants.LEN1 and data_len != 8:
+            if self._cmd_size == constants.LEN2 and data_len != 8:
                 read_data = self.spec_reader.read(4)
-                value = struct.unpack("<I", read_data)
-            elif self._cmd_size == constants.LEN2 and data_len == 8:
+                value = struct.unpack("<I", read_data)[0]
+            elif self._cmd_size == constants.LEN3 and data_len == 8:
                 read_data = self.spec_reader.read(8)
-                value = struct.unpack("<Q", read_data)
+                value = struct.unpack("<Q", read_data)[0]
             else:
                 raise exceptions.DataSpecificationSyntaxError(
                     "Command {0:s} requires a value as an argument, but the "
                     "current encoding ({1:X}) is specified to be {2:d} words "
                     "long and the data length command argument is specified to "
                     "be {3:d} bytes long".format(
-                        commands.Commands.WRITE.name, cmd, self._cmd_size,
+                        "WRITE", cmd, self._cmd_size,
                         data_len))
 
         # Perform the writes
         self._write_to_mem(
-            value, data_len, n_repeats, commands.Commands.WRITE.name)
+            value, data_len, n_repeats, "WRITE")
 
     def execute_write_array(self, cmd):
         pass
@@ -184,7 +183,7 @@ class DataSpecificationExecutorFunctions:
 
         if self.mem_regions.is_empty(region):
             raise exceptions.DataSpecificationRegionUnfilledException(
-                region, commands.Commands.SWITCH_FOCUS.name)
+                region, "SWITCH_FOCUS")
         else:
             self.current_region = region
 

@@ -318,3 +318,23 @@ class DataSpecificationRegionNotAllocated(DataSpecificationException):
     def __init__(self, region, command):
         print "Region {0:d} has not been allocated during execution of " \
               "command {1:s}".format(region, command)
+
+
+class UnimplementedDSECommand(DataSpecificationException):
+    """ An exception which occurs when trying to write to an unallocated region\
+    of memory
+    """
+
+    def __init__(self, command):
+        print "Command {0:s} in the data specification executor has not yet " \
+              "been implemented".format(command)
+
+
+class UnimplementedDSGCommand(DataSpecificationException):
+    """ An exception which occurs when trying to write to an unallocated region\
+    of memory
+    """
+
+    def __init__(self, command):
+        print "Command {0:s} in the data specification generator has not yet " \
+              "been implemented".format(command)

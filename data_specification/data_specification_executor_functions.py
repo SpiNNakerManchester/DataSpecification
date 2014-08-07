@@ -95,34 +95,34 @@ class DataSpecificationExecutorFunctions:
         self.space_allocated += size
 
     def execute_free(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("FREE")
 
     def execute_declare_rng(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("DECLARE_RNG")
 
     def execute_random_dist(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("DECLARE_RANDOM_DIST")
 
     def execute_get_random_rumber(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("GET_RANDOM_NUMBER")
 
     def execute_start_struct(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("START_STRUCT")
 
     def execute_struct_elem(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("STRUCT_ELEM")
 
     def execute_end_struct(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("END_STRUCT")
 
     def execute_start_constructor(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("START_CONSTRUCTOR")
 
     def execute_end_constructor(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("END_CONSTRUCTOR")
 
     def execute_construct(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("CONSTRUCT")
 
     def execute_write(self, cmd):
         self.__unpack_cmd__(cmd)
@@ -165,13 +165,18 @@ class DataSpecificationExecutorFunctions:
             value, data_len, n_repeats, "WRITE")
 
     def execute_write_array(self, cmd):
-        pass
+        length_encoded = self.spec_reader.read(4)
+        length = struct.unpack("<I", length_encoded)[0]
+        for i in xrange(length-1):
+            value_encoded = self.spec_reader.read(4)
+            value = struct.unpack("<I", value_encoded)[0]
+            self._write_to_mem(value, 4, 1, "WRITE_ARRAY")
 
     def execute_write_struct(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("WRITE_STRUCT")
 
     def execute_block_copy(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("BLOCK_COPY")
 
     def execute_switch_focus(self, cmd):
         self.__unpack_cmd__(cmd)
@@ -188,67 +193,67 @@ class DataSpecificationExecutorFunctions:
             self.current_region = region
 
     def execute_loop(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("LOOP")
 
     def execute_break_loop(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("BREAK_LOOP")
 
     def execute_end_loop(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("END_LOOP")
 
     def execute_if(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("IF")
 
     def execute_else(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("ELSE")
 
     def execute_end_if(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("ENDIF")
 
     def execute_mv(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("MV")
 
     def execute_get_wr_ptr(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("GET_WR_PTR")
 
     def execute_set_wr_ptr(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("SET_WR_PTR")
 
     def execute_align_wr_ptr(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("ALIGN_WR_PTR")
 
     def execute_arith_op(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("ARITH_OP")
 
     def execute_logic_op(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("LOGIC_OP")
 
     def execute_reformat(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("REFORMAT")
 
     def execute_copy_struct(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("COPY_STRUCT")
 
     def execute_copy_param(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("COPY_PARAM")
 
     def execute_write_param(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("WRITE_PARAM")
 
     def execute_write_param_component(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("WRITE_PARAM_COMPONENT")
 
     def execute_print_val(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("PRINT_VAL")
 
     def execute_print_txt(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("PRINT_TXT")
 
     def execute_print_struct(self, cmd):
-        pass
+        raise exceptions.UnimplementedDSECommand("PRINT_STRUCT")
 
     def execute_end_spec(self, cmd):
-        pass
+        return constants.END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):
         """Write to a memory array.
@@ -293,4 +298,4 @@ class DataSpecificationExecutorFunctions:
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]
         self.mem_regions[self.current_region][current_write_ptr:current_write_ptr + len(encoded_array)] = encoded_array
-        self.wr_ptr += len(encoded_array)
+        self.wr_ptr[self.current_region] += len(encoded_array)

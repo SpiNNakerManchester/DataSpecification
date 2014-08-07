@@ -50,7 +50,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        self.write_command_to_files([], comment, no_instruction_number=True)
+        self.write_command_to_files(bytearray(), comment, no_instruction_number=True)
 
     def define_break(self):
         """ Insert command to stop execution with an exception (for debugging)
@@ -63,7 +63,8 @@ class DataSpecificationGenerator(object):
             If a write to external storage fails
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.DSG_BREAK.value << 20)
-        cmd_word_list = [cmd_word]
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = encoded_cmd_word
         cmd_string = "BREAK"
         self.write_command_to_files(cmd_word_list, cmd_string)
         return
@@ -79,7 +80,8 @@ class DataSpecificationGenerator(object):
             If a write to external storage fails
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.NOP.value << 20)
-        cmd_word_list = [cmd_word]
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = encoded_cmd_word
         cmd_string = "NOP"
         self.write_command_to_files(cmd_word_list, cmd_string)
         return
@@ -136,9 +138,11 @@ class DataSpecificationGenerator(object):
         # Length [29:28], command[27:20], field_use[18:16], unfilled[7],
         # region ID [4:0]:
 
-        cmd_word = (constants.LEN2 << 28) | (Commands.RESERVE << 20) \
-                   | (constants.NO_REGS << 16) | (unfilled << 7) | region
-        cmd_word_list = [cmd_word, size]
+        cmd_word = (constants.LEN2 << 28) | (Commands.RESERVE.value << 20) | \
+                   (constants.NO_REGS << 16) | (unfilled << 7) | region
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_size = bytearray(struct.pack("<I", size))
+        cmd_word_list = encoded_cmd_word + encoded_size
 
         if unfilled:
             unfilled_string = "UNFILLED"
@@ -146,10 +150,10 @@ class DataSpecificationGenerator(object):
             unfilled_string = ""
 
         if label is None:
-            cmd_string = "RESERVE memRegion={0:d} sz={1:d} {2:s}".format(
+            cmd_string = "RESERVE memRegion={0:d} size={1:d} {2:s}".format(
                 region, size, unfilled_string)
         else:
-            cmd_string = "RESERVE memRegion={0:d} sz={1:d} label='{2:s}' {3:s}".format(
+            cmd_string = "RESERVE memRegion={0:d} size={1:d} label='{2:s}' {3:s}".format(
                 region, size, label, unfilled_string)
         # Send the command to the output files:
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -170,7 +174,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If the region requested was out of the allowed range
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("free_memory_region")
 
     def declare_random_number_generator(self, rng_type, seed):
         """ Insert command to declare a random number generator
@@ -192,19 +196,21 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If the seed is too big or too small
         """
-        if rng_type < 0 or rng_type >= constants.MAX_RNGS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "random number generator type", rng_type, 0,
-                (constants.MAX_RNGS - 1), Commands.DECLARE_RNG.name)
-        # Source field is constant for now, may allow multiple different
-        # sources of random numbers later.
-        rng_source = 0x0
-        cmd_word = (constants.LEN2 << 28) | (Commands.DECLARE_RNG.value << 20)
-        cmd_word = cmd_word | (rng_type << 12) | (rng_source << 8)
-        cmd_word_list = [cmd_word, seed]
-        cmd_string = "DECLARE_RNG id={0:d}, source={1:d}, seed={2:d}".format(
-            rng_type, rng_source, seed)
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        raise exceptions.UnimplementedDSGCommand("declare_random_number_generator")
+
+#        if rng_type < 0 or rng_type >= constants.MAX_RNGS:
+#            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+#                "random number generator type", rng_type, 0,
+#                (constants.MAX_RNGS - 1), Commands.DECLARE_RNG.name)
+#        # Source field is constant for now, may allow multiple different
+#        # sources of random numbers later.
+#        rng_source = 0x0
+#        cmd_word = (constants.LEN2 << 28) | (Commands.DECLARE_RNG.value << 20)
+#        cmd_word = cmd_word | (rng_type << 12) | (rng_source << 8)
+#        cmd_word_list = [cmd_word, seed]
+#        cmd_string = "DECLARE_RNG id={0:d}, source={1:d}, seed={2:d}".format(
+#            rng_type, rng_source, seed)
+#        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def declare_uniform_random_distribution(self, rng_id, min_value, max_value):
         """ Insert commands to declare a uniform random distribution
@@ -231,7 +237,8 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If rng_id, min_value or max_value is out of range
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand(
+            "declare_uniform_random_distribution")
 
         # if self.distribution_id > 63:
         # raise exceptions.DataSpecificationNoMoreException(
@@ -266,7 +273,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If the distribution_id or register_id specified was out of range
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("call_random_distribution")
 
     def define_structure(self, parameters):
         """ Insert commands to define a data structure
@@ -296,7 +303,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             If one of the data types in the structure is unknown
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("define_structure")
 
     def set_structure_value(self, structure_id, parameter_index, value,
                             value_is_register=False):
@@ -336,7 +343,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
             If the structure requested has not been declared
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("set_structure_value")
 
     def write_structure(
             self, structure_id, repeats=1, repeats_is_register=False):
@@ -377,7 +384,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
             If the selected region has no more space
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("write_structure")
 
     def start_function(self, argument_by_value):
         """ Insert command to start a function definition, with up to 5\
@@ -407,7 +414,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is already a function being defined at this point
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("start_function")
 
     def end_function(self):
         """ Insert command to mark the end of a function definition
@@ -421,7 +428,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is no function being defined at this point
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("end_function")
 
     def call_function(self, function_id, structure_ids):
         """ Insert command to call a function
@@ -446,7 +453,7 @@ class DataSpecificationGenerator(object):
             * If no structure has been defined with one of the ids in\
               structure_ids
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("call_function")
 
     def write_value(
             self, data, repeats=1, repeats_register=None,
@@ -528,7 +535,7 @@ class DataSpecificationGenerator(object):
                 Commands.WRITE.name)
 
         parameters = 0
-        cmd_string = "WRITE data=0x{0:X}".format(data)
+        cmd_string = "WRITE data=0x%8.8X"%(data)
 
         if repeats_register is not None:
             repeat_reg_usage = 1
@@ -538,12 +545,14 @@ class DataSpecificationGenerator(object):
         else:
             repeat_reg_usage = 0
             parameters |= repeats
-            cmd_string = "{0:s}, repeats={1:u}".format(cmd_string, repeats)
+            cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
         cmd_word = (cmd_data_len << 28) | (Commands.WRITE.value << 20) | \
                    (repeat_reg_usage << 16) | (data_len << 12) | parameters
 
-        data_format = "<{0:c}".format(data_type.struct_encoding)
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+
+        data_format = "<{0:s}".format(data_type.struct_encoding)
         data_value = decimal.Decimal(data) * data_type.scale
         data_encoded = bytearray(struct.pack(data_format, data_value))
 
@@ -552,7 +561,7 @@ class DataSpecificationGenerator(object):
         elif data_type.size == 2:
             data_encoded.append([0,0])
 
-        cmd_word_list = [cmd_word, data_encoded]
+        cmd_word_list = encoded_cmd_word + data_encoded
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -647,12 +656,12 @@ class DataSpecificationGenerator(object):
         cmd_word = (cmd_len << 28) | (Commands.WRITE.value << 20) | \
                    (data_reg << 17) | (repeat_reg_usage << 16) | \
                    (cmd_data_len << 12) | (data_register << 8) | parameters
-
-        cmd_word_list = [cmd_word]
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = encoded_cmd_word
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def write_array(self, array):
+    def write_array(self, array_values):
         """ Insert command to write an array of words, causing the write pointer
         to move on by (4 * the array size), in bytes
 
@@ -670,7 +679,25 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
             If the selected region has no more space
         """
-        pass
+        cmd_len = 0xF
+        cmd_word = (cmd_len << 28) | (Commands.WRITE_ARRAY.value << 20)
+        len_array = len(array_values)
+        size = len_array + 1
+
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_size = bytearray(struct.pack("<I", size))
+
+        encoded_array = bytearray()
+        cmd_string = "WRITE_ARRAY, %d elements:\n" % len_array
+        index = 0
+        for i in array_values:
+            cmd_string += "%16d %8.8X\n" % (index, i)
+            index += 1
+            encoded_array += bytearray(struct.pack("<I", i))
+
+        cmd_word_list = encoded_cmd_word + encoded_size + encoded_array
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def switch_write_focus(self, region):
         """ Insert command to switch the region being written to
@@ -712,7 +739,10 @@ class DataSpecificationGenerator(object):
                    (Commands.SWITCH_FOCUS.value << 20) | \
                    (reg_usage << 16) | \
                    (parameters << 8)
-        cmd_word_string = [cmd_word]
+
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+
+        cmd_word_string = encoded_cmd_word
         self.write_command_to_files(cmd_word_string, cmd_string)
 
     def start_loop(self, counter_register_id, start, end, increment=1,
@@ -772,7 +802,7 @@ class DataSpecificationGenerator(object):
             * If increment_is_register is False and increment is not\
               in the allowed range
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("start_loop")
 
     def break_loop(self):
         """ Insert command to break out of a loop before it has completed
@@ -786,7 +816,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is no loop in operation at this point
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("break_loop")
 
     def end_loop(self):
         """ Insert command to indicate that this is the end of the loop.\
@@ -802,7 +832,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is no loop in operation at this point
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("end_loop")
 
     def start_conditional(self, register_id, condition, value,
                           value_is_register=False):
@@ -837,7 +867,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             If the condition is not a valid condition
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("start_conditional")
 
     def else_conditional(self):
         """ Insert command for the else of an if...then...else construct.\
@@ -855,7 +885,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is no conditional in operation at this point
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("else_conditional")
 
     def end_conditional(self):
         """ Insert command to mark the end of an if...then...else construct
@@ -869,7 +899,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is no conditional in operation at this point
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("end_conditional")
 
     def set_register_value(self, register_id, data, data_is_register=False,
                            data_type=DataType.UINT32):
@@ -903,7 +933,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             If the data type is not known
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("set_register_value")
 
     def save_write_pointer(self, register_id):
         """ Insert command to save the write pointer to a register
@@ -921,7 +951,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
             If no region has been selected
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("save_write_pointer")
 
     def set_write_pointer(self, address, address_is_register=False,
                           relative_to_current=False):
@@ -956,7 +986,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
             If no region has been selected
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("set_write_pointer")
 
     def align_write_pointer(self, log_block_size,
                             log_block_size_is_register=False,
@@ -998,7 +1028,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
             If no region has been selected
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("align_write_pointer")
 
     def call_arithmetic_operation(self, register_id, operand_1, operation,
                                   operand_2, signed,
@@ -1040,7 +1070,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             If operation is not a known operation
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("call_arthmetic_operation")
 
     def call_logic_operation(self, register_id, operand_1, operation,
                              operand_2, operand_1_is_register=False,
@@ -1078,7 +1108,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             If operation is not a known operation
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("call_logic_operation")
 
     def copy_structure(self, source_structure_id, destination_structure_id=None,
                        source_id_is_register=False,
@@ -1131,7 +1161,7 @@ class DataSpecificationGenerator(object):
             * If no structure with id source_structure_id has been\
               allocated
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("copy_structure")
 
     def copy_structure_parameter(self, source_structure_id,
                                  source_parameter_index,
@@ -1173,7 +1203,7 @@ class DataSpecificationGenerator(object):
             * If no structure with id source_structure_id has been
               allocated
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("copy_structure_parameter")
 
     def print_value(self, value, value_is_register=False,
                     data_type=DataType.UINT32):
@@ -1205,7 +1235,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             * If data_type is not a vaild data type
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("print_value")
 
     def print_text(self, text):
         """ Insert command to print some text (for debugging)
@@ -1219,7 +1249,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("print_text")
 
     def print_struct(self, structure_id, structure_id_is_register=False):
         """ Insert command to print out a structure (for debugging)
@@ -1250,7 +1280,7 @@ class DataSpecificationGenerator(object):
             If structure_id_is_register is False and structure_id is\
             is the id of a structure that has not been allocated
         """
-        pass
+        raise exceptions.UnimplementedDSGCommand("print_struct")
 
     def end_specification(self, close_writer=True):
         """ Insert a command to indicate that the specification has finished\
@@ -1269,7 +1299,8 @@ class DataSpecificationGenerator(object):
 
         cmd_word = (constants.LEN1 << 28) | \
                    (Commands.END_SPEC.value << 20)
-        cmd_word_list = [cmd_word, -1]
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = encoded_cmd_word
         cmd_string = "END_SPEC"
         self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -1290,7 +1321,7 @@ class DataSpecificationGenerator(object):
 
         :param cmd_word_list: list of binary words to be added to the binary\
             data specification file
-        :type cmd_word_list: list of int
+        :type cmd_word_list: bytearray
         :param cmd_string: string describing the command to be added to the\
             report for the data specification file
         :type cmd_string: str
@@ -1310,7 +1341,7 @@ class DataSpecificationGenerator(object):
         """
 
         if self.spec_writer is None:
-            raise DataUndefinedWriterException(
+            raise exceptions.DataUndefinedWriterException(
                 "The spec file writer has not been initialized")
         elif len(cmd_word_list) > 0:
             self.spec_writer.write(cmd_word_list)
@@ -1324,7 +1355,7 @@ class DataSpecificationGenerator(object):
                 formatted_cmd_string = "%s%s\n" % (
                     "   " * self.txt_indent, cmd_string)
             else:
-                formatted_cmd_string = "%#x. %s%s\n" % (
+                formatted_cmd_string = "%8.8X. %s%s\n" % (
                     self.instruction_counter,
                     "   " * self.txt_indent,
                     cmd_string)

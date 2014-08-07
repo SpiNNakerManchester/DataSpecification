@@ -69,16 +69,17 @@ class DataSpecificationExecutor(object):
         tbl_pointers_size = used_regions * 4
         self.space_used += tbl_pointers_size
 
-        id = 0
-        tbl_pointers[id] = tbl_pointers_size
+        index = 0
+        tbl_pointers[index] = tbl_pointers_size
 
-        for i in self.dsef.mem_regions.regions():
-            if i is not None:
-                region_size = len(i)
+        for i in xrange(constants.MAX_MEM_REGIONS):
+            memory_area = self.dsef.mem_regions[i]
+            if memory_area is not None:
+                region_size = len(memory_area)
                 self.space_used += region_size
-                if id != used_regions:
-                    id += 1
-                    tbl_pointers[id] = tbl_pointers[id - 1] + region_size
+                if index < used_regions - 1:
+                    index += 1
+                    tbl_pointers[index] = tbl_pointers[index - 1] + region_size
 
         if self.space_used + tbl_pointers_size > self.space_available:
             raise exceptions.DataSpecificationTablePointerOutOfMemory(
@@ -86,9 +87,11 @@ class DataSpecificationExecutor(object):
 
         for i in tbl_pointers:
             encoded_pointer = struct.pack("<I", i)
-            self.mem_writer(encoded_pointer)
+            self.mem_writer.write(encoded_pointer)
 
-        for i in self.dsef.mem_regions.regions():
-            self.mem_writer(i)
+        for i in xrange(constants.MAX_MEM_REGIONS):
+            memory_area = self.dsef.mem_regions[i]
+            if memory_area is not None:
+                self.mem_writer.write(memory_area)
 
         return self.space_used

@@ -53,7 +53,6 @@ class DataSpecificationExecutor(object):
             cmd = struct.unpack("<I", instruction_spec)[0]
 
             opcode = (cmd >> 20) & 0xFF
-            print "command: ", hex(cmd), "opcode: ", hex(opcode)
 
             try:
                 return_value = commands.Commands(opcode).exec_function(

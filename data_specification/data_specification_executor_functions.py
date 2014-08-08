@@ -331,6 +331,12 @@ class DataSpecificationExecutorFunctions:
         :rtype: int
         :raise None
         """
+        read_data = self.spec_reader.read(4)
+        value = struct.unpack("<i", read_data)[0]
+        if value != -1:
+            raise exceptions.DataSpecificationSyntaxError(
+                "Command END_SPEC requires an argument equal to -1. The current"
+                "argument value is {0:d}".format(value))
         return constants.END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):

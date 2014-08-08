@@ -1,6 +1,7 @@
 import unittest
+
 from enums.arithemetic_operation import ArithmeticOperation
-from enums.commands import Commands
+from data_specification.enums.commands import Commands
 from enums.condition import Condition
 from enums.data_type import DataType
 from enums.logic_operation import LogicOperation

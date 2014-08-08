@@ -1,8 +1,9 @@
+import struct
+
 from data_specification.data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as dsef
 from data_specification import exceptions, constants
-from enums import commands
-import struct
+from data_specification.enums import commands
 
 
 class DataSpecificationExecutor(object):

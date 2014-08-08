@@ -1,10 +1,11 @@
-from enums.data_type import DataType
-from enums.commands import Commands
-from data_specification import constants, exceptions
-from spinn_machine import sdram
 import logging
 import struct
 import decimal
+
+from enums.data_type import DataType
+from data_specification.enums.commands import Commands
+from data_specification import constants, exceptions
+from spinn_machine import sdram
 
 
 logger = logging.getLogger(__name__)
@@ -552,7 +553,8 @@ class DataSpecificationGenerator(object):
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
 
         data_format = "<{0:s}".format(data_type.struct_encoding)
-        data_value = decimal.Decimal(data) * data_type.scale
+        text_value = "{0:f}".format(data)
+        data_value = decimal.Decimal(text_value) * data_type.scale
         data_encoded = bytearray(struct.pack(data_format, data_value))
 
         if data_type.size == 1:

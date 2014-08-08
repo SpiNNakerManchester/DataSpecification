@@ -1,9 +1,5 @@
 import unittest
-from data_specification.data_specification_generator \
-    import DataSpecificationGenerator
-import enums as enums
-import data_specification.exceptions as exceptions
-from struct import pack, unpack
+
 
 class TestDataSpecGeneration(unittest.TestCase):
     def test_new_data_spec_generator(self):

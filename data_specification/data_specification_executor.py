@@ -44,6 +44,9 @@ class DataSpecificationExecutor(object):
                     If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationException:\
                     If there is an error when executing the specification
+        :raise data_specification.exceptions.DataSpecificationTablePointerOutOfMemory:
+                    If the table pointer generated as data header exceeds the \
+                    size of the available memory
         """
         for instruction_spec in iter(lambda: self.spec_reader.read(4), ''):
             #process the received command

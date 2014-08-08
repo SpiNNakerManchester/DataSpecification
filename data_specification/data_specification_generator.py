@@ -4,7 +4,6 @@ from data_specification import constants, exceptions
 from spinn_machine import sdram
 import logging
 import struct
-import math
 import decimal
 
 
@@ -503,16 +502,16 @@ class DataSpecificationGenerator(object):
 
         data_size = data_type.size
         if data_size == 1:
-            cmd_data_len = constants.LEN1
+            cmd_data_len = constants.LEN2
             data_len = 0
         elif data_size == 2:
-            cmd_data_len = constants.LEN1
+            cmd_data_len = constants.LEN2
             data_len = 1
         elif data_size == 4:
-            cmd_data_len = constants.LEN1
+            cmd_data_len = constants.LEN2
             data_len = 2
         elif data_size == 8:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = constants.LEN3
             data_len = 3
         else:
             raise exceptions.DataSpecificationInvalidSizeException(
@@ -1300,7 +1299,9 @@ class DataSpecificationGenerator(object):
         cmd_word = (constants.LEN1 << 28) | \
                    (Commands.END_SPEC.value << 20)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
-        cmd_word_list = encoded_cmd_word
+        parameter = -1
+        encoded_parameter = struct.pack("<i", parameter)
+        cmd_word_list = encoded_cmd_word + encoded_parameter
         cmd_string = "END_SPEC"
         self.write_command_to_files(cmd_word_list, cmd_string)
 

@@ -18,6 +18,9 @@ class DataSpecificationExecutorFunctions:
         :param mem_writer: The object to write the memory image to
         :type mem_writer:\
                     :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+        :param space_available: Memory space available for the data to be\
+        generated
+        :type space_available: int
         """
         self.spec_reader = spec_reader
         self.mem_writer = mem_writer
@@ -33,6 +36,15 @@ class DataSpecificationExecutorFunctions:
         self.wr_ptr = [None] * constants.MAX_MEM_REGIONS
 
     def __unpack_cmd__(self, cmd):
+        """ Routine to unpack the command read from the data spec file. The\
+        parameters of the command are stored in the class data
+
+        :param cmd: The command read form the data spec file
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise None
+        """
         self._cmd_size = (cmd >> 28) & 0x3
         self.opcode = (cmd >> 20) & 0xFF
         self.use_dest_reg = (cmd >> 18) & 0x1 == 0x1
@@ -44,19 +56,44 @@ class DataSpecificationExecutorFunctions:
         self.data_len = (cmd >> 12) & 0x3
 
     def execute_break(self, cmd):
+        """
+        This command raises an exception to stop the execution of the data spec
+         executor (DSE)
+
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise data_specification.exceptions.ExecuteBreakInstruction:\
+            Raises the exception to break the execution of the DSE
+        """
         raise exceptions.ExecuteBreakInstruction(
             self.spec_reader.tell(), self.spec_reader.filename)
 
     def execute_nop(self, cmd):
+        """
+        This command executes no operation
+
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise None
+        """
         pass
 
     def execute_reserve(self, cmd):
         """
+        This command reserves a region and assigns some memory space to it
 
-        :param cmd:
-        :return:
-        :raise data_specification.exceptions.DataSpecificationException:\
-            If there is an error when executing the specification
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise data_specification.exceptions.DataSpecificationSyntaxError:\
+            If there is an error in the command syntax
+        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+            If the requested size of the region is beyond the available memory space
         """
         self.__unpack_cmd__(cmd)
         region = cmd & 0x1F  # cmd[4:0]
@@ -125,6 +162,18 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("CONSTRUCT")
 
     def execute_write(self, cmd):
+        """
+        This command writes the given value in the specified region a number\
+         of times as identified by either a value in the command or a register\
+         value
+
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise data_specification.exceptions.DataSpecificationSyntaxError:\
+            If there is an error in the command syntax
+        """
         self.__unpack_cmd__(cmd)
 
         if self.use_src2_reg:
@@ -165,6 +214,15 @@ class DataSpecificationExecutorFunctions:
             value, data_len, n_repeats, "WRITE")
 
     def execute_write_array(self, cmd):
+        """
+        This command writes an array of values in the specified region
+
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise None
+        """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", length_encoded)[0]
         for i in xrange(length-1):
@@ -179,6 +237,18 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("BLOCK_COPY")
 
     def execute_switch_focus(self, cmd):
+        """
+        This command switches the focus to the desired, already allocated,\
+        memory region
+
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise data_specification.exceptions.DataSpecificationRegionUnfilledException: \
+        if the focus is being switched to a region of memory which has been \
+        declared to be kept unfilled
+        """
         self.__unpack_cmd__(cmd)
 
         if not self.use_src1_reg:
@@ -253,17 +323,41 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("PRINT_STRUCT")
 
     def execute_end_spec(self, cmd):
+        """Returns the value which terminates the data spec executor
+
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: constants.END_SPEC_EXECUTOR
+        :rtype: int
+        :raise None
+        """
         return constants.END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):
-        """Write to a memory array.
+        """Write the specified value to data memory the specified amount of\
+        times.
 
-        If a memory slot is not assigned the current memory slot is used.
-        Likewise, if neither the aligned or offset pointers are provided the
-        next free space in memory is used.
+        The selected memory region needs to be already allocated
 
-        The resultant pointers are returned and may need writing back to the
-        memory slot.
+        :param value: the value to be written in the data memory region
+        :type value: int
+        :param n_bytes: number of bytes that represent the value
+        :type n_bytes: int
+        :param repeat: the number of times the value is to be repeated
+        :type repeat: int
+        :param command: the command which is being executed
+        :type command: str
+        :return: No value returned
+        :rtype: None
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException: \
+        raised if there is no memory region selected for the write operation
+        :raise data_specification.exceptions.DataSpecificationRegionNotAllocated: \
+        raised if the selected region has not been allocated memory space
+        :raise data_specification.exceptions.DataSpecificationNoMoreException: \
+        raised if the selected region has not enough available memory to store \
+        the required data
+        :raise data_specification.exceptions.DataSpecificationUnknownTypeLengthException: \
+        raised if the data type size is not 1, 2, 4, or 8 bytes
         """
 
         if self.current_region is None:

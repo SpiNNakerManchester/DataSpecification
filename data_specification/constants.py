@@ -4,8 +4,9 @@ and the Spec Executor
 """
 
 # MAGIC Numbers:
-DSG_MAGIC_NUM     = 0x5B7CA17E # Data spec magic number
-APPDATA_MAGIC_NUM = 0xAD130AD6 # Application datafile magic number
+DSG_MAGIC_NUM     = 0x5B7CA17E  # Data spec magic number
+APPDATA_MAGIC_NUM = 0xAD130AD6  # Application datafile magic number
+DSE_VERSION       = 0x00000001  # Version of the file produced by the DSE
 
 # DSG Arrays and tables sizes:
 MAX_REGISTERS       = 16

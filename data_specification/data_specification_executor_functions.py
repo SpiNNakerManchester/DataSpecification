@@ -12,14 +12,14 @@ class DataSpecificationExecutorFunctions:
         """
 
         :param spec_reader: The object to read the specification language file\
-                    from
+            from
         :type spec_reader:\
-                    :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
+            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
         :param mem_writer: The object to write the memory image to
         :type mem_writer:\
-                    :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
         :param space_available: Memory space available for the data to be\
-        generated
+            generated
         :type space_available: int
         """
         self.spec_reader = spec_reader
@@ -118,7 +118,7 @@ class DataSpecificationExecutorFunctions:
         if (size <= 0) or size > (self.space_available - self.space_allocated):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "region size", size, 1,
-                (self.space_available-self.space_allocated),
+                (self.space_available - self.space_allocated),
                 "RESERVE"
             )
 
@@ -225,7 +225,7 @@ class DataSpecificationExecutorFunctions:
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", length_encoded)[0]
-        for i in xrange(length-1):
+        for i in xrange(length - 1):
             value_encoded = self.spec_reader.read(4)
             value = struct.unpack("<I", value_encoded)[0]
             self._write_to_mem(value, 4, 1, "WRITE_ARRAY")
@@ -246,8 +246,8 @@ class DataSpecificationExecutorFunctions:
         :return: No value returned
         :rtype: None
         :raise data_specification.exceptions.DataSpecificationRegionUnfilledException: \
-        if the focus is being switched to a region of memory which has been \
-        declared to be kept unfilled
+            If the focus is being switched to a region of memory which has \
+            been declared to be kept unfilled
         """
         self.__unpack_cmd__(cmd)
 
@@ -281,6 +281,19 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("ENDIF")
 
     def execute_mv(self, cmd):
+        """
+        This command moves an immediate value to a register or copies the value\
+        of a register to another register
+
+        :param cmd: the command which triggered the function call
+        :type cmd: int
+        :return: No value returned
+        :rtype: None
+        :raise data_specification.exceptions.DataSpecificationSyntaxError: \
+        if the destination register is not correctly specified - the \
+        destination must be a register and the appropriate bit needs to be set \
+        in the specification
+        """
         self.__unpack_cmd__(cmd)
 
         if not self.use_dest_reg:
@@ -366,15 +379,15 @@ class DataSpecificationExecutorFunctions:
         :type command: str
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException: \
-        raised if there is no memory region selected for the write operation
+        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:
+            raised if there is no memory region selected for the write operation
         :raise data_specification.exceptions.DataSpecificationRegionNotAllocated: \
-        raised if the selected region has not been allocated memory space
+            raised if the selected region has not been allocated memory space
         :raise data_specification.exceptions.DataSpecificationNoMoreException: \
-        raised if the selected region has not enough available memory to store \
-        the required data
+            raised if the selected region has not enough available memory to \
+            store the required data
         :raise data_specification.exceptions.DataSpecificationUnknownTypeLengthException: \
-        raised if the data type size is not 1, 2, 4, or 8 bytes
+            raised if the data type size is not 1, 2, 4, or 8 bytes
         """
 
         if self.current_region is None:
@@ -408,5 +421,7 @@ class DataSpecificationExecutorFunctions:
 
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]
-        self.mem_regions[self.current_region][current_write_ptr:current_write_ptr + len(encoded_array)] = encoded_array
+        self.mem_regions[self.current_region] \
+            [current_write_ptr:current_write_ptr + len(encoded_array)] = \
+            encoded_array
         self.wr_ptr[self.current_region] += len(encoded_array)

@@ -65,8 +65,11 @@ class DataSpecificationExecutor(object):
 
             if return_value == constants.END_SPEC_EXECUTOR:
                 break
-        #write here the files from dsef.mem_regions
 
+        # write the data file header
+        self.write_header()
+
+        # write the data from dsef.mem_regions previously computed
         used_regions = self.dsef.mem_regions.count_used_regions()
         tbl_pointers = [0] * used_regions
         tbl_pointers_size = used_regions * 4
@@ -98,3 +101,11 @@ class DataSpecificationExecutor(object):
                 self.mem_writer.write(memory_area)
 
         return self.space_used
+
+    def write_header(self):
+        magic_number_encoded = bytearray(
+            struct.pack("<I", constants.APPDATA_MAGIC_NUM))
+        self.mem_writer.write(magic_number_encoded)
+        version_encoded = bytearray(
+            struct.pack("<I", constants.DSE_VERSION))
+        self.mem_writer.write(version_encoded)

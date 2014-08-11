@@ -558,9 +558,12 @@ class DataSpecificationGenerator(object):
         data_encoded = bytearray(struct.pack(data_format, data_value))
 
         if data_type.size == 1:
-            data_encoded.append([0,0,0])
+            data_encoded.append(0)
+            data_encoded.append(0)
+            data_encoded.append(0)
         elif data_type.size == 2:
-            data_encoded.append([0,0])
+            data_encoded.append(0)
+            data_encoded.append(0)
 
         cmd_word_list = encoded_cmd_word + data_encoded
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)

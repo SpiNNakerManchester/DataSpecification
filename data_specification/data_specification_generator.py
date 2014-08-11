@@ -523,8 +523,8 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats_register < 0) or (
-                        repeats_register >= constants.MAX_REGISTERS):
+            if (repeats_register < 0) or\
+                    (repeats_register >= constants.MAX_REGISTERS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats_register", repeats_register, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
@@ -628,8 +628,7 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats_register < 0) or (
-                        repeats_register >= constants.MAX_REGISTERS):
+            if (repeats_register < 0) or (repeats_register >= constants.MAX_REGISTERS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats_register", repeats_register, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
@@ -652,7 +651,7 @@ class DataSpecificationGenerator(object):
         else:
             repeat_reg_usage = 0
             parameters |= repeats
-            cmd_string = "{0:s}, repeats={1:u}".format(cmd_string, repeats)
+            cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
         cmd_word = (cmd_len << 28) | (Commands.WRITE.value << 20) | \
                    (data_reg << 17) | (repeat_reg_usage << 16) | \
@@ -934,7 +933,39 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             If the data type is not known
         """
-        raise exceptions.UnimplementedDSGCommand("set_register_value")
+        if data_is_register:
+            # Build command to move between registers:
+            dest_reg = register_id
+            src_reg = data
+            cmd_word = (constants.LEN1 << 28) | \
+                       (Commands.MV.value << 20) | \
+                       (constants.DEST_AND_SRC1 << 16) | \
+                       (dest_reg << 12) | \
+                       (src_reg << 8)
+            encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+            cmd_word_list = encoded_cmd_word
+            cmd_string = "reg[{0:d}] = reg[{1:d}]".format(dest_reg, src_reg)
+        else:
+            # Build command to assign from an immediate:
+            # command has a second word (the immediate)
+            dest_reg = register_id
+            cmd_word = (constants.LEN2 << 28) | \
+                       (Commands.MV.value << 20) | \
+                       (constants.DEST_ONLY << 16) | \
+                       (dest_reg << 12)
+            if data_type.min > data or data_type.max < data:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "data", data, data_type.min, data_type.max,
+                    Commands.MV.name)
+            scaled_data = int(data * data_type.scale)
+            encoding_string = "<{0:s}".format(data_type.struct_encoding)
+            encoded_data = bytearray(struct.pack(encoding_string, scaled_data))
+            encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+            cmd_word_list = encoded_cmd_word + encoded_data
+            cmd_string = "reg[{0:d}] = {1:d} (0x{2:X})".format(
+                dest_reg, data, data)
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def save_write_pointer(self, register_id):
         """ Insert command to save the write pointer to a register

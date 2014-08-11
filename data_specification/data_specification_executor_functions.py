@@ -281,7 +281,18 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("ENDIF")
 
     def execute_mv(self, cmd):
-        raise exceptions.UnimplementedDSECommand("MV")
+        self.__unpack_cmd__(cmd)
+
+        if not self.use_dest_reg:
+            raise exceptions.DataSpecificationSyntaxError(
+                "Destination register not correctly specified")
+
+        if self.use_src1_reg:
+            self.registers[self.dest_reg] = self.registers[self.src1_reg]
+        else:
+            data_encoded = self.spec_reader.read(4)
+            data = struct.unpack("<I", data_encoded)[0]
+            self.registers[self.dest_reg] = data
 
     def execute_get_wr_ptr(self, cmd):
         raise exceptions.UnimplementedDSECommand("GET_WR_PTR")

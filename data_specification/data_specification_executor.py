@@ -69,32 +69,10 @@ class DataSpecificationExecutor(object):
         # write the data file header
         self.write_header()
 
+        # write the table pointer
+        self.write_pointer_table()
+
         # write the data from dsef.mem_regions previously computed
-        used_regions = self.dsef.mem_regions.count_used_regions()
-        tbl_pointers = [0] * used_regions
-        tbl_pointers_size = used_regions * 4
-        self.space_used += tbl_pointers_size
-
-        index = 0
-        tbl_pointers[index] = tbl_pointers_size
-
-        for i in xrange(constants.MAX_MEM_REGIONS):
-            memory_area = self.dsef.mem_regions[i]
-            if memory_area is not None:
-                region_size = len(memory_area)
-                self.space_used += region_size
-                if index < used_regions - 1:
-                    index += 1
-                    tbl_pointers[index] = tbl_pointers[index - 1] + region_size
-
-        if self.space_used + tbl_pointers_size > self.space_available:
-            raise exceptions.DataSpecificationTablePointerOutOfMemory(
-                self.space_available, (self.space_used + tbl_pointers_size))
-
-        for i in tbl_pointers:
-            encoded_pointer = struct.pack("<I", i)
-            self.mem_writer.write(encoded_pointer)
-
         for i in xrange(constants.MAX_MEM_REGIONS):
             memory_area = self.dsef.mem_regions[i]
             if memory_area is not None:
@@ -109,3 +87,35 @@ class DataSpecificationExecutor(object):
         version_encoded = bytearray(
             struct.pack("<I", constants.DSE_VERSION))
         self.mem_writer.write(version_encoded)
+
+        # number of bytes in the header (2 words = 8 bytes)
+        self.space_used = 8
+
+    def write_pointer_table(self):
+        pointer_table = [0] * constants.MAX_MEM_REGIONS
+        pointer_table_size = constants.MAX_MEM_REGIONS * 4
+        self.space_used += pointer_table_size
+
+        index = 0
+        pointer_table[index] = self.space_used
+
+        for i in xrange(constants.MAX_MEM_REGIONS):
+            memory_area = self.dsef.mem_regions[i]
+            if memory_area is not None:
+                region_size = len(memory_area)
+                self.space_used += region_size
+                if index < constants.MAX_MEM_REGIONS - 1:
+                    index += 1
+                    pointer_table[index] =\
+                        pointer_table[index - 1] + region_size
+            else:
+                pointer_table[index] = 0
+                index += 1
+
+        if self.space_used > self.space_available:
+            raise exceptions.DataSpecificationTablePointerOutOfMemory(
+                self.space_available, self.space_used)
+
+        for i in pointer_table:
+            encoded_pointer = struct.pack("<I", i)
+            self.mem_writer.write(encoded_pointer)

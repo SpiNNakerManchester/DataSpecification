@@ -152,8 +152,8 @@ class DataSpecificationParameterOutOfBoundsException(
         :param command: The command being executed
         :type command: str
         """
-        print "Requesting value {0:d} for parameter {1:s} whose allowed range " \
-              "is from {2:d} to {3:d} during command {4:s}".format(
+        print "Requesting value {} for parameter {} whose allowed range " \
+              "is from {} to {} during command {}".format(
                   value, parameter, range_min, range_max, command)
 
 

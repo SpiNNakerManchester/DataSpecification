@@ -15,7 +15,7 @@ class FileDataWriter(AbstractDataWriter):
             self.file_handle = open(self.filename, "wb")
         except:
             raise DataWriteException(
-                "Unable to open file {0:s} for writing\n".format(filename))
+                "Unable to open file {} for writing\n".format(filename))
 
     def write(self, data):
         """ See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write`

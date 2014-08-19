@@ -278,6 +278,26 @@ class DataSpecificationInvalidTypeException(DataSpecificationException):
                   requested_value, expected_value, type_name, command)
 
 
+class DataSpecificationInvalidOperationException(DataSpecificationException):
+    """ An exception that indicates that the operation of the type given type
+    is not available
+    """
+
+    def __init__(self, operation_type, requested_operation_id, command):
+        """
+        :param operation_type: The type of operation requested \
+        (i.e. arithmetic or logic)
+        :type operation_type: str
+        :param requested_operation_id: The id of the requested operation
+        :type requested_operation_id: int
+        :param command: The command being executed
+        :type command: str
+        """
+        print "The {0:s} operation requested with id {1:d} does not match " \
+              "the possible operations available during command {3:s}".format(
+                  operation_type, requested_operation_id, command)
+
+
 class ExecuteBreakInstruction(DataSpecificationException):
     """ An exception which occurs when a BREAK instruction is found in the data\
     specification
@@ -294,6 +314,11 @@ class DataSpecificationSyntaxError(DataSpecificationException):
     """
 
     def __init__(self, message):
+        """
+
+        :param message: message describing the error occurred
+        :type message: str
+        """
         print message
 
 
@@ -305,9 +330,17 @@ class DataSpecificationTablePointerOutOfMemory(DataSpecificationException):
     """
 
     def __init__(self, memory_available, memory_required):
+        """
+
+        :param memory_available: on-chip memory available
+        :type memory_available: int
+        :param memory_required: on-chip memory required to complete the
+        execution of the specification file
+        :type memory_required: int
+        """
         print "The memory available {0:d} is not sufficient for the allocated" \
               " regions plus the header table pointer {1:d}".format(
-            memory_available, memory_required)
+                  memory_available, memory_required)
 
 
 class DataSpecificationRegionNotAllocated(DataSpecificationException):
@@ -318,6 +351,19 @@ class DataSpecificationRegionNotAllocated(DataSpecificationException):
     def __init__(self, region, command):
         print "Region {0:d} has not been allocated during execution of " \
               "command {1:s}".format(region, command)
+
+
+class DataSpecificationNoMoreStructAvailable(DataSpecificationException):
+    """ An exception that indicates that there are no more positions \
+    available to define a structure
+    """
+
+    def __init__(self):
+        """
+
+        """
+        print "No more slots available to define a new structure"
+
 
 
 class UnimplementedDSECommand(DataSpecificationException):

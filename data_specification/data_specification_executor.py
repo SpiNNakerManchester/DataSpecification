@@ -10,6 +10,8 @@ class DataSpecificationExecutor(object):
     """ Used to execute a data specification language file to produce a memory\
         image
     """
+    MAGIC_NUMBER = 0xAD130AD6
+    VERSION = 1
     
     def __init__(self, spec_reader, mem_writer, space_available):
         """
@@ -33,6 +35,16 @@ class DataSpecificationExecutor(object):
         self.space_used = 0
         self.dsef = dsef(
             self.spec_reader, self.mem_writer, self.space_available)
+        magic_number = struct.unpack("<I", str(self.spec_reader.read(4)))
+        version = struct.unpack("<I", str(self.spec_reader.read(4)))
+        if magic_number != self.MAGIC_NUMBER:
+            raise exceptions.DataReadException(
+                "the magic number of this dsg does not match the supported "
+                "magic number of this DSE")
+        if version != self.VERSION:
+            raise exceptions.DataReadException(
+                "the version of this dsg does not match the supported "
+                "version of this DSE")
     
     def execute(self):
         """ Executes the specification

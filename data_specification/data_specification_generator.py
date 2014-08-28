@@ -18,14 +18,14 @@ class DataSpecificationGenerator(object):
     """ Used to generate a data specification language file that can be\
         executed to produce a memory image
     """
+    MAGIC_NUMBER = 0xAD130AD6
+    VERSION = 1
 
-    def __init__(self, spec_writer, magic=None, report_writer=None):
+    def __init__(self, spec_writer, report_writer=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
         :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
-        :param magic: Magic number to write to the header or None to use default
-        :type magic: int
         :param report_writer: Determines if a text version of the specification\
         is to be written
         :type report_writer: Implementation of\
@@ -35,11 +35,14 @@ class DataSpecificationGenerator(object):
         """
         self.spec_writer = spec_writer
         self.report_writer = report_writer
-        self.magic_number = magic
         self.txt_indent = 0
         self.instruction_counter = 0
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
         self.struct_slots = [None] * constants.MAX_STRUCT_SLOTS
+        #storing constant to identifiy the data spec generator used to \
+        # generate dsg
+        self.spec_writer.write(self.MAGIC_NUMBER)
+        self.spec_writer.write(self.VERSION)
 
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\

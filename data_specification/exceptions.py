@@ -5,6 +5,7 @@ class DataWriteException(Exception):
 
     def __init__(self, message):
         """
+
         :param message: A message to indicate what when wrong
         :type message: str
         """
@@ -18,6 +19,7 @@ class DataUndefinedWriterException(Exception):
 
     def __init__(self, message):
         """
+
         :param message: A message to indicate what when wrong
         :type message: str
         """
@@ -31,6 +33,7 @@ class DataReadException(Exception):
 
     def __init__(self, message):
         """
+
         :param message: A message to indicate what when wrong
         :type message: str
         """
@@ -43,6 +46,11 @@ class DataSpecificationException(Exception):
     """
 
     def __init__(self, message):
+        """
+
+        :param message: message reporting the exception occurred
+        :type message: str
+        """
         print message
 
 
@@ -53,8 +61,9 @@ class DataSpecificationRegionInUseException(DataSpecificationException):
 
     def __init__(self, region):
         """
+
         :param region: The region that was already allocated
-        :type message: int
+        :type region: int
         """
         print "Region {0:d} was already allocated".format(region)
 
@@ -66,6 +75,7 @@ class DataSpecificationRegionUnfilledException(DataSpecificationException):
 
     def __init__(self, region, command):
         """
+
         :param region: The region that was requested as unfilled
         :type region: int
         :param command: The command being executed
@@ -81,6 +91,7 @@ class DataSpecificationNoRegionSelectedException(DataSpecificationException):
 
     def __init__(self, command):
         """
+
         :param command: The command being executed
         :type command: str
         """
@@ -95,6 +106,7 @@ class DataSpecificationRegionExhaustedException(DataSpecificationException):
 
     def __init__(self, region, region_size, allocated_size, command):
         """
+
         :param region: The region that was being written to
         :type region: int
         :param region_size: The originally requested size of the region that\
@@ -118,6 +130,7 @@ class DataSpecificationRegionOutOfBoundsException(DataSpecificationException):
 
     def __init__(self, region, region_size, requested_offset, command):
         """
+
         :param region: The region that was being offset into 
         :type region: int
         :param region_size: The originally requested size of the region in\
@@ -134,17 +147,18 @@ class DataSpecificationRegionOutOfBoundsException(DataSpecificationException):
 
 
 class DataSpecificationParameterOutOfBoundsException(
-    DataSpecificationException):
+        DataSpecificationException):
     """ An exception that indicates that a parameter value was outside of the\
         allowed bounds
     """
 
     def __init__(self, parameter, value, range_min, range_max, command):
         """
-        :param paramter: The parameter that is out of bounds
+
+        :param parameter: The parameter that is out of bounds
         :type parameter: str
         :param value: The value specified
-        :type type: float
+        :type value: float
         :param range_min: The minimum allowed value
         :type range_min: float
         :param range_max: The maximum allowed value
@@ -164,6 +178,7 @@ class DataSpecificationNotAllocatedException(DataSpecificationException):
 
     def __init__(self, item_type, item_id, command):
         """
+
         :param item_type: The type of the item being used
         :type item_type: str
         :param item_id: The id of the item being used
@@ -182,6 +197,7 @@ class DataSpecificationNoMoreException(DataSpecificationException):
 
     def __init__(self, space_available, space_required):
         """
+
         :param space_available: The space available in the region
         :type space_available: int
         :param space_required: The space requested by the write command
@@ -197,17 +213,16 @@ class DataSpecificationUnknownTypeException(DataSpecificationException):
         is unknown
     """
 
-    def __init__(self, type_name, requested_value, command):
+    def __init__(self, type_id, command):
         """
-        :param type_name: The name of the requested type
-        :type type_name: str
-        :param requested_value: The requested value
-        :type requested_value: float
+
+        :param type_id: The id of the requested type
+        :type type_id: int
         :param command: The command being executed
         :type command: str
         """
-        print "Unknown value {0:f} of the requested type {1:s} during " \
-              "command {2:s}".format(type_name, requested_value, command)
+        print "Unknown id value {0:d} for data type during command " \
+              "{1:s}".format(type_id, command)
 
 
 class DataSpecificationUnknownTypeLengthException(DataSpecificationException):
@@ -217,6 +232,7 @@ class DataSpecificationUnknownTypeLengthException(DataSpecificationException):
 
     def __init__(self, data_length, command):
         """
+
         :param data_length: the length of the requested type
         :type data_length: int
         :param command: The command being executed
@@ -233,6 +249,7 @@ class DataSpecificationInvalidSizeException(DataSpecificationException):
 
     def __init__(self, type_name, type_size, command):
         """
+
         :param type_name: The name of the requested type
         :type type_name: str
         :param type_size: The size of the requested variable
@@ -250,6 +267,7 @@ class DataSpecificationInvalidCommandException(DataSpecificationException):
 
     def __init__(self, command):
         """
+
         :param command: The command being executed
         :type command: str
         """
@@ -257,25 +275,22 @@ class DataSpecificationInvalidCommandException(DataSpecificationException):
               "in the specification".format(command)
 
 
-class DataSpecificationInvalidTypeException(DataSpecificationException):
-    """ An exception that indicates that the value of the type given does not\
-        match that expected
+class DataSpecificationUnknownConditionException(DataSpecificationException):
+    """ And exception which is triggered in case the condition in an IF test
+     does not exist in the list of possible conditions
     """
 
-    def __init__(self, type_name, requested_value, expected_value, command):
+    def __init__(self, condition_id, command):
         """
-        :param type_name: The name of the requested type
-        :type type_name: str
-        :param requested_value: The requested value
-        :type requested_value: int
-        :param expected_value: The expected value
-        :type expected_value: int
+
+        :param condition_id: id of the condition being requested
+        :type condition_id: int
         :param command: The command being executed
         :type command: str
         """
-        print "The value assigned {0:d} does not match the value expected " \
-              "{1:d} for type {2:s} during command {3:s}".format(
-                  requested_value, expected_value, type_name, command)
+        print "The requested condition with id {0:d} does not belong to the " \
+              "list of possible tests during command {1:s}".format(condition_id,
+                                                                   command)
 
 
 class DataSpecificationInvalidOperationException(DataSpecificationException):
@@ -285,6 +300,7 @@ class DataSpecificationInvalidOperationException(DataSpecificationException):
 
     def __init__(self, operation_type, requested_operation_id, command):
         """
+
         :param operation_type: The type of operation requested \
         (i.e. arithmetic or logic)
         :type operation_type: str
@@ -304,6 +320,14 @@ class ExecuteBreakInstruction(DataSpecificationException):
     """
 
     def __init__(self, address, filename):
+        """
+
+        :param address: address of the data specification being executed
+        at the time of breakpoint
+        :type address: int
+        :param filename: file being parsed
+        :param filename: str
+        """
         print "Executing BREAK instruction at address {0:d} of file " \
               "{1:s}".format(address, filename)
 
@@ -349,20 +373,15 @@ class DataSpecificationRegionNotAllocated(DataSpecificationException):
     """
 
     def __init__(self, region, command):
+        """
+
+        :param region:
+        :type region:
+        :param command:
+        :type command:
+        """
         print "Region {0:d} has not been allocated during execution of " \
               "command {1:s}".format(region, command)
-
-
-class DataSpecificationNoMoreStructAvailable(DataSpecificationException):
-    """ An exception that indicates that there are no more positions \
-    available to define a structure
-    """
-
-    def __init__(self):
-        """
-
-        """
-        print "No more slots available to define a new structure"
 
 
 
@@ -372,6 +391,11 @@ class UnimplementedDSECommand(DataSpecificationException):
     """
 
     def __init__(self, command):
+        """
+
+        :param command: Command attempted to be executed by the DSE
+        :type command: str
+        """
         print "Command {0:s} in the data specification executor has not yet " \
               "been implemented".format(command)
 
@@ -382,5 +406,10 @@ class UnimplementedDSGCommand(DataSpecificationException):
     """
 
     def __init__(self, command):
+        """
+
+        :param command: Command attempted to be generated by the DSG
+        :type command: str
+        """
         print "Command {0:s} in the data specification generator has not yet " \
               "been implemented".format(command)

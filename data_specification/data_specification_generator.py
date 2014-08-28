@@ -2,12 +2,12 @@ import logging
 import struct
 import decimal
 
-from enums.data_type import DataType
+from data_specification import constants, exceptions
+from data_specification.enums.data_type import DataType
 from data_specification.enums.commands import Commands
 from data_specification.enums.condition import Condition
 from data_specification.enums.logic_operation import LogicOperation
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
-from data_specification import constants, exceptions
 from spinn_machine import sdram
 
 
@@ -39,7 +39,7 @@ class DataSpecificationGenerator(object):
         self.txt_indent = 0
         self.instruction_counter = 0
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
-        self.struct_slots = [None] * constants.MAX_STRUCT_SLOTS
+        self.function = [0] * constants.MAX_CONSTRUCTORS
 
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\
@@ -139,9 +139,6 @@ class DataSpecificationGenerator(object):
             unfilled = True
         self.mem_slot[region] = [size, label, unfilled]
 
-        # Length [29:28], command[27:20], field_use[18:16], unfilled[7],
-        # region ID [4:0]:
-
         cmd_word = (constants.LEN2 << 28) | (Commands.RESERVE.value << 20) | \
                    (constants.NO_REGS << 16) | (unfilled << 7) | region
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
@@ -161,7 +158,6 @@ class DataSpecificationGenerator(object):
                 "RESERVE memRegion={0:d} size={1:d} label='{2:s}' {3:s}".format(
                     region, size, label, unfilled_string)
 
-        # Send the command to the output files:
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def free_memory_region(self, region):
@@ -202,8 +198,6 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If the seed is too big or too small
         """
-        # raise exceptions.UnimplementedDSGCommand(
-        #            "declare_random_number_generator")
 
         if rng_type < 0 or rng_type >= constants.MAX_RNGS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
@@ -221,9 +215,15 @@ class DataSpecificationGenerator(object):
             rng_type, rng_source, seed)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def declare_uniform_random_distribution(self, rng_id, min_value, max_value):
+    def declare_uniform_random_distribution(self, distribution_id, structure_id,
+                                            rng_id, min_value, max_value):
         """ Insert commands to declare a uniform random distribution
 
+        :param distribution_id: id of the distribution being set up
+        :param distribution_id: int
+        :param structure_id: id of an empty structure slot to fill with the
+            uniform random distribution data
+        :type structure_id: int
         :param rng_id: The id of the random number generator, between 0 and 15
         :type rng_id: int
         :param min_value: The minimum value that should be returned from the\
@@ -246,21 +246,36 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If rng_id, min_value or max_value is out of range
         """
-        raise exceptions.UnimplementedDSGCommand(
-            "declare_uniform_random_distribution")
+        if distribution_id < 0 or distribution_id >= constants.MAX_RANDOM_DISTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "distribution id", distribution_id, 0,
+                    constants.MAX_RANDOM_DISTS-1,
+                    Commands.DECLARE_RANDOM_DIST.name)
 
-    # if rng_id > 63:
-    #            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-    #                "Random distribution id", rng_id, 0, 63,
-    #                Commands.DECLARE_RANDOM_DIST.name)
-    #
-    #        cmd_word = (constants.LEN1 << 28) | \
-    #                   (Commands.DECLARE_RANDOM_DIST.value << 20)
-    #        cmd_word = cmd_word | (rng_id << 8) | paramList
-    #        cmd_word_list = [cmd_word]
-    #        cmd_string= "DECLARE_RANDOM_DIST distId=%d, paramList=%d" \
-    #               % (distId, paramList)
-    #        self.write_command_to_files(cmd_word_list, cmd_string)
+        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "structure id", structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS-1,
+                    Commands.DECLARE_RANDOM_DIST.name)
+
+        parameters = [("distType", DataType.UINT32, 0),
+                      ("rngID", DataType.UINT32, rng_id),
+                      ("param1", DataType.S1615, min_value),
+                      ("param2", DataType.S1615, max_value)]
+        self.define_structure(structure_id, parameters)
+
+        cmd_word = (constants.LEN1 << 28) | \
+                   (Commands.DECLARE_RANDOM_DIST.value << 20) | \
+                   (distribution_id << 8) | \
+                   structure_id
+
+        cmd_string = "DECLARE_RANDOM_DIST distribution_id={0:d} " \
+                     "structure_id={1:d}".format(distribution_id, structure_id)
+
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def call_random_distribution(self, distribution_id, register_id):
         """ Insert command to get the next random number from  a random\
@@ -284,11 +299,35 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
             If the distribution_id or register_id specified was out of range
         """
-        raise exceptions.UnimplementedDSGCommand("call_random_distribution")
+        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
+                    Commands.GET_RANDOM_NUMBER.name)
 
-    def define_structure(self, parameters):
+        if distribution_id < 0 or distribution_id >= constants.MAX_RANDOM_DISTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "distribution_id", distribution_id, 0, constants.MAX_RANDOM_DISTS - 1,
+                    Commands.GET_RANDOM_NUMBER.name)
+
+        bit_field = 0x4
+
+        cmd_string = "GET_RANDOM_NUMBER distribution={0:d} " \
+                     "dest=reg[{1:d}]".format(distribution_id, register_id)
+        cmd_word = (constants.LEN1 << 28) | \
+                   (Commands.GET_RANDOM_NUMBER.value << 20) | \
+                   (bit_field << 16) | \
+                   (register_id << 12) | \
+                   distribution_id
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
+    def define_structure(self, structure_id, parameters):
         """ Insert commands to define a data structure
 
+        :param structure_id: the id of the structure to create, between 0 and 15
+        :type structure_id: int
         :param parameters: A list of between 1 and 255 tuples of (label,\
             data_type, value) where:
                 * label is the label of the element (for debugging)
@@ -296,8 +335,8 @@ class DataSpecificationGenerator(object):
                 * value is the value of the element, or None if no value is to\
                   be assigned
         :type parameters: list of (str, :py:class:`DataType`, float)
-        :return: The id of the new structure, between 0 and 15
-        :rtype: int
+        :return: Nothing is returned
+        :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
@@ -315,18 +354,19 @@ class DataSpecificationGenerator(object):
             If one of the data types in the structure is unknown
         """
         # start of struct
-        struct_index = self.get_next_available_struct_entry()
-
+        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "structure id", structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS-1, Commands.START_STRUCT.name)
         cmd_word = (constants.LEN1 << 28) | \
                    (Commands.START_STRUCT.value << 20) | \
-                   struct_index
+                   structure_id
 
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded
-        cmd_string = "START_STRUCT id={0:d}".format(struct_index)
+        cmd_string = "START_STRUCT id={0:d}".format(structure_id)
 
         self.write_command_to_files(cmd_word_list, cmd_string)
-        self.struct_slots[struct_index] = list()
 
         # elements of the struct
         elem_index = 0
@@ -339,6 +379,10 @@ class DataSpecificationGenerator(object):
             label = i[0]
             data_type = i[1]
             value = i[2]
+
+            if data_type not in DataType:
+                raise exceptions.DataSpecificationUnknownTypeException(
+                    data_type.value, Commands.WRITE_PARAM.name)
 
             if value is not None:
 
@@ -376,14 +420,16 @@ class DataSpecificationGenerator(object):
 
                 cmd_word_list = cmd_word_encoded + value_encoded + padding
 
-                cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
-                             "{1:s}, value = {2:d}".format(
-                                 elem_index, data_type.name, value)
+                if len(label) == 0:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}, value = {2:d}".format(
+                                     elem_index, data_type.name, value)
+                else:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}, value = {2:d}, label = {3:s}".format(
+                                     elem_index, data_type.name, value, label)
 
                 self.write_command_to_files(cmd_word_list, cmd_string)
-                self.struct_slots[struct_index].append(
-                    {'index': elem_index, 'label': label,
-                     'data_type': data_type, 'value': value})
 
             else:
                 label = i[0]
@@ -393,15 +439,18 @@ class DataSpecificationGenerator(object):
                            (Commands.STRUCT_ELEM.value << 20) | \
                            (elem_index << 8) | \
                            data_type.value
-                self.struct_slots[struct_index].append(
-                    {'index': elem_index, 'label': label,
-                     'data_type': data_type, 'value': None})
 
                 cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
                 cmd_word_list = cmd_word_encoded
 
-                cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
-                             "{1:s}".format(elem_index, data_type.name)
+                if len(label) == 0:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}".format(elem_index, data_type.name)
+                else:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}, label = {2:s}".format(elem_index,
+                                                               data_type.name,
+                                                               label)
 
                 self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -412,15 +461,13 @@ class DataSpecificationGenerator(object):
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded
 
-        cmd_string = "END_STRUCT id={0:d}".format(struct_index)
+        cmd_string = "END_STRUCT id={0:d}".format(structure_id)
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-        return struct_index
-
 
     def set_structure_value(self, structure_id, parameter_index, value,
-                            value_is_register=False):
+                            data_type, value_is_register=False):
         """ Insert command to set a value in a structure
 
         :param structure_id:
@@ -439,6 +486,12 @@ class DataSpecificationGenerator(object):
             * If value_is_register is True, the id of the register containing\
               the value to assign to the position, between 0 and 15
         :type value: float
+        :param data_type: type of the data to be stored in the structure.\
+            If parameter value_is_register is set to true, this variable is\
+            disregarded
+        :type data_type: :py:class:`DataType`
+        :param value_is_register: Identifies if value identifies a register
+        :type value_is_register: bool
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
@@ -463,14 +516,9 @@ class DataSpecificationGenerator(object):
                 "structure_id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_PARAM.name)
 
-        if self.struct_slots[structure_id] is None:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "struct", structure_id, Commands.WRITE_PARAM.name)
-
-        n_of_elements = len(self.struct_slots[structure_id])
-        if parameter_index < 0 or parameter_index >= n_of_elements:
+        if parameter_index < 0 or parameter_index >= constants.MAX_STRUCT_ELEMENTS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "parameter_index", parameter_index, 0, n_of_elements - 1,
+                "parameter_index", parameter_index, 0, constants.MAX_STRUCT_ELEMENTS - 1,
                 Commands.WRITE_PARAM.name)
 
         if value_is_register:
@@ -486,10 +534,9 @@ class DataSpecificationGenerator(object):
                        parameter_index
             value_encoded = bytearray()
             cmd_string = "WRITE_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "value=rag[{2:d}]".format(
-                structure_id, parameter_index, value)
+                         "value=reg[{2:d}]".format(structure_id,
+                                                   parameter_index, value)
         else:
-            data_type = self.struct_slots[parameter_index]['data_type']
             if value < data_type.min or value > data_type.max:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "value", value, data_type.min, data_type.max,
@@ -525,8 +572,8 @@ class DataSpecificationGenerator(object):
 
             value_encoded += padding
             cmd_string = "WRITE_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "value={2:d}".format(
-                structure_id, parameter_index, value)
+                         "value={2:d}".format(structure_id,
+                                              parameter_index, value)
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = encoded_cmd_word + value_encoded
@@ -564,8 +611,6 @@ class DataSpecificationGenerator(object):
               a valid id
             * If repeats_is_register is True and structure_id
             * If the number of repeats is out of range
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If the structure requested has not been declared
         :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
             If no region has been selected to write to
         :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
@@ -575,10 +620,6 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "structure_id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_STRUCT.name)
-
-        if self.struct_slots[structure_id] is None:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "struct", structure_id, Commands.WRITE_STRUCT.name)
 
         if repeats_is_register:
             if repeats < 0 or repeats >= constants.MAX_REGISTERS:
@@ -628,7 +669,7 @@ class DataSpecificationGenerator(object):
         :param argument_by_value: A list of up to 5 booleans indicating if the\
             structure to be passed as an argument is to be passed by\
             reference (i.e. changes made within the function are\
-            persisited) or by value (i.e. changes made within the\
+            persisted) or by value (i.e. changes made within the\
             function are lost when the function exits.  The number of\
             arguments is determined by the length of this list.
         :type argument_by_value: list of bool
@@ -645,7 +686,8 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is already a function being defined at this point
         """
-        raise exceptions.UnimplementedDSGCommand("start_function")
+        function_id = self.allocate_function()
+
 
     def end_function(self):
         """ Insert command to mark the end of a function definition
@@ -730,7 +772,7 @@ class DataSpecificationGenerator(object):
         """
         if data_type not in DataType:
             raise exceptions.DataSpecificationUnknownTypeException(
-                data_type, data, Commands.WRITE.name)
+                data_type.value, Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:
@@ -841,7 +883,7 @@ class DataSpecificationGenerator(object):
         """
         if data_type not in DataType:
             raise exceptions.DataSpecificationUnknownTypeException(
-                data_type, 0, Commands.WRITE.name)
+                data_type.value, Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:
@@ -899,8 +941,8 @@ class DataSpecificationGenerator(object):
         """ Insert command to write an array of words, causing the write pointer
         to move on by (4 * the array size), in bytes
 
-        :param array: An array of words to be written
-        :type array: array
+        :param array_values: An array of words to be written
+        :type array_values: list of unsigned int
         :return: The position of the write pointer within the current region,\
             in bytes from the start of the region
         :rtype: int
@@ -908,10 +950,6 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
-            If no region has been selected to write to
-        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
-            If the selected region has no more space
         """
         cmd_len = 0xF
         cmd_word = (cmd_len << 28) | (Commands.WRITE_ARRAY.value << 20)
@@ -1205,8 +1243,8 @@ class DataSpecificationGenerator(object):
                     Commands.IF.name)
 
         if condition not in Condition:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                "condition", condition, Commands.IF.name)
+            raise exceptions.DataSpecificationUnknownConditionException(
+                condition, Commands.IF.name)
 
         if condition == Condition.IS_ZERO.value or \
            condition == Condition.IS_NON_ZERO.value:
@@ -1839,7 +1877,50 @@ class DataSpecificationGenerator(object):
             * If no structure with id source_structure_id has been\
               allocated
         """
-        raise exceptions.UnimplementedDSGCommand("copy_structure")
+        bit_field = 0
+        cmd_string = "COPY_STRUCT"
+
+        if source_id_is_register:
+            if source_structure_id < 0 or source_structure_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "source_structure_id", source_structure_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            bit_field |= 1
+            cmd_string = "{0:s} source_struct = reg[{1:d}]".format(
+                cmd_string, source_structure_id)
+        else:
+            if source_structure_id < 0 or source_structure_id >= constants.MAX_STRUCT_SLOTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "source_structure_id", source_structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_STRUCT.name)
+            cmd_string = "{0:s} source_struct = {1:d}".format(
+                cmd_string, source_structure_id)
+
+        if destination_id_is_register:
+            if destination_structure_id < 0 or destination_structure_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "destination_structure_id", destination_structure_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            bit_field |= 2
+            cmd_string = "{0:s} destination_struct = reg[{1:d}]".format(
+                cmd_string, destination_structure_id)
+        else:
+            if destination_structure_id < 0 or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "destination_structure_id", destination_structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_STRUCT.name)
+            cmd_string = "{0:s} destination_struct = {1:d}".format(
+                cmd_string, destination_structure_id)
+
+        cmd_word = (constants.LEN1 << 28) | \
+                   (Commands.COPY_STRUCT.value << 20) | \
+                   (bit_field << 16) | \
+                   (destination_structure_id << 12) | \
+                   (source_structure_id << 8)
+
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def copy_structure_parameter(self, source_structure_id,
                                  source_parameter_index,
@@ -1873,15 +1954,48 @@ class DataSpecificationGenerator(object):
               in the source structure
             * If destination_parameter_index is not a valid parameter\
               index in the destination structure
-        :raise data_specification.exceptions.DataSpecificationInvalidTypeException:\
-            If the source and destination data types do not match
         :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
             * If no structure with id destination_structure_id has been\
               allocated
             * If no structure with id source_structure_id has been
               allocated
         """
-        raise exceptions.UnimplementedDSGCommand("copy_structure_parameter")
+        if source_structure_id < 0 or source_structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "source_structure_id", source_structure_id, 0,
+                constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
+
+        if source_parameter_index < 0 or source_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "source_parameter_index", source_parameter_index, 0,
+                constants.MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
+
+        if destination_structure_id < 0 or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "destination_structure_id", destination_structure_id, 0,
+                constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
+
+        if destination_parameter_index < 0 or destination_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "destination_parameter_index", destination_parameter_index,
+                0, constants.MAX_STRUCT_ELEMENTS - 1,
+                Commands.COPY_PARAM.name)
+
+        cmd_word_1 = (constants.LEN2 << 28) | (Commands.WRITE_PARAM.value << 20) | (destination_structure_id << 12) | (source_structure_id << 8)
+        cmd_word_2 = (destination_parameter_index << 8) | source_parameter_index
+
+        cmd_word_1_encoded = bytearray(struct.pack("<I", cmd_word_1))
+        cmd_word_2_encoded = bytearray(struct.pack("<I", cmd_word_2))
+
+        cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
+                     "source_parameter_id = {1:d}, destination_structure_id " \
+                     "= {2:d}, destination_parameter_id = {3:d}".format(
+                         source_structure_id, source_parameter_index,
+                         destination_structure_id, destination_parameter_index)
+
+        cmd_word_list = cmd_word_1_encoded + cmd_word_2_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def print_value(self, value, value_is_register=False,
                     data_type=DataType.UINT32):
@@ -1913,12 +2027,47 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
             * If data_type is not a vaild data type
         """
-        raise exceptions.UnimplementedDSGCommand("print_value")
+        cmd_word_length = constants.LEN1
+        source_register_id = 0
+        bit_field = 0
+        data_encoded = bytearray()
+
+        if value_is_register:
+            if value < 0 or value >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "value", value, 0, constants.MAX_REGISTERS - 1,
+                    Commands.PRINT_VAL.name)
+            bit_field |= 2
+            source_register_id = value
+            cmd_string = "PRINT_VAL reg[{0:d}]".format(source_register_id)
+        else:
+            if value < data_type.min or value > data_type.max:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "value", value, data_type.min, data_type.max,
+                    Commands.PRINT_VAL.name)
+            if data_type.size <= 4:
+                cmd_word_length = constants.LEN2
+            else:
+                cmd_word_length = constants.LEN3
+            data_encoding_string = "<{0:s}".format(data_type.struct_encoding)
+            data_encoded = bytearray(struct.pack(data_encoding_string, value))
+            cmd_string = "PRINT_VAL {0:d}".format(value)
+
+        cmd_word = (cmd_word_length << 28) | \
+                   (Commands.PRINT_VAL.value << 20) | \
+                   (bit_field << 16) | \
+                   (source_register_id << 8) | \
+                   data_type.value
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+
+        cmd_word_list = cmd_word_encoded + data_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def print_text(self, text):
         """ Insert command to print some text (for debugging)
         
-        :param text: The text to write
+        :param text: The text to write (max 12 characters)
         :type text: str
         :return: Nothing is returned
         :rtype: None
@@ -1927,7 +2076,30 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        raise exceptions.UnimplementedDSGCommand("print_text")
+        text_len = len(text)
+        if text_len > 12:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "len(text)", text_len, 1, 12,
+                Commands.PRINT_TXT.name)
+
+        if text_len <= 4:
+            cmd_word_len = constants.LEN2
+        elif text_len <= 8:
+            cmd_word_len = constants.LEN3
+        else:
+            cmd_word_len = constants.LEN4
+
+        text_encoded = bytearray(text)
+        #add final padding to the encoded text
+        text_encoded += bytearray(4 - (text_len % 4))
+
+        cmd_string = "PRINT_TXT \"{0:s}\"".format(text)
+
+        cmd_word = (cmd_word_len << 28) | (Commands.PRINT_TXT.value << 20) | (text_len - 1)
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded + text_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def print_struct(self, structure_id, structure_id_is_register=False):
         """ Insert command to print out a structure (for debugging)
@@ -1958,7 +2130,37 @@ class DataSpecificationGenerator(object):
             If structure_id_is_register is False and structure_id is\
             is the id of a structure that has not been allocated
         """
-        raise exceptions.UnimplementedDSGCommand("print_struct")
+        struct_register = 0
+        bit_field = 0
+        cmd_string = "PRINT_STRUCT"
+
+        if structure_id_is_register:
+            if structure_id < 0 or structure_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "structure_id", structure_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.PRINT_STRUCT.name)
+            struct_register = structure_id
+            bit_field = 0x2
+            cmd_string = "{0:s} struct(reg[{1:d}])".format(
+                cmd_string, struct_register)
+        else:
+            if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "structure_id", structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS - 1, Commands.PRINT_STRUCT.name)
+            cmd_string = "{0:s} struct({1:d})".format(
+                cmd_string, structure_id)
+
+        cmd_word = (constants.LEN1 << 28) | \
+                   (Commands.PRINT_STRUCT.value << 20) | \
+                   (bit_field << 16) | \
+                   (struct_register << 8) | \
+                   structure_id
+
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def end_specification(self, close_writer=True):
         """ Insert a command to indicate that the specification has finished\
@@ -2032,7 +2234,7 @@ class DataSpecificationGenerator(object):
                 if self.txt_indent < 0:
                     self.txt_indent = 0
             if no_instruction_number is True:
-                formatted_cmd_string = "%s%s\n" % (
+                formatted_cmd_string = "{0:s}{1:s}\n".format(
                     "   " * self.txt_indent, cmd_string)
             else:
                 formatted_cmd_string = "%8.8X. %s%s\n" % (
@@ -2045,8 +2247,8 @@ class DataSpecificationGenerator(object):
                 self.txt_indent += 1
         return
 
-    def get_next_available_struct_entry(self):
-        for index in xrange(constants.MAX_STRUCT_SLOTS):
-            if self.struct_slots[index] is None:
-                return index
-        raise exceptions.DataSpecificationNoMoreStructAvailable()
+    def allocate_function(self):
+        free_id = next(i for i in xrange(constants.MAX_CONSTRUCTORS)
+                       if self.function[i] == 0)
+        self.function[free_id] = 1
+        return free_id

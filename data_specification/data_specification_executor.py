@@ -49,9 +49,11 @@ class DataSpecificationExecutor(object):
                     If the table pointer generated as data header exceeds the \
                     size of the available memory
         """
-        for instruction_spec in iter(lambda: self.spec_reader.read(4), ''):
+        instruction_spec = self.spec_reader.read(4)
+        while len(instruction_spec) != 0:
+            length = len(instruction_spec)
             #process the received command
-            cmd = struct.unpack("<I", instruction_spec)[0]
+            cmd = struct.unpack("<I", str(instruction_spec))[0]
 
             opcode = (cmd >> 20) & 0xFF
 
@@ -65,6 +67,7 @@ class DataSpecificationExecutor(object):
 
             if return_value == constants.END_SPEC_EXECUTOR:
                 break
+            instruction_spec = self.spec_reader.read(4)
 
         # write the data file header
         self.write_header()

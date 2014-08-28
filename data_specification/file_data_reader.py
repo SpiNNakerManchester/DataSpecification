@@ -30,7 +30,6 @@ class FileDataReader(AbstractDataReader):
             raise IOError(
                 "FileDataReader.read: unable to read {} bytes from file {}".format(
                     n_bytes, self.filename))
-
         byte_data = bytearray(data)
         return byte_data
 

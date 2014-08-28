@@ -783,8 +783,8 @@ class DataSpecificationGenerator(object):
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
 
-        data_format = "<{0:s}".format(data_type.struct_encoding)
-        text_value = "{0:f}".format(data)
+        data_format = "<{}".format(data_type.struct_encoding)
+        text_value = "{}".format(data)
         data_value = decimal.Decimal(text_value) * data_type.scale
         data_encoded = bytearray(struct.pack(data_format, data_value))
 

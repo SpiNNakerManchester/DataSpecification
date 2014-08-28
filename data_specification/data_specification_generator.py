@@ -18,14 +18,14 @@ class DataSpecificationGenerator(object):
     """ Used to generate a data specification language file that can be\
         executed to produce a memory image
     """
+    MAGIC_NUMBER = 0xAD130AD6
+    VERSION = 1
 
-    def __init__(self, spec_writer, magic=None, report_writer=None):
+    def __init__(self, spec_writer, report_writer=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
         :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
-        :param magic: Magic number to write to the header or None to use default
-        :type magic: int
         :param report_writer: Determines if a text version of the specification\
         is to be written
         :type report_writer: Implementation of\
@@ -35,7 +35,6 @@ class DataSpecificationGenerator(object):
         """
         self.spec_writer = spec_writer
         self.report_writer = report_writer
-        self.magic_number = magic
         self.txt_indent = 0
         self.instruction_counter = 0
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
@@ -465,7 +464,6 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-
     def set_structure_value(self, structure_id, parameter_index, value,
                             data_type, value_is_register=False):
         """ Insert command to set a value in a structure
@@ -825,8 +823,8 @@ class DataSpecificationGenerator(object):
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
 
-        data_format = "<{0:s}".format(data_type.struct_encoding)
-        text_value = "{0:f}".format(data)
+        data_format = "<{}".format(data_type.struct_encoding)
+        text_value = "{}".format(data)
         data_value = decimal.Decimal(text_value) * data_type.scale
         data_encoded = bytearray(struct.pack(data_format, data_value))
 

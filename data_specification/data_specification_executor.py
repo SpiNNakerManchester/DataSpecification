@@ -1,7 +1,7 @@
 import struct
 
 from data_specification.data_specification_executor_functions \
-    import DataSpecificationExecutorFunctions as dsef
+    import DataSpecificationExecutorFunctions as Dsef
 from data_specification import exceptions, constants
 from data_specification.enums import commands
 
@@ -10,6 +10,8 @@ class DataSpecificationExecutor(object):
     """ Used to execute a data specification language file to produce a memory\
         image
     """
+    MAGIC_NUMBER = 0xAD130AD6
+    VERSION = 1
     
     def __init__(self, spec_reader, mem_writer, space_available):
         """
@@ -31,7 +33,7 @@ class DataSpecificationExecutor(object):
         self.mem_writer = mem_writer
         self.space_available = space_available
         self.space_used = 0
-        self.dsef = dsef(
+        self.dsef = Dsef(
             self.spec_reader, self.mem_writer, self.space_available)
     
     def execute(self):
@@ -49,13 +51,15 @@ class DataSpecificationExecutor(object):
                     If the table pointer generated as data header exceeds the \
                     size of the available memory
         """
-        for instruction_spec in iter(lambda: self.spec_reader.read(4), ''):
+        instruction_spec = self.spec_reader.read(4)
+        while len(instruction_spec) != 0:
             #process the received command
-            cmd = struct.unpack("<I", instruction_spec)[0]
+            cmd = struct.unpack("<I", str(instruction_spec))[0]
 
             opcode = (cmd >> 20) & 0xFF
 
             try:
+                # noinspection PyArgumentList
                 return_value = commands.Commands(opcode).exec_function(
                     self.dsef, cmd)
             except ValueError:
@@ -65,6 +69,7 @@ class DataSpecificationExecutor(object):
 
             if return_value == constants.END_SPEC_EXECUTOR:
                 break
+            instruction_spec = self.spec_reader.read(4)
 
         # write the data file header
         self.write_header()

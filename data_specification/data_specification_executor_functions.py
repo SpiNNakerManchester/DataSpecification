@@ -111,7 +111,7 @@ class DataSpecificationExecutorFunctions:
             raise exceptions.DataSpecificationRegionInUseException(region)
 
         size_encoded = self.spec_reader.read(4)
-        size = struct.unpack("<I", size_encoded)[0]
+        size = struct.unpack("<I", str(size_encoded))[0]
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
@@ -196,10 +196,10 @@ class DataSpecificationExecutorFunctions:
         else:
             if self._cmd_size == constants.LEN2 and data_len != 8:
                 read_data = self.spec_reader.read(4)
-                value = struct.unpack("<I", read_data)[0]
+                value = struct.unpack("<I", str(read_data))[0]
             elif self._cmd_size == constants.LEN3 and data_len == 8:
                 read_data = self.spec_reader.read(8)
-                value = struct.unpack("<Q", read_data)[0]
+                value = struct.unpack("<Q", str(read_data))[0]
             else:
                 raise exceptions.DataSpecificationSyntaxError(
                     "Command {0:s} requires a value as an argument, but the "
@@ -224,10 +224,10 @@ class DataSpecificationExecutorFunctions:
         :raise None
         """
         length_encoded = self.spec_reader.read(4)
-        length = struct.unpack("<I", length_encoded)[0]
+        length = struct.unpack("<I", str(length_encoded))[0]
         for i in xrange(length - 1):
             value_encoded = self.spec_reader.read(4)
-            value = struct.unpack("<I", value_encoded)[0]
+            value = struct.unpack("<I", str(value_encoded))[0]
             self._write_to_mem(value, 4, 1, "WRITE_ARRAY")
 
     def execute_write_struct(self, cmd):
@@ -304,7 +304,7 @@ class DataSpecificationExecutorFunctions:
             self.registers[self.dest_reg] = self.registers[self.src1_reg]
         else:
             data_encoded = self.spec_reader.read(4)
-            data = struct.unpack("<I", data_encoded)[0]
+            data = struct.unpack("<I", str(data_encoded))[0]
             self.registers[self.dest_reg] = data
 
     def execute_get_wr_ptr(self, cmd):
@@ -356,7 +356,7 @@ class DataSpecificationExecutorFunctions:
         :raise None
         """
         read_data = self.spec_reader.read(4)
-        value = struct.unpack("<i", read_data)[0]
+        value = struct.unpack("<i", str(read_data))[0]
         if value != -1:
             raise exceptions.DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The current"

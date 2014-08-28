@@ -41,5 +41,5 @@ class FileDataWriter(AbstractDataWriter):
             self.file_handle.close()
         except:
             raise IOError(
-                "FileDataWriter.close: unable to close file {0:s}".format(
-                    self.filename))
+                "FileDataWriter.close: unable to close file {}"
+                .format(self.filename))

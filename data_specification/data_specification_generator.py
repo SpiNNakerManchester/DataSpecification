@@ -41,8 +41,6 @@ class DataSpecificationGenerator(object):
         self.struct_slots = [None] * constants.MAX_STRUCT_SLOTS
         #storing constant to identifiy the data spec generator used to \
         # generate dsg
-        self.spec_writer.write(self.MAGIC_NUMBER)
-        self.spec_writer.write(self.VERSION)
 
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\

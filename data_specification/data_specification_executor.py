@@ -1,7 +1,7 @@
 import struct
 
 from data_specification.data_specification_executor_functions \
-    import DataSpecificationExecutorFunctions as dsef
+    import DataSpecificationExecutorFunctions as Dsef
 from data_specification import exceptions, constants
 from data_specification.enums import commands
 
@@ -33,18 +33,8 @@ class DataSpecificationExecutor(object):
         self.mem_writer = mem_writer
         self.space_available = space_available
         self.space_used = 0
-        self.dsef = dsef(
+        self.dsef = Dsef(
             self.spec_reader, self.mem_writer, self.space_available)
-        magic_number = struct.unpack("<I", str(self.spec_reader.read(4)))
-        version = struct.unpack("<I", str(self.spec_reader.read(4)))
-        if magic_number != self.MAGIC_NUMBER:
-            raise exceptions.DataReadException(
-                "the magic number of this dsg does not match the supported "
-                "magic number of this DSE")
-        if version != self.VERSION:
-            raise exceptions.DataReadException(
-                "the version of this dsg does not match the supported "
-                "version of this DSE")
     
     def execute(self):
         """ Executes the specification
@@ -63,13 +53,13 @@ class DataSpecificationExecutor(object):
         """
         instruction_spec = self.spec_reader.read(4)
         while len(instruction_spec) != 0:
-            length = len(instruction_spec)
             #process the received command
             cmd = struct.unpack("<I", str(instruction_spec))[0]
 
             opcode = (cmd >> 20) & 0xFF
 
             try:
+                # noinspection PyArgumentList
                 return_value = commands.Commands(opcode).exec_function(
                     self.dsef, cmd)
             except ValueError:

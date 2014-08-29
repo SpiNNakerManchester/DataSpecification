@@ -763,8 +763,7 @@ class DataSpecificationGenerator(object):
 
         if (data_type.min > data) or (data_type.max < data):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "data", data, data_type.min, data_type.max,
-                Commands.WRITE.name)
+                "data", data, data_type.min, data_type.max, Commands.WRITE.name)
 
         parameters = 0
         cmd_string = "WRITE data=0x%8.8X" % (data)

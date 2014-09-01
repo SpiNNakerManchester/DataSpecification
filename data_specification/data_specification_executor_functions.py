@@ -311,7 +311,27 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("GET_WR_PTR")
 
     def execute_set_wr_ptr(self, cmd):
-        raise exceptions.UnimplementedDSECommand("SET_WR_PTR")
+        address = None
+        self.__unpack_cmd__(cmd)
+        #check that the data is a register
+        if self.use_src1_reg == 1:
+            future_address = self.registers[self.dest_reg]
+        else:  # the data is a raw address
+            data_encoded = self.spec_reader.read(4)
+            future_address = struct.unpack("<I", str(data_encoded))[0]
+
+        #check that the address is realtive or abosulte
+        if cmd & 0x1 == 1:
+            if self.wr_ptr[self.current_region] is None:
+                raise exceptions.DataSpecificationNoRegionSelectedException(
+                    "the write pointer for this region is currently undefined")
+            else:
+                # noinspection PyTypeChecker
+                address = self.wr_ptr[self.current_region] + future_address
+        else:
+            address = future_address
+        #update write pointer
+        self.wr_ptr[self.current_region] = address
 
     def execute_align_wr_ptr(self, cmd):
         raise exceptions.UnimplementedDSECommand("ALIGN_WR_PTR")
@@ -400,6 +420,7 @@ class DataSpecificationExecutorFunctions:
 
         space_allocated = len(self.mem_regions[self.current_region])
         space_used = self.wr_ptr[self.current_region]
+        # noinspection PyTypeChecker
         space_available = space_allocated - space_used
         space_required = n_bytes * repeat
 
@@ -421,7 +442,8 @@ class DataSpecificationExecutorFunctions:
 
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]
-        self.mem_regions[self.current_region] \
-            [current_write_ptr:current_write_ptr + len(encoded_array)] = \
+        # noinspection PyTypeChecker
+        self.mem_regions[self.current_region]\
+        [current_write_ptr:current_write_ptr + len(encoded_array)] = \
             encoded_array
         self.wr_ptr[self.current_region] += len(encoded_array)

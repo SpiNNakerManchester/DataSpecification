@@ -321,11 +321,11 @@ class DataSpecificationExecutorFunctions:
             future_address = struct.unpack("<I", str(data_encoded))[0]
 
         #check that the address is realtive or abosulte
-        if cmd & 0x1 == 1:
+        if cmd & 0x1 == 1: #relative to its current write pointer
             if self.wr_ptr[self.current_region] is None:
                 raise exceptions.DataSpecificationNoRegionSelectedException(
                     "the write pointer for this region is currently undefined")
-            else:
+            else: # realtive to the base address of the region (absolete)
                 # noinspection PyTypeChecker
                 address = self.wr_ptr[self.current_region] + future_address
         else:

@@ -1,5 +1,6 @@
 from data_specification import constants, exceptions, memory_region_collection
 import struct
+from data_specification.memory_region import MemoryRegion
 
 
 class DataSpecificationExecutorFunctions:
@@ -122,12 +123,8 @@ class DataSpecificationExecutorFunctions:
                 "RESERVE"
             )
 
-        self.mem_regions[region] = bytearray(size)
-        if unfilled:
-            self.mem_regions.set_unfilled(region)
-        else:
-            self.mem_regions.set_filled(region)
-
+        self.mem_regions[region] = MemoryRegion(memory_pointer=0,
+                                                unfilled=unfilled, size=size)
         self.wr_ptr[region] = 0
         self.space_allocated += size
 
@@ -414,11 +411,11 @@ class DataSpecificationExecutorFunctions:
             raise exceptions.DataSpecificationNoRegionSelectedException(
                 command)
 
-        if self.mem_regions[self.current_region] is None:
+        if self.mem_regions.is_empty(self.current_region) is None:
             raise exceptions.DataSpecificationRegionNotAllocated(
                 self.current_region, command)
 
-        space_allocated = len(self.mem_regions[self.current_region])
+        space_allocated = self.mem_regions[self.current_region].allocated_size
         space_used = self.wr_ptr[self.current_region]
         # noinspection PyTypeChecker
         space_available = space_allocated - space_used
@@ -443,7 +440,7 @@ class DataSpecificationExecutorFunctions:
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]
         # noinspection PyTypeChecker
-        self.mem_regions[self.current_region]\
+        self.mem_regions[self.current_region].region_data\
         [current_write_ptr:current_write_ptr + len(encoded_array)] = \
             encoded_array
         self.wr_ptr[self.current_region] += len(encoded_array)

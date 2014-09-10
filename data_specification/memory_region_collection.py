@@ -62,7 +62,8 @@ class MemoryRegionCollection(object):
         else:
             needs_writing = False
             for region in range(region_id, self._n_regions):
-                if not self._regions[region_id].unfilled:
+                if (self._regions[region_id] is not None
+                        and not self._regions[region_id].unfilled):
                     needs_writing = True
         return needs_writing
 

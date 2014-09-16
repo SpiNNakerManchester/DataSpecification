@@ -39,6 +39,7 @@ class DataSpecificationGenerator(object):
         self.instruction_counter = 0
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
         self.function = [0] * constants.MAX_CONSTRUCTORS
+        self.ongoing_function_definition = False
 
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\
@@ -686,6 +687,8 @@ class DataSpecificationGenerator(object):
         """
         function_id = self.allocate_function()
 
+        self.ongoing_function_definition = True
+
 
     def end_function(self):
         """ Insert command to mark the end of a function definition
@@ -699,7 +702,16 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
             If there is no function being defined at this point
         """
-        raise exceptions.UnimplementedDSGCommand("end_function")
+        cmd_word = (constants.LEN1 << 28) | \
+                   (Commands.END_CONSTRUCTOR.value << 20)
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        cmd_string = "END_CONSTRUCT"
+
+        self.write_command_to_files(cmd_word_list, cmd_string, outdent=True)
+
+        self.ongoing_function_definition = False
 
     def call_function(self, function_id, structure_ids):
         """ Insert command to call a function

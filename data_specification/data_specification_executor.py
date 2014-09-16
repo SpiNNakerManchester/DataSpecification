@@ -104,22 +104,18 @@ class DataSpecificationExecutor(object):
         pointer_table = [0] * constants.MAX_MEM_REGIONS
         pointer_table_size = constants.MAX_MEM_REGIONS * 4
         self.space_used += pointer_table_size
-
-        index = 0
-        pointer_table[index] = self.space_used
+        next_free_offset = pointer_table_size
 
         for i in xrange(constants.MAX_MEM_REGIONS):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
+                pointer_table[i] = next_free_offset
                 region_size = memory_region.allocated_size
-                self.space_used += region_size
-                if index < constants.MAX_MEM_REGIONS - 1:
-                    index += 1
-                    pointer_table[index] =\
-                        pointer_table[index - 1] + region_size
             else:
-                pointer_table[index] = 0
-                index += 1
+                pointer_table[i] = 0
+                region_size = 0
+            self.space_used += region_size
+            next_free_offset += region_size
 
         if self.space_used > self.space_available:
             raise exceptions.DataSpecificationTablePointerOutOfMemory(

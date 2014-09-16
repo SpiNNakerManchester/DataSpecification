@@ -79,10 +79,14 @@ class DataSpecificationExecutor(object):
 
         # write the data from dsef.mem_regions previously computed
         for i in xrange(constants.MAX_MEM_REGIONS):
-            memory_area = self.dsef.mem_regions[i]
-            if memory_area is not None:
-                self.mem_writer.write(memory_area)
-
+            memory_region = self.dsef.mem_regions[i]
+            if memory_region is not None:
+                if (memory_region.unfilled and
+                    self.dsef.mem_regions.needs_to_write_region(i)
+                        or not memory_region.unfilled):
+                    self.mem_writer.write(memory_region.region_data)
+                else:
+                    self.space_used -= memory_region.allocated_size
         return self.space_used
 
     def write_header(self):
@@ -105,9 +109,9 @@ class DataSpecificationExecutor(object):
         pointer_table[index] = self.space_used
 
         for i in xrange(constants.MAX_MEM_REGIONS):
-            memory_area = self.dsef.mem_regions[i]
-            if memory_area is not None:
-                region_size = len(memory_area)
+            memory_region = self.dsef.mem_regions[i]
+            if memory_region is not None:
+                region_size = memory_region.allocated_size
                 self.space_used += region_size
                 if index < constants.MAX_MEM_REGIONS - 1:
                     index += 1

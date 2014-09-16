@@ -1,5 +1,6 @@
 from data_specification import constants, exceptions, memory_region_collection
 import struct
+from data_specification.memory_region import MemoryRegion
 
 
 class DataSpecificationExecutorFunctions:
@@ -122,12 +123,8 @@ class DataSpecificationExecutorFunctions:
                 "RESERVE"
             )
 
-        self.mem_regions[region] = bytearray(size)
-        if unfilled:
-            self.mem_regions.set_unfilled(region)
-        else:
-            self.mem_regions.set_filled(region)
-
+        self.mem_regions[region] = MemoryRegion(memory_pointer=0,
+                                                unfilled=unfilled, size=size)
         self.wr_ptr[region] = 0
         self.space_allocated += size
 
@@ -311,7 +308,27 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("GET_WR_PTR")
 
     def execute_set_wr_ptr(self, cmd):
-        raise exceptions.UnimplementedDSECommand("SET_WR_PTR")
+        address = None
+        self.__unpack_cmd__(cmd)
+        #check that the data is a register
+        if self.use_src1_reg == 1:
+            future_address = self.registers[self.dest_reg]
+        else:  # the data is a raw address
+            data_encoded = self.spec_reader.read(4)
+            future_address = struct.unpack("<I", str(data_encoded))[0]
+
+        #check that the address is realtive or abosulte
+        if cmd & 0x1 == 1: #relative to its current write pointer
+            if self.wr_ptr[self.current_region] is None:
+                raise exceptions.DataSpecificationNoRegionSelectedException(
+                    "the write pointer for this region is currently undefined")
+            else: # realtive to the base address of the region (absolete)
+                # noinspection PyTypeChecker
+                address = self.wr_ptr[self.current_region] + future_address
+        else:
+            address = future_address
+        #update write pointer
+        self.wr_ptr[self.current_region] = address
 
     def execute_align_wr_ptr(self, cmd):
         raise exceptions.UnimplementedDSECommand("ALIGN_WR_PTR")
@@ -394,12 +411,13 @@ class DataSpecificationExecutorFunctions:
             raise exceptions.DataSpecificationNoRegionSelectedException(
                 command)
 
-        if self.mem_regions[self.current_region] is None:
+        if self.mem_regions.is_empty(self.current_region) is None:
             raise exceptions.DataSpecificationRegionNotAllocated(
                 self.current_region, command)
 
-        space_allocated = len(self.mem_regions[self.current_region])
+        space_allocated = self.mem_regions[self.current_region].allocated_size
         space_used = self.wr_ptr[self.current_region]
+        # noinspection PyTypeChecker
         space_available = space_allocated - space_used
         space_required = n_bytes * repeat
 
@@ -421,7 +439,8 @@ class DataSpecificationExecutorFunctions:
 
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]
-        self.mem_regions[self.current_region] \
-            [current_write_ptr:current_write_ptr + len(encoded_array)] = \
+        # noinspection PyTypeChecker
+        self.mem_regions[self.current_region].region_data\
+        [current_write_ptr:current_write_ptr + len(encoded_array)] = \
             encoded_array
         self.wr_ptr[self.current_region] += len(encoded_array)

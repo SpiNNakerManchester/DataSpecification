@@ -9,8 +9,6 @@ class MemoryRegionCollection(object):
         """
         self._n_regions = n_regions
         self._regions = [None] * n_regions
-        self._mem_pointers = [0] * n_regions
-        self._unfilled = [None] * n_regions
 
     def __len__(self):
         return self._n_regions
@@ -34,14 +32,8 @@ class MemoryRegionCollection(object):
     def is_empty(self, region):
         return self._regions[region] is None
 
-    def set_unfilled(self, region):
-        self._unfilled[region] = True
-
-    def set_filled(self, region):
-        self._unfilled[region] = False
-
     def is_unfilled(self, region):
-        return self._unfilled[region]
+        return self._regions[region].unfilled
 
     def count_used_regions(self):
         count = 0
@@ -49,3 +41,29 @@ class MemoryRegionCollection(object):
             if i is not None:
                 count += 1
         return count
+
+    def needs_to_write_region(self, region_id):
+        """
+        helper method which determines if a unfilled region actually needs to
+        be written (optimisation to stop large data files)
+
+        :param region_id: the region id to which the test is being ran on
+        :return: a boolean stating if the region needs to be written
+        :rtype: boolean
+        :raise DataSpecificationNoRegionSelectedException: when the id is \
+        beyond the expected region range
+        """
+        if region_id > self._n_regions:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                "the region id requested is beyond the supported number of"
+                "avilable region ids")
+        if not self._regions[region_id].unfilled:
+            return True
+        else:
+            needs_writing = False
+            for region in range(region_id, self._n_regions):
+                if (self._regions[region_id] is not None
+                        and not self._regions[region_id].unfilled):
+                    needs_writing = True
+        return needs_writing
+

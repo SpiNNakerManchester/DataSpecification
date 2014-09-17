@@ -41,7 +41,8 @@ class DataSpecificationExecutor(object):
     def execute(self):
         """ Executes the specification
         
-        :return: The number of bytes used by the image
+        :return: The number of bytes used by the image and \
+                the number of bytes written by the image
         :rtype: int
         :raise data_specification.exceptions.DataReadException:\
                     If a read from external storage fails

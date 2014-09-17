@@ -13,7 +13,8 @@ class DataSpecificationExecutor(object):
     MAGIC_NUMBER = 0xAD130AD6
     VERSION = 1
     
-    def __init__(self, spec_reader, mem_writer, space_available):
+    def __init__(self, spec_reader, mem_writer, space_available,
+                 report_writer=None):
         """
         :param spec_reader: The object to read the specification language file\
                     from
@@ -33,6 +34,7 @@ class DataSpecificationExecutor(object):
         self.mem_writer = mem_writer
         self.space_available = space_available
         self.space_used = 0
+        self.space_written = 0
         self.dsef = Dsef(
             self.spec_reader, self.mem_writer, self.space_available)
     
@@ -77,17 +79,20 @@ class DataSpecificationExecutor(object):
         # write the table pointer
         self.write_pointer_table()
 
+        #take into account what has just been written to file
+        self.space_written = self.space_used
+
         # write the data from dsef.mem_regions previously computed
         for i in xrange(constants.MAX_MEM_REGIONS):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
-                if (memory_region.unfilled and
-                    self.dsef.mem_regions.needs_to_write_region(i)
+                if ((memory_region.unfilled and
+                    self.dsef.mem_regions.needs_to_write_region(i))
                         or not memory_region.unfilled):
                     self.mem_writer.write(memory_region.region_data)
                 else:
-                    self.space_used -= memory_region.allocated_size
-        return self.space_used
+                    self.space_written -= memory_region.allocated_size
+        return self.space_used, self.space_written
 
     def write_header(self):
         magic_number_encoded = bytearray(
@@ -97,14 +102,15 @@ class DataSpecificationExecutor(object):
             struct.pack("<I", constants.DSE_VERSION))
         self.mem_writer.write(version_encoded)
 
-        # number of bytes in the header (2 words = 8 bytes)
-        self.space_used = 8
+        self.space_used = 0
 
     def write_pointer_table(self):
         pointer_table = [0] * constants.MAX_MEM_REGIONS
         pointer_table_size = constants.MAX_MEM_REGIONS * 4
-        self.space_used += pointer_table_size
-        next_free_offset = pointer_table_size
+        self.space_used += \
+            pointer_table_size + constants.APP_PTR_TABLE_HEADER_BYTE_SIZE
+        next_free_offset = \
+            pointer_table_size + constants.APP_PTR_TABLE_HEADER_BYTE_SIZE
 
         for i in xrange(constants.MAX_MEM_REGIONS):
             memory_region = self.dsef.mem_regions[i]

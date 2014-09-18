@@ -47,3 +47,12 @@ class AbstractDataReader(object):
         :raise IOError: If an error occurs reading from the underlying storage
         """
         pass
+
+    @abstractmethod
+    def tell(self):
+        """ Returns the position of the file cursor
+
+        :return: Position of the file cursor
+        :rtype: int
+        """
+        pass

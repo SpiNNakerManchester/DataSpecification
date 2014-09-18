@@ -19,12 +19,19 @@ class DataSpecificationExecutor(object):
         :param spec_reader: The object to read the specification language file\
                     from
         :type spec_reader:\
-                    :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
+                    :py:class:`data_specification.abstract_data_reader.\
+                    AbstractDataReader`
         :param mem_writer: The object to write the memory image to
         :type mem_writer:\
-                    :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+                    :py:class:`data_specification.abstract_data_writer.
+                    AbstractDataWriter`
         :param space_available: memory available (in bytes) for the data
         :type space_available: int
+        :param report_writer: The object to write the report of the data \
+                    specification executor
+        :type report_writer:\
+                    :py:class:`data_specification.abstract_data_writer.
+                    AbstractDataWriter`
         :raise data_specification.exceptions.DataReadException:\
                     If a read from external storage fails
         :raise data_specification.exceptions.DataWriteException:\
@@ -32,6 +39,7 @@ class DataSpecificationExecutor(object):
         """
         self.spec_reader = spec_reader
         self.mem_writer = mem_writer
+        self.report_writer = report_writer
         self.space_available = space_available
         self.space_used = 0
         self.space_written = 0
@@ -50,7 +58,8 @@ class DataSpecificationExecutor(object):
                     If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationException:\
                     If there is an error when executing the specification
-        :raise data_specification.exceptions.DataSpecificationTablePointerOutOfMemory:
+        :raise data_specification.exceptions.\
+                    DataSpecificationTablePointerOutOfMemory:\
                     If the table pointer generated as data header exceeds the \
                     size of the available memory
         """
@@ -96,16 +105,24 @@ class DataSpecificationExecutor(object):
         return self.space_used, self.space_written
 
     def write_header(self):
+        self.report_writer.write("header structure")
         magic_number_encoded = bytearray(
             struct.pack("<I", constants.APPDATA_MAGIC_NUM))
+        self.report_writer.write(
+            "%8.8X Magic number - file identifier: %8.8X".format(
+                self.mem_writer.tell(), constants.APPDATA_MAGIC_NUM))
         self.mem_writer.write(magic_number_encoded)
         version_encoded = bytearray(
             struct.pack("<I", constants.DSE_VERSION))
+        self.report_writer.write(
+            "%8.8X File structure version: %8.8X".format(
+                self.mem_writer.tell(), constants.DSE_VERSION))
         self.mem_writer.write(version_encoded)
 
         self.space_used = 0
 
     def write_pointer_table(self):
+        self.report_writer.write("Pointer table")
         pointer_table = [0] * constants.MAX_MEM_REGIONS
         pointer_table_size = constants.MAX_MEM_REGIONS * 4
         self.space_used += \
@@ -128,6 +145,13 @@ class DataSpecificationExecutor(object):
             raise exceptions.DataSpecificationTablePointerOutOfMemory(
                 self.space_available, self.space_used)
 
+        index = 0
         for i in pointer_table:
+            self.report_writer.write(
+                "%8.8X pointer %d: %8.8X, %d".format(
+                self.mem_writer.tell(), index, i))
             encoded_pointer = struct.pack("<I", i)
             self.mem_writer.write(encoded_pointer)
+            self.report_writer.write("Pointer table")
+            index += 1
+

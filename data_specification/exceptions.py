@@ -208,6 +208,32 @@ class DataSpecificationNoMoreException(DataSpecificationException):
               "{1:d}".format(space_available, space_required)
 
 
+class DataSpecificationNoMoreFunctionsException(DataSpecificationException):
+    """ An exception that indicates that there is no more space available for \
+        functions
+    """
+
+    def __init__(self, max_functions):
+        """
+
+        """
+        print "Space unavailable to instantiate a new function. Constructor " \
+              "function used: {0:d}".format(max_functions)
+
+
+class NestedFunctionException(DataSpecificationException):
+    """ An exception that indicates that a function is being defined within the
+    context of another function definition
+    """
+
+    def __init__(self):
+        """
+
+        """
+        print "Nested function definition not supported"
+
+
+
 class DataSpecificationUnknownTypeException(DataSpecificationException):
     """ An exception that indicates that the value of the requested type\
         is unknown

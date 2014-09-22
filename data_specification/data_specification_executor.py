@@ -72,8 +72,8 @@ class DataSpecificationExecutor(object):
 
             try:
                 # noinspection PyArgumentList
-                return_value = commands.Commands(opcode).exec_function(
-                    self.dsef, cmd)
+                return_value = \
+                    commands.Commands(opcode).exec_function(self.dsef, cmd)
             except ValueError:
                 raise exceptions.DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(

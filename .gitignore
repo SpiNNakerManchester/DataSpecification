@@ -3,3 +3,6 @@
 /.idea
 /.settings
 *.pyc
+build/
+dist/
+DataSpecification.egg-info

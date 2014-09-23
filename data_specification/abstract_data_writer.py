@@ -1,8 +1,8 @@
-#from abc import ABCMeta
+from abc import ABCMeta
 from abc import abstractmethod
-#from six import add_metaclass
+from six import add_metaclass
 
-#@add_metaclass(ABCMeta)
+@add_metaclass(ABCMeta)
 class AbstractDataWriter(object):
     """ Abstract writer used to write data somewhere
     """
@@ -29,5 +29,14 @@ class AbstractDataWriter(object):
         :return: Nothing is returned
         :rtype: None
         :raise IOError: If an error occurs writing to the underlying storage
+        """
+        pass
+
+    @abstractmethod
+    def tell(self):
+        """ Returns the position of the file cursor
+
+        :return: Position of the file cursor
+        :rtype: int
         """
         pass

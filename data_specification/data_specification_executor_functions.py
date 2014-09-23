@@ -15,10 +15,12 @@ class DataSpecificationExecutorFunctions:
         :param spec_reader: The object to read the specification language file\
             from
         :type spec_reader:\
-            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
+            :py:class:`data_specification.abstract_data_reader.\
+            AbstractDataReader`
         :param mem_writer: The object to write the memory image to
         :type mem_writer:\
-            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+            :py:class:`data_specification.abstract_data_writer.\
+            AbstractDataWriter`
         :param space_available: Memory space available for the data to be\
             generated
         :type space_available: int
@@ -93,8 +95,9 @@ class DataSpecificationExecutorFunctions:
         :rtype: None
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If there is an error in the command syntax
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the requested size of the region is beyond the available memory space
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\ If the requested \
+            size of the region is beyond the available memory space
         """
         self.__unpack_cmd__(cmd)
         region = cmd & 0x1F  # cmd[4:0]
@@ -242,9 +245,10 @@ class DataSpecificationExecutorFunctions:
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.DataSpecificationRegionUnfilledException: \
-            If the focus is being switched to a region of memory which has \
-            been declared to be kept unfilled
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionUnfilledException: If the focus is being \
+            switched to a region of memory which has been declared to be kept \
+            unfilled
         """
         self.__unpack_cmd__(cmd)
 
@@ -310,19 +314,19 @@ class DataSpecificationExecutorFunctions:
     def execute_set_wr_ptr(self, cmd):
         address = None
         self.__unpack_cmd__(cmd)
-        #check that the data is a register
+        # check that the data is a register
         if self.use_src1_reg == 1:
             future_address = self.registers[self.dest_reg]
         else:  # the data is a raw address
             data_encoded = self.spec_reader.read(4)
             future_address = struct.unpack("<I", str(data_encoded))[0]
 
-        #check that the address is realtive or abosulte
-        if cmd & 0x1 == 1: #relative to its current write pointer
+        #check that the address is relative or absolute
+        if cmd & 0x1 == 1:  # relative to its current write pointer
             if self.wr_ptr[self.current_region] is None:
                 raise exceptions.DataSpecificationNoRegionSelectedException(
                     "the write pointer for this region is currently undefined")
-            else: # realtive to the base address of the region (absolete)
+            else:  # relative to the base address of the region (obsolete)
                 # noinspection PyTypeChecker
                 address = self.wr_ptr[self.current_region] + future_address
         else:
@@ -396,15 +400,18 @@ class DataSpecificationExecutorFunctions:
         :type command: str
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:
-            raised if there is no memory region selected for the write operation
-        :raise data_specification.exceptions.DataSpecificationRegionNotAllocated: \
-            raised if the selected region has not been allocated memory space
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: raised if there is no \
+            memory region selected for the write operation
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionNotAllocated: raised if the selected region \
+            has not been allocated memory space
         :raise data_specification.exceptions.DataSpecificationNoMoreException: \
             raised if the selected region has not enough available memory to \
             store the required data
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeLengthException: \
-            raised if the data type size is not 1, 2, 4, or 8 bytes
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeLengthException: raised if the data \
+            type size is not 1, 2, 4, or 8 bytes
         """
 
         if self.current_region is None:
@@ -440,7 +447,7 @@ class DataSpecificationExecutorFunctions:
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]
         # noinspection PyTypeChecker
-        self.mem_regions[self.current_region].region_data\
-        [current_write_ptr:current_write_ptr + len(encoded_array)] = \
-            encoded_array
+        self.mem_regions[self.current_region].region_data[
+            current_write_ptr:current_write_ptr + len(
+                encoded_array)] = encoded_array
         self.wr_ptr[self.current_region] += len(encoded_array)

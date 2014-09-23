@@ -27,6 +27,14 @@ class FileDataWriter(AbstractDataWriter):
                 "FileDataWriter.write: unable to write {0:d} bytes to file {1:s}".format(
                     len(data), self.filename))
 
+    def tell(self):
+        """ Returns the position of the file cursor
+
+        :return: Position of the file cursor
+        :rtype: int
+        """
+        return self.file_handle.tell()
+
     def close(self):
         """ Closes the file
         

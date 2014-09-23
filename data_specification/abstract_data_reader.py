@@ -1,8 +1,8 @@
-#from abc import ABCMeta
+from abc import ABCMeta
 from abc import abstractmethod
-#from six import add_metaclass
+from six import add_metaclass
 
-#@add_metaclass(ABCMeta)
+@add_metaclass(ABCMeta)
 class AbstractDataReader(object):
     """ Abstract reader used to read data from somewhere
     """
@@ -45,5 +45,14 @@ class AbstractDataReader(object):
         :return: The number of bytes stored in data
         :rtype: int
         :raise IOError: If an error occurs reading from the underlying storage
+        """
+        pass
+
+    @abstractmethod
+    def tell(self):
+        """ Returns the position of the file cursor
+
+        :return: Position of the file cursor
+        :rtype: int
         """
         pass

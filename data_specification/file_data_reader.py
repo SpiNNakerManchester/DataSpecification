@@ -46,6 +46,11 @@ class FileDataReader(AbstractDataReader):
         return length
 
     def tell(self):
+        """ Returns the position of the file cursor
+
+        :return: Position of the file cursor
+        :rtype: int
+        """
         return self.file_handle.tell()
 
     def close(self):

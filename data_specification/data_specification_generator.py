@@ -2,12 +2,12 @@ import logging
 import struct
 import decimal
 
-from enums.data_type import DataType
+from data_specification import constants, exceptions
+from data_specification.enums.data_type import DataType
 from data_specification.enums.commands import Commands
 from data_specification.enums.condition import Condition
 from data_specification.enums.logic_operation import LogicOperation
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
-from data_specification import constants, exceptions
 from spinn_machine import sdram
 
 
@@ -38,9 +38,8 @@ class DataSpecificationGenerator(object):
         self.txt_indent = 0
         self.instruction_counter = 0
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
-        self.struct_slots = [None] * constants.MAX_STRUCT_SLOTS
-        #storing constant to identifiy the data spec generator used to \
-        # generate dsg
+        self.function = [0] * constants.MAX_CONSTRUCTORS
+        self.ongoing_function_definition = False
 
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\
@@ -108,11 +107,13 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationRegionInUseException:\
-            If the region was already reserved
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the region requested was out of the allowed range, or that the\
-            size was too big to fit in SDRAM
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionInUseException: If the region was already \
+            reserved
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If the region
+            requested was out of the allowed range, or that the size was too \
+            big to fit in SDRAM
         """
         if (region < 0) or (region >= constants.MAX_MEM_REGIONS):
             logger.error(
@@ -140,11 +141,11 @@ class DataSpecificationGenerator(object):
             unfilled = True
         self.mem_slot[region] = [size, label, unfilled]
 
-        # Length [29:28], command[27:20], field_use[18:16], unfilled[7],
-        # region ID [4:0]:
-
-        cmd_word = (constants.LEN2 << 28) | (Commands.RESERVE.value << 20) | \
-                   (constants.NO_REGS << 16) | (unfilled << 7) | region
+        cmd_word = ((constants.LEN2 << 28) |
+                    (Commands.RESERVE.value << 20) |
+                    (constants.NO_REGS << 16) |
+                    (unfilled << 7) |
+                    region)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_size = bytearray(struct.pack("<I", size))
         cmd_word_list = encoded_cmd_word + encoded_size
@@ -162,7 +163,6 @@ class DataSpecificationGenerator(object):
                 "RESERVE memRegion={0:d} size={1:d} label='{2:s}' {3:s}".format(
                     region, size, label, unfilled_string)
 
-        # Send the command to the output files:
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def free_memory_region(self, region):
@@ -176,10 +176,12 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If the region was not reserved
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the region requested was out of the allowed range
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException: If the region was not\
+            reserved
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If the region \
+            requested was out of the allowed range
         """
         raise exceptions.UnimplementedDSGCommand("free_memory_region")
 
@@ -198,13 +200,13 @@ class DataSpecificationGenerator(object):
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If there is no more space for a new generator
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If the rng_type is not one of the allowed values
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the seed is too big or too small
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If the rng_type is not one \
+            of the allowed values
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If the seed is too \
+            big or too small
         """
-        # raise exceptions.UnimplementedDSGCommand(
-        #            "declare_random_number_generator")
 
         if rng_type < 0 or rng_type >= constants.MAX_RNGS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
@@ -222,9 +224,15 @@ class DataSpecificationGenerator(object):
             rng_type, rng_source, seed)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def declare_uniform_random_distribution(self, rng_id, min_value, max_value):
+    def declare_uniform_random_distribution(self, distribution_id, structure_id,
+                                            rng_id, min_value, max_value):
         """ Insert commands to declare a uniform random distribution
 
+        :param distribution_id: id of the distribution being set up
+        :param distribution_id: int
+        :param structure_id: id of an empty structure slot to fill with the
+            uniform random distribution data
+        :type structure_id: int
         :param rng_id: The id of the random number generator, between 0 and 15
         :type rng_id: int
         :param min_value: The minimum value that should be returned from the\
@@ -242,26 +250,43 @@ class DataSpecificationGenerator(object):
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If there is no more space for a new random distribution
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If the requested rng_id has not been allocated
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If rng_id, min_value or max_value is out of range
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException: If the requested rng_id \
+            has not been allocated
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If rng_id, \
+            min_value or max_value is out of range
         """
-        raise exceptions.UnimplementedDSGCommand(
-            "declare_uniform_random_distribution")
+        if distribution_id < 0 or distribution_id >= constants.MAX_RANDOM_DISTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "distribution id", distribution_id, 0,
+                constants.MAX_RANDOM_DISTS-1,
+                Commands.DECLARE_RANDOM_DIST.name)
 
-    # if rng_id > 63:
-    #            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-    #                "Random distribution id", rng_id, 0, 63,
-    #                Commands.DECLARE_RANDOM_DIST.name)
-    #
-    #        cmd_word = (constants.LEN1 << 28) | \
-    #                   (Commands.DECLARE_RANDOM_DIST.value << 20)
-    #        cmd_word = cmd_word | (rng_id << 8) | paramList
-    #        cmd_word_list = [cmd_word]
-    #        cmd_string= "DECLARE_RANDOM_DIST distId=%d, paramList=%d" \
-    #               % (distId, paramList)
-    #        self.write_command_to_files(cmd_word_list, cmd_string)
+        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "structure id", structure_id, 0,
+                constants.MAX_STRUCT_SLOTS-1,
+                Commands.DECLARE_RANDOM_DIST.name)
+
+        parameters = [("distType", DataType.UINT32, 0),
+                      ("rngID", DataType.UINT32, rng_id),
+                      ("param1", DataType.S1615, min_value),
+                      ("param2", DataType.S1615, max_value)]
+        self.define_structure(structure_id, parameters)
+
+        cmd_word = ((constants.LEN1 << 28) |
+                    (Commands.DECLARE_RANDOM_DIST.value << 20) |
+                    (distribution_id << 8) |
+                    structure_id)
+
+        cmd_string = "DECLARE_RANDOM_DIST distribution_id={0:d} " \
+                     "structure_id={1:d}".format(distribution_id, structure_id)
+
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def call_random_distribution(self, distribution_id, register_id):
         """ Insert command to get the next random number from  a random\
@@ -280,16 +305,43 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If the random distribution id was not previously declared
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the distribution_id or register_id specified was out of range
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException: If the random distribution \
+            id was not previously declared
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If the \
+            distribution_id or register_id specified was out of range
         """
-        raise exceptions.UnimplementedDSGCommand("call_random_distribution")
+        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
+                    Commands.GET_RANDOM_NUMBER.name)
 
-    def define_structure(self, parameters):
+        if distribution_id < 0 or distribution_id >= constants.MAX_RANDOM_DISTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "distribution_id", distribution_id, 0,
+                    constants.MAX_RANDOM_DISTS - 1,
+                    Commands.GET_RANDOM_NUMBER.name)
+
+        bit_field = 0x4
+
+        cmd_string = "GET_RANDOM_NUMBER distribution={0:d} " \
+                     "dest=reg[{1:d}]".format(distribution_id, register_id)
+        cmd_word = ((constants.LEN1 << 28) |
+                    (Commands.GET_RANDOM_NUMBER.value << 20) |
+                    (bit_field << 16) |
+                    (register_id << 12) |
+                    distribution_id)
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
+    def define_structure(self, structure_id, parameters):
         """ Insert commands to define a data structure
 
+        :param structure_id: the id of the structure to create, between 0 and 15
+        :type structure_id: int
         :param parameters: A list of between 1 and 255 tuples of (label,\
             data_type, value) where:
                 * label is the label of the element (for debugging)
@@ -297,37 +349,40 @@ class DataSpecificationGenerator(object):
                 * value is the value of the element, or None if no value is to\
                   be assigned
         :type parameters: list of (str, :py:class:`DataType`, float)
-        :return: The id of the new structure, between 0 and 15
-        :rtype: int
+        :return: Nothing is returned
+        :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If there are no more spaces for new structures
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If there are an incorrect number of parameters
             * If the size of one of the tuples is incorrect
             * If one of the values to be assigned has an integer\
               data_type but has a fractional part
             * If one of the values to be assigned would overflow its\
               data_type
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If one of the data types in the structure is unknown
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If one of the data types in \
+            the structure is unknown
         """
         # start of struct
-        struct_index = self.get_next_available_struct_entry()
-
-        cmd_word = (constants.LEN1 << 28) | \
-                   (Commands.START_STRUCT.value << 20) | \
-                   struct_index
+        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "structure id", structure_id, 0, constants.MAX_STRUCT_SLOTS-1,
+                Commands.START_STRUCT.name)
+        cmd_word = ((constants.LEN1 << 28) |
+                    (Commands.START_STRUCT.value << 20) |
+                    structure_id)
 
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded
-        cmd_string = "START_STRUCT id={0:d}".format(struct_index)
+        cmd_string = "START_STRUCT id={0:d}".format(structure_id)
 
         self.write_command_to_files(cmd_word_list, cmd_string)
-        self.struct_slots[struct_index] = list()
 
         # elements of the struct
         elem_index = 0
@@ -341,6 +396,10 @@ class DataSpecificationGenerator(object):
             data_type = i[1]
             value = i[2]
 
+            if data_type not in DataType:
+                raise exceptions.DataSpecificationUnknownTypeException(
+                    data_type.value, Commands.WRITE_PARAM.name)
+
             if value is not None:
 
                 if value < data_type.min or value > data_type.max:
@@ -350,15 +409,15 @@ class DataSpecificationGenerator(object):
                             Commands.WRITE_PARAM.name)
 
                 if data_type.size <= 4:
-                    cmd_word = (constants.LEN2 << 28) | \
-                               (Commands.STRUCT_ELEM.value << 20) | \
-                               (elem_index << 8) | \
-                               data_type.value
+                    cmd_word = ((constants.LEN2 << 28) |
+                                (Commands.STRUCT_ELEM.value << 20) |
+                                (elem_index << 8) |
+                                data_type.value)
                 elif data_type.size == 8:
-                    cmd_word = (constants.LEN3 << 28) | \
-                               (Commands.STRUCT_ELEM.value << 20) | \
-                               (elem_index << 8) | \
-                               data_type.value
+                    cmd_word = ((constants.LEN3 << 28) |
+                                (Commands.STRUCT_ELEM.value << 20) |
+                                (elem_index << 8) |
+                                data_type.value)
                 else:
                     raise exceptions.DataSpecificationInvalidSizeException(
                         data_type.name, data_type.size,
@@ -377,32 +436,37 @@ class DataSpecificationGenerator(object):
 
                 cmd_word_list = cmd_word_encoded + value_encoded + padding
 
-                cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
-                             "{1:s}, value = {2:d}".format(
-                                 elem_index, data_type.name, value)
+                if len(label) == 0:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}, value = {2:d}".format(
+                                     elem_index, data_type.name, value)
+                else:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}, value = {2:d}, label = {3:s}".format(
+                                     elem_index, data_type.name, value, label)
 
                 self.write_command_to_files(cmd_word_list, cmd_string)
-                self.struct_slots[struct_index].append(
-                    {'index': elem_index, 'label': label,
-                     'data_type': data_type, 'value': value})
 
             else:
                 label = i[0]
                 data_type = i[1]
 
-                cmd_word = (constants.LEN1 << 28) | \
-                           (Commands.STRUCT_ELEM.value << 20) | \
-                           (elem_index << 8) | \
-                           data_type.value
-                self.struct_slots[struct_index].append(
-                    {'index': elem_index, 'label': label,
-                     'data_type': data_type, 'value': None})
+                cmd_word = ((constants.LEN1 << 28) |
+                            (Commands.STRUCT_ELEM.value << 20) |
+                            (elem_index << 8) |
+                            data_type.value)
 
                 cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
                 cmd_word_list = cmd_word_encoded
 
-                cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
-                             "{1:s}".format(elem_index, data_type.name)
+                if len(label) == 0:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}".format(elem_index, data_type.name)
+                else:
+                    cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
+                                 "{1:s}, label = {2:s}".format(elem_index,
+                                                               data_type.name,
+                                                               label)
 
                 self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -413,15 +477,12 @@ class DataSpecificationGenerator(object):
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded
 
-        cmd_string = "END_STRUCT id={0:d}".format(struct_index)
+        cmd_string = "END_STRUCT id={0:d}".format(structure_id)
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-        return struct_index
-
-
     def set_structure_value(self, structure_id, parameter_index, value,
-                            value_is_register=False):
+                            data_type, value_is_register=False):
         """ Insert command to set a value in a structure
 
         :param structure_id:
@@ -440,13 +501,20 @@ class DataSpecificationGenerator(object):
             * If value_is_register is True, the id of the register containing\
               the value to assign to the position, between 0 and 15
         :type value: float
+        :param data_type: type of the data to be stored in the structure.\
+            If parameter value_is_register is set to true, this variable is\
+            disregarded
+        :type data_type: :py:class:`DataType`
+        :param value_is_register: Identifies if value identifies a register
+        :type value_is_register: bool
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If structure_id is not in the allowed range
             * If parameter_index is larger than the number of parameters\
               declared in the original structure
@@ -455,8 +523,9 @@ class DataSpecificationGenerator(object):
             * If value_is_register is False, and value would overflow the\
               position in the structure
             * If value_is_register is True, and value is not a valid register id
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If the structure requested has not been declared
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException: If the structure requested \
+            has not been declared
         """
 
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
@@ -464,51 +533,46 @@ class DataSpecificationGenerator(object):
                 "structure_id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_PARAM.name)
 
-        if self.struct_slots[structure_id] is None:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "struct", structure_id, Commands.WRITE_PARAM.name)
-
-        n_of_elements = len(self.struct_slots[structure_id])
-        if parameter_index < 0 or parameter_index >= n_of_elements:
+        if (parameter_index < 0
+                or parameter_index >= constants.MAX_STRUCT_ELEMENTS):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "parameter_index", parameter_index, 0, n_of_elements - 1,
-                Commands.WRITE_PARAM.name)
+                "parameter_index", parameter_index, 0,
+                constants.MAX_STRUCT_ELEMENTS - 1, Commands.WRITE_PARAM.name)
 
         if value_is_register:
             if value < 0 or value >= constants.MAX_REGISTERS:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "value", value, 0, constants.MAX_REGISTERS - 1,
                     Commands.WRITE_PARAM.name)
-            cmd_word = (constants.LEN1 << 28) | \
-                       (Commands.WRITE_PARAM.value << 20) | \
-                       (constants.SRC1_ONLY << 16) | \
-                       (structure_id << 12) | \
-                       (value << 8) | \
-                       parameter_index
+            cmd_word = ((constants.LEN1 << 28) |
+                        (Commands.WRITE_PARAM.value << 20) |
+                        (constants.SRC1_ONLY << 16) |
+                        (structure_id << 12) |
+                        (value << 8) |
+                        parameter_index)
             value_encoded = bytearray()
             cmd_string = "WRITE_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "value=rag[{2:d}]".format(
-                structure_id, parameter_index, value)
+                         "value=reg[{2:d}]".format(structure_id,
+                                                   parameter_index, value)
         else:
-            data_type = self.struct_slots[parameter_index]['data_type']
             if value < data_type.min or value > data_type.max:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "value", value, data_type.min, data_type.max,
                     Commands.WRITE_PARAM.name)
             if data_type.size <= 4:
-                cmd_word = (constants.LEN2 << 28) | \
-                           (Commands.WRITE_PARAM.value << 20) | \
-                           (constants.SRC1_ONLY << 16) | \
-                           (structure_id << 12) | \
-                           (value << 8) | \
-                           parameter_index
+                cmd_word = ((constants.LEN2 << 28) |
+                            (Commands.WRITE_PARAM.value << 20) |
+                            (constants.SRC1_ONLY << 16) |
+                            (structure_id << 12) |
+                            (value << 8) |
+                            parameter_index)
             elif data_type.size == 8:
-                cmd_word = (constants.LEN2 << 28) | \
-                           (Commands.WRITE_PARAM.value << 20) | \
-                           (constants.SRC1_ONLY << 16) | \
-                           (structure_id << 12) | \
-                           (value << 8) | \
-                           parameter_index
+                cmd_word = ((constants.LEN2 << 28) |
+                            (Commands.WRITE_PARAM.value << 20) |
+                            (constants.SRC1_ONLY << 16) |
+                            (structure_id << 12) |
+                            (value << 8) |
+                            parameter_index)
             else:
                 raise exceptions.DataSpecificationInvalidSizeException(
                     data_type.name, data_type.size,
@@ -526,8 +590,8 @@ class DataSpecificationGenerator(object):
 
             value_encoded += padding
             cmd_string = "WRITE_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "value={2:d}".format(
-                structure_id, parameter_index, value)
+                         "value={2:d}".format(structure_id,
+                                              parameter_index, value)
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = encoded_cmd_word + value_encoded
@@ -560,26 +624,23 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If repeats_is_register is False and structure_id is not\
               a valid id
             * If repeats_is_register is True and structure_id
             * If the number of repeats is out of range
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If the structure requested has not been declared
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
-            If no region has been selected to write to
-        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
-            If the selected region has no more space
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected to write to
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionExhaustedException: If the selected region \
+            has no more space
         """
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "structure_id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_STRUCT.name)
-
-        if self.struct_slots[structure_id] is None:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "struct", structure_id, Commands.WRITE_STRUCT.name)
 
         if repeats_is_register:
             if repeats < 0 or repeats >= constants.MAX_REGISTERS:
@@ -587,11 +648,11 @@ class DataSpecificationGenerator(object):
                     "repeats", repeats, 0, constants.MAX_REGISTERS - 1,
                     Commands.WRITE_STRUCT.name)
 
-            cmd_word = (constants.LEN1 << 28) | \
-                       (Commands.WRITE_STRUCT.value << 20) | \
-                       (constants.SRC1_ONLY << 16) | \
-                       (repeats << 8) | \
-                       structure_id
+            cmd_word = ((constants.LEN1 << 28) |
+                        (Commands.WRITE_STRUCT.value << 20) |
+                        (constants.SRC1_ONLY << 16) |
+                        (repeats << 8) |
+                        structure_id)
 
             cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
             cmd_string = "WRITE_STRUCT structure_id={0:d}, " \
@@ -606,10 +667,10 @@ class DataSpecificationGenerator(object):
                     "repeats", repeats, 0, 15,
                     Commands.WRITE_STRUCT.name)
 
-            cmd_word = (constants.LEN1 << 28) | \
-                       (Commands.WRITE_STRUCT.value << 20) | \
-                       (repeats << 8) | \
-                       structure_id
+            cmd_word = ((constants.LEN1 << 28) |
+                        (Commands.WRITE_STRUCT.value << 20) |
+                        (repeats << 8) |
+                        structure_id)
 
             cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
             cmd_string = "WRITE_STRUCT structure_id={0:d}, " \
@@ -629,38 +690,79 @@ class DataSpecificationGenerator(object):
         :param argument_by_value: A list of up to 5 booleans indicating if the\
             structure to be passed as an argument is to be passed by\
             reference (i.e. changes made within the function are\
-            persisited) or by value (i.e. changes made within the\
+            persisted) or by value (i.e. changes made within the\
             function are lost when the function exits.  The number of\
             arguments is determined by the length of this list.
         :type argument_by_value: list of bool
         :return: The id of the function, between 0 and 31
         :rtype: int
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
-            If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
-            If there are no more spaces for new functions
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If there are too many items in the list of arguments
-        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
-            If there is already a function being defined at this point
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If there are too \
+            many items in the list of arguments
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidCommandException: If there is already a \
+            function being defined at this point
         """
-        raise exceptions.UnimplementedDSGCommand("start_function")
+        if self.ongoing_function_definition:
+            raise exceptions.DataSpecificationInvalidCommandException(
+                Commands.START_CONSTRUCTOR.name)
+        else:
+            self.ongoing_function_definition = True
+
+        if len(argument_by_value) > 5:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "number of arguments", len(argument_by_value), 0, 5,
+                Commands.START_CONSTRUCTOR.name)
+
+        function_id = self.allocate_function()
+
+        cmd_string = "START_CONSTRUCTOR id={0:d} number_of_args={1:d}".format(
+            function_id, len(argument_by_value))
+
+        read_only_flags = 0
+        for i in xrange(len(argument_by_value)):
+            cmd_string = "{0:s} arg[{1:d}]=".format(cmd_string, i+1)
+            if argument_by_value[i]:
+                read_only_flags |= 2**i
+                cmd_string = "{0:s}read-only".format(cmd_string)
+            else:
+                cmd_string = "{0:s}read-write".format(cmd_string)
+
+        cmd_word = ((constants.LEN1 << 28) |
+                    (Commands.START_CONSTRUCTOR.value << 20) |
+                    (function_id << 11) |
+                    (len(argument_by_value) << 8) |
+                    read_only_flags)
+
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string, indent=True)
 
     def end_function(self):
         """ Insert command to mark the end of a function definition
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
-            If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
-            If there is no function being defined at this point
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidCommandException: If there is no function \
+            being defined at this point
         """
-        raise exceptions.UnimplementedDSGCommand("end_function")
+
+        if not self.ongoing_function_definition:
+            raise exceptions.DataSpecificationInvalidCommandException(
+                Commands.END_CONSTRUCTOR.name)
+        else:
+            self.ongoing_function_definition = False
+
+        cmd_word = (constants.LEN1 << 28) | \
+                   (Commands.END_CONSTRUCTOR.value << 20)
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        cmd_string = "END_CONSTRUCT"
+
+        self.write_command_to_files(cmd_word_list, cmd_string, outdent=True)
 
     def call_function(self, function_id, structure_ids):
         """ Insert command to call a function
@@ -677,15 +779,56 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If the function id is not valid
             * If any of the structure ids are not valid
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException:\
             * If a function has not been defined with the given id
             * If no structure has been defined with one of the ids in\
               structure_ids
         """
-        raise exceptions.UnimplementedDSGCommand("call_function")
+        if function_id < 0 or function_id >= constants.MAX_CONSTRUCTORS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "function_id", function_id, 0, constants.MAX_CONSTRUCTORS - 1,
+                Commands.CONSTRUCT.name)
+
+        if len(structure_ids) > 5:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "number of structures", len(structure_ids), 0, 5,
+                Commands.CONSTRUCT.name)
+
+        cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
+
+        param_word = None
+        if len(structure_ids) > 0:
+            param_word = 0
+            for i in xrange(len(structure_ids)):
+                if structure_ids[i] < 0 \
+                        or structure_ids[i] >= constants.MAX_STRUCT_SLOTS:
+                    raise exceptions.\
+                        DataSpecificationParameterOutOfBoundsException(
+                            "structure argument {0:d}".format(i),
+                            structure_ids[i], 0, constants.MAX_STRUCT_SLOTS - 1,
+                            Commands.CONSTRUCT.name)
+                param_word |= structure_ids[i] << (6 * i)
+                cmd_string = "{0:s} arg[{1:d}]=struct[{2:d}]".format(
+                    cmd_string, i, structure_ids[i])
+
+        if param_word is None:
+            cmd_word_length = constants.LEN1
+        else:
+            cmd_word_length = constants.LEN2
+
+        cmd_word = ((cmd_word_length << 28) |
+                    (Commands.CONSTRUCT.value << 20) |
+                    (function_id << 8))
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        param_word_encoded = bytearray(struct.pack("<I", param_word))
+        cmd_word_list = cmd_word_encoded + param_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_value(
             self, data, repeats=1, repeats_register=None,
@@ -715,23 +858,26 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_type is an integer type, and data has a fractional part
             * If data would overflow the data type
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If the data type is not known
-        :raise data_specification.exceptions.DataSpecificationInvalidSizeException:\
-            If the data size is invalid
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
-            If no region has been selected to write to
-        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
-            If the selected region has no more space
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If the data type is not known
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidSizeException: If the data size is invalid
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected to write to
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionExhaustedException: If the selected region \
+            has no more space
         """
         if data_type not in DataType:
             raise exceptions.DataSpecificationUnknownTypeException(
-                data_type, data, Commands.WRITE.name)
+                data_type.value, Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:
@@ -766,7 +912,7 @@ class DataSpecificationGenerator(object):
                 "data", data, data_type.min, data_type.max, Commands.WRITE.name)
 
         parameters = 0
-        cmd_string = "WRITE data=0x%8.8X" % (data)
+        cmd_string = "WRITE data=0x%8.8X" % data
 
         if repeats_register is not None:
             repeat_reg_usage = 1
@@ -828,20 +974,23 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_register is not a valid register id
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If the data type is not known
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
-            If no region has been selected to write to
-        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
-            If the selected region has no more space
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If the data type is not known
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected to write to
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionExhaustedException: If the selected region \
+            has no more space
         """
         if data_type not in DataType:
             raise exceptions.DataSpecificationUnknownTypeException(
-                data_type, 0, Commands.WRITE.name)
+                data_type.value, Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:
@@ -861,8 +1010,8 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats_register < 0) or (
-                        repeats_register >= constants.MAX_REGISTERS):
+            if (repeats_register < 0) \
+                    or (repeats_register >= constants.MAX_REGISTERS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats_register", repeats_register, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
@@ -887,9 +1036,9 @@ class DataSpecificationGenerator(object):
             parameters |= repeats
             cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
-        cmd_word = (cmd_len << 28) | (Commands.WRITE.value << 20) | \
-                   (data_reg << 17) | (repeat_reg_usage << 16) | \
-                   (cmd_data_len << 12) | (data_register << 8) | parameters
+        cmd_word = ((cmd_len << 28) | (Commands.WRITE.value << 20) |
+                    (data_reg << 17) | (repeat_reg_usage << 16) |
+                    (cmd_data_len << 12) | (data_register << 8) | parameters)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
@@ -899,8 +1048,8 @@ class DataSpecificationGenerator(object):
         """ Insert command to write an array of words, causing the write pointer
         to move on by (4 * the array size), in bytes
 
-        :param array: An array of words to be written
-        :type array: array
+        :param array_values: An array of words to be written
+        :type array_values: list of unsigned int
         :return: The position of the write pointer within the current region,\
             in bytes from the start of the region
         :rtype: int
@@ -908,10 +1057,6 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
-            If no region has been selected to write to
-        :raise data_specification.exceptions.DataSpecificationRegionExhaustedException:\
-            If the selected region has no more space
         """
         cmd_len = 0xF
         cmd_word = (cmd_len << 28) | (Commands.WRITE_ARRAY.value << 20)
@@ -944,12 +1089,15 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the region identifier is not valid
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If the region has not been allocated
-        :raise data_specification.exceptions.DataSpecificationRegionUnfilledException:\
-            If the selected region should not be filled
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If the region \
+            identifier is not valid
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException: If the region has not been \
+            allocated
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionUnfilledException: If the selected region \
+            should not be filled
         """
         if region < 0 or region >= constants.MAX_MEM_REGIONS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
@@ -969,10 +1117,10 @@ class DataSpecificationGenerator(object):
         cmd_string = "SWITCH_FOCUS memRegion = {0:d}".format(region)
 
         # Write command to switch focus:
-        cmd_word = (constants.LEN1 << 28) | \
-                   (Commands.SWITCH_FOCUS.value << 20) | \
-                   (reg_usage << 16) | \
-                   (parameters << 8)
+        cmd_word = ((constants.LEN1 << 28) |
+                    (Commands.SWITCH_FOCUS.value << 20) |
+                    (reg_usage << 16) |
+                    (parameters << 8))
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
 
@@ -1006,8 +1154,8 @@ class DataSpecificationGenerator(object):
             * If increment_is_register is False, the amount by which to\
               increment the loop counter on each run of the loop, >= 0
             * If increment_is_register is True, the id of the register\
-              containing the amount by which to increlement the loop\
-              counter on each run of the loop, betwen 0 and 15
+              containing the amount by which to increment the loop\
+              counter on each run of the loop, between 0 and 15
         :type increment: int
         :param start_is_register: Indicates if start is a register id
         :type start_is_register: bool
@@ -1021,7 +1169,8 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If counter_register_id is not a valid register id
             * If start_is_register is True and increment is not a valid\
               register_id
@@ -1042,7 +1191,8 @@ class DataSpecificationGenerator(object):
         cmd_word = (Commands.LOOP.value << 20)
         cmd_string = "LOOP"
 
-        if counter_register_id < 0 or counter_register_id >= constants.MAX_REGISTERS:
+        if counter_register_id < 0 \
+                or counter_register_id >= constants.MAX_REGISTERS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "counter_register_id", counter_register_id, 0,
                 constants.MAX_REGISTERS - 1, Commands.LOOP.name)
@@ -1121,8 +1271,9 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
-            If there is no loop in operation at this point
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidCommandException: If there is no loop in \
+            operation at this point
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.BREAK_LOOP.value << 20)
         cmd_string = "BREAK_LOOP"
@@ -1142,8 +1293,9 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
-            If there is no loop in operation at this point
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidCommandException: If there is no loop in \
+            operation at this point
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.END_LOOP.value << 20)
         cmd_string = "END_LOOP"
@@ -1178,12 +1330,14 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If the register_id is not a valid register id
             * if value_is_register is True and value is not a valid\
               register id
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If the condition is not a valid condition
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If the condition is not a \
+            valid condition
         """
         data_encoded = bytearray()
         cmd_word = 0
@@ -1205,38 +1359,38 @@ class DataSpecificationGenerator(object):
                     Commands.IF.name)
 
         if condition not in Condition:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                "condition", condition, Commands.IF.name)
+            raise exceptions.DataSpecificationUnknownConditionException(
+                condition, Commands.IF.name)
 
         if condition == Condition.IS_ZERO.value or \
            condition == Condition.IS_NON_ZERO.value:
             bit_field = 0x2
-            cmd_word = (constants.LEN2 << 28) | \
-                       (Commands.IF.value << 20) | \
-                       (bit_field << 16) | \
-                       (register_id << 8) | \
-                       condition.value
+            cmd_word = ((constants.LEN2 << 28) |
+                        (Commands.IF.value << 20) |
+                        (bit_field << 16) |
+                        (register_id << 8) |
+                        condition.value)
             cmd_string = "IF reg[{0:d}] {1:s}".format(
                 register_id, condition.operator)
 
         elif value_is_register:
             bit_field = 0x3
-            cmd_word = (constants.LEN2 << 28) | \
-                       (Commands.IF.value << 20) | \
-                       (bit_field << 16) | \
-                       (register_id << 8) | \
-                       (value << 4) | \
-                       condition.value
+            cmd_word = ((constants.LEN2 << 28) |
+                        (Commands.IF.value << 20) |
+                        (bit_field << 16) |
+                        (register_id << 8) |
+                        (value << 4) |
+                        condition.value)
             cmd_string = "IF reg[{0:d}] {1:s} reg[{2:d}]".format(
                 register_id, condition.operator, value)
 
         elif not value_is_register:
             bit_field = 0x2
-            cmd_word = (constants.LEN2 << 28) | \
-                       (Commands.IF.value << 20) | \
-                       (bit_field << 16) | \
-                       (register_id << 8) | \
-                       condition.value
+            cmd_word = ((constants.LEN2 << 28) |
+                        (Commands.IF.value << 20) |
+                        (bit_field << 16) |
+                        (register_id << 8) |
+                        condition.value)
             data_encoded = bytearray(struct.pack("<i", value))
             cmd_string = "IF reg[{0:d}] {1:s} {2:d}".format(
                 register_id, condition.operator, value)
@@ -1258,8 +1412,9 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
-            If there is no conditional in operation at this point
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidCommandException: If there is no \
+            conditional in operation at this point
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.ELSE.value << 20)
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
@@ -1278,8 +1433,9 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationInvalidCommandException:\
-            If there is no conditional in operation at this point
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidCommandException: If there is no \
+            conditional in operation at this point
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.END_IF.value << 20)
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
@@ -1309,7 +1465,8 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If register_id is not a valid register_id
             * If data_is_register is True, and data is not a valid\
               register id
@@ -1317,18 +1474,18 @@ class DataSpecificationGenerator(object):
               type and data has a fractional part
             * If data_is_register if False, and data would overflow the\
               data type
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If the data type is not known
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If the data type is not known
         """
         if data_is_register:
             # Build command to move between registers:
             dest_reg = register_id
             src_reg = data
-            cmd_word = (constants.LEN1 << 28) | \
-                       (Commands.MV.value << 20) | \
-                       (constants.DEST_AND_SRC1 << 16) | \
-                       (dest_reg << 12) | \
-                       (src_reg << 8)
+            cmd_word = ((constants.LEN1 << 28) |
+                        (Commands.MV.value << 20) |
+                        (constants.DEST_AND_SRC1 << 16) |
+                        (dest_reg << 12) |
+                        (src_reg << 8))
             encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
             cmd_word_list = encoded_cmd_word
             cmd_string = "reg[{0:d}] = reg[{1:d}]".format(dest_reg, src_reg)
@@ -1336,10 +1493,10 @@ class DataSpecificationGenerator(object):
             # Build command to assign from an immediate:
             # command has a second word (the immediate)
             dest_reg = register_id
-            cmd_word = (constants.LEN2 << 28) | \
-                       (Commands.MV.value << 20) | \
-                       (constants.DEST_ONLY << 16) | \
-                       (dest_reg << 12)
+            cmd_word = ((constants.LEN2 << 28) |
+                        (Commands.MV.value << 20) |
+                        (constants.DEST_ONLY << 16) |
+                        (dest_reg << 12))
             if data_type.min > data or data_type.max < data:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "data", data, data_type.min, data_type.max,
@@ -1365,8 +1522,9 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the register_id is not a valid register id
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If the register_id \
+            is not a valid register id
         """
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
@@ -1407,9 +1565,9 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
-            If the address_is_register is True and address is not a valid\
-            register id
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException: If the \
+            address_is_register is True and address is not a valid register id
         """
         if relative_to_current:
             relative = 1
@@ -1425,10 +1583,11 @@ class DataSpecificationGenerator(object):
                     "address", address, 0, constants.MAX_REGISTERS - 1,
                     Commands.SET_WR_PTR.name)
             bit_field = 0x2
-            cmd_word = (constants.LEN1 << 28) | \
-                       (Commands.SET_WR_PTR.value << 20) | \
-                       (bit_field << 16) | \
-                       (address << 12) | relative
+            cmd_word = ((constants.LEN1 << 28) |
+                        (Commands.SET_WR_PTR.value << 20) |
+                        (bit_field << 16) |
+                        (address << 12) |
+                        relative)
             cmd_string = "SET_WR_PTR reg[{0:d}] {1:s}".format(
                 address, relative_string)
         else:
@@ -1450,10 +1609,10 @@ class DataSpecificationGenerator(object):
                     data_encoded = bytearray(struct.pack("<i", address))
 
             bit_field = 0x0
-            cmd_word = (constants.LEN2 << 28) | \
-                       (Commands.SET_WR_PTR.value << 20) | \
-                       (bit_field << 16) | \
-                       relative
+            cmd_word = ((constants.LEN2 << 28) |
+                        (Commands.SET_WR_PTR.value << 20) |
+                        (bit_field << 16) |
+                        relative)
             cmd_string = "SET_WR_PTR {0:d} {1:s}".format(
                 address, relative_string)
 
@@ -1491,16 +1650,19 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If log_block_size_is_register is False, and\
               log_block_size is not within the allowed range
             * If log_block_size_is_register is True and log_block_size\
               is not a valid register id
-        :raise data_specification.exceptions.DataSpecificationRegionOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionOutOfBoundsException:\
             If the move of the pointer would put it outside of the\
             current region
-        :raise data_specification.exceptions.DataSpecificationNoRegionSelectedException:\
-            If no region has been selected
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected
         """
         bit_field = 0
         imm_value = 0
@@ -1509,10 +1671,11 @@ class DataSpecificationGenerator(object):
         cmd_string = "ALIGN_WR_PTR"
 
         if return_register_id is not None:
-            if return_register_id < 0 or return_register_id >= constants.MAX_REGISTERS:
+            if return_register_id < 0 \
+                    or return_register_id >= constants.MAX_REGISTERS:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                    "return_register_id", return_register_id, 0, constants.MAX_REGISTERS - 1,
-                    Commands.ALIGN_WR_PTR.name)
+                    "return_register_id", return_register_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.ALIGN_WR_PTR.name)
             bit_field |= 0x4
             return_register_value = return_register_id
             cmd_string = "{0:s} reg[{1:d}] =".format(
@@ -1536,17 +1699,16 @@ class DataSpecificationGenerator(object):
             cmd_string = "{0:s} align({1:d})".format(
                 cmd_string, imm_value)
 
-        cmd_word = (constants.LEN1 << 28) | \
-                   (Commands.ALIGN_WR_PTR.value << 20) | \
-                   (bit_field << 16) | \
-                   (return_register_value << 12) | \
-                   (block_size_reg << 8) | \
-                   imm_value
+        cmd_word = ((constants.LEN1 << 28) |
+                    (Commands.ALIGN_WR_PTR.value << 20) |
+                    (bit_field << 16) |
+                    (return_register_value << 12) |
+                    (block_size_reg << 8) |
+                    imm_value)
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
-
 
     def call_arithmetic_operation(self, register_id, operand_1, operation,
                                   operand_2, signed,
@@ -1580,13 +1742,15 @@ class DataSpecificationGenerator(object):
             initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If operation is not a known operation
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If operation is not a known \
+            operation
         """
         cmd_length = 0
         bit_field = 0x4
@@ -1621,18 +1785,22 @@ class DataSpecificationGenerator(object):
         else:
             cmd_length += 1
             if signed:
-                if operand_1 < DataType.INT32.min or operand_1 > DataType.INT32.max:
-                    raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                        "operand_1", operand_1, DataType.INT32.min, DataType.INT32.max,
-                        Commands.ARITH_OP.name)
-                operand_1_encoded=bytearray(struct.pack("<i", operand_1))
+                if operand_1 < DataType.INT32.min \
+                        or operand_1 > DataType.INT32.max:
+                    raise exceptions.\
+                        DataSpecificationParameterOutOfBoundsException(
+                            "operand_1", operand_1, DataType.INT32.min,
+                            DataType.INT32.max, Commands.ARITH_OP.name)
+                operand_1_encoded = bytearray(struct.pack("<i", operand_1))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_1)
             else:
-                if operand_1 < DataType.UINT32.min or operand_1 > DataType.UINT32.max:
-                    raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                        "operand_1", operand_1, DataType.UINT32.min, DataType.UINT32.max,
-                        Commands.ARITH_OP.name)
-                operand_1_encoded=bytearray(struct.pack("<I", operand_1))
+                if operand_1 < DataType.UINT32.min \
+                        or operand_1 > DataType.UINT32.max:
+                    raise exceptions.\
+                        DataSpecificationParameterOutOfBoundsException(
+                            "operand_1", operand_1, DataType.UINT32.min,
+                            DataType.UINT32.max, Commands.ARITH_OP.name)
+                operand_1_encoded = bytearray(struct.pack("<I", operand_1))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_1)
 
         if operation not in ArithmeticOperation:
@@ -1652,28 +1820,32 @@ class DataSpecificationGenerator(object):
         else:
             cmd_length += 1
             if signed:
-                if operand_2 < DataType.INT32.min or operand_2 > DataType.INT32.max:
-                    raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                        "operand_2", operand_2, DataType.INT32.min, DataType.INT32.max,
-                        Commands.ARITH_OP.name)
-                operand_2_encoded=bytearray(struct.pack("<i", operand_2))
+                if operand_2 < DataType.INT32.min \
+                        or operand_2 > DataType.INT32.max:
+                    raise exceptions.\
+                        DataSpecificationParameterOutOfBoundsException(
+                            "operand_2", operand_2, DataType.INT32.min,
+                            DataType.INT32.max, Commands.ARITH_OP.name)
+                operand_2_encoded = bytearray(struct.pack("<i", operand_2))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_2)
             else:
-                if operand_2 < DataType.UINT32.min or operand_2 > DataType.UINT32.max:
-                    raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                        "operand_2", operand_2, DataType.UINT32.min, DataType.UINT32.max,
-                        Commands.ARITH_OP.name)
-                operand_2_encoded=bytearray(struct.pack("<I", operand_2))
+                if operand_2 < DataType.UINT32.min \
+                        or operand_2 > DataType.UINT32.max:
+                    raise exceptions.\
+                        DataSpecificationParameterOutOfBoundsException(
+                            "operand_2", operand_2, DataType.UINT32.min,
+                            DataType.UINT32.max, Commands.ARITH_OP.name)
+                operand_2_encoded = bytearray(struct.pack("<I", operand_2))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_2)
 
-        cmd_word = (cmd_length << 28) | \
-                   (Commands.ARITH_OP.value << 20) | \
-                   (signed_value << 19) | \
-                   (bit_field << 16) | \
-                   (register_id << 12) | \
-                   (register_op_1 << 8) | \
-                   (register_op_2 << 4) | \
-                   operation.value
+        cmd_word = ((cmd_length << 28) |
+                    (Commands.ARITH_OP.value << 20) |
+                    (signed_value << 19) |
+                    (bit_field << 16) |
+                    (register_id << 12) |
+                    (register_op_1 << 8) |
+                    (register_op_2 << 4) |
+                    operation.value)
 
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded + operand_1_encoded + operand_2_encoded
@@ -1708,13 +1880,15 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            If operation is not a known operation
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If operation is not a known \
+            operation
         """
         cmd_length = 0
         bit_field = 0x4
@@ -1748,11 +1922,12 @@ class DataSpecificationGenerator(object):
             cmd_string = "{0:s} reg[{1:d}]".format(cmd_string, register_op_1)
         else:
             cmd_length += 1
-            if operand_1 < DataType.UINT32.min or operand_1 > DataType.UINT32.max:
+            if operand_1 < DataType.UINT32.min \
+                    or operand_1 > DataType.UINT32.max:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                    "operand_1", operand_1, DataType.UINT32.min, DataType.UINT32.max,
-                    Commands.LOGIC_OP.name)
-            operand_1_encoded=bytearray(struct.pack("<I", operand_1))
+                    "operand_1", operand_1, DataType.UINT32.min,
+                    DataType.UINT32.max, Commands.LOGIC_OP.name)
+            operand_1_encoded = bytearray(struct.pack("<I", operand_1))
             cmd_string = "{0:s} {1:d}".format(cmd_string, operand_1)
 
         if operation.value != LogicOperation.NOT.value:
@@ -1760,28 +1935,32 @@ class DataSpecificationGenerator(object):
 
             if operand_2_is_register:
                 if operand_2 < 0 or operand_2 >= constants.MAX_REGISTERS:
-                    raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                        "operand_2", operand_2, 0, constants.MAX_REGISTERS - 1,
-                        Commands.LOGIC_OP.name)
+                    raise exceptions.\
+                        DataSpecificationParameterOutOfBoundsException(
+                            "operand_2", operand_2, 0,
+                            constants.MAX_REGISTERS - 1, Commands.LOGIC_OP.name)
                 bit_field |= 1
                 register_op_2 = operand_2
-                cmd_string = "{0:s} reg[{1:d}]".format(cmd_string, register_op_2)
+                cmd_string = "{0:s} reg[{1:d}]".format(
+                    cmd_string, register_op_2)
             else:
                 cmd_length += 1
-                if operand_2 < DataType.UINT32.min or operand_2 > DataType.UINT32.max:
-                    raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                        "operand_2", operand_2, DataType.UINT32.min, DataType.UINT32.max,
-                        Commands.LOGIC_OP.name)
-                operand_2_encoded=bytearray(struct.pack("<I", operand_2))
+                if (operand_2 < DataType.UINT32.min
+                        or operand_2 > DataType.UINT32.max):
+                    raise exceptions.\
+                        DataSpecificationParameterOutOfBoundsException(
+                            "operand_2", operand_2, DataType.UINT32.min,
+                            DataType.UINT32.max, Commands.LOGIC_OP.name)
+                operand_2_encoded = bytearray(struct.pack("<I", operand_2))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_2)
 
-        cmd_word = (cmd_length << 28) | \
-                   (Commands.LOGIC_OP.value << 20) | \
-                   (bit_field << 16) | \
-                   (register_id << 12) | \
-                   (register_op_1 << 8) | \
-                   (register_op_2 << 4) | \
-                   operation.value
+        cmd_word = ((cmd_length << 28) |
+                    (Commands.LOGIC_OP.value << 20) |
+                    (bit_field << 16) |
+                    (register_id << 12) |
+                    (register_op_1 << 8) |
+                    (register_op_2 << 4) |
+                    operation.value)
 
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded + operand_1_encoded + operand_2_encoded
@@ -1821,7 +2000,8 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If source_id_is_register is True and source_structure_id\
               is not a valid register id
             * If destination_id_is_register is True and\
@@ -1833,13 +2013,61 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If destination_structure_id is None and there are no more\
             structure ids
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException:\
             * If destination_structure_id is not None and no structure\
               with id destination_structure_id has been allocated
             * If no structure with id source_structure_id has been\
               allocated
         """
-        raise exceptions.UnimplementedDSGCommand("copy_structure")
+        bit_field = 0
+        cmd_string = "COPY_STRUCT"
+
+        if source_id_is_register:
+            if source_structure_id < 0 \
+                    or source_structure_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "source_structure_id", source_structure_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            bit_field |= 1
+            cmd_string = "{0:s} source_struct = reg[{1:d}]".format(
+                cmd_string, source_structure_id)
+        else:
+            if source_structure_id < 0 \
+                    or source_structure_id >= constants.MAX_STRUCT_SLOTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "source_structure_id", source_structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_STRUCT.name)
+            cmd_string = "{0:s} source_struct = {1:d}".format(
+                cmd_string, source_structure_id)
+
+        if destination_id_is_register:
+            if destination_structure_id < 0 \
+                    or destination_structure_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "destination_structure_id", destination_structure_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            bit_field |= 2
+            cmd_string = "{0:s} destination_struct = reg[{1:d}]".format(
+                cmd_string, destination_structure_id)
+        else:
+            if destination_structure_id < 0 \
+                    or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "destination_structure_id", destination_structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_STRUCT.name)
+            cmd_string = "{0:s} destination_struct = {1:d}".format(
+                cmd_string, destination_structure_id)
+
+        cmd_word = (constants.LEN1 << 28) | \
+                   (Commands.COPY_STRUCT.value << 20) | \
+                   (bit_field << 16) | \
+                   (destination_structure_id << 12) | \
+                   (source_structure_id << 8)
+
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def copy_structure_parameter(self, source_structure_id,
                                  source_parameter_index,
@@ -1866,22 +2094,64 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If source_structure_id is not a valid structure id
             * If destination_structure_id is not a valid structure id
             * If source_parameter_index is not a valid parameter index\
               in the source structure
             * If destination_parameter_index is not a valid parameter\
               index in the destination structure
-        :raise data_specification.exceptions.DataSpecificationInvalidTypeException:\
-            If the source and destination data types do not match
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException:\
             * If no structure with id destination_structure_id has been\
               allocated
             * If no structure with id source_structure_id has been
               allocated
         """
-        raise exceptions.UnimplementedDSGCommand("copy_structure_parameter")
+        if source_structure_id < 0 \
+                or source_structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "source_structure_id", source_structure_id, 0,
+                constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
+
+        if source_parameter_index < 0 \
+                or source_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "source_parameter_index", source_parameter_index, 0,
+                constants.MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
+
+        if destination_structure_id < 0 \
+                or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "destination_structure_id", destination_structure_id, 0,
+                constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
+
+        if destination_parameter_index < 0 \
+                or destination_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "destination_parameter_index", destination_parameter_index,
+                0, constants.MAX_STRUCT_ELEMENTS - 1,
+                Commands.COPY_PARAM.name)
+
+        cmd_word_1 = ((constants.LEN2 << 28) |
+                      (Commands.WRITE_PARAM.value << 20) |
+                      (destination_structure_id << 12) |
+                      (source_structure_id << 8))
+        cmd_word_2 = (destination_parameter_index << 8) | source_parameter_index
+
+        cmd_word_1_encoded = bytearray(struct.pack("<I", cmd_word_1))
+        cmd_word_2_encoded = bytearray(struct.pack("<I", cmd_word_2))
+
+        cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
+                     "source_parameter_id = {1:d}, destination_structure_id " \
+                     "= {2:d}, destination_parameter_id = {3:d}".format(
+                         source_structure_id, source_parameter_index,
+                         destination_structure_id, destination_parameter_index)
+
+        cmd_word_list = cmd_word_1_encoded + cmd_word_2_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def print_value(self, value, value_is_register=False,
                     data_type=DataType.UINT32):
@@ -1903,22 +2173,59 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If value_is_register is True and value is not a valid\
               register id
             * If value_is_register is False, the data_type is an
               integer type and value has a fractional part
             * If value_is_register is False and the value would
               overflow the data type
-        :raise data_specification.exceptions.DataSpecificationUnknownTypeException:\
-            * If data_type is not a vaild data type
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException:\
+            * If data_type is not a valid data type
         """
-        raise exceptions.UnimplementedDSGCommand("print_value")
+        cmd_word_length = constants.LEN1
+        source_register_id = 0
+        bit_field = 0
+        data_encoded = bytearray()
+
+        if value_is_register:
+            if value < 0 or value >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "value", value, 0, constants.MAX_REGISTERS - 1,
+                    Commands.PRINT_VAL.name)
+            bit_field |= 2
+            source_register_id = value
+            cmd_string = "PRINT_VAL reg[{0:d}]".format(source_register_id)
+        else:
+            if value < data_type.min or value > data_type.max:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "value", value, data_type.min, data_type.max,
+                    Commands.PRINT_VAL.name)
+            if data_type.size <= 4:
+                cmd_word_length = constants.LEN2
+            else:
+                cmd_word_length = constants.LEN3
+            data_encoding_string = "<{0:s}".format(data_type.struct_encoding)
+            data_encoded = bytearray(struct.pack(data_encoding_string, value))
+            cmd_string = "PRINT_VAL {0:d}".format(value)
+
+        cmd_word = ((cmd_word_length << 28) |
+                    (Commands.PRINT_VAL.value << 20) |
+                    (bit_field << 16) |
+                    (source_register_id << 8) |
+                    data_type.value)
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+
+        cmd_word_list = cmd_word_encoded + data_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def print_text(self, text):
         """ Insert command to print some text (for debugging)
         
-        :param text: The text to write
+        :param text: The text to write (max 12 characters)
         :type text: str
         :return: Nothing is returned
         :rtype: None
@@ -1927,7 +2234,32 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        raise exceptions.UnimplementedDSGCommand("print_text")
+        text_len = len(text)
+        if text_len > 12:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "len(text)", text_len, 1, 12,
+                Commands.PRINT_TXT.name)
+
+        if text_len <= 4:
+            cmd_word_len = constants.LEN2
+        elif text_len <= 8:
+            cmd_word_len = constants.LEN3
+        else:
+            cmd_word_len = constants.LEN4
+
+        text_encoded = bytearray(text)
+        #add final padding to the encoded text
+        text_encoded += bytearray(4 - (text_len % 4))
+
+        cmd_string = "PRINT_TXT \"{0:s}\"".format(text)
+
+        cmd_word = ((cmd_word_len << 28) |
+                    (Commands.PRINT_TXT.value << 20) |
+                    (text_len - 1))
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded + text_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def print_struct(self, structure_id, structure_id_is_register=False):
         """ Insert command to print out a structure (for debugging)
@@ -1949,16 +2281,48 @@ class DataSpecificationGenerator(object):
             initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
             * If structure_id_is_register is True and structure_id is\
               not a valid register id
             * If structure_id_is_register is False and structure_id is\
               not a valid structure id
-        :raise data_specification.exceptions.DataSpecificationNotAllocatedException:\
-            If structure_id_is_register is False and structure_id is\
-            is the id of a structure that has not been allocated
+        :raise data_specification.exceptions.
+            DataSpecificationNotAllocatedException: If \
+            structure_id_is_register is False and structure_id is the id of a \
+            structure that has not been allocated
         """
-        raise exceptions.UnimplementedDSGCommand("print_struct")
+        struct_register = 0
+        bit_field = 0
+        cmd_string = "PRINT_STRUCT"
+
+        if structure_id_is_register:
+            if structure_id < 0 or structure_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "structure_id", structure_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.PRINT_STRUCT.name)
+            struct_register = structure_id
+            bit_field = 0x2
+            cmd_string = "{0:s} struct(reg[{1:d}])".format(
+                cmd_string, struct_register)
+        else:
+            if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "structure_id", structure_id, 0,
+                    constants.MAX_STRUCT_SLOTS - 1, Commands.PRINT_STRUCT.name)
+            cmd_string = "{0:s} struct({1:d})".format(
+                cmd_string, structure_id)
+
+        cmd_word = ((constants.LEN1 << 28) |
+                    (Commands.PRINT_STRUCT.value << 20) |
+                    (bit_field << 16) |
+                    (struct_register << 8) |
+                    structure_id)
+
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
 
     def end_specification(self, close_writer=True):
         """ Insert a command to indicate that the specification has finished\
@@ -2032,7 +2396,7 @@ class DataSpecificationGenerator(object):
                 if self.txt_indent < 0:
                     self.txt_indent = 0
             if no_instruction_number is True:
-                formatted_cmd_string = "%s%s\n" % (
+                formatted_cmd_string = "{0:s}{1:s}\n".format(
                     "   " * self.txt_indent, cmd_string)
             else:
                 formatted_cmd_string = "%8.8X. %s%s\n" % (
@@ -2045,8 +2409,17 @@ class DataSpecificationGenerator(object):
                 self.txt_indent += 1
         return
 
-    def get_next_available_struct_entry(self):
-        for index in xrange(constants.MAX_STRUCT_SLOTS):
-            if self.struct_slots[index] is None:
-                return index
-        raise exceptions.DataSpecificationNoMoreStructAvailable()
+    def allocate_function(self):
+        """
+        This function looks for the first available function slot and \
+        allocates it, returning the assigned id
+
+        :return: id of the next available function slot
+        :rtype: int
+        """
+        for i in xrange(constants.MAX_CONSTRUCTORS):
+            if self.function[i] == 0:
+                self.function[i] = 1
+                return i
+        raise exceptions.DataSpecificationNoMoreFunctionsException(
+            constants.MAX_CONSTRUCTORS)

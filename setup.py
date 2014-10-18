@@ -4,7 +4,7 @@ except ImportError:
     from distutils.core import setup
 
 setup(
-    name="DataSpecification",
+    name="SpiNNaker_DataSpecification",
     version="0.1-SNAPSHOT",
     description="Specification of Memory Images",
     url="https://github.com/SpiNNakerManchester/DataSpecification",

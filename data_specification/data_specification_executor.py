@@ -106,13 +106,13 @@ class DataSpecificationExecutor(object):
 
     def write_header(self):
         if self.report_writer is not None:
-            self.report_writer.write("header structure")
+            self.report_writer.write("header structure \n")
         magic_number_encoded = bytearray(
             struct.pack("<I", constants.APPDATA_MAGIC_NUM))
 
         if self.report_writer is not None:
             self.report_writer.write(
-                "%8.8X Magic number - file identifier: %8.8X".format(
+                "{} Magic number - file identifier: {} \n".format(
                     self.mem_writer.tell(), constants.APPDATA_MAGIC_NUM))
         self.mem_writer.write(magic_number_encoded)
 
@@ -120,7 +120,7 @@ class DataSpecificationExecutor(object):
             struct.pack("<I", constants.DSE_VERSION))
         if self.report_writer is not None:
             self.report_writer.write(
-                "%8.8X File structure version: %8.8X".format(
+                "{} File structure version: {} \n".format(
                     self.mem_writer.tell(), constants.DSE_VERSION))
         self.mem_writer.write(version_encoded)
 
@@ -128,7 +128,7 @@ class DataSpecificationExecutor(object):
 
     def write_pointer_table(self):
         if self.report_writer is not None:
-            self.report_writer.write("Pointer table")
+            self.report_writer.write("Pointer table \n")
         pointer_table = [0] * constants.MAX_MEM_REGIONS
         pointer_table_size = constants.MAX_MEM_REGIONS * 4
         self.space_used += \
@@ -155,12 +155,12 @@ class DataSpecificationExecutor(object):
         for i in pointer_table:
             if self.report_writer is not None:
                 self.report_writer.write(
-                    "%8.8X pointer %d: %8.8X, %d".format(
+                    "{:8X} pointer {:d}: {:8X} \n".format(
                     self.mem_writer.tell(), index, i))
             encoded_pointer = struct.pack("<I", i)
             self.mem_writer.write(encoded_pointer)
-
-            if self.report_writer is not None:
-                self.report_writer.write("End of pointer table")
             index += 1
+
+        if self.report_writer is not None:
+            self.report_writer.write("End of pointer table \n")
 

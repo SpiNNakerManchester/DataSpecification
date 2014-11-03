@@ -10,6 +10,7 @@ setup(
     url="https://github.com/SpiNNakerManchester/DataSpecification",
     license="GNU GPLv3.0",
     packages=['data_specification',
-              'data_specification.enums'],
+              'data_specification.enums',
+              'data_specification.interfaces'],
     install_requires=['six', 'enum34']
 )

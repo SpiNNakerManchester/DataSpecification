@@ -163,4 +163,3 @@ class DataSpecificationExecutor(object):
 
         if self.report_writer is not None:
             self.report_writer.write("End of pointer table \n")
-

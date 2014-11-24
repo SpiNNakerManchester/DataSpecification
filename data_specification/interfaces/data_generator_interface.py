@@ -1,3 +1,4 @@
+import sys
 
 
 class DataGeneratorInterface(object):
@@ -16,6 +17,8 @@ class DataGeneratorInterface(object):
         self._graph_mapper = graph_mapper
         self._report_default_directory = report_default_directory
         self._progress_bar = progress_bar
+        self._exception = None
+        self._stack_trace = None
 
     def start(self):
         try:
@@ -27,6 +30,16 @@ class DataGeneratorInterface(object):
         except Exception as e:
             print "something died for {} with error {}".format(
                 self.__str__(), e.message)
+            self._exception = e
+            self._stack_trace = sys.exc_info()[2]
+
+    @property
+    def stack_trace(self):
+        return self._stack_trace
+
+    @property
+    def exception(self):
+        return self._exception
 
     def __str__(self):
         return "dgi for placement {}.{}.{}".format(self._placement.x,

@@ -5,12 +5,11 @@ except ImportError:
 
 setup(
     name="SpiNNaker_DataSpecification",
-    version="0.1-SNAPSHOT",
+    version="2014.12-rc-01",
     description="Specification of Memory Images",
     url="https://github.com/SpiNNakerManchester/DataSpecification",
     license="GNU GPLv3.0",
     packages=['data_specification',
-              'data_specification.enums',
-              'data_specification.interfaces'],
+              'data_specification.enums'],
     install_requires=['six', 'enum34']
 )

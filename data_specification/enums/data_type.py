@@ -112,6 +112,18 @@ class DataType(Enum):
              decimal.Decimal("2147483648"),
              "q",
              "32.31 signed fixed point number")  # rounding problem for max
+    FLOAT_32 = (14,
+                4,
+                decimal.Decimal("-3.4e38"),
+                decimal.Decimal("3.4e38"),
+                "f",
+                "32-bit floating point number")
+    FLOAT_64 = (15,
+                8,
+                decimal.Decimal("-1.7976931348623157e+308"),
+                decimal.Decimal("1.7976931348623157e+308"),
+                "d",
+                "64-bit floating point number")
     U08 = (16,
            1,
            decimal.Decimal("0"),

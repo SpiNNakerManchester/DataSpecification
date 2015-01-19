@@ -114,8 +114,8 @@ class DataType(Enum):
              "32.31 signed fixed point number")  # rounding problem for max
     FLOAT_32 = (14,
                 4,
-                decimal.Decimal("-3.4e38"),
-                decimal.Decimal("3.4e38"),
+                decimal.Decimal("-3.4028234e38"),
+                decimal.Decimal("3.4028234e38"),
                 "f",
                 "32-bit floating point number")
     FLOAT_64 = (15,

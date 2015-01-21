@@ -764,6 +764,8 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string, outdent=True)
 
+        self.ongoing_function_definition = False
+
     def call_function(self, function_id, structure_ids):
         """ Insert command to call a function
 

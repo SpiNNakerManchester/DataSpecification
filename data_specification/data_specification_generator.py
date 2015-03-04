@@ -260,13 +260,13 @@ class DataSpecificationGenerator(object):
         if distribution_id < 0 or distribution_id >= constants.MAX_RANDOM_DISTS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "distribution id", distribution_id, 0,
-                constants.MAX_RANDOM_DISTS-1,
+                constants.MAX_RANDOM_DISTS - 1,
                 Commands.DECLARE_RANDOM_DIST.name)
 
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "structure id", structure_id, 0,
-                constants.MAX_STRUCT_SLOTS-1,
+                constants.MAX_STRUCT_SLOTS - 1,
                 Commands.DECLARE_RANDOM_DIST.name)
 
         parameters = [("distType", DataType.UINT32, 0),
@@ -372,7 +372,7 @@ class DataSpecificationGenerator(object):
         # start of struct
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "structure id", structure_id, 0, constants.MAX_STRUCT_SLOTS-1,
+                "structure id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.START_STRUCT.name)
         cmd_word = ((constants.LEN1 << 28) |
                     (Commands.START_STRUCT.value << 20) |
@@ -721,9 +721,9 @@ class DataSpecificationGenerator(object):
 
         read_only_flags = 0
         for i in xrange(len(argument_by_value)):
-            cmd_string = "{0:s} arg[{1:d}]=".format(cmd_string, i+1)
+            cmd_string = "{0:s} arg[{1:d}]=".format(cmd_string, i + 1)
             if argument_by_value[i]:
-                read_only_flags |= 2**i
+                read_only_flags |= 2 ** i
                 cmd_string = "{0:s}read-only".format(cmd_string)
             else:
                 cmd_string = "{0:s}read-write".format(cmd_string)

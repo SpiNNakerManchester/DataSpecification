@@ -10,8 +10,6 @@ class DataSpecificationExecutor(object):
     """ Used to execute a data specification language file to produce a memory\
         image
     """
-    MAGIC_NUMBER = 0xAD130AD6
-    VERSION = 1
     
     def __init__(self, spec_reader, mem_writer, space_available,
                  report_writer=None):
@@ -65,7 +63,7 @@ class DataSpecificationExecutor(object):
         """
         instruction_spec = self.spec_reader.read(4)
         while len(instruction_spec) != 0:
-            #process the received command
+            # process the received command
             cmd = struct.unpack("<I", str(instruction_spec))[0]
 
             opcode = (cmd >> 20) & 0xFF
@@ -89,7 +87,7 @@ class DataSpecificationExecutor(object):
         # write the table pointer
         self.write_pointer_table()
 
-        #take into account what has just been written to file
+        # take into account what has just been written to file
         self.space_written = self.space_used
 
         # write the data from dsef.mem_regions previously computed
@@ -97,14 +95,20 @@ class DataSpecificationExecutor(object):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
                 if ((memory_region.unfilled and
-                    self.dsef.mem_regions.needs_to_write_region(i))
-                        or not memory_region.unfilled):
+                    self.dsef.mem_regions.needs_to_write_region(i)) or
+                        not memory_region.unfilled):
                     self.mem_writer.write(memory_region.region_data)
                 else:
                     self.space_written -= memory_region.allocated_size
         return self.space_used, self.space_written
 
     def write_header(self):
+        """ writes the DSE header which resides at the top of any cores
+        memory region when used with a DSE.
+
+        :return: None
+        :raise None: this method does not raise any known exceptions
+        """
         if self.report_writer is not None:
             self.report_writer.write("header structure \n")
         magic_number_encoded = bytearray(
@@ -127,6 +131,12 @@ class DataSpecificationExecutor(object):
         self.space_used = 0
 
     def write_pointer_table(self):
+        """ writes the pointer table which defines at what memory address
+        each memory region starts at as well as the size of each region
+
+        :return: None
+        :raise None: this method does not raise any known exceptions
+        """
         if self.report_writer is not None:
             self.report_writer.write("Pointer table \n")
         pointer_table = [0] * constants.MAX_MEM_REGIONS
@@ -156,7 +166,7 @@ class DataSpecificationExecutor(object):
             if self.report_writer is not None:
                 self.report_writer.write(
                     "{:8X} pointer {:d}: {:8X} \n".format(
-                    self.mem_writer.tell(), index, i))
+                        self.mem_writer.tell(), index, i))
             encoded_pointer = struct.pack("<I", i)
             self.mem_writer.write(encoded_pointer)
             index += 1

@@ -430,7 +430,7 @@ class DataSpecificationExecutorFunctions:
 
         if space_available < space_required:
             raise exceptions.DataSpecificationNoMoreException(
-                space_available, space_required)
+                space_available, space_required, self.current_region)
 
         if n_bytes == 1:
             encoded_value = struct.pack("<B", value)

@@ -195,7 +195,7 @@ class DataSpecificationNoMoreException(DataSpecificationException):
         requested item
     """
 
-    def __init__(self, space_available, space_required):
+    def __init__(self, space_available, space_required, region):
         """
 
         :param space_available: The space available in the region
@@ -205,7 +205,8 @@ class DataSpecificationNoMoreException(DataSpecificationException):
         """
         print "Space unavailable to write all the elements requested by the " \
               "write operation. Space available: {0:d}; space requested: " \
-              "{1:d}".format(space_available, space_required)
+              "{1:d} for region {}."\
+            .format(space_available, space_required, region)
 
 
 class DataSpecificationNoMoreFunctionsException(DataSpecificationException):

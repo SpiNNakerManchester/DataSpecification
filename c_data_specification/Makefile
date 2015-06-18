@@ -5,6 +5,8 @@
 # extension)
 APP = data_specification_executor
 
+LIBRARIES += -lspinn_frontend_common -lspinn_common
+
 # Directory to create APLX files in (must include trailing slash)
 APP_OUTPUT_DIR = ./
 

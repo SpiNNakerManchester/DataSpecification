@@ -4,6 +4,8 @@
 #include <sark.h>
 #include <debug.h>
 #include <spinnaker.h>
+#include <data_specification.h>
+#include <spin1_api.h>
 
 // Stores the details of a command.
 struct Command {
@@ -67,10 +69,11 @@ struct Command get_next_command(uint32_t **command_pointer) {
     cmd.fieldUsage     = get_command_fieldUsage(cmd_word);
     cmd.cmdWord        = cmd_word;
 
-    // Get the data words.
-    for (int index = 0; index < cmd.dataLength; index++, (*command_pointer)++)
-        cmd.dataWords[index] = **command_pointer;
     log_info("Read %x opcode %x", cmd_word, cmd.opCode);
+    // Get the data words.
+    for (int index = 0; index < cmd.dataLength; index++, (*command_pointer)++) {
+        cmd.dataWords[index] = **command_pointer;
+    }
 
     return cmd;
 }
@@ -85,16 +88,16 @@ struct MemoryRegion {
 
 // Array to keep track of allocated memory regions.
 // Initialised with 0 (NULL) by default.
-struct MemoryRegion *memory_regions[32];
+struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
 // Points to the first unallocated memory region of the SDRAM stack to
 // be used by the DSE.
-void *memory_pointer = (void *)SDRAM_TOP;
+void *stack_pointer = (void *)SDRAM_TOP;
 
 // The current memory region.
 int current_region = -1;
 
-uint32_t registers[32];
+uint32_t registers[MAX_REGISTERS];
 
 int execute_reserve(struct Command cmd) {
 
@@ -112,7 +115,7 @@ int execute_reserve(struct Command cmd) {
     }
 
     // TODO: take into account the data spec.
-    if ((int)(memory_pointer - cmd.dataWords[0]) < SDRAM_BASE) {
+    if ((int)(stack_pointer - cmd.dataWords[0]) < SDRAM_BASE) {
         log_error("Data specification RESERVE unable to allocate memory: SDRAM is full");
         return -1;
     }
@@ -124,12 +127,13 @@ int execute_reserve(struct Command cmd) {
         return -1;
     }
 
-    memory_regions[region]->startAddress   = memory_pointer;
-    memory_regions[region]->currentAddress = memory_pointer;
     memory_regions[region]->size           = cmd.dataWords[0];
+    memory_regions[region]->startAddress   = stack_pointer - memory_regions[region]->size;
+    memory_regions[region]->currentAddress = stack_pointer - memory_regions[region]->size;
     memory_regions[region]->unfilled       = (cmd.cmdWord >> 7) & 0x1;
 
-    memory_pointer -= cmd.dataWords[0];
+    log_info("Reserving region %d of %d bytes starting from %x", region, memory_regions[region]->size, memory_regions[region]->startAddress);
+    stack_pointer -= cmd.dataWords[0];
 
     return 0;
 }
@@ -182,6 +186,7 @@ int execute_write(struct Command cmd) {
         for (int count = 0; count < n_repeats; count++) {
             uint8_t *writer = (uint8_t*)&data_val;
             for (int byte = 0; byte < data_len; byte++) {
+                log_info("Writing %x at address %x", *writer, memory_regions[current_region]->currentAddress);
                 *(memory_regions[current_region]->currentAddress++) = *writer;
                 writer++;
             }
@@ -202,6 +207,7 @@ int execute_switch_focus(struct Command cmd) {
         log_error("Data specification SWITCH_FOCUS Unallocated memory region");
         return -1;
     } else {
+        log_info("Switching focus to region %d", region);
         current_region = region;
     }
     return 0;
@@ -354,12 +360,33 @@ void data_specification_executor(uint32_t ds_block_address) {
 //    }
 }
 
+void write_header() {
+    address_t header_writer   = (address_t)HEADER_START_ADDRESS;
+
+    *header_writer       = APPDATA_MAGIC_NUM;
+    *(header_writer + 1) = DSE_VERSION;
+}
+
+void write_pointer_table() {
+    int *pointer_table_writer = POINTER_TABLE_START_ADDRESS;
+    int space_used = POINTER_TABLE_SIZE + APP_PTR_TABLE_HEADER_BYTE_SIZE;
+    int next_free_offset = POINTER_TABLE_SIZE + APP_PTR_TABLE_HEADER_BYTE_SIZE;
+    for (int i = 0; i < MAX_MEM_REGIONS; i++) {
+        if (memory_regions[i] != NULL) {
+            *(pointer_table_writer++) = memory_regions[i]->startAddress;
+        } else {
+            *(pointer_table_writer++) = 0;
+        }
+    }
+}
+
 
 void c_main(void) {
     data_specification_executor(DS_ADDRESS);
-    log_info("Mem pointer %x", memory_pointer);
+    data_specification_get_data_address();
+    log_info("Mem pointer %x", stack_pointer);
     log_info("Started at %x", SDRAM_TOP);
-    log_info("diff %d", (int)SDRAM_TOP - (int)memory_pointer);
+    log_info("diff %d", (int)SDRAM_TOP - (int)stack_pointer);
 }
 
 

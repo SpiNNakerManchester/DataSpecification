@@ -1060,7 +1060,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        cmd_len = 0xF
+        cmd_len = 0x1
         cmd_word = (cmd_len << 28) | (Commands.WRITE_ARRAY.value << 20)
         len_array = len(array_values)
         size = len_array

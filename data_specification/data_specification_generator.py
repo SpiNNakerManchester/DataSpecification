@@ -1063,7 +1063,7 @@ class DataSpecificationGenerator(object):
         cmd_len = 0xF
         cmd_word = (cmd_len << 28) | (Commands.WRITE_ARRAY.value << 20)
         len_array = len(array_values)
-        size = len_array + 1
+        size = len_array
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_size = bytearray(struct.pack("<I", size))

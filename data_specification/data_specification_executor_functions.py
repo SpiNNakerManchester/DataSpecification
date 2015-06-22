@@ -225,7 +225,7 @@ class DataSpecificationExecutorFunctions:
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", str(length_encoded))[0]
-        for i in xrange(length - 1):
+        for i in xrange(length):
             value_encoded = self.spec_reader.read(4)
             value = struct.unpack("<I", str(value_encoded))[0]
             self._write_to_mem(value, 4, 1, "WRITE_ARRAY")

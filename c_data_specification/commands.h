@@ -1,3 +1,11 @@
+/*! \file commands.h
+ *  \brief Define the supported commands.
+ */
+
+#ifndef _DATA_SPECIFICATION_COMMANDS
+#define _DATA_SPECIFICATION_COMMANDS
+
+//! The op-codes of the supported commands.
 enum OpCode {
     BREAK                 = 0x00,
     NOP                   = 0x01,
@@ -16,6 +24,7 @@ enum OpCode {
     END_CONSTRUCTOR       = 0x25,
     CONSTRUCT             = 0x40,
     WRITE                 = 0x41,
+    WRITE_ARRAY           = 0x42,
     WRITE_STRUCT          = 0x43,
     BLOCK_COPY            = 0x44,
     SWITCH_FOCUS          = 0x50,
@@ -42,3 +51,4 @@ enum OpCode {
     END_SPEC              = 0xFF
 };
 
+#endif

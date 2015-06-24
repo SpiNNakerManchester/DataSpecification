@@ -197,8 +197,8 @@ class DataSpecificationExecutorFunctions:
                 raise exceptions.DataSpecificationSyntaxError(
                     "Command {0:s} requires a value as an argument, but the "
                     "current encoding ({1:X}) is specified to be {2:d} words "
-                    "long and the data length command argument is specified to "
-                    "be {3:d} bytes long".format(
+                    "long and the data length command argument is specified "
+                    "to be {3:d} bytes long".format(
                         "WRITE", cmd, self._cmd_size,
                         data_len))
 
@@ -220,7 +220,6 @@ class DataSpecificationExecutorFunctions:
         length = struct.unpack("<I", str(length_encoded))[0]
         value_encoded = self.spec_reader.read(4 * (length - 1))
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
-
 
     def execute_write_struct(self, cmd):
         raise exceptions.UnimplementedDSECommand("WRITE_STRUCT")
@@ -275,17 +274,17 @@ class DataSpecificationExecutorFunctions:
 
     def execute_mv(self, cmd):
         """
-        This command moves an immediate value to a register or copies the value\
-        of a register to another register
+        This command moves an immediate value to a register or copies the \
+        value of a register to another register
 
         :param cmd: the command which triggered the function call
         :type cmd: int
         :return: No value returned
         :rtype: None
         :raise data_specification.exceptions.DataSpecificationSyntaxError: \
-        if the destination register is not correctly specified - the \
-        destination must be a register and the appropriate bit needs to be set \
-        in the specification
+                if the destination register is not correctly specified - the \
+                destination must be a register and the appropriate bit needs \
+                to be set in the specification
         """
         self.__unpack_cmd__(cmd)
 
@@ -313,7 +312,7 @@ class DataSpecificationExecutorFunctions:
             data_encoded = self.spec_reader.read(4)
             future_address = struct.unpack("<I", str(data_encoded))[0]
 
-        #check that the address is relative or absolute
+        # check that the address is relative or absolute
         if cmd & 0x1 == 1:  # relative to its current write pointer
             if self.wr_ptr[self.current_region] is None:
                 raise exceptions.DataSpecificationNoRegionSelectedException(
@@ -323,7 +322,7 @@ class DataSpecificationExecutorFunctions:
                 address = self.wr_ptr[self.current_region] + future_address
         else:
             address = future_address
-        #update write pointer
+        # update write pointer
         self.wr_ptr[self.current_region] = address
 
     def execute_align_wr_ptr(self, cmd):
@@ -372,10 +371,10 @@ class DataSpecificationExecutorFunctions:
         value = struct.unpack("<i", str(read_data))[0]
         if value != -1:
             raise exceptions.DataSpecificationSyntaxError(
-                "Command END_SPEC requires an argument equal to -1. The current"
-                "argument value is {0:d}".format(value))
+                "Command END_SPEC requires an argument equal to -1. The "
+                "current argument value is {0:d}".format(value))
         return constants.END_SPEC_EXECUTOR
-        
+
     def _write_to_mem(self, value, n_bytes, repeat, command):
         """Write the specified value to data memory the specified amount of\
         times.
@@ -396,9 +395,9 @@ class DataSpecificationExecutorFunctions:
             DataSpecificationNoRegionSelectedException: raised if there is no \
             memory region selected for the write operation
         :raise data_specification.exceptions.\
-            DataSpecificationRegionNotAllocated: raised if the selected region \
+            DataSpecificationRegionNotAllocated: raised if the selected region\
             has not been allocated memory space
-        :raise data_specification.exceptions.DataSpecificationNoMoreException: \
+        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             raised if the selected region has not enough available memory to \
             store the required data
         :raise data_specification.exceptions.\
@@ -443,7 +442,7 @@ class DataSpecificationExecutorFunctions:
             current_write_ptr:current_write_ptr + len(
                 encoded_array)] = encoded_array
         self.wr_ptr[self.current_region] += len(encoded_array)
-        
+
     def _write_bytes_to_mem(self, data, command):
         """Write raw bytes to data memory
 
@@ -459,9 +458,9 @@ class DataSpecificationExecutorFunctions:
             DataSpecificationNoRegionSelectedException: raised if there is no \
             memory region selected for the write operation
         :raise data_specification.exceptions.\
-            DataSpecificationRegionNotAllocated: raised if the selected region \
+            DataSpecificationRegionNotAllocated: raised if the selected region\
             has not been allocated memory space
-        :raise data_specification.exceptions.DataSpecificationNoMoreException: \
+        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             raised if the selected region has not enough available memory to \
             store the required data
         """

@@ -181,15 +181,8 @@ class DataSpecificationExecutorFunctions:
         else:
             n_repeats = cmd & 0xFF
 
-        data_len = 0
-        if self.data_len == 0:
-            data_len = 1
-        elif self.data_len == 1:
-            data_len = 2
-        elif self.data_len == 2:
-            data_len = 4
-        elif self.data_len == 3:
-            data_len = 8
+        # Convert data length to bytes
+        data_len = (1 << self.data_len)
 
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
@@ -225,10 +218,9 @@ class DataSpecificationExecutorFunctions:
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", str(length_encoded))[0]
-        for i in xrange(length - 1):
-            value_encoded = self.spec_reader.read(4)
-            value = struct.unpack("<I", str(value_encoded))[0]
-            self._write_to_mem(value, 4, 1, "WRITE_ARRAY")
+        value_encoded = self.spec_reader.read(4 * (length - 1))
+        self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
+
 
     def execute_write_struct(self, cmd):
         raise exceptions.UnimplementedDSECommand("WRITE_STRUCT")
@@ -383,7 +375,7 @@ class DataSpecificationExecutorFunctions:
                 "Command END_SPEC requires an argument equal to -1. The current"
                 "argument value is {0:d}".format(value))
         return constants.END_SPEC_EXECUTOR
-
+        
     def _write_to_mem(self, value, n_bytes, repeat, command):
         """Write the specified value to data memory the specified amount of\
         times.
@@ -451,3 +443,50 @@ class DataSpecificationExecutorFunctions:
             current_write_ptr:current_write_ptr + len(
                 encoded_array)] = encoded_array
         self.wr_ptr[self.current_region] += len(encoded_array)
+        
+    def _write_bytes_to_mem(self, data, command):
+        """Write raw bytes to data memory
+
+        The selected memory region needs to be already allocated
+
+        :param data: the value to be written in the data memory region
+        :type value: bytestring
+        :param command: the command which is being executed
+        :type command: str
+        :return: No value returned
+        :rtype: None
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: raised if there is no \
+            memory region selected for the write operation
+        :raise data_specification.exceptions.\
+            DataSpecificationRegionNotAllocated: raised if the selected region \
+            has not been allocated memory space
+        :raise data_specification.exceptions.DataSpecificationNoMoreException: \
+            raised if the selected region has not enough available memory to \
+            store the required data
+        """
+        data_length = len(data)
+
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                command)
+
+        if self.mem_regions.is_empty(self.current_region) is None:
+            raise exceptions.DataSpecificationRegionNotAllocated(
+                self.current_region, command)
+
+        space_allocated = self.mem_regions[self.current_region].allocated_size
+        space_used = self.wr_ptr[self.current_region]
+        # noinspection PyTypeChecker
+        space_available = space_allocated - space_used
+        space_required = data_length
+
+        if space_available < space_required:
+            raise exceptions.DataSpecificationNoMoreException(
+                space_available, space_required, self.current_region)
+
+        current_write_ptr = self.wr_ptr[self.current_region]
+        # noinspection PyTypeChecker
+        self.mem_regions[self.current_region].region_data[
+            current_write_ptr:current_write_ptr + data_length] = data
+        self.wr_ptr[self.current_region] += data_length

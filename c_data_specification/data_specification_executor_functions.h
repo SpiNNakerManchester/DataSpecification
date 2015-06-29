@@ -66,6 +66,12 @@ uint8_t command_get_src1Reg(uint32_t command);
 uint8_t command_get_src2Reg(uint32_t command);
 
 
+//! \brief Function to find the field usage of a command.
+//! \param[in] The command word (the first word of a command).
+//! \return The command's field usage, 3 one-hot encoded bits at the end of the
+//!         returned byte.
+uint8_t command_get_fieldUsage(uint32_t command);
+
 //! \brief Check if the destination register is used by a command.
 //! \param[in] The command word (the first word of a command).
 //! \return 1 if the destination register is used by the given command,

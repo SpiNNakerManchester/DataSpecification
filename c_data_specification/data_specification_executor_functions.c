@@ -1,13 +1,16 @@
 /*! \file data_specification_executor_functions.c
  *  \brief Functions to execute the commands in the data sequence.
+ *
+ *
  */
 #include "data_specification_executor_functions.h"
+
+#include <math.h>
 
 // Load external variables defined in data_specification_executor.c
 extern address_t command_pointer;
 extern uint32_t registers[MAX_REGISTERS];
 extern int current_region;
-extern void *stack_pointer;
 extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
 uint8_t command_get_length(uint32_t command) {
@@ -18,11 +21,7 @@ enum OpCode command_get_opcode(uint32_t command) {
     return (command & 0x0FF00000) >> 20;
 }
 
-//! \brief Private function to find the field usage of a command.
-//! \param[in] The command word (the first word of a command).
-//! \return The command's field usage, 3 one-hot encoded bits at the end of the
-//!         returned byte.
-uint8_t _command_get_fieldUsage(uint32_t command) {
+uint8_t command_get_fieldUsage(uint32_t command) {
     return (command & 0x00070000) >> 16;
 }
 
@@ -39,15 +38,15 @@ uint8_t command_get_src2Reg(uint32_t command) {
 }
 
 int command_dest_in_use(uint32_t command) {
-    return _command_get_fieldUsage(command) & 0x4;
+    return command_get_fieldUsage(command) & 0x4;
 }
 
 int command_src1_in_use(uint32_t command) {
-    return _command_get_fieldUsage(command) & 0x2;
+    return command_get_fieldUsage(command) & 0x2;
 }
 
 int command_src2_in_use(uint32_t command) {
-    return _command_get_fieldUsage(command) & 0x1;
+    return command_get_fieldUsage(command) & 0x1;
 }
 
 int execute_reserve(struct Command cmd) {
@@ -65,29 +64,33 @@ int execute_reserve(struct Command cmd) {
         return -1;
     }
 
-    // TODO: be careful with the memory map.
-    if ((int)(stack_pointer - cmd.dataWords[0]) < SDRAM_BASE) {
-        log_error("Data specification RESERVE unable to allocate memory:
-                   SDRAM is full");
-        return -1;
+    int mem_region_size    = ceil((double)cmd.dataWords[0] / 4.) * 4;
+    void *mem_region_start = sark_xalloc(((sv_t*)SV_SV)->sdram_heap,
+                                         mem_region_size, region, 0x00);
+
+    if (mem_region_start == NULL) {
+        log_error("Data specification RESERVE unable to allocate memory on "
+                  "SDRAM.");
+        spin1_exit(-1);
     }
 
     memory_regions[region] = sark_alloc(1, sizeof(struct MemoryRegion));
 
     if (memory_regions[region] == NULL) {
-        log_error("Data specification RESERVE unable to allocate memory:
-                   DTCM is full");
+        log_error("Data specification RESERVE unable to allocate memory on "
+                  "DTCM");
         return -1;
     }
 
-    memory_regions[region]->size           = cmd.dataWords[0];
-    memory_regions[region]->startAddress   = stack_pointer
-                                             - memory_regions[region]->size;
-    memory_regions[region]->currentAddress = stack_pointer
-                                             - memory_regions[region]->size;
+    memory_regions[region]->size           = mem_region_size;
+    memory_regions[region]->startAddress   = mem_region_start;
+    memory_regions[region]->currentAddress = mem_region_start;
     memory_regions[region]->unfilled       = (cmd.cmdWord >> 7) & 0x1;
 
-    stack_pointer -= cmd.dataWords[0];
+    if (memory_regions[region]->unfilled) {
+        for (int i = 0; i < memory_regions[region]->size / 4; i++)
+            *(memory_regions[region]->startAddress + i) = 0;
+    }
 
     return 0;
 }
@@ -130,21 +133,7 @@ int execute_write(struct Command cmd) {
     }
 
     // The length of the data (bits 13:12).
-    int data_len = (cmd.cmdWord >> 12) & 0x3;
-    switch (data_len) {
-        case 0x00:
-            data_len = 1;
-            break;
-        case 0x01:
-            data_len = 2;
-            break;
-        case 0x10:
-            data_len = 4;
-            break;
-        case 0x11:
-            data_len = 8;
-            break;
-    }
+    int data_len = 0x1 << ((cmd.cmdWord >> 12) & 0x3);
 
     // The value of the data to be written.
     uint64_t data_val;
@@ -197,6 +186,7 @@ int execute_write_array(struct Command cmd) {
         log_error("Data specification WRITE the current memory region is full");
         return -1;
     } else {
+        log_info("WRITE_ARRAY");
         for (int count = 0; count < length; count++) {
             write_value(command_pointer++, 4);
         }
@@ -220,6 +210,7 @@ int execute_switch_focus(struct Command cmd) {
         log_error("Data specification SWITCH_FOCUS Unallocated memory region");
         return -1;
     } else {
+        log_error("SWITCH_FOCUS to %d", region);
         current_region = region;
     }
 

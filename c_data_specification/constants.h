@@ -32,4 +32,19 @@
 // The start address of the stack.
 #define STACK_START_ADDRESS            POINTER_TABLE_START_ADDRESS + POINTER_TABLE_SIZE
 
+
+// The states of a core.
+//   READY_TO_RECEIVE - The core can receive new information about a data
+//                      block.
+//   WAITING_FOR_DATA - The core has allocated memory for the new block and
+//                      waits for its content.
+//   CORE_BUSY        - The core cannot receive any packets.
+enum Core_states {
+    READY_TO_RECEIVE = 1,
+    WAITING_FOR_DATA = 2,
+    CORE_BUSY = 3
+};
+
+
 #endif
+

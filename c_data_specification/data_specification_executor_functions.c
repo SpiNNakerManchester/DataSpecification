@@ -65,7 +65,7 @@ int execute_reserve(struct Command cmd) {
 
     int mem_region_size    = ceil((double)cmd.dataWords[0] / 4.) * 4;
     void *mem_region_start = sark_xalloc(((sv_t*)SV_SV)->sdram_heap,
-                                         mem_region_size, region, 0x00);
+                                         mem_region_size, 0, 0x01);
 
     if (mem_region_start == NULL) {
         log_error("Data specification RESERVE unable to allocate %d bytes of "

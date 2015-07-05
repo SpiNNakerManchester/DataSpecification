@@ -18,7 +18,7 @@
 struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
 //! The current memory region.
-//! Initialised with -1, as no context switch has been performed.
+//! Initialised with -1, since no context switch has been performed.
 int current_region = -1;
 
 //! The array of registers.
@@ -336,6 +336,7 @@ void write_pointer_table() {
 
     // Iterate over the memory regions and write their start address in the
     // memory location pointed at by the pt_writer.
+    // If a memory region has not been defined, 0 is written.
     for (int i = 0; i < MAX_MEM_REGIONS; i++, pt_writer++) {
         if (memory_regions[i] != NULL) {
             *pt_writer = (uint32_t)memory_regions[i]->startAddress;

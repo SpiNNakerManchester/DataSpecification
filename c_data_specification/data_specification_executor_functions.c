@@ -1,7 +1,6 @@
-/*! \file data_specification_executor_functions.c
+/*!
+ *  \file data_specification_executor_functions.c
  *  \brief Functions to execute the commands in the data sequence.
- *
- *
  */
 #include "data_specification_executor_functions.h"
 

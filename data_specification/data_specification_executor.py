@@ -12,7 +12,7 @@ class DataSpecificationExecutor(object):
     """
     
     def __init__(self, spec_reader, mem_writer, space_available,
-                 report_writer=None):
+                 start_address, report_writer=None):
         """
         :param spec_reader: The object to read the specification language file\
                     from
@@ -41,6 +41,7 @@ class DataSpecificationExecutor(object):
         self.space_available = space_available
         self.space_used = 0
         self.space_written = 0
+        self.start_address = start_address
         self.dsef = Dsef(
             self.spec_reader, self.mem_writer, self.space_available)
     
@@ -149,7 +150,7 @@ class DataSpecificationExecutor(object):
         for i in xrange(constants.MAX_MEM_REGIONS):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
-                pointer_table[i] = next_free_offset
+                pointer_table[i] = next_free_offset + self.start_address
                 region_size = memory_region.allocated_size
             else:
                 pointer_table[i] = 0

@@ -68,8 +68,8 @@ int execute_reserve(struct Command cmd) {
                                          mem_region_size, region, 0x00);
 
     if (mem_region_start == NULL) {
-        log_error("Data specification RESERVE unable to allocate memory on "
-                  "SDRAM.");
+        log_error("Data specification RESERVE unable to allocate %d bytes of "
+                  "SDRAM memory.", mem_region_size);
         spin1_exit(-1);
     }
 
@@ -185,7 +185,7 @@ int execute_write_array(struct Command cmd) {
         log_error("Data specification WRITE the current memory region is full");
         return -1;
     } else {
-        log_info("WRITE_ARRAY");
+        log_debug("WRITE_ARRAY");
         for (int count = 0; count < length; count++) {
             write_value(command_pointer++, 4);
         }
@@ -209,7 +209,7 @@ int execute_switch_focus(struct Command cmd) {
         log_error("Data specification SWITCH_FOCUS Unallocated memory region");
         return -1;
     } else {
-        log_error("SWITCH_FOCUS to %d", region);
+        log_debug("SWITCH_FOCUS to %d", region);
         current_region = region;
     }
 

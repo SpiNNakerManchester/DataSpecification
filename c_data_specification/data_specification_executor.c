@@ -46,12 +46,9 @@ struct Command get_next_command() {
     cmd.fieldUsage     = command_get_fieldUsage(cmd_word);
     cmd.cmdWord        = cmd_word;
 
-    log_info("Read command %x", cmd.opCode);
-
     // Get the data words.
     for (int index = 0; index < cmd.dataLength; index++, command_pointer++) {
         cmd.dataWords[index] = *command_pointer;
-        log_info("Param %x", cmd.dataWords[index]);
     }
 
     return cmd;
@@ -218,7 +215,6 @@ void set_header_start_address() {
 
 //! \brief Set the current core's state.
 void set_core_state(enum Core_states core_state) {
-    log_info("Core state %d", core_state);
     ((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user1 = core_state;
 }
 
@@ -318,7 +314,7 @@ void write_header() {
     address_t header_writer =
                      (address_t)((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user0;
 
-    log_info("HEADER %x", header_writer);
+    log_info("Header address %x", header_writer);
 
     // Write the headers.
     *header_writer       = APPDATA_MAGIC_NUM;
@@ -340,6 +336,10 @@ void write_pointer_table() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++, pt_writer++) {
         if (memory_regions[i] != NULL) {
             *pt_writer = (uint32_t)memory_regions[i]->startAddress;
+
+            log_info("Region %d address %x %s", i, 
+                     (uint32_t)memory_regions[i]->startAddress,
+                     memory_regions[i]->unfilled ? "unfilled" : "");
         } else {
             *pt_writer = 0;
         }

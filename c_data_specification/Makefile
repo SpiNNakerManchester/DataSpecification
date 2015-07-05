@@ -8,7 +8,7 @@ APP = data_specification_executor
 LIBRARIES = $(SPINN_DIRS)/lib/libspinn_frontend_common.a -lspinn_common $(SPINN_DIRS)/lib/libspin1_api.a -lm
 
 # Directory to create APLX files in (must include trailing slash)
-APP_OUTPUT_DIR = ./
+APP_OUTPUT_DIR = ../data_specification/data_spec_sender/
 
 # Directory to place compilation artefacts (must include trailing slash)
 BUILD_DIR = ./

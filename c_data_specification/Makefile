@@ -16,7 +16,7 @@ BUILD_DIR = ./
 # A space-separated list of object files to be built into the executable. These
 # .o files will be created from corresponding .c files (e.g. example.c in this
 # case).
-OBJECTS = data_specification_executor_functions.o data_specification_executor.o 
+OBJECTS = data_specification_executor.o data_specification_stack.o struct.o c_main.o
 
 # The spinnaker_tools standard makefile
 include $(SPINN_DIRS)/Makefile.common

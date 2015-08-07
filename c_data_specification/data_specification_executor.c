@@ -1,35 +1,101 @@
-/*! \file data_specification_executor.c
- *
- *  \brief The implementation of the on-chip Data Specification Executor (DSG).
+/*!
+ *  \file data_specification_executor_functions.c
+ *  \brief Functions to execute the commands in the data sequence.
  */
+#include "data_specification_executor.h"
+#include "data_specification_stack.h"
+#include "struct.h"
 
-#include "commands.h"
-#include "constants.h"
-#include "data_specification_executor_functions.h"
-#include <stdint.h>
-#include <sark.h>
-#include <debug.h>
-#include <data_specification.h>
-#include <spinnaker.h>
-#include <spin1_api.h>
+#include <math.h>
 
-//! Array to keep track of allocated memory regions.
-//! Initialised with 0 (NULL) by default.
-struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
+// Load external variables defined in data_specification_executor.c
+extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
 //! The current memory region.
 //! Initialised with -1, since no context switch has been performed.
 int current_region = -1;
 
 //! The array of registers.
-uint32_t registers[MAX_REGISTERS];
+uint64_t registers[MAX_REGISTERS];
 
 //! Pointer to the next command to be analysed.
 address_t command_pointer;
 
+struct Struct *structs[MAX_STRUCTS];
+struct Constructor constructors[MAX_CONSTRUCTORS];
 
-//! \brief Read the next command from the memory and updates the command_pointer
-//! accordingly.
+//! \brief Find the length of a command (bits 29:28).
+//! \param[in] The command word (the first word of a command).
+//! \return The length of the command (integer from 0 to 3, as stated in the
+//!         data spec documentation.
+uint8_t command_get_length(uint32_t command) {
+    return (command & 0x30000000) >> 28;
+}
+
+//! \brief Find the operation code of a command (bits 27:20).
+//! \param[in] The command word (the first word of a command).
+//! \return The command's opcode.
+enum OpCode command_get_opcode(uint32_t command) {
+    return (command & 0x0FF00000) >> 20;
+}
+
+//! \brief Function to find the field usage of a command (bits 18:16).
+//! \param[in] The command word (the first word of a command).
+//! \return The command's field usage, 3 one-hot encoded bits at the end of the
+//!         returned byte.
+uint8_t command_get_fieldUsage(uint32_t command) {
+    return (command & 0x00070000) >> 16;
+}
+
+//! \brief Find the destination register used by a command (bits 15:12).
+//! \param[in] The command word (the first word of a command).
+//! \return The register used as destination by the given command.
+uint8_t command_get_destReg(uint32_t command) {
+    return (command & 0x0000F000) >> 12;
+}
+
+//! \brief Find the source1 register used by a command (bits 11:8).
+//! \param[in] The command word (the first word of a command).
+//! \return The register used as source1 by the given command.
+uint8_t command_get_src1Reg(uint32_t command) {
+    return (command & 0x00000F00) >> 8;
+}
+
+//! \brief Find the source2 register used by a command (bits 7:4).
+//! \param[in] The command word (the first word of a command).
+//! \return The register used as source2 by the given command.
+uint8_t command_get_src2Reg(uint32_t command) {
+    return (command & 0x000000F0) >> 4;
+}
+
+//! \brief Check if a command uses a register as destination.
+//! \param[in] The command word (the first word of a command).
+//! \return 1 if the destination register is used by the given command,
+//!         0 otherwise.
+int command_dest_in_use(uint32_t command) {
+    return (command_get_fieldUsage(command) & 0x4) >> 2;
+}
+
+//! \brief Check if a command uses a register as source1.
+//! \param[in] The command word (the first word of a command).
+//! \return 1 if the source1 register is used by the given command,
+//!         0 otherwise.
+int command_src1_in_use(uint32_t command) {
+    return (command_get_fieldUsage(command) & 0x2) >> 1;
+}
+
+//! \brief Check if a command uses a register as source2.
+//! \param[in] The command word (the first word of a command).
+//! \return 1 if the source2 register is used by the given command,
+//!         0 otherwise.
+int command_src2_in_use(uint32_t command) {
+    return command_get_fieldUsage(command) & 0x1;
+}
+
+int print_commands = 0;
+
+//! \brief Read the next command from the memory and update the command_pointer
+//!        accordingly.
 //! \return A Command object storing the command.
 struct Command get_next_command() {
 
@@ -41,17 +107,892 @@ struct Command get_next_command() {
     command_pointer++;
 
     // Get the command fields.
-    cmd.dataLength     = command_get_length(cmd_word);
     cmd.opCode         = command_get_opcode(cmd_word);
-    cmd.fieldUsage     = command_get_fieldUsage(cmd_word);
     cmd.cmdWord        = cmd_word;
+    cmd.dataLength     = command_get_length(cmd_word);
+
+    if (print_commands)
+        log_info("Command %08x", cmd_word);
 
     // Get the data words.
-    for (int index = 0; index < cmd.dataLength; index++, command_pointer++) {
-        cmd.dataWords[index] = *command_pointer;
+    for (int index = 0; index < command_get_length(cmd_word); index++) {
+        if (print_commands)
+            log_info("\t%08x", *command_pointer);
+        cmd.dataWords[index] = *(command_pointer++);
     }
 
     return cmd;
+}
+
+//! \brief Execute a reserve memory command, which allocates a memory region of
+//!        a given size on SDRAM.
+//! \param[in] The command to be executed.
+void execute_reserve(struct Command cmd) {
+
+    // Check if the instruction format is correct.
+    if (cmd.dataLength != 1) {
+        log_error("Data specification RESERVE requires one word as argument");
+        rt_error(RTE_ABORT);
+    }
+
+    // Get the region id and perform some checks on it.
+    uint8_t region_id = cmd.cmdWord & 0x1F;
+    if (region_id > MAX_MEM_REGIONS) {
+        log_error("RESERVE memory region id %d out of bounds", region_id);
+        rt_error(RTE_ABORT);
+    }
+    if (memory_regions[region_id] != NULL) {
+        log_error("RESERVE region %d already in use", region_id);
+        rt_error(RTE_ABORT);
+    }
+
+    // Allocate the required memory .
+    // int mem_region_size    = ceil((double)cmd.dataWords[0] / 4.) * 4;
+    uint32_t mem_region_size = ((cmd.dataWords[0] & 0x03) > 0) ?
+                               (((cmd.dataWords[0] >> 2) + 1) << 2) :
+                                                    cmd.dataWords[0];
+
+    void *mem_region_start = sark_xalloc(((sv_t*)SV_SV)->sdram_heap,
+                                         mem_region_size, 0, 0x01);
+
+    if (mem_region_start == NULL) {
+        log_error("RESERVE unable to allocate %d bytes of SDRAM memory.",
+                  mem_region_size);
+        rt_error(RTE_ABORT);
+    }
+
+    memory_regions[region_id] = sark_alloc(1, sizeof(struct MemoryRegion));
+
+    if (memory_regions[region_id] == NULL) {
+        log_error("RESERVE unable to allocate memory on DTCM");
+        rt_error(RTE_ABORT);
+    }
+
+    uint8_t read_only = (cmd.cmdWord >> 7) & 0x1;
+
+    log_debug("RESERVE %smemory region %d of %d bytes",
+              read_only ? "read-only " : "", region_id, mem_region_size);
+
+    memory_regions[region_id]->size           = mem_region_size;
+    memory_regions[region_id]->start_address   = mem_region_start;
+    memory_regions[region_id]->write_pointer  = mem_region_start;
+    memory_regions[region_id]->unfilled       = read_only;
+
+    if (memory_regions[region_id]->unfilled) {
+        for (int i = 0; i < (memory_regions[region_id]->size >> 2); i++)
+            *(memory_regions[region_id]->start_address + i) = 0;
+    }
+}
+
+//! \brief Execute a FREE command.
+//! \param[in] cmd The command to be executed.
+void execute_free(struct Command cmd) {
+
+    uint8_t region_id = cmd.cmdWord & 0x0F;
+
+    if (memory_regions[region_id] == NULL) {
+        log_error("FREE region %d not allocated.", region_id);
+        rt_error(RTE_ABORT);
+    }
+
+    log_debug("FREE memory region %d.", region_id);
+
+    sark_xfree(((sv_t*)SV_SV)->sdram_heap,
+                memory_regions[region_id]->start_address, 0x01);
+
+    sark_free(memory_regions[region_id]);
+
+    memory_regions[region_id] = NULL;
+}
+
+//! \brief Private function to write a value to the specified memory location
+//!        and update its write pointer accordingly.
+//!        The caller must ensure the selected memory region is valid.
+//! \param[in] value Pointer to the data to be written.
+//! \param[in] size The size in bytes of the data to be written.
+//                  The supported sizes are 1, 2, 4 and 8 bytes.
+void write_value(void *value, int size) {
+
+    switch (size) {
+        case 1:
+            *(memory_regions[current_region]->write_pointer) =
+                                                        *((uint8_t*)value);
+            break;
+        case 2:
+            *((uint16_t*)memory_regions[current_region]->write_pointer) =
+                                                        *((uint16_t*)value);
+            break;
+        case 4:
+            *((uint32_t*)memory_regions[current_region]->write_pointer) =
+                                                        *((uint32_t*)value);
+            break;
+        case 8:
+            *((uint64_t*)memory_regions[current_region]->write_pointer) =
+                                                        *((uint64_t*)value);
+            break;
+        default:
+            log_error("write value unknown size");
+            rt_error(RTE_ABORT);
+    }
+
+    ((memory_regions[current_region]->write_pointer)) += size;
+}
+
+//! \brief Execute a WRITE command, which writes 1, 2, 4 or 8 bytes of data from
+//!        a parameter to memory, with the possibility of data to be repeated.
+//! \param[in] cmd The command to be executed.
+void execute_write(struct Command cmd) {
+
+    // The number of repetitions.
+    int n_repeats;
+
+    // If the source2 register is in use, it specifies the number or
+    // repetitions.
+    // Otherwise, the number of repetitions is stored into the last significant
+    // byte.
+    if (command_src2_in_use(cmd.cmdWord))
+        n_repeats = registers[command_get_src2Reg(cmd.cmdWord)];
+    else {
+        n_repeats = cmd.cmdWord & 0xFF;
+    }
+
+    // The length of the data (bits 13:12).
+    int data_len = 0x1 << ((cmd.cmdWord >> 12) & 0x3);
+
+    // The value of the data to be written.
+    uint64_t data_val;
+    if (command_src1_in_use(cmd.cmdWord) && cmd.dataLength == 0) {
+        data_val = registers[command_get_src1Reg(cmd.cmdWord)];
+    } else if (cmd.dataLength == 1 && data_len != 8) {
+        data_val = cmd.dataWords[0];
+    } else if (cmd.dataLength == 2 && data_len == 8) {
+        data_val = ((uint64_t)cmd.dataWords[0] << 32) | cmd.dataWords[1];
+    } else {
+        log_error("WRITE format error. DataLength %d data_len %d src1 in use %d",
+                  cmd.dataLength, data_len, command_src1_in_use(cmd.cmdWord));
+        rt_error(RTE_ABORT);
+    }
+
+    // Perform some checks and, if everything is fine, write the data n_repeats
+    // times.
+    if (current_region == -1) {
+        log_error("WRITE the current memory region has not been selected");
+        rt_error(RTE_ABORT);
+    } else if (memory_regions[current_region] == NULL) {
+        log_error("WRITE the current memory region has not been allocated");
+        rt_error(RTE_ABORT);
+    } else if (memory_regions[current_region]->size - data_len < 0) {
+        log_error("WRITE the current memory region is full");
+        rt_error(RTE_ABORT);
+    } else {
+        for (int count = 0; count < n_repeats; count++)
+            write_value(&data_val, data_len);
+    }
+}
+
+//! \brief Execute a WRITE_ARRAY command, which writes an array of 32 bit words
+//!        to memory.
+//! \param[in] cmd The command to be executed.
+void execute_write_array(struct Command cmd) {
+
+    // The length of the array is specified in the second word of the command.
+    int length        = cmd.dataWords[0];
+    uint8_t data_size = cmd.cmdWord & 0x0F;
+
+
+    // Perform some checks and, if everything is fine, write the array to
+    // memory.
+    if (current_region == -1) {
+        log_error("WRITE_ARRAY the current memory region has not been selected");
+        rt_error(RTE_ABORT);
+    } else if (memory_regions[current_region] == NULL) {
+        log_error("WRITE_ARRAY the current memory region has not been allocated");
+        rt_error(RTE_ABORT);
+    } else if (memory_regions[current_region]->size - length * data_size < 0) {
+        log_error("WRITE_ARRAY the current memory region is full");
+        rt_error(RTE_ABORT);
+    } else {
+
+        uint8_t *array_writer = (uint8_t*)command_pointer;
+        for (int count = 0; count < length; count++) {
+            write_value(array_writer, data_size);
+            array_writer += data_size;
+        }
+
+        command_pointer = ((int)array_writer & 0x03)
+                         ? (uint32_t*)((((uint32_t)array_writer >> 2) + 1) << 2)
+                         : (uint32_t*)array_writer;
+    }
+}
+
+//! \brief Execute a SWITCH_FOCUS command, which changes the selected memory
+//!        region.
+//! \param[in] cmd The command to be executed.
+void execute_switch_focus(struct Command cmd) {
+
+    // The region to be selected.
+    int region;
+
+    // Get the region to be selected from the command or from a register.
+    if (command_src1_in_use(cmd.cmdWord))
+        region = registers[command_get_src1Reg(cmd.cmdWord)];
+    else
+        region = (cmd.cmdWord >> 8) & 0xF;
+
+    // Perform some checks and, if everything is fine, change the value of
+    // current_region.
+    if (memory_regions[region] == NULL) {
+        log_error("SWITCH_FOCUS unallocated memory region");
+        rt_error(RTE_ABORT);
+    } else {
+        current_region = region;
+        log_info("SWITCH_FOCUS to region %d", region);
+    }
+}
+
+extern int stack_size;
+
+//! \brief Execute a LOOP command.
+//! \param[in] cmd The command to be executed.
+void execute_loop(struct Command cmd) {
+
+    int used_data_words = 0;
+
+    // The start value of the loop counter.
+    int loop_start;
+    if (command_dest_in_use(cmd.cmdWord))
+        loop_start = registers[command_get_destReg(cmd.cmdWord)];
+    else
+        loop_start = cmd.dataWords[used_data_words++];
+
+    // The end value of the loop counter.
+    int loop_end;
+    if (command_src1_in_use(cmd.cmdWord))
+        loop_end = registers[command_get_src1Reg(cmd.cmdWord)];
+    else
+        loop_end = cmd.dataWords[used_data_words++];
+
+    // The step of the loop counter.
+    int increment;
+    if (command_src2_in_use(cmd.cmdWord))
+        increment = registers[command_get_src2Reg(cmd.cmdWord)];
+    else
+        increment = cmd.dataWords[used_data_words++];
+
+    // The register used to store the counter.
+    int count_reg = cmd.cmdWord & 0xFF;
+
+    char str[10];
+    int i;
+    for (i = 0; i < stack_size; i++)
+        str[i] = ' ';
+    str[i] = '\0';
+    log_info("%sLooping from %d to %d with increment %d", str, loop_start, loop_end,
+             increment);
+
+    // If the loop is not going to have any iteration, skip to the first
+    // END_LOOP. Otherwise, start iterating.
+    if (loop_start >= loop_end) {
+        struct Command command;
+        while((command = get_next_command()).opCode != END_LOOP);
+    } else {
+        // Push the return value of the command pointer on the stack.
+        stack_push(command_pointer);
+
+        for (registers[count_reg] = loop_start;
+             registers[count_reg] < loop_end;
+             registers[count_reg] += increment) {
+            data_specification_executor(stack_top(), 0);
+        }
+        // Pop the return value of the command pointer from the stack.
+        stack_pop();
+    }
+
+ //   print_commands = 0;
+
+    log_info("%sLoop ended", str);
+
+}
+
+//! \brief Execute a START_STRUCT (structure definition) command.
+//!        Reads the entire structure definition, up to the END_STRUCT command.
+//! \param[in] cmd The command to be executed.
+void execute_start_struct(struct Command cmd) {
+    // The id of the new struct.
+    int struct_id = cmd.cmdWord & 0x1F;
+
+    log_info("START STRUCT %d", struct_id);
+
+    // Save the command pointer.
+    stack_push(command_pointer);
+
+    // Count the number of struct elements.
+    struct Command command;
+    int no_of_elements = 0;
+    while ((command = get_next_command()).opCode != END_STRUCT)
+        no_of_elements++;
+
+    // Restore the command pointer.
+    command_pointer = stack_pop();
+
+    // Allocate memory for the new struct definition.
+    struct Struct *str = struct_new(no_of_elements);
+
+    // Read all the entries in the struct definition and create the requested
+    // structure.
+    struct Command structEntry;
+    int current_element_id = 0;
+    while ((structEntry = get_next_command()).opCode != END_STRUCT) {
+        if (structEntry.opCode != STRUCT_ELEM) {
+            log_error("A struct definition must contain only struct elements");
+            rt_error(RTE_ABORT);
+        }
+        uint8_t elem_type = structEntry.cmdWord & 0x1F;
+
+        struct_set_element_type(str, current_element_id, elem_type);
+
+        if (structEntry.dataLength == 1) {
+            struct_set_element_value(str, current_element_id, structEntry.dataWords[0]);
+        } else {
+            struct_set_element_value(str, current_element_id, 0);
+        }
+
+        current_element_id++;
+    }
+
+    // Store a pointer to the newly created struct.
+    structs[struct_id] = str;
+}
+
+//! \brief Execute a WRITE_STRUCT command, which writes a struct to the current
+//!        memory region.
+//! \param[in] cmd The command to be executed.
+void execute_write_struct(struct Command cmd) {
+
+    // The number of repetitions of the same struct.
+    log_info("WRITE STRUCT in region %d", current_region);
+    uint8_t n_repeats;
+    if (command_src1_in_use(cmd.cmdWord)) {
+        n_repeats = registers[command_get_src1Reg(cmd.cmdWord)];
+    } else {
+        n_repeats = (cmd.cmdWord & 0xF00) >> 8;
+    }
+
+    // The id of the struct to be printed.
+    uint8_t struct_id = cmd.cmdWord & 0xF;
+
+    if (structs[struct_id] == NULL) {
+        log_error("WRITE_STRUCT structure %d has not been defined", struct_id);
+        rt_error(RTE_ABORT);
+    }
+
+    // Iterate over all elements of the struct n times and print all the
+    // defined elements.
+    for (int count = 0; count < n_repeats; count++) {
+        for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++)
+                write_value(&(structs[struct_id]->elements[elem_id].data),
+                            data_type_get_size(
+                                structs[struct_id]->elements[elem_id].type));
+    }
+}
+
+//! \brief Execute a MV instruction.
+//! \param[in] cmd The command to be executed.
+void execute_mv(struct Command cmd) {
+
+    // The id of the destination register.
+    uint8_t dest_id = command_get_destReg(cmd.cmdWord);
+
+    // The data to be moved.
+    uint32_t data;
+    if (command_src1_in_use(cmd.cmdWord))
+        data = registers[command_get_src1Reg(cmd.cmdWord)];
+    else
+        data = cmd.dataWords[0];
+
+    // Perform the actual data move.
+    registers[dest_id] = data;
+}
+
+//! \brief Execute a LOGIC_OP instruction.
+//! \param[in] cmd The command to be executed.
+void execute_logic_op(struct Command cmd) {
+
+    // The operation to be performend.
+    uint8_t operation = cmd.cmdWord & 0xF;
+
+    // The first operand.
+    uint64_t source1;
+    if (command_src1_in_use(cmd.cmdWord)) {
+        source1 = registers[command_get_src1Reg(cmd.cmdWord)];
+    } else {
+        source1 = cmd.dataWords[0];
+    }
+
+    // The second operand.
+    uint64_t source2;
+    if (operation != 0x5 && command_src2_in_use(cmd.cmdWord)) {
+        source2 = registers[command_get_src2Reg(cmd.cmdWord)];
+    } else {
+        if (command_src1_in_use(cmd.cmdWord))
+            source2 = cmd.dataWords[0];
+        else
+            source2 = cmd.dataWords[1];
+    }
+
+    // The id of the destination register.
+    uint8_t dest_id = command_get_destReg(cmd.cmdWord);
+
+    switch (operation) {
+        case 0x0: registers[dest_id] = source1 << source2; break;
+        case 0x1: registers[dest_id] = source1 >> source2; break;
+        case 0x2: registers[dest_id] = source1 |  source2; break;
+        case 0x3: registers[dest_id] = source1 &  source2; break;
+        case 0x4: registers[dest_id] = source1 ^  source2; break;
+        case 0x5: registers[dest_id] =~source1; break;
+        default: 
+            log_error("Undefined logic operation %d", operation);
+            rt_error(RTE_ABORT);
+    }
+    log_info("LOGIC_OP %08x%08x %d %08x%08x = %08x%08x",
+            (uint32_t)((source1 & 0xFFFFFFFF00000000LL) >> 32),
+            (uint32_t)(source1  & 0xFFFFFFFFF),
+            operation,
+            (uint32_t)((source2 & 0xFFFFFFFF00000000LL) >> 32),
+            (uint32_t)(source2  & 0xFFFFFFFFF),
+            (uint32_t)((registers[dest_id] & 0xFFFFFFFF00000000LL) >> 32),
+            (uint32_t)(registers[dest_id]  & 0xFFFFFFFFF));
+}
+
+
+//! \brief Execute a WRITE_PARAM instruction.
+//! \param[in] cmd The command to be executed.
+void execute_write_param(struct Command cmd) {
+
+    // The value to be written.
+    uint32_t value;
+    if (command_src1_in_use(cmd.cmdWord)) {
+        value = registers[command_get_src1Reg(cmd.cmdWord)];
+    } else {
+        value = cmd.dataWords[0];
+    }
+
+    uint8_t struct_id = (cmd.cmdWord & 0xF000) >> 12;
+    uint8_t elem_id   = cmd.cmdWord & 0xFF;
+
+    if (structs[struct_id] == NULL) {
+        log_error("WRITE_PARAM structure %d has not been defined", struct_id);
+        rt_error(RTE_ABORT);
+    }
+    if (structs[struct_id]->size <= elem_id) {
+        log_error("WRITE_PARAM %d is not a valid element id in structure %d",
+                  struct_id, elem_id);
+        rt_error(RTE_ABORT);
+    }
+
+    log_info("Setting %d of struct %d to %08x", elem_id, struct_id, value);
+    struct_set_element_value(structs[struct_id], elem_id, value);
+}
+
+//! \brief Execute a READ_PARAM instruction.
+//! \param[in] cmd The command to be executed.
+void execute_read_param(struct Command cmd) {
+    log_info("READ_PARAM %08x", cmd.cmdWord);
+    uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
+    uint8_t struct_id = cmd.cmdWord & 0xF;
+    uint8_t elem_id;
+    if (command_src1_in_use(cmd.cmdWord))
+        elem_id = registers[command_get_src1Reg(cmd.cmdWord)];
+    else
+        elem_id = (cmd.cmdWord & 0xFF0) >> 4;
+
+    registers[dest_reg] = structs[struct_id]->elements[elem_id].data;
+    log_info("READ PARAM register %d has now value %08x, from element %d of struct %d", dest_reg, (uint32_t)registers[dest_reg], elem_id, struct_id);
+}
+
+//! \brief Execute a COPY_PARAM instruction.
+//! \param[in] cmd The command to be executed.
+void execute_copy_param(struct Command cmd) {
+
+    uint8_t dest_id = (cmd.cmdWord & 0xF000) >> 12;
+    uint8_t src_struct_id  = (cmd.cmdWord & 0x0F00) >> 8;
+
+    uint8_t dest_elem_id  = (cmd.dataWords[0] & 0xFF00) >> 8;
+    uint8_t src_elem_id   = (cmd.dataWords[0] & 0x00FF);
+
+    if (structs[src_struct_id] == NULL) {
+        log_error("COPY_PARAM source structure %d not defined.", src_struct_id);
+        rt_error(RTE_ABORT);
+    }
+    if (structs[src_struct_id]->size <= src_elem_id) {
+        log_error("COPY_PARAM source element %d of structure %d not defined.",
+                  dest_elem_id, dest_id);
+        rt_error(RTE_ABORT);
+    }
+
+    if (command_dest_in_use(cmd.cmdWord)) {
+        registers[dest_id] = structs[src_struct_id]->elements[src_elem_id].data;
+    } else {
+
+        if (structs[src_struct_id] == NULL) {
+            log_error("COPY_PARAM destination structure %d not defined.",
+                      dest_id);
+            rt_error(RTE_ABORT);
+        }
+        if (structs[src_struct_id]->size <= dest_elem_id) {
+            log_error("COPY_PARAM destination element %d of structure %d "
+                      "not defined.", dest_elem_id, dest_id);
+            rt_error(RTE_ABORT);
+        }
+
+        structs[dest_id]->elements[dest_elem_id].data =
+                            structs[src_struct_id]->elements[src_elem_id].data;
+    }
+}
+
+//! \brief Execute a PRINT_TEXT command.
+//! \param[in] cmd The command to be executed.
+void execute_print_text(struct Command cmd) {
+
+    // The number of characters to be printed.
+    uint8_t n_characters = cmd.cmdWord & 0xFF;
+
+    if (n_characters > PRINT_TEXT_MAX_CHARACTERS) {
+        log_error("PRINT_TEXT too many characters: %d", n_characters);
+        rt_error(RTE_ABORT);
+    }
+
+    char *reader = (char*)cmd.dataWords;
+
+    // Temporary storage for the text to be printed.
+    char temp[PRINT_TEXT_MAX_CHARACTERS];
+
+    // Read the characters and copy them to the temporary storage.
+    for (int count = 0; count <= n_characters; count++, reader++)
+        temp[count] = *reader;
+
+    temp[n_characters + 1] = '\0';
+    log_info("Print text: %s", temp);
+}
+
+//! \brief Execute a PRINT_STRUCT command.
+//! \param[in] cmd The command to be executed.
+void execute_print_struct(struct Command cmd) {
+
+    uint8_t struct_id;
+    if (command_src1_in_use(cmd.cmdWord))
+        struct_id = registers[command_get_src1Reg(cmd.cmdWord)];
+    else
+        struct_id = cmd.cmdWord & 0xF;
+
+    if (structs[struct_id] == NULL) {
+        log_error("PRINT_STRUCT struct %d has not been defined", struct_id);
+        rt_error(RTE_ABORT);
+    }
+
+    log_info("Printing structure %d", struct_id);
+    for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++) {
+        log_info("\t%016x", structs[struct_id]->elements[elem_id].data);
+    }
+}
+
+//! \brief Check if a parameter of a constructor is read-only.
+//! \param[in] constructor_id The id of the constructor whose parameter is
+//!                           being checked.
+//! \param[in] param_id The id of the parameter being checked.
+//! \return 1, if the parameter param_id of the constructor constructor_id
+//!            is read only,
+//!         0, otherwise
+int param_read_only(int constructor_id, int param_id) {
+    return !!(constructors[constructor_id].arg_read_only & (1 << param_id));
+}
+
+//! \brief Get the id of a specific structure parameter from a CONSTRUCT
+//!        command.
+//! \param[in] cmd The command to be analysed.
+//! \param[in] param_n The id of the parameter to be returned.
+//!
+//! \return The id of the structure used as the nth parameter in this
+//!         constructor.
+int get_nth_struct_arg(struct Command cmd, int param_n) {
+    return (cmd.dataWords[0] & (0x1F << (6 * param_n))) >> (6 * param_n);
+}
+
+//! \brief Execute a START_CONSTRUCTOR command.
+//! \param[in] cmd The command to be executed.
+void execute_start_constructor(struct Command cmd) {
+
+    int constructor_id = (cmd.cmdWord & 0xF800) >> 11;
+    int arg_count      = (cmd.cmdWord & 0x0700) >> 8;
+    int read_only_mask = (cmd.cmdWord & 0x001F);
+
+    constructors[constructor_id].start_address  = command_pointer;
+    constructors[constructor_id].arg_count     = arg_count;
+    constructors[constructor_id].arg_read_only = read_only_mask;
+
+    // Skip all instructions up to END_CONSTRUCTOR.
+    struct Command constructorEntry;
+    while ((constructorEntry = get_next_command()).opCode != END_CONSTRUCTOR);
+}
+
+
+//! \brief Execute a CONSTRUCT command.
+//! \param[in] cmd The command to be executed.
+void execute_construct(struct Command cmd) {
+
+    int constructor_id = (cmd.cmdWord & 0x1F00) >> 8;
+
+    // Space to temporarly save the read only structs.
+    struct Struct *temp[MAX_STRUCT_ARGS];
+
+    // Save read only structs and swap struct ids such that the first
+    // 5 elements of the structs array point to the arguments of the
+    // constructor.
+    for (int struct_arg_id = 0;
+             struct_arg_id < constructors[constructor_id].arg_count;
+             struct_arg_id++) {
+        int struct_id = get_nth_struct_arg(cmd, struct_arg_id);
+        if (param_read_only(constructor_id, struct_arg_id)) {
+            temp[struct_arg_id] = struct_create_copy(structs[struct_id]);
+        }
+        struct Struct *tmp     = structs[struct_id];
+        structs[struct_id]     = structs[struct_arg_id];
+        structs[struct_arg_id] = tmp;
+    }
+
+    // Save the return address.
+    stack_push(command_pointer);
+
+    print_commands = 1;
+    data_specification_executor(constructors[constructor_id].start_address, 0);
+
+    // Restore the return address.
+    command_pointer = stack_pop();
+
+    // Restore context.
+    for (int struct_arg_id = 0;
+             struct_arg_id < constructors[constructor_id].arg_count;
+             struct_arg_id++) {
+        int struct_id = get_nth_struct_arg(cmd, struct_arg_id);
+        if (param_read_only(constructor_id, struct_arg_id)) {
+            structs[struct_arg_id] = temp[struct_arg_id];
+        }
+        struct Struct *tmp     = structs[struct_id];
+        structs[struct_id]     = structs[struct_arg_id];
+        structs[struct_arg_id] = tmp;
+    }
+    print_commands = 0;
+}
+
+//! \brief Execute a READ command.
+//! \param[in] cmd The command to be executed.
+void execute_read(struct Command cmd) {
+
+    int dest_id = command_get_destReg(cmd.cmdWord);
+
+    int data_len = cmd.cmdWord & 0xF;
+
+    switch (data_len) {
+        case 1:
+            registers[dest_id]
+                  = *((uint8_t*)memory_regions[current_region]->write_pointer);
+    log_info("READ Register %d has now value %02x", dest_id, (uint32_t)registers[dest_id]);
+            break;
+        case 2:
+            registers[dest_id]
+                  = *((uint16_t*)memory_regions[current_region]->write_pointer);
+    log_info("READ Register %d has now value %04x", dest_id, (uint32_t)registers[dest_id]);
+            break;
+        case 4:
+            registers[dest_id]
+                  = *((uint32_t*)memory_regions[current_region]->write_pointer);
+    log_info("READ Register %d has now value %08x", dest_id, (uint32_t)registers[dest_id]);
+            break;
+        default:
+            log_info("READ unsupported size");
+            rt_error(RTE_ABORT);
+    }
+
+
+    memory_regions[current_region]->write_pointer += data_len;
+}
+
+//! \brief Execute a GET_WR_PTR command.
+//! \param[in] cmd The command to be executed.
+void execute_get_wr_ptr(struct Command cmd) {
+    int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
+    log_info("GET_WR_PTR %d", dest_reg);
+    registers[dest_reg]
+                     = (uint32_t)memory_regions[current_region]->write_pointer;
+    //print_commands = 1;
+}
+
+//! \brief Execute a SET_WR_PTR command.
+//! \param[in] cmd The command to be executed.
+void execute_set_wr_ptr(struct Command cmd) {
+    int32_t source;
+    if (command_src1_in_use(cmd.cmdWord)) {
+        source = registers[command_get_src1Reg(cmd.cmdWord)];
+        log_info("SET_WR_PTR %08x %d %d %08x", cmd.cmdWord, (cmd.cmdWord & 0x00000F00) >> 8, command_get_src1Reg(cmd.cmdWord), source);
+    } else
+        source = cmd.dataWords[0];
+
+    uint8_t relative_addressing = cmd.cmdWord & 0x01;
+
+    // If relative addressing is used
+    if (relative_addressing)
+        memory_regions[current_region]->write_pointer += source;
+    else
+        memory_regions[current_region]->write_pointer = (uint8_t*)source;
+    log_info("Wr ptr set to %08x", memory_regions[current_region]->write_pointer);
+}
+/*
+//! \brief Execute a GET_RD_PTR command.
+//! \param[in] cmd The command to be executed.
+void execute_get_rd_ptr(struct Command cmd) {
+    int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
+    registers[dest_reg]
+                     = (uint32_t)memory_regions[current_region]->read_pointer;
+}
+
+//! \brief Execute a SET_RD_PTR command.
+//! \param[in] cmd The command to be executed.
+void execute_set_rd_ptr(struct Command cmd) {
+    int32_t source;
+    if (command_src1_in_use(cmd.cmdWord))
+        source = registers[command_get_src1Reg(cmd.cmdWord)];
+    else
+        source = cmd.dataWords[0];
+
+    uint8_t relative_addressing = cmd.cmdWord & 0x01;
+
+    // If relative addressing is used
+    if (relative_addressing)
+        memory_regions[current_region]->read_pointer += source;
+    else
+        memory_regions[current_region]->read_pointer = (uint8_t*)source;
+}
+
+//! \brief Execute a RESET_RD_PTR command.
+//! \param[in] cmd The command to be executed.
+void execute_reset_rd_ptr(struct Command cmd) {
+    log_info("Resetting read pointer");
+    memory_regions[current_region]->read_pointer
+                                = memory_regions[current_region]->start_address;
+}
+*/
+//! \brief Execute a RESET_WR_PTR command.
+//! \param[in] cmd The command to be executed.
+void execute_reset_wr_ptr(struct Command cmd) {
+    memory_regions[current_region]->write_pointer
+                                = memory_regions[current_region]->start_address;
+}
+
+//! \brief Execute an IF command.
+//! \param[in] cmd The command to be executed.
+void execute_if(struct Command cmd) {
+    uint8_t operation = cmd.cmdWord & 0x0F;
+
+    //print_commands = 1;
+
+    uint8_t op_result;
+
+    int32_t source1 = registers[command_get_src1Reg(cmd.cmdWord)];
+    int32_t source2 = 0;
+
+    if (command_src2_in_use(cmd.cmdWord));
+        source2 = registers[command_get_src2Reg(cmd.cmdWord)];
+
+    switch (operation) {
+        case 0x00: op_result = source1 == source2; break;
+        case 0x01: op_result = source1 != source2; break;
+        case 0x02: op_result = source1 <= source2; break;
+        case 0x03: op_result = source1 <  source2; break;
+        case 0x04: op_result = source1 >= source2; break;
+        case 0x05: op_result = source1 >  source2; break;
+        case 0x06: op_result = source1 == 0;       break;
+        case 0x07: op_result = source1 != 0;       break;
+    }
+
+    log_info("COND %08x %d %08x = %d", source1, operation,
+             source2, op_result);
+
+    //print_commands = 1;
+
+    if (op_result == 0) {
+        // Skip all instructions up to ELSE or END_IF.
+        struct Command command = get_next_command();
+        while (command.opCode != ELSE && command.opCode != END_IF) {
+             command = get_next_command();
+        }
+    }
+}
+
+//! \brief Execute an ELSE command.
+//! \param[in] cmd The command to be executed.
+void execute_else(struct Command cmd) {
+    // Skip all instructions up to END_IF.
+    struct Command command;
+    while ((command = get_next_command()).opCode != END_IF);
+}
+
+//! \brief Execute a PRINT_VAL command.
+//! \param[in] cmd The command to be executed.
+void execute_print_val(struct Command cmd) {
+    if (command_src1_in_use(cmd.cmdWord)) {
+        uint64_t data = registers[command_get_src1Reg(cmd.cmdWord)];
+        log_info("Register %d has value %08x%08x",
+                 command_get_src1Reg(cmd.cmdWord),
+                 (uint32_t)((data % 0xFFFFFFFF00000000LL) >> 32),
+                 (uint32_t)(data & 0xFFFFFFFFF));
+    } else {
+        log_info("Value %08x", cmd.dataWords[0]);
+    }
+}
+
+//! \brief Execute a ARITH_OP command.
+//! \param[in] cmd The command to be executed.
+void execute_arith_op(struct Command cmd) {
+    log_info("ARITH_OP %08x", cmd.cmdWord);
+    uint8_t sgn = (cmd.cmdWord & (0x1 << 19)) >> 19;
+
+    uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
+
+    uint32_t source1;
+    if (command_src1_in_use(cmd.cmdWord))
+        source1 = registers[command_get_src1Reg(cmd.cmdWord)];
+    else
+        source1 = cmd.dataWords[0];
+
+    uint32_t source2;
+    if (command_src2_in_use(cmd.cmdWord))
+        source2 = registers[command_get_src2Reg(cmd.cmdWord)];
+    else {
+        if (!command_src1_in_use(cmd.cmdWord))
+            source2 = cmd.dataWords[1];
+        else
+            source2 = cmd.dataWords[0];
+    }
+
+    uint8_t operation = cmd.cmdWord & 0x0F;
+
+    uint64_t result = 0;
+    switch (operation) {
+        case 0x00: result = (sgn == 1 ? (int32_t)source1 + (int32_t)source2 :
+                              source1 + source2);
+                   break;
+        case 0x01: result = (sgn == 1 ? (int32_t)source1 - (int32_t)source2 :
+                              source1 - source2);
+                   break;
+        case 0x02: result = (sgn == 1 ? (int64_t)source1 * (int64_t)source2 :
+                              (uint64_t)source1 * (uint64_t)source2);
+                   break;
+        default:
+                   log_error("Unknown arithmetic operation");
+                   rt_error(RTE_ABORT);
+    }
+    registers[dest_reg] = result;
+    log_info("ARITH_OP %08x %d %08x = %08x%08x", source1, operation, source2, (uint32_t)((registers[dest_reg] & 0xFFFFFFFF00000000LL) >> 32), (uint32_t)(registers[dest_reg] & 0xFFFFFFFFF));
 }
 
 //! \brief Execute a part of a data specification.
@@ -59,26 +1000,29 @@ struct Command get_next_command() {
 //!        valid.
 //! \param[in] ds_start The start address of the data spec.
 //! \param[in] ds_size  The size of the data spec. Must be divisible by 4.
+//!                     If ds_size is 0, DSE will run until a stopping command
+//!                     is reached.
 void data_specification_executor(address_t ds_start, uint32_t ds_size) {
 
     // Pointer to the next command to be executed.
     command_pointer = ds_start;
 
     // Pointer to the end of the data spec memory region.
-    address_t ds_end = ds_start + ds_size / 4;
+    address_t ds_end = ds_start + (ds_size >> 2);
 
     struct Command cmd;
 
     // Dummy value of the opCode.
     cmd.opCode = 0x00;
 
-    while (command_pointer < ds_end && cmd.opCode != END_SPEC) {
+    while ((ds_size != 0 ? command_pointer < ds_end : 1) && cmd.opCode != END_SPEC) {
         cmd = get_next_command();
         switch (cmd.opCode) {
             case BREAK:
                 // This command stops the execution of the data spec and
                 // outputs an error in the log.
                 log_error("BREAK encountered");
+                rt_error(RTE_ABORT);
                 return;
             case NOP:
                 // This command executes no operation.
@@ -87,7 +1031,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_reserve(cmd);
                 break;
             case FREE:
-                log_error("Unimplemented DSE command FREE");
+                execute_free(cmd);
                 break;
             case DECLARE_RNG:
                 log_error("Unimplemented DSE command DECLARE_RNG");
@@ -99,13 +1043,11 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 log_error("Unimplemented DSE command GET_RANDOM_NUMBER");
                 break;
             case START_STRUCT:
-                log_error("Unimplemented DSE command START_STRUCT");
+                execute_start_struct(cmd);
                 break;
             case STRUCT_ELEM:
-                log_error("Unimplemented DSE command STRUCT_ELEM");
                 break;
             case END_STRUCT:
-                log_error("Unimplemented DSE command END_STRUCT");
                 break;
             case START_PACKSPEC:
                 log_error("Unimplemented DSE command START_PACKSPEC");
@@ -117,13 +1059,17 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 log_error("Unimplemented DSE command END_PACKSPEC");
                 break;
             case START_CONSTRUCTOR:
-                log_error("Unimplemented DSE command START_CONSTRUCTOR");
+                execute_start_constructor(cmd);
                 break;
             case END_CONSTRUCTOR:
-                log_error("Unimplemented DSE command END_CONSTRUCTOR");
-                break;
+                log_debug("Constructor ended");
+                //print_commands = 1;
+                return;
             case CONSTRUCT:
-                log_error("Unimplemented DSE command CONSTRUCT");
+                execute_construct(cmd);
+                break;
+            case READ:
+                execute_read(cmd);
                 break;
             case WRITE:
                 execute_write(cmd);
@@ -132,7 +1078,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_write_array(cmd);
                 break;
             case WRITE_STRUCT:
-                log_error("Unimplemented DSE command WRITE_STRUCT");
+                execute_write_struct(cmd);
                 break;
             case BLOCK_COPY:
                 log_error("Unimplemented DSE command BLOCK_COPY");
@@ -140,38 +1086,50 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case SWITCH_FOCUS:
                 execute_switch_focus(cmd);
                 break;
+            case LOOP:
+                execute_loop(cmd);
+                break;
             case BREAK_LOOP:
-                log_error("Unimplemented DSE command BREAK_LOOP");
-                break;
+                return;
             case END_LOOP:
-                log_error("Unimplemented DSE command END_LOOP");
-                break;
+                return;
             case IF:
-                log_error("Unimplemented DSE command IF");
+                execute_if(cmd);
                 break;
             case ELSE:
-                log_error("Unimplemented DSE command ELSE");
+                execute_else(cmd);
                 break;
             case END_IF:
-                log_error("Unimplemented DSE command END_IF");
                 break;
             case MV:
-                log_error("Unimplemented DSE command MV");
+                execute_mv(cmd);
                 break;
             case GET_WR_PTR:
-                log_error("Unimplemented DSE command GET_WR_PTR");
+                execute_get_wr_ptr(cmd);
                 break;
             case SET_WR_PTR:
-                log_error("Unimplemented DSE command SET_WR_PTR");
+                execute_set_wr_ptr(cmd);
                 break;
             case ALIGN_WR_PTR:
                 log_error("Unimplemented DSE command ALIGN_WR_PTR");
                 break;
+            case RESET_WR_PTR:
+                execute_reset_wr_ptr(cmd);
+                break;
+//            case GET_RD_PTR:
+//                execute_get_rd_ptr(cmd);
+//                break;
+//            case SET_RD_PTR:
+//                execute_set_rd_ptr(cmd);
+//                break;
+//            case RESET_RD_PTR:
+//                execute_reset_rd_ptr(cmd);
+//                break;
             case ARITH_OP:
-                log_error("Unimplemented DSE command ARITH_OP");
+                execute_arith_op(cmd);
                 break;
             case LOGIC_OP:
-                log_error("Unimplemented DSE command LOGIC_OP");
+                execute_logic_op(cmd);
                 break;
             case REFORMAT:
                 log_error("Unimplemented DSE command REFORMAT");
@@ -180,22 +1138,25 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 log_error("Unimplemented DSE command COPY_STRUCT");
                 break;
             case COPY_PARAM:
-                log_error("Unimplemented DSE command COPY_PARAM");
+                execute_copy_param(cmd);
                 break;
             case WRITE_PARAM:
-                log_error("Unimplemented DSE command WRITE_PARAM");
+                execute_write_param(cmd);
+                break;
+            case READ_PARAM:
+                execute_read_param(cmd);
                 break;
             case WRITE_PARAM_COMPONENT:
                 log_error("Unimplemented DSE command WRITE_PARAM_COMPONENT");
                 break;
             case PRINT_VAL:
-                log_error("Unimplemented DSE command PRINT_VAL");
+                execute_print_val(cmd);
                 break;
             case PRINT_TXT:
-                log_error("Unimplemented DSE command PRINT_TXT");
+                execute_print_text(cmd);
                 break;
             case PRINT_STRUCT:
-                log_error("Unimplemented DSE command PRINT_STRUCT");
+                execute_print_struct(cmd);
                 break;
             case END_SPEC:
                 log_info("End of spec has been reached");
@@ -203,168 +1164,8 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 break;
             default:
                 log_error("Not a DSE command: %x", cmd.opCode);
+                rt_error(RTE_ABORT);
         }
     }
 }
-
-//! \brief Set the header's start address.
-void set_header_start_address() {
-    vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
-    sark_virtual_processor_info[spin1_get_core_id()].user0 = HEADER_START_ADDRESS;
-}
-
-//! \brief Set the current core's state.
-void set_core_state(enum Core_states core_state) {
-    ((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user1 = core_state;
-}
-
-//! \brief Get the current core's state.
-//!
-//! \return The state of the current core (the value of user1).
-int get_core_state() {
-    return ((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user1;
-}
-
-//! \brief Set the value of user2 register.
-//!
-//! \param[in] value The new value of user2.
-int set_user2_value(uint32_t value) {
-    ((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user2 = value;
-}
-
-//! \brief Pointer to a memory region that contains the currently executing
-//!        data spec.
-address_t execRegion = NULL;
-
-//! \brief The size of the execRegion memory block.
-int currentBlock_size = 0;
-
-//! \brief Callback for sdp packets.
-//! 
-//! The data spec is passed to the DSE in atomic chunks (the smallest chunks
-//! that can be executed on their own).
-//! By default, the DSE is in a READY_TO_RECEIVE state.
-//! In order to send a packet to be executed, the specification sender must
-//! send a sdp packet that contains the length of the next chunk. Then, the
-//! DSE allocates memory for that chunk, puts memory address in user2 and goes
-//! in the WAITING_FOR_DATA state. The sender must then read user2, put data in
-//! the indicated address and send a trigger packet (any sdp packet), which
-//! will trigger the execution of the chunk.
-//!
-//! \param[in] mailbox The mailbox where the packet is received.
-//! \param[in] mailbox The packet's port.
-void sdp_packet_callback(uint mailbox, uint port) {
-
-    // Go in a busy state while executing.
-    set_core_state(CORE_BUSY);
-
-    sdp_msg_t *msg = (sdp_msg_t *)mailbox;
-
-    if (execRegion == NULL) {
-        // Allocate memory of a data spec chunk and go in the WAITING_FOR_DATA
-        // state.
-        currentBlock_size = ((int*)&(msg->cmd_rc))[0];
-
-        execRegion = sark_alloc(1, currentBlock_size);
-        set_user2_value((uint32_t)execRegion);
-
-        if (execRegion == NULL) {
-            log_error("Could not allocate memory for the execution of an "
-                      "instruction block of %d words.", currentBlock_size);
-            spin1_exit(-1);
-        }
-
-        // free the message to stop overload
-        spin1_msg_free(msg);
-
-        set_core_state(WAITING_FOR_DATA);
-    } else {
-        // Execute the data spec, free memory and go in the READY_TO_RECEIVE
-        // state.
-        data_specification_executor(execRegion, currentBlock_size);
-
-        sark_free(execRegion);
-        execRegion = NULL;
-        currentBlock_size = 0;
-
-        // free the message to stop overload
-        spin1_msg_free(msg);
-
-        set_core_state(READY_TO_RECEIVE);
-    }
-}
-
-//! \brief Allocate memory for the header and the pointer table.
-void pointer_table_header_alloc() {
-    void *header_start = sark_xalloc(((sv_t*)SV_SV)->sdram_heap,
-                                     HEADER_SIZE + POINTER_TABLE_SIZE,
-                                     0x00,                // tag
-                                     0x01);               // flag
-    if (header_start == NULL) {
-        log_error("Could not allocate memory for the header and pointer table");
-        spin1_exit(-1);
-    }
-
-    ((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user0 = (uint)header_start;
-}
-
-//! \brief Write the DSE headers in the memory region specified by user0.
-void write_header() {
-    // Pointer to write the headers.
-    address_t header_writer =
-                     (address_t)((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user0;
-
-    log_info("Header address %x", header_writer);
-
-    // Write the headers.
-    *header_writer       = APPDATA_MAGIC_NUM;
-    *(header_writer + 1) = DSE_VERSION;
-}
-
-//! \brief Write the pointer table in the memory region specified by user0.
-//! Must be called after the DSE has finished its execution so that the memory
-//! regions are allocated.
-void write_pointer_table() {
-
-    // Pointer to write the pointer table.
-    address_t pt_writer =
-       (address_t)(((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user0) + HEADER_SIZE;
-
-    // Iterate over the memory regions and write their start address in the
-    // memory location pointed at by the pt_writer.
-    // If a memory region has not been defined, 0 is written.
-    for (int i = 0; i < MAX_MEM_REGIONS; i++, pt_writer++) {
-        if (memory_regions[i] != NULL) {
-            *pt_writer = (uint32_t)memory_regions[i]->startAddress;
-
-            log_info("Region %d address %x %s", i, 
-                     (uint32_t)memory_regions[i]->startAddress,
-                     memory_regions[i]->unfilled ? "unfilled" : "");
-        } else {
-            *pt_writer = 0;
-        }
-    }
-}
-
-//! \brief Free all the allocated structures in the memory_regions array, used
-//!        to store information about the allocated memory regions.
-void free_mem_region_info() {
-    for (int index = 0; index < MAX_MEM_REGIONS; index++)
-        if (memory_regions[index] != NULL)
-            sark_free(memory_regions[index]);
-}
-
-void c_main(void) {
-    pointer_table_header_alloc();
-
-    spin1_callback_on(SDP_PACKET_RX, sdp_packet_callback, 1);
-    set_core_state(READY_TO_RECEIVE);
-    spin1_start(FALSE);
-
-    write_header();
-    write_pointer_table();
-
-    free_mem_region_info();
-}
-
 

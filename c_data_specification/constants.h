@@ -33,6 +33,12 @@
 #define STACK_START_ADDRESS            POINTER_TABLE_START_ADDRESS + POINTER_TABLE_SIZE
 
 
+#define MAX_STRUCTS 32
+#define MAX_CONSTRUCTORS 15
+#define MAX_STRUCT_ARGS 5
+
+#define PRINT_TEXT_MAX_CHARACTERS 11
+
 // The states of a core.
 //   READY_TO_RECEIVE - The core can receive new information about a data
 //                      block.

@@ -161,6 +161,9 @@ class DataSpecificationExecutorFunctions:
     def execute_construct(self, cmd):
         raise exceptions.UnimplementedDSECommand("CONSTRUCT")
 
+    def execute_read(self, cmd):
+        raise exceptions.UnimplementedDSECommand("READ")
+
     def execute_write(self, cmd):
         """
         This command writes the given value in the specified region a number\
@@ -334,6 +337,9 @@ class DataSpecificationExecutorFunctions:
         #update write pointer
         self.wr_ptr[self.current_region] = address
 
+    def execute_reset_wr_ptr(self, cmd):
+        raise exceptions.UnimplementedDSECommand("RESET_RW_PTR")
+
     def execute_align_wr_ptr(self, cmd):
         raise exceptions.UnimplementedDSECommand("ALIGN_WR_PTR")
 
@@ -366,6 +372,9 @@ class DataSpecificationExecutorFunctions:
 
     def execute_print_struct(self, cmd):
         raise exceptions.UnimplementedDSECommand("PRINT_STRUCT")
+
+    def execute_read_param(self, cmd):
+        raise exceptions.UnimplementedDSECommand("READ_PARAM")
 
     def execute_end_spec(self, cmd):
         """Returns the value which terminates the data spec executor

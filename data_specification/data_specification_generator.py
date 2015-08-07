@@ -66,7 +66,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        cmd_word = (constants.LEN1 << 28) | (Commands.DSG_BREAK.value << 20)
+        cmd_word = (constants.LEN1 << 28) | (Commands.BREAK.value << 20)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "BREAK"

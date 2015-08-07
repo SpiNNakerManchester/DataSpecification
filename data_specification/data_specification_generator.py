@@ -2226,8 +2226,9 @@ class DataSpecificationGenerator(object):
 
     def copy_structure_parameter(self, source_structure_id,
                                  source_parameter_index,
-                                 destination_structure_id,
-                                 destination_parameter_index):
+                                 destination_id,
+                                 destination_parameter_index = None,
+                                 destination_is_register = False):
         """ Insert command to copy the value of a parameter from one structure
         to another
         
@@ -2237,13 +2238,16 @@ class DataSpecificationGenerator(object):
         :param source_parameter_index: The index of the parameter in the source\
             structure
         :type source_parameter_index: int
-        :param destination_structure_id: The id of the destination structure,
-            between 0 and 15
-        :type destination_structure_id: int
+        :param destination_id: The id of the destination structure, or the
+            id of the destination register, between 0 and 15
+        :type destination_id: int
         :param destination_parameter_index: The index of the parameter in the\
-            destination structure
+            destination structure. Ignored when writing to a register.
         :type destination_parameter_index: int
         :return: Nothing is returned
+        :param destination_is_register: Indicates whether the destination is
+                                        a structure or a register.
+        :type destination_is_register: boolean
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
@@ -2252,14 +2256,14 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
             * If source_structure_id is not a valid structure id
-            * If destination_structure_id is not a valid structure id
+            * If destination_id is not a valid structure id
             * If source_parameter_index is not a valid parameter index\
               in the source structure
             * If destination_parameter_index is not a valid parameter\
               index in the destination structure
         :raise data_specification.exceptions.\
             DataSpecificationNotAllocatedException:\
-            * If no structure with id destination_structure_id has been\
+            * If no structure with id destination_id has been\
               allocated
             * If no structure with id source_structure_id has been
               allocated
@@ -2276,33 +2280,54 @@ class DataSpecificationGenerator(object):
                 "source_parameter_index", source_parameter_index, 0,
                 constants.MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
 
-        if destination_structure_id < 0 \
-                or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "destination_structure_id", destination_structure_id, 0,
-                constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
+        if not destination_is_register:
+            if destination_parameter_index < 0 \
+                    or destination_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "destination_parameter_index", destination_parameter_index,
+                    0, constants.MAX_STRUCT_ELEMENTS - 1,
+                    Commands.COPY_PARAM.name)
 
-        if destination_parameter_index < 0 \
-                or destination_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "destination_parameter_index", destination_parameter_index,
-                0, constants.MAX_STRUCT_ELEMENTS - 1,
-                Commands.COPY_PARAM.name)
+            if destination_id < 0 \
+                    or destination_id >= constants.MAX_STRUCT_SLOTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "destination_structure_id", destination_id, 0,
+                    constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
 
-        cmd_word_1 = ((constants.LEN2 << 28) |
-                      (Commands.WRITE_PARAM.value << 20) |
-                      (destination_structure_id << 12) |
-                      (source_structure_id << 8))
-        cmd_word_2 = (destination_parameter_index << 8) | source_parameter_index
+            cmd_word_1 = ((constants.LEN2 << 28) |
+                          (Commands.COPY_PARAM.value << 20) |
+                          (constants.NO_REGS << 16) |
+                          (destination_id << 12) |
+                          (source_structure_id << 8))
+            cmd_word_2 = (destination_parameter_index << 8) | source_parameter_index
+
+            cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
+                         "source_parameter_id = {1:d}, destination_structure_id " \
+                         "= {2:d}, destination_parameter_id = {3:d}".format(
+                             source_structure_id, source_parameter_index,
+                             destination_id, destination_parameter_index)
+        else:
+
+            if destination_id < 0 \
+                    or destination_id >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "destination_register_id", destination_id, 0,
+                    constants.MAX_REGISTERS - 1, Commands.COPY_PARAM.name)
+
+            cmd_word_1 = ((constants.LEN2 << 28) |
+                          (Commands.COPY_PARAM.value << 20) |
+                          (constants.DEST_ONLY << 16) |
+                          (destination_id << 12) |
+                          (source_structure_id << 8))
+            cmd_word_2 =  source_parameter_index
+
+            cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
+                         "source_parameter_id = {1:d}, destination_register_id " \
+                         "= {2:d}".format(source_structure_id,
+                                       source_parameter_index, destination_id)
 
         cmd_word_1_encoded = bytearray(struct.pack("<I", cmd_word_1))
         cmd_word_2_encoded = bytearray(struct.pack("<I", cmd_word_2))
-
-        cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
-                     "source_parameter_id = {1:d}, destination_structure_id " \
-                     "= {2:d}, destination_parameter_id = {3:d}".format(
-                         source_structure_id, source_parameter_index,
-                         destination_structure_id, destination_parameter_index)
 
         cmd_word_list = cmd_word_1_encoded + cmd_word_2_encoded
 

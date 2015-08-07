@@ -657,14 +657,13 @@ class DataSpecificationGenerator(object):
             if data_type.size <= 4:
                 cmd_word = ((constants.LEN2 << 28) |
                             (Commands.WRITE_PARAM.value << 20) |
-                            (constants.SRC1_ONLY << 16) |
+                            (constants.NO_REGS << 16) |
                             (structure_id << 12) |
-                            (value << 8) |
                             parameter_index)
             elif data_type.size == 8:
-                cmd_word = ((constants.LEN2 << 28) |
+                cmd_word = ((constants.LEN3 << 28) |
                             (Commands.WRITE_PARAM.value << 20) |
-                            (constants.SRC1_ONLY << 16) |
+                            (constants.NO_REGS << 16) |
                             (structure_id << 12) |
                             (value << 8) |
                             parameter_index)

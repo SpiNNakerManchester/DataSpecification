@@ -428,12 +428,10 @@ class DataSpecificationGenerator(object):
                 if data_type.size <= 4:
                     cmd_word = ((constants.LEN2 << 28) |
                                 (Commands.STRUCT_ELEM.value << 20) |
-                                (elem_index << 8) |
                                 data_type.value)
                 elif data_type.size == 8:
                     cmd_word = ((constants.LEN3 << 28) |
                                 (Commands.STRUCT_ELEM.value << 20) |
-                                (elem_index << 8) |
                                 data_type.value)
                 else:
                     raise exceptions.DataSpecificationInvalidSizeException(
@@ -441,8 +439,11 @@ class DataSpecificationGenerator(object):
                         Commands.STRUCT_ELEM.name)
 
                 cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
-                encoding_string = "<{0:s}".format(data_type.struct_encoding)
-                value_encoded = bytearray(struct.pack(encoding_string, value))
+
+                data_format = "<{}".format(data_type.struct_encoding)
+                text_value = "{}".format(value)
+                data_value = decimal.Decimal(text_value) * data_type.scale
+                value_encoded = bytearray(struct.pack(data_format, data_value))
 
                 if data_type.size == 1:
                     padding = bytearray(3)
@@ -458,8 +459,10 @@ class DataSpecificationGenerator(object):
                                  "{1:s}, value = {2:d}".format(
                                      elem_index, data_type.name, value)
                 else:
+                    print "{2:" + data_type.struct_encoding + "}"
                     cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
-                                 "{1:s}, value = {2:d}, label = {3:s}".format(
+                                 "{1:s}, value = {2:f}, label = {3:s}"
+                    cmd_string = cmd_string.format(
                                      elem_index, data_type.name, value, label)
 
                 self.write_command_to_files(cmd_word_list, cmd_string)
@@ -470,7 +473,6 @@ class DataSpecificationGenerator(object):
 
                 cmd_word = ((constants.LEN1 << 28) |
                             (Commands.STRUCT_ELEM.value << 20) |
-                            (elem_index << 8) |
                             data_type.value)
 
                 cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))

@@ -1532,7 +1532,7 @@ class DataSpecificationGenerator(object):
 
         elif value_is_register:
             bit_field = 0x3
-            cmd_word = ((constants.LEN2 << 28) |
+            cmd_word = ((constants.LEN1 << 28) |
                         (Commands.IF.value << 20) |
                         (bit_field << 16) |
                         (register_id << 8) |
@@ -1739,11 +1739,10 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "address", address, 0, constants.MAX_REGISTERS - 1,
                     Commands.SET_WR_PTR.name)
-            bit_field = 0x2
             cmd_word = ((constants.LEN1 << 28) |
                         (Commands.SET_WR_PTR.value << 20) |
-                        (bit_field << 16) |
-                        (address << 12) |
+                        (constants.SRC1_ONLY << 16) |
+                        (address << 8) |
                         relative)
             cmd_string = "SET_WR_PTR reg[{0:d}] {1:s}".format(
                 address, relative_string)
@@ -1765,10 +1764,9 @@ class DataSpecificationGenerator(object):
                 else:
                     data_encoded = bytearray(struct.pack("<i", address))
 
-            bit_field = 0x0
             cmd_word = ((constants.LEN2 << 28) |
                         (Commands.SET_WR_PTR.value << 20) |
-                        (bit_field << 16) |
+                        (constants.NO_REGS << 16) |
                         relative)
             cmd_string = "SET_WR_PTR {0:d} {1:s}".format(
                 address, relative_string)

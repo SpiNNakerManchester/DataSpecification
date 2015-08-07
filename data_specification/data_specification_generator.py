@@ -773,7 +773,7 @@ class DataSpecificationGenerator(object):
 
             self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def start_function(self, argument_by_value):
+    def start_function(self, argument_by_value, function_id=None):
         """ Insert command to start a function definition, with up to 5\
         arguments, which are the ids of structures to be used within the\
         function, each of which can be passed by reference or by value.\
@@ -808,7 +808,8 @@ class DataSpecificationGenerator(object):
                 "number of arguments", len(argument_by_value), 0, 5,
                 Commands.START_CONSTRUCTOR.name)
 
-        function_id = self.allocate_function()
+        if function_id is None:
+            function_id = self.allocate_function()
 
         cmd_string = "START_CONSTRUCTOR id={0:d} number_of_args={1:d}".format(
             function_id, len(argument_by_value))
@@ -892,8 +893,8 @@ class DataSpecificationGenerator(object):
 
         if len(structure_ids) > 5:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "number of structures", len(structure_ids), 0, 5,
-                Commands.CONSTRUCT.name)
+                 "number of structures", len(structure_ids), 0, 5,
+                 Commands.CONSTRUCT.name)
 
         cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
 

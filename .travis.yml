@@ -9,4 +9,4 @@ virtualenv:
 
 before_script:
   - python ./setup.py install
-script: "py.test ."
+script: "cd unittests && py.test . && cd ../integration_tests && py.test ."

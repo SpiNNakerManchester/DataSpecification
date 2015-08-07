@@ -500,6 +500,82 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
+    def get_structure_value(self, destination_id, structure_id,
+                            parameter_index, parameter_index_is_register=False):
+        """
+        Insert command to get a value from a structure.
+        The value is copied in a register.
+
+        :param destination_id: The id of the destination register
+        :type destination_id: int
+        :param structure_id: The id of the source structure
+        :type structure_id: int
+        :param parameter_index: The id of the parameter/element to copy
+        :type parameter_index: int
+        :return: Nothing is returned
+        :rtype: None
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If structure_id is not in the allowed range
+            * If parameter_index is larger than the number of parameters\
+              declared in the original structure
+            * If destination_id is not the id of a valid register
+            * If parameter_index_is_register is True and parameter_index is\
+              not a valid register id
+        :raise data_specification.exceptions.\
+            DataSpecificationNotAllocatedException: If the structure requested \
+            has not been declared
+        """
+        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "structure_id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
+                Commands.READ_PARAM.name)
+
+        if destination_id < 0 or destination_id >= constants.MAX_REGISTERS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "destination_id", destination_id, 0, constants.MAX_REGISTERS - 1,
+                Commands.READ_PARAM.name)
+
+        if (parameter_index_is_register == True):
+            if parameter_index < 0 or parameter_index >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                         "parameter_index", parameter_index, 0,
+                         constants.MAX_REGISTERS - 1, Commands.READ_PARAM.name)
+            cmd_word = (constants.LEN1 << 28)            |  \
+                       (Commands.READ_PARAM.value << 20) |  \
+                       (constants.DEST_AND_SRC1 << 16)   |  \
+                       (destination_id << 12)            |  \
+                       (parameter_index << 8)            |  \
+                       structure_id
+            cmd_string = "READ_PARAM structure_id={0:d}, "  \
+                         "element_id_from_register={1:d}, " \
+                         "destination_register={2:d}".format(structure_id,
+                                               parameter_index, destination_id)
+        else:
+            if (parameter_index < 0
+                    or parameter_index >= constants.MAX_STRUCT_ELEMENTS):
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "parameter_index", parameter_index, 0,
+                    constants.MAX_STRUCT_ELEMENTS - 1, Commands.READ_PARAM.name)
+
+            cmd_word = (constants.LEN1 << 28)            | \
+                       (Commands.READ_PARAM.value << 20) | \
+                       (constants.DEST_ONLY << 16)       | \
+                       (destination_id << 12)            | \
+                       (parameter_index << 4)            | \
+                       structure_id
+            cmd_string = "READ_PARAM structure_id={0:d}, element_id={1:d}, " \
+                         "destination_register={2:d}".format(structure_id,
+                                                parameter_index, destination_id)
+
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        self.write_command_to_files(encoded_cmd_word, cmd_string)
+
+
     def set_structure_value(self, structure_id, parameter_index, value,
                             data_type, value_is_register=False):
         """ Insert command to set a value in a structure

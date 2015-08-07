@@ -183,7 +183,24 @@ class DataSpecificationGenerator(object):
             DataSpecificationParameterOutOfBoundsException: If the region \
             requested was out of the allowed range
         """
-        raise exceptions.UnimplementedDSGCommand("free_memory_region")
+        if (region < 0) or (region >= constants.MAX_MEM_REGIONS):
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "memory region identifier", region, 0,
+                (constants.MAX_MEM_REGIONS - 1), Commands.RESERVE.name)
+        if self.mem_slot[region] == 0:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                                          "region", region, Commands.FREE.name)
+
+        self.mem_slot[region] = 0
+
+        cmd_word   = (constants.LEN1 << 28)      | \
+                     (Commands.FREE.value << 20) | \
+                     (constants.NO_REGS << 16)   | \
+                     region
+        cmd_string = "FREE memRegion={0:d}".format(region)
+
+        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        self.write_command_to_files(encoded_cmd_word, cmd_string)
 
     def declare_random_number_generator(self, rng_type, seed):
         """ Insert command to declare a random number generator

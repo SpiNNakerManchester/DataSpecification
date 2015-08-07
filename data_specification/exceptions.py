@@ -337,7 +337,7 @@ class DataSpecificationInvalidOperationException(DataSpecificationException):
         :type command: str
         """
         print "The {0:s} operation requested with id {1:d} does not match " \
-              "the possible operations available during command {3:s}".format(
+              "the possible operations available during command {2:s}".format(
                   operation_type, requested_operation_id, command)
 
 

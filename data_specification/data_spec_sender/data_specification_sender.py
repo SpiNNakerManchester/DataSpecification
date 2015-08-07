@@ -3,7 +3,8 @@ import struct
 from data_specification_sender_functions \
         import DataSpecificationSenderFunctions as Dssf
 import constants
-import commands
+from commands import Commands
+from command import Command
 
 class DataSpecificationSender(object):
     """ Used to send a data specification language file to SpiNNaker to produce\
@@ -33,12 +34,9 @@ class DataSpecificationSender(object):
         instruction_spec = self.spec_reader.read(4)
         while len(instruction_spec) != 0:
             # process the received command
-            cmd = struct.unpack("<I", str(instruction_spec))[0]
+            cmd = Command(struct.unpack("<I", str(instruction_spec))[0])
 
-            opcode = (cmd >> 20) & 0xFF
-
-            return_value = commands.Commands(opcode).send_function(self.dssf, \
-                                                                   cmd)
+            return_value = Commands(cmd.get_opcode()).send_function(self.dssf, cmd)
             self.spec_sender.send()
 
             if return_value == constants.END_SPEC_SENDER:

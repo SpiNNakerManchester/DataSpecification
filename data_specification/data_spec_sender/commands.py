@@ -34,3 +34,4 @@ class Commands(Enum):
         self._value_ = value
         self.send_function = send_function
         self.__doc__ = doc
+

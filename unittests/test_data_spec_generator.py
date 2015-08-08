@@ -60,6 +60,56 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.spec_writer.read(1)
         self.assertEqual(command, "", "NOP added more words")
 
+    def test_reserve_memory_region(self):
+        self.dsg.reserve_memory_region(1, 0x111)
+        self.dsg.reserve_memory_region(2, 0x1122)
+        self.dsg.reserve_memory_region(3, 0x1122, empty=True)
+        self.dsg.reserve_memory_region(4, 0x3344, label='test')
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.reserve_memory_region, -1, 0x100)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.reserve_memory_region, constants.MAX_MEM_REGIONS, 0x100)
+        self.assertRaises(
+            exceptions.DataSpecificationRegionInUseException,
+            self.dsg.reserve_memory_region, 1, 0x100)
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x10200001,
+                         "RESERVE command word wrong for memory region 1")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x111,
+                         "RESERVE size word wrong for memory region 1")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x10200002,
+                         "RESERVE command word wrong for memory region 2")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x1122,
+                         "RESERVE size word wrong for memory region 2")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x10200083,
+                         "RESERVE command word wrong for memory region 3")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x1122,
+                         "RESERVE size word wrong for memory region 3")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x10200004,
+                         "RESERVE command word wrong for memory region 4")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x3344,
+                         "RESERVE size word wrong for memory region 4")
+
+        self.assertEqual(self.dsg.mem_slot[1], [0x111, None, False],
+                         "Memory region 0 DSG data wrong")
+        self.assertEqual(self.dsg.mem_slot[2], [0x1122, None, False],
+                         "Memory region 1 DSG data wrong")
+        self.assertEqual(self.dsg.mem_slot[3], [0x1122, None, True],
+                         "Memory region 2 DSG data wrong")
+        self.assertEqual(self.dsg.mem_slot[4], [0x3344, "test", False],
+                         "Memory region 3 DSG data wrong")
+
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_align_write_pointer(self):
@@ -123,9 +173,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_print_value(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_reserve_memory_region(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_save_write_pointer(self):

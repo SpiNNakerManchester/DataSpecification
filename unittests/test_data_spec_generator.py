@@ -134,6 +134,56 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.dsg.mem_slot[1], 0,
                          "FREE not cleared mem slot entry")
 
+    def test_define_structure(self):
+        self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
+        self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
+                                      ("second", DataType.UINT32, 0x12345679),
+                                      ("third", DataType.INT16, None)])
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.define_structure, -1, [("first", DataType.UINT8, 0xAB)])
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.define_structure, constants.MAX_STRUCT_SLOTS,
+            [("first", DataType.UINT8, 0xAB)])
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.define_structure, 1, [])
+        self.assertRaises(exceptions.DataSpecificationStructureInUseException,
+            self.dsg.define_structure, 0, [("first", DataType.UINT8, 0xAB)])
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01000000, "START_STRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x11100000, "STRUCT_ELEM command word wrong")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x000000AB, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01200000, "END_STRUCT command word wrong")
+
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01000001, "START_STRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x11100000, "STRUCT_ELEM command word wrong")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x000000AB, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x11100002, "STRUCT_ELEM command word wrong")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x12345679, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01100005, "STRUCT_ELEM command word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01200000, "END_STRUCT command word wrong")
+
+
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_align_write_pointer(self):
@@ -167,9 +217,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_declare_uniform_random_distribution(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_define_structure(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_else_conditional(self):

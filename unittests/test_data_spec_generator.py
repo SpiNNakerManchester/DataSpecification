@@ -42,6 +42,15 @@ class TestDataSpecGeneration(unittest.TestCase):
                          "DSG constructor slots not initialized correctly")
 
     def test_define_break(self):
+        self.dsg.define_break()
+
+        command = self.get_next_word()
+
+        self.assertEqual(command, 0x00000000, "BREAK command word wrong")
+
+        command = self.spec_writer.read(1)
+        self.assertEqual(command, "", "BREAK added more words")
+
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_align_write_pointer(self):

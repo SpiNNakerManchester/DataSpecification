@@ -30,7 +30,16 @@ class TestDataSpecGeneration(unittest.TestCase):
         return struct.unpack("<I", self.spec_writer.read(4))[0]
 
     def test_new_data_spec_generator(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.assertEqual(self.dsg.spec_writer, self.spec_writer,
+                         "DSG spec writer not initialized correctly")
+        self.assertEqual(self.dsg.report_writer, self.report_writer,
+                         "DSG report writer not initialized correctly")
+        self.assertEqual(self.dsg.instruction_counter, 0,
+                         "DSG instruction counter not initialized correctly")
+        self.assertEqual(self.dsg.mem_slot, constants.MAX_MEM_REGIONS * [0],
+                         "DSG memory slots not initialized correctly")
+        self.assertEqual(self.dsg.function, constants.MAX_CONSTRUCTORS * [0],
+                         "DSG constructor slots not initialized correctly")
 
     def test_define_break(self):
         self.assertEqual(True, False, "Not implemented yet")

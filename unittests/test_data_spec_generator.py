@@ -1,7 +1,34 @@
 import unittest
+import struct
+from io import BytesIO
+from StringIO import StringIO
+
+from data_specification import constants, exceptions
+from data_specification.enums.data_type import DataType
+from data_specification.data_specification_generator \
+                                              import DataSpecificationGenerator
 
 
 class TestDataSpecGeneration(unittest.TestCase):
+
+    def setUp(self):
+        # Indicate if there has been a previous read
+        self.previous_read = False
+
+        self.spec_writer = BytesIO()
+        self.report_writer = StringIO()
+        self.dsg = DataSpecificationGenerator(self.spec_writer,
+                                              self.report_writer)
+
+    def tearDown(self):
+        pass
+
+    def get_next_word(self):
+        if not self.previous_read:
+            self.spec_writer.seek(0)
+            self.previous_read = True
+        return struct.unpack("<I", self.spec_writer.read(4))[0]
+
     def test_new_data_spec_generator(self):
         self.assertEqual(True, False, "Not implemented yet")
 
@@ -113,4 +140,4 @@ class TestDataSpecGeneration(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main(self)
+    unittest.main()

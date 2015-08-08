@@ -110,6 +110,30 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.dsg.mem_slot[4], [0x3344, "test", False],
                          "Memory region 3 DSG data wrong")
 
+    def test_free_memory_region(self):
+        self.dsg.reserve_memory_region(1, 0x111)
+        self.dsg.free_memory_region(1)
+
+        self.get_next_word()
+        self.get_next_word()
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00300001, "FREE command word wrong")
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.free_memory_region, -1)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.free_memory_region, constants.MAX_MEM_REGIONS)
+        self.assertRaises(
+            exceptions.DataSpecificationNotAllocatedException,
+            self.dsg.free_memory_region, 2)
+        self.assertRaises(
+            exceptions.DataSpecificationNotAllocatedException,
+            self.dsg.free_memory_region, 1)
+        self.assertEqual(self.dsg.mem_slot[1], 0,
+                         "FREE not cleared mem slot entry")
+
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_align_write_pointer(self):

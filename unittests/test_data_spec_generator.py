@@ -51,6 +51,15 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.spec_writer.read(1)
         self.assertEqual(command, "", "BREAK added more words")
 
+    def test_no_operation(self):
+        self.dsg.no_operation()
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00100000, "NOP command word wrong")
+
+        command = self.spec_writer.read(1)
+        self.assertEqual(command, "", "NOP added more words")
+
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_align_write_pointer(self):
@@ -105,9 +114,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_free_memory_region(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_no_operation(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_print_struct(self):

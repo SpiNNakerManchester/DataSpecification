@@ -234,9 +234,6 @@ class TestDataSpecGeneration(unittest.TestCase):
     def test_end_specification(self):
         self.assertEqual(True, False, "Not implemented yet")
 
-    def test_free_memory_region(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
     def test_print_struct(self):
         self.assertEqual(True, False, "Not implemented yet")
 

@@ -40,6 +40,7 @@ class DataSpecificationGenerator(object):
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
         self.function = [0] * constants.MAX_CONSTRUCTORS
         self.struct_slot = [0] * constants.MAX_STRUCT_SLOTS
+        self.current_region = None
         self.ongoing_function_definition = False
 
     def comment(self, comment):
@@ -1277,6 +1278,8 @@ class DataSpecificationGenerator(object):
         if self.mem_slot[region][2]:
             raise exceptions.DataSpecificationRegionUnfilledException(
                 region, Commands.SWITCH_FOCUS.name)
+
+        self.current_region = region
 
         reg_usage = 0x0
         parameters = region & 0xF

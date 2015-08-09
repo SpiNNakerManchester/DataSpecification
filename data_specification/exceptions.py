@@ -68,6 +68,20 @@ class DataSpecificationRegionInUseException(DataSpecificationException):
         print "Region {0:d} was already allocated".format(region)
 
 
+class DataSpecificationStructureInUseException(DataSpecificationException):
+    """ An exception that indicates that a structure has already been\
+        defined
+    """
+
+    def __init__(self, structure):
+        """
+
+        :param structure: The structure that was already allocated
+        :type structure: int
+        """
+        print "Structure {0:d} was already allocated".format(structure)
+
+
 class DataSpecificationRegionUnfilledException(DataSpecificationException):
     """ An exception that indicates that a memory region is being used\
         that was originally requested to be unfilled

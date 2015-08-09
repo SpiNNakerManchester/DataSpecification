@@ -39,6 +39,7 @@ class DataSpecificationGenerator(object):
         self.instruction_counter = 0
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
         self.function = [0] * constants.MAX_CONSTRUCTORS
+        self.struct_slot = [0] * constants.MAX_STRUCT_SLOTS
         self.ongoing_function_definition = False
 
     def comment(self, comment):
@@ -391,6 +392,12 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "structure id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.START_STRUCT.name)
+
+        if self.struct_slot[structure_id] != 0:
+            raise exceptions.DataSpecificationStructureInUseException(
+                                                                   structure_id)
+        self.struct_slot[structure_id] = parameters
+
         cmd_word = ((constants.LEN1 << 28) |
                     (Commands.START_STRUCT.value << 20) |
                     structure_id)

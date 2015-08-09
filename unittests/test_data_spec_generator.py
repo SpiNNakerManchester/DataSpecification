@@ -337,7 +337,72 @@ class TestDataSpecGeneration(unittest.TestCase):
 
 
     def test_align_write_pointer(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        # Test DataSpecificationNoRegionSelectedException raise
+        self.assertRaises(
+            exceptions.DataSpecificationNoRegionSelectedException,
+            self.dsg.align_write_pointer, 1)
+
+        # Define a memory region and switch focus to it
+        self.dsg.reserve_memory_region(1, 100)
+        self.dsg.switch_write_focus(1)
+
+        # Call align_write_pointer with different parameters
+        self.dsg.align_write_pointer(1, False, None)
+        self.dsg.align_write_pointer(31, False,  None)
+        self.dsg.align_write_pointer(5, True,  None)
+
+        self.dsg.align_write_pointer(1, False, 2)
+        self.dsg.align_write_pointer(5, True, 3)
+
+        # Test DataSpecificationOutOfBoundsException raise
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.align_write_pointer, -1)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.align_write_pointer, 33)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.align_write_pointer, -1, True)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.align_write_pointer, constants.MAX_REGISTERS, True)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.align_write_pointer, 1, False, -1)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.align_write_pointer, 1, False, constants.MAX_REGISTERS)
+
+        # Get rid of the 3 words used for setup (memory region allocation and
+        # context switch)
+        self.get_next_word()
+        self.get_next_word()
+        self.get_next_word()
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x06600001,
+                         "WRITE_POINTER wrong command word")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x0660001F,
+                         "WRITE_POINTER wrong command word")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x06620500,
+                         "WRITE_POINTER wrong command word")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x06642001,
+                         "WRITE_POINTER wrong command word")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x06663500,
+                         "WRITE_POINTER wrong command word")
+
+
 
     def test_break_loop(self):
         self.assertEqual(True, False, "Not implemented yet")

@@ -402,10 +402,20 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(command, 0x06663500,
                          "WRITE_POINTER wrong command word")
 
-
-
     def test_break_loop(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.break_loop)
+
+        self.dsg.start_loop(0, 0, 0, True, True, True)
+        self.dsg.break_loop()
+
+        self.get_next_word()
+        self.get_next_word()
+
+        command = self.get_next_word()
+
+        self.assertEqual(command, 0x05200000, "BREAK_LOOP wrong command word")
+
 
     def test_call_function(self):
         self.assertEqual(True, False, "Not implemented yet")

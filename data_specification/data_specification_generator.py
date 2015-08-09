@@ -42,6 +42,7 @@ class DataSpecificationGenerator(object):
         self.struct_slot = [0] * constants.MAX_STRUCT_SLOTS
         self.current_region = None
         self.ongoing_function_definition = False
+        self.ongoing_loop = False
 
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\
@@ -1423,6 +1424,8 @@ class DataSpecificationGenerator(object):
             encoded_values += encoded_increment
             cmd_string = "{0:s} increment={1:d},".format(cmd_string, increment)
 
+        self.ongoing_loop = True
+
         cmd_word |= (length << 28)
         cmd_word |= (bit_field << 16)
 
@@ -1443,6 +1446,10 @@ class DataSpecificationGenerator(object):
             DataSpecificationInvalidCommandException: If there is no loop in \
             operation at this point
         """
+
+        if self.ongoing_loop is not True:
+            raise exceptions.DataSpecificationInvalidCommandException(
+                                                                     "END_LOOP")
         cmd_word = (constants.LEN1 << 28) | (Commands.BREAK_LOOP.value << 20)
         cmd_string = "BREAK_LOOP"
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))

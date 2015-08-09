@@ -469,7 +469,6 @@ class DataSpecificationGenerator(object):
                                  "{1:s}, value = {2:d}".format(
                                      elem_index, data_type.name, value)
                 else:
-                    print "{2:" + data_type.struct_encoding + "}"
                     cmd_string = "STRUCT_ELEM element_id={0:d}, element_type=" \
                                  "{1:s}, value = {2:f}, label = {3:s}"
                     cmd_string = cmd_string.format(

@@ -2057,7 +2057,7 @@ class DataSpecificationGenerator(object):
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If operation is not a known \
+            DataSpecificationInvalidOperationException: If operation is not a known \
             operation
         """
         cmd_length = 0

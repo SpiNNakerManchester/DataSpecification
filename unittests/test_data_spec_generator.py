@@ -31,6 +31,12 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.previous_read = True
         return struct.unpack("<I", self.spec_writer.read(4))[0]
 
+    def skip_words(self, words):
+        if not self.previous_read:
+            self.spec_writer.seek(0)
+            self.previous_read = True
+        self.spec_writer.read(4 * words)
+
     def test_new_data_spec_generator(self):
         self.assertEqual(self.dsg.spec_writer, self.spec_writer,
                          "DSG spec writer not initialized correctly")
@@ -116,8 +122,8 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.reserve_memory_region(1, 0x111)
         self.dsg.free_memory_region(1)
 
-        self.get_next_word()
-        self.get_next_word()
+        self.skip_words(2)
+
         command = self.get_next_word()
         self.assertEqual(command, 0x00300001, "FREE command word wrong")
 
@@ -376,11 +382,7 @@ class TestDataSpecGeneration(unittest.TestCase):
             exceptions.DataSpecificationParameterOutOfBoundsException,
             self.dsg.align_write_pointer, 1, False, constants.MAX_REGISTERS)
 
-        # Get rid of the 3 words used for setup (memory region allocation and
-        # context switch)
-        self.get_next_word()
-        self.get_next_word()
-        self.get_next_word()
+        self.skip_words(3)
 
         command = self.get_next_word()
         self.assertEqual(command, 0x06600001,
@@ -409,8 +411,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.start_loop(0, 0, 0, True, True, True)
         self.dsg.break_loop()
 
-        self.get_next_word()
-        self.get_next_word()
+        self.skip_words(2)
 
         command = self.get_next_word()
 

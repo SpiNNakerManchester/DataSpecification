@@ -5,6 +5,8 @@ from StringIO import StringIO
 
 from data_specification import constants, exceptions
 from data_specification.enums.data_type import DataType
+from data_specification.enums.arithemetic_operation import ArithmeticOperation
+from data_specification.enums.logic_operation import LogicOperation
 from data_specification.data_specification_generator \
                                               import DataSpecificationGenerator
 
@@ -183,16 +185,161 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEqual(command, 0x01200000, "END_STRUCT command word wrong")
 
+    def test_call_arithmetic_operation(self):
+        # Call addition signed and unsigned
+        self.dsg.call_arithmetic_operation(2, 0x12, ArithmeticOperation.ADD,
+                                           0x34, False, False, False)
+        self.dsg.call_arithmetic_operation(2, 0x1234, ArithmeticOperation.ADD,
+                                           0x5678, True, False, False)
 
-        self.assertEqual(True, False, "Not implemented yet")
+        # Call subtraction signed and unsigned
+        self.dsg.call_arithmetic_operation(3, 0x1234,
+                                           ArithmeticOperation.SUBTRACT,
+                                           0x3456, False, False, False)
+        self.dsg.call_arithmetic_operation(3, 0x1234,
+                                           ArithmeticOperation.SUBTRACT,
+                                           0x3456, True, False, False)
+
+        # Call multiplication signed and unsigned
+        self.dsg.call_arithmetic_operation(3, 0x12345678,
+                                           ArithmeticOperation.MULTIPLY,
+                                           0x3456, False, False, False)
+        self.dsg.call_arithmetic_operation(3, 0x1234,
+                                           ArithmeticOperation.MULTIPLY,
+                                           0x3456ABCD, True, False, False)
+
+        # Call with register arguments
+        self.dsg.call_arithmetic_operation(3, 1, ArithmeticOperation.ADD,
+                                           0x3456, False, True, False)
+        self.dsg.call_arithmetic_operation(3, 1, ArithmeticOperation.ADD,
+                                           2, False, False, True)
+        self.dsg.call_arithmetic_operation(3, 3, ArithmeticOperation.ADD,
+                                           4, False, True, True)
+        self.dsg.call_arithmetic_operation(3, 3, ArithmeticOperation.MULTIPLY,
+                                           4, False, True, True)
+        self.dsg.call_arithmetic_operation(3, 3, ArithmeticOperation.MULTIPLY,
+                                           4, True, True, True)
+
+        # Call exception raise for register values out of bounds
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_arithmetic_operation, -1, 0x12,
+                ArithmeticOperation.ADD, 0x34, True, True, False)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_arithmetic_operation, constants.MAX_REGISTERS,
+                0x12, ArithmeticOperation.ADD, 0x34, True, True, False)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_arithmetic_operation, 1, -1,
+                ArithmeticOperation.ADD, 0x34, True, True, False)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_arithmetic_operation, 1, constants.MAX_REGISTERS,
+                ArithmeticOperation.ADD, 2, False, True, False)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_arithmetic_operation, 1, 5,
+                ArithmeticOperation.SUBTRACT, -1, False, False, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_arithmetic_operation, 1, 1,
+                ArithmeticOperation.SUBTRACT, constants.MAX_REGISTERS,
+                False, True, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_arithmetic_operation, 1, 0x1,
+                ArithmeticOperation.SUBTRACT, -1, False, False, True)
+
+        # Test unknown type exception raise
+        self.assertRaises(
+                exceptions.DataSpecificationInvalidOperationException,
+                self.dsg.call_arithmetic_operation, 1, 1, LogicOperation.OR,
+                2, 1, False)
+
+        # Test addition signed and unsigned
+        command = self.get_next_word()
+        self.assertEqual(command, 0x26742000, "ARITH_OP command word wrong")
+
+        data = self.get_next_word()
+        self.assertEqual(data, 0x12, "ARITH_OP data word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x34, "ARITH_OP data word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x267C2000, "ARITH_OP command word wrong")
+
+        data = self.get_next_word()
+        self.assertEqual(data, 0x1234, "ARITH_OP data word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x5678, "ARITH_OP data word wrong")
+
+        # Test subtraction signed and unsigned
+        command = self.get_next_word()
+        self.assertEqual(command, 0x26743001, "ARITH_OP command word wrong")
+
+        data = self.get_next_word()
+        self.assertEqual(data, 0x1234, "ARITH_OP data word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x3456, "ARITH_OP data word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x267C3001, "ARITH_OP command word wrong")
+
+        data = self.get_next_word()
+        self.assertEqual(data, 0x1234, "ARITH_OP data word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x3456, "ARITH_OP data word wrong")
+
+        # Test multiplication signed and unsigned
+        command = self.get_next_word()
+        self.assertEqual(command, 0x26743002, "ARITH_OP command word wrong")
+
+        data = self.get_next_word()
+        self.assertEqual(data, 0x12345678, "ARITH_OP data word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x3456, "ARITH_OP data word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x267C3002, "ARITH_OP command word wrong")
+
+        data = self.get_next_word()
+        self.assertEqual(data, 0x1234, "ARITH_OP data word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x3456ABCD, "ARITH_OP data word wrong")
+
+        # Test register arguments
+        command = self.get_next_word()
+        self.assertEqual(command, 0x16763100, "ARITH_OP command word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x3456, "ARITH_OP data word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x16753020, "ARITH_OP command word wrong")
+        data = self.get_next_word()
+        self.assertEqual(data, 0x1, "ARITH_OP data word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x06773340, "ARITH_OP command word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x06773342, "ARITH_OP command word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x067F3342, "ARITH_OP command word wrong")
+
+
 
     def test_align_write_pointer(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_break_loop(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_call_arithmetic_operation(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_call_function(self):

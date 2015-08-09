@@ -1837,6 +1837,10 @@ class DataSpecificationGenerator(object):
         block_size_reg = 0
         cmd_string = "ALIGN_WR_PTR"
 
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                                                                "ALIGN_WR_PTR")
+
         if return_register_id is not None:
             if return_register_id < 0 \
                     or return_register_id >= constants.MAX_REGISTERS:

@@ -393,6 +393,12 @@ class DataSpecificationGenerator(object):
                 "structure id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.START_STRUCT.name)
 
+        if len(parameters) == 0 or \
+           len(parameters) > constants.MAX_STRUCT_ELEMENTS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "structure elements", len(parameters), 0,
+                    constants.MAX_STRUCT_ELEMENTS, Commands.WRITE_PARAM.name)
+
         if self.struct_slot[structure_id] != 0:
             raise exceptions.DataSpecificationStructureInUseException(
                                                                    structure_id)
@@ -411,10 +417,6 @@ class DataSpecificationGenerator(object):
         # elements of the struct
         elem_index = 0
         for i in parameters:
-            if elem_index > constants.MAX_STRUCT_ELEMENTS:
-                raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                    "structure elements", elem_index, 0,
-                    constants.MAX_STRUCT_ELEMENTS, Commands.WRITE_PARAM.name)
 
             label = i[0]
             data_type = i[1]

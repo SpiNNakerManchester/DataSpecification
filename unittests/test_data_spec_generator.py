@@ -1143,6 +1143,99 @@ class TestDataSpecGeneration(unittest.TestCase):
         data = self.get_next_word()
         self.assertEquals(data, 0x00000002, "COPY_PARAM wrong command word")
 
+    def test_start_loop(self):
+        self.dsg.start_loop(0, 1, 2)
+        self.dsg.start_loop(2, 0x02345678, 0x0ABBCCDD)
+        self.dsg.start_loop(0, 1, 2, 5)
+        self.dsg.start_loop(1, 0x02345678, 0x0ABBCCDD, 0x01111111)
+        self.dsg.start_loop(0, 10, 2, -1)
+        self.dsg.start_loop(1, 2, 3, 4, True, False, False)
+        self.dsg.start_loop(1, 5, 3, 4, False, True, False)
+        self.dsg.start_loop(2, 2, 3, 5, False, False, True)
+        self.dsg.start_loop(1, 2, 3, 4, True, True, True)
+        self.dsg.start_loop(5, 1, 1, 1, False, False, False)
+        self.dsg.start_loop(1, 1, 1, 1, True, True, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x35100000, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000001, "LOOP wrong start word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000002, "LOOP wrong end word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000001, "LOOP wrong increment word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x35100002, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x02345678, "LOOP wrong start word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x0ABBCCDD, "LOOP wrong end word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000001, "LOOP wrong increment word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x35100000, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000001, "LOOP wrong start word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000002, "LOOP wrong end word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000005, "LOOP wrong increment word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x35100001, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x02345678, "LOOP wrong start word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x0ABBCCDD, "LOOP wrong end word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x01111111, "LOOP wrong increment word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x35100000, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x0000000A, "LOOP wrong start word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000002, "LOOP wrong end word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xFFFFFFFF, "LOOP wrong increment word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x25142001, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000003, "LOOP wrong end word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000004, "LOOP wrong increment word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x25120301, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000005, "LOOP wrong start word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000004, "LOOP wrong increment word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x25110052, "LOOP wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000002, "LOOP wrong start word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000003, "LOOP wrong end word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05172341, "LOOP wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x35100005, "LOOP wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x00000001, "LOOP wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x00000001, "LOOP wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x00000001, "LOOP wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05171111, "LOOP wrong command word")
 
 
 
@@ -1187,9 +1280,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_start_conditional(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_start_loop(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_switch_write_focus(self):

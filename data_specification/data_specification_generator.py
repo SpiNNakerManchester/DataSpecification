@@ -2447,6 +2447,9 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "source_structure_id", source_structure_id, 0,
                     constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_STRUCT.name)
+            if self.struct_slot[source_structure_id] == 0:
+                raise exceptions.DataSpecificationNotAllocatedException(
+                    "struct", source_structure_id, "COPY_STRUCT")
             cmd_string = "{0:s} source_struct = {1:d}".format(
                 cmd_string, source_structure_id)
 

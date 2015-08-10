@@ -895,16 +895,29 @@ class DataSpecificationGenerator(object):
             * If a function has not been defined with the given id
             * If no structure has been defined with one of the ids in\
               structure_ids
+        :raise data_specification.exceptions.\
+            DataSpecificationWrongParameterNumberException:\
+            If a function is called with a wrong number of parameters
+        :raise data_specification.exceptions.\
+            DataSpecificationDuplicateParameterException:\
+            If a function is called with duplicate parameters
         """
         if function_id < 0 or function_id >= constants.MAX_CONSTRUCTORS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "function_id", function_id, 0, constants.MAX_CONSTRUCTORS - 1,
                 Commands.CONSTRUCT.name)
 
-        if len(structure_ids) > 5:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                 "number of structures", len(structure_ids), 0, 5,
-                 Commands.CONSTRUCT.name)
+        if self.function[function_id] == 0:
+            raise exceptions.DataSpecificationNotAllocatedException("function",
+                    function_id, Commands.CONSTRUCT.name)
+
+        if len(structure_ids) != len(self.function[function_id]):
+            raise exceptions.DataSpecificationWrongParameterNumberException(
+                function_id, len(self.function[function_id]), structure_ids)
+
+        if len(structure_ids) != len(set(structure_ids)):
+            raise exceptions.DataSpecificationDuplicateParameterException(
+                function_id, structure_ids)
 
         cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
 
@@ -919,20 +932,26 @@ class DataSpecificationGenerator(object):
                             "structure argument {0:d}".format(i),
                             structure_ids[i], 0, constants.MAX_STRUCT_SLOTS - 1,
                             Commands.CONSTRUCT.name)
+                if self.struct_slot[structure_ids[i]] == 0:
+                    raise exceptions.DataSpecificationNotAllocatedException(
+                            "structure argument {0:d}".format(i),
+                            structure_ids[i], Commands.CONSTRUCT.name)
+
                 param_word |= structure_ids[i] << (6 * i)
                 cmd_string = "{0:s} arg[{1:d}]=struct[{2:d}]".format(
                     cmd_string, i, structure_ids[i])
 
+        param_word_encoded = bytearray()
         if param_word is None:
             cmd_word_length = constants.LEN1
         else:
             cmd_word_length = constants.LEN2
+            param_word_encoded = bytearray(struct.pack("<I", param_word))
 
         cmd_word = ((cmd_word_length << 28) |
                     (Commands.CONSTRUCT.value << 20) |
                     (function_id << 8))
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
-        param_word_encoded = bytearray(struct.pack("<I", param_word))
         cmd_word_list = cmd_word_encoded + param_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)

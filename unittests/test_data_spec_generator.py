@@ -878,6 +878,35 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06873330,
                           "Logical LEFT_SHIFT wrong command word")
 
+    def test_logical_not(self):
+        self.dsg.logical_not(1, 0x12345678, False)
+
+        self.dsg.logical_not(3, 2, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_not, -1, 0x12, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_not, constants.MAX_REGISTERS, 0x12, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_not, 1, -1, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_not, 1, constants.MAX_REGISTERS, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16841005,
+                          "Logical NOT wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678,
+                          "Logical NOT wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06863205,
+                          "Logical NOT wrong command word")
+
     def test_logical_right_shift(self):
         self.dsg.logical_right_shift(0, 0x12, 0x34, False, False)
         self.dsg.logical_right_shift(1, 0x12345678, 0xABCDEF14, False, False)

@@ -2426,6 +2426,12 @@ class DataSpecificationGenerator(object):
         bit_field = 0
         cmd_string = "COPY_STRUCT"
 
+        if source_structure_id == destination_structure_id and \
+           destination_id_is_register == source_id_is_register:
+            raise exceptions.DataSpecificationDuplicateParameterException(
+                             "COPY_STRUCT",
+                             [source_structure_id, destination_structure_id])
+
         if source_id_is_register:
             if source_structure_id < 0 \
                     or source_structure_id >= constants.MAX_REGISTERS:

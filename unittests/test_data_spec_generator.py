@@ -519,6 +519,19 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(2)
 
+    def test_end_function(self):
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.end_function)
+
+        self.dsg.start_function(0, [])
+        self.dsg.end_function()
+
+        self.skip_words(1)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x02500000,
+                          "END_CONSTRUCTOR command word wrong")
+
     def test_call_logic_operation(self):
         self.assertEqual(True, False, "Not implemented yet")
 
@@ -544,9 +557,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_end_conditional(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_end_function(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_end_loop(self):

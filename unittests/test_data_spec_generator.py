@@ -532,8 +532,75 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x02500000,
                           "END_CONSTRUCTOR command word wrong")
 
-    def test_call_logic_operation(self):
-        self.assertEqual(True, False, "Not implemented yet")
+    def test_logical_and(self):
+        self.dsg.logical_and(0, 0x12, 0x34, False, False)
+        self.dsg.logical_and(1, 0x12345678, 0xABCDEF14, False, False)
+
+        self.dsg.logical_and(3, 2, 0xABCDEF14, True, False)
+        self.dsg.logical_and(4, 0x12345678, 5, False, True)
+
+        self.dsg.logical_and(4, 3, 5, True, True)
+        self.dsg.logical_and(3, 3, 3, True, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_and, -1, 0x12, 0x34, False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_and, constants.MAX_REGISTERS, 0x12, 0x34,
+                False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_and, 1, -1, 0x34, True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_and, 1, constants.MAX_REGISTERS, 0x34,
+                True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_and, 1, 0x12, -1, False, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_and, 1, 0x34, constants.MAX_REGISTERS,
+                False, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26840003,
+                          "Logical AND command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "Logical AND data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000034, "Logical AND data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26841003,
+                          "Logical AND command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "Logical AND data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14, "Logical AND data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16863203,
+                          "Logical AND command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14, "Logical AND data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16854053,
+                          "Logical AND command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "Logical AND data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06874353,
+                          "Logical AND command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06873333,
+                          "Logical AND command word wrong")
+
+
 
     def test_call_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
@@ -545,9 +612,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_copy_structure_parameter(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_declare_random_number_generator(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_declare_uniform_random_distribution(self):

@@ -668,6 +668,74 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06873332,
                           "Logical OR command word wrong")
 
+    def test_logical_or(self):
+        self.dsg.logical_or(0, 0x12, 0x34, False, False)
+        self.dsg.logical_or(1, 0x12345678, 0xABCDEF14, False, False)
+
+        self.dsg.logical_or(3, 2, 0xABCDEF14, True, False)
+        self.dsg.logical_or(4, 0x12345678, 5, False, True)
+
+        self.dsg.logical_or(4, 3, 5, True, True)
+        self.dsg.logical_or(3, 3, 3, True, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_or, -1, 0x12, 0x34, False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_or, constants.MAX_REGISTERS, 0x12, 0x34,
+                False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_or, 1, -1, 0x34, True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_or, 1, constants.MAX_REGISTERS, 0x34,
+                True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_or, 1, 0x12, -1, False, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_or, 1, 0x34, constants.MAX_REGISTERS,
+                False, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26840002,
+                          "Logical OR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "Logical OR data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000034, "Logical OR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26841002,
+                          "Logical OR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "Logical OR data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14, "Logical OR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16863202,
+                          "Logical OR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14, "Logical OR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16854052,
+                          "Logical OR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "Logical OR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06874352,
+                          "Logical OR command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06873332,
+                          "Logical OR command word wrong")
+
 
 
     def test_call_random_distribution(self):

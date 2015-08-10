@@ -952,12 +952,16 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06873331,
                           "Logical RIGHT_SHIFT command word wrong")
 
+    def test_comment(self):
+        self.dsg.comment("test")
+
+        self.assertEquals(self.spec_writer.tell(), 0,
+                          "Comment generated data specification")
+        self.assertEquals(self.report_writer.getvalue(), "test\n")
+
 
 
     def test_call_random_distribution(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_comment(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_copy_structure(self):

@@ -2484,8 +2484,8 @@ class DataSpecificationGenerator(object):
     def copy_structure_parameter(self, source_structure_id,
                                  source_parameter_index,
                                  destination_id,
-                                 destination_parameter_index = None,
-                                 destination_is_register = False):
+                                 destination_parameter_index=None,
+                                 destination_is_register=False):
         """ Insert command to copy the value of a parameter from one structure
         to another
         
@@ -2593,7 +2593,7 @@ class DataSpecificationGenerator(object):
                           (source_structure_id << 8))
             cmd_word_2 = (destination_parameter_index << 8) | source_parameter_index
 
-            cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
+            cmd_string = "COPY_PARAM source_structure_id = {0:d}, " \
                          "source_parameter_id = {1:d}, destination_structure_id " \
                          "= {2:d}, destination_parameter_id = {3:d}".format(
                              source_structure_id, source_parameter_index,

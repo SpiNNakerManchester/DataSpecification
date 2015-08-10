@@ -256,20 +256,20 @@ class DataSpecificationWrongParameterNumberException(
 
 
 class DataSpecificationDuplicateParameterException(DataSpecificationException):
-    """ And exception that indicates that a function has been called with a
-        duplicate parameter.
+    """ And exception that indicates that a command has been called with a
+        duplicate parameter, which shouldn't be allowed.
     """
 
-    def __init__(self, function_id, parameters):
+    def __init__(self, command, parameters):
         """
-        :param function_id: The id of the function
-        :type function_id: int
+        :param command: The command called with duplicate parameters
+        :type command: int
         :param parameters: The parameters used to call the function
         :type parameters: list
         """
 
-        print "Function {0:d} has been called with duplicate parameters: {1:s}"\
-              .format(function_id, repr(parameters))
+        print "The command {0:s} has been called with duplicate parameters: "\
+              "{1:s}".format(command, repr(parameters))
 
 
 class NestedFunctionException(DataSpecificationException):

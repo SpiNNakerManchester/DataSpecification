@@ -926,7 +926,7 @@ class DataSpecificationGenerator(object):
 
         if len(structure_ids) != len(set(structure_ids)):
             raise exceptions.DataSpecificationDuplicateParameterException(
-                function_id, structure_ids)
+                "CONSTRUCT %d" % function_id, structure_ids)
 
         cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
 

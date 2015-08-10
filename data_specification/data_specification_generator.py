@@ -783,7 +783,7 @@ class DataSpecificationGenerator(object):
 
             self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def start_function(self, argument_by_value, function_id=None):
+    def start_function(self, function_id, argument_by_value):
         """ Insert command to start a function definition, with up to 5\
         arguments, which are the ids of structures to be used within the\
         function, each of which can be passed by reference or by value.\
@@ -791,6 +791,8 @@ class DataSpecificationGenerator(object):
         command, structures can only be referenced using the numbers 1 to 5\
         which address the arguments, rather than the original structure ids
 
+        :param function_id: The id of the function currently defined.
+        :type function_id: int
         :param argument_by_value: A list of up to 5 booleans indicating if the\
             structure to be passed as an argument is to be passed by\
             reference (i.e. changes made within the function are\
@@ -806,23 +808,32 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.\
             DataSpecificationInvalidCommandException: If there is already a \
             function being defined at this point
+        :raise data_specification.exceptions.\
+            DataSpecificationFunctionInUse: If the function is already defined
         """
         if self.ongoing_function_definition:
             raise exceptions.DataSpecificationInvalidCommandException(
                 Commands.START_CONSTRUCTOR.name)
-        else:
-            self.ongoing_function_definition = True
 
         if len(argument_by_value) > 5:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "number of arguments", len(argument_by_value), 0, 5,
                 Commands.START_CONSTRUCTOR.name)
 
-        if function_id is None:
-            function_id = self.allocate_function()
+        if function_id < 0 or function_id >= constants.MAX_CONSTRUCTORS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "function_id", function_id, 0, constants.MAX_CONSTRUCTORS,
+                    "START_CONSTRUCTOR")
+
+        if self.function[function_id] != 0:
+            raise exceptions.DataSpecificationFunctionInUse(function_id)
+
+        self.function[function_id] = argument_by_value
 
         cmd_string = "START_CONSTRUCTOR id={0:d} number_of_args={1:d}".format(
             function_id, len(argument_by_value))
+
+        self.ongoing_function_definition = True
 
         read_only_flags = 0
         for i in xrange(len(argument_by_value)):
@@ -857,8 +868,8 @@ class DataSpecificationGenerator(object):
         if not self.ongoing_function_definition:
             raise exceptions.DataSpecificationInvalidCommandException(
                 Commands.END_CONSTRUCTOR.name)
-        else:
-            self.ongoing_function_definition = False
+
+        self.ongoing_function_definition = False
 
         cmd_word = (constants.LEN1 << 28) | \
                    (Commands.END_CONSTRUCTOR.value << 20)
@@ -868,8 +879,6 @@ class DataSpecificationGenerator(object):
         cmd_string = "END_CONSTRUCT"
 
         self.write_command_to_files(cmd_word_list, cmd_string, outdent=True)
-
-        self.ongoing_function_definition = False
 
     def call_function(self, function_id, structure_ids):
         """ Insert command to call a function
@@ -2630,17 +2639,3 @@ class DataSpecificationGenerator(object):
                 self.txt_indent += 1
         return
 
-    def allocate_function(self):
-        """
-        This function looks for the first available function slot and \
-        allocates it, returning the assigned id
-
-        :return: id of the next available function slot
-        :rtype: int
-        """
-        for i in xrange(constants.MAX_CONSTRUCTORS):
-            if self.function[i] == 0:
-                self.function[i] = 1
-                return i
-        raise exceptions.DataSpecificationNoMoreFunctionsException(
-            constants.MAX_CONSTRUCTORS)

@@ -2438,7 +2438,7 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "source_structure_id", source_structure_id, 0,
                     constants.MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
-            bit_field |= 1
+            bit_field |= constants.SRC1_ONLY
             cmd_string = "{0:s} source_struct = reg[{1:d}]".format(
                 cmd_string, source_structure_id)
         else:
@@ -2456,7 +2456,7 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "destination_structure_id", destination_structure_id, 0,
                     constants.MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
-            bit_field |= 2
+            bit_field |= constants.DEST_ONLY
             cmd_string = "{0:s} destination_struct = reg[{1:d}]".format(
                 cmd_string, destination_structure_id)
         else:

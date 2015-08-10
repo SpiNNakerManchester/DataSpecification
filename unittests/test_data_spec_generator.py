@@ -1156,6 +1156,36 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.start_loop(5, 1, 1, 1, False, False, False)
         self.dsg.start_loop(1, 1, 1, 1, True, True, True)
 
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, -1, 0, 1)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, constants.MAX_REGISTERS, 0, 1)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, 1, -1, 1, 1, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, 1, constants.MAX_REGISTERS, 0, 1, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, 1, 1, -1, 1, False, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, 1, 1, constants.MAX_REGISTERS,
+                1, False, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, 1, 1, 1, -1, False, False, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_loop, 1, 1, 1, constants.MAX_REGISTERS,
+                False, False, True)
+
         command = self.get_next_word()
         self.assertEquals(command, 0x35100000, "LOOP wrong command word")
         data = self.get_next_word()

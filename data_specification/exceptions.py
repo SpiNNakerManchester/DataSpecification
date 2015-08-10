@@ -235,6 +235,22 @@ class DataSpecificationNoMoreFunctionsException(DataSpecificationException):
         print "Space unavailable to instantiate a new function. Constructor " \
               "function used: {0:d}".format(max_functions)
 
+class DataSpecificationDuplicateParameterException(DataSpecificationException):
+    """ And exception that indicates that a function has been called with a
+        duplicate parameter.
+    """
+
+    def __init__(self, function_id, parameters):
+        """
+        :param function_id: The id of the function
+        :type function_id: int
+        :param parameters: The parameters used to call the function
+        :type parameters: list
+        """
+
+        print "Function {0:d} has been called with duplicate parameters: {1:s}"\
+              .format(function_id, repr(parameters))
+
 
 class NestedFunctionException(DataSpecificationException):
     """ An exception that indicates that a function is being defined within the

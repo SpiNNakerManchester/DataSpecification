@@ -422,7 +422,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.start_function(0, [])
         self.dsg.end_function()
 
-        # TODO: check why this throws
         self.dsg.start_function(1, [True, True, False])
         self.dsg.end_function()
 

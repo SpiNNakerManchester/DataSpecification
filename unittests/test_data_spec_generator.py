@@ -417,9 +417,66 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.assertEqual(command, 0x05200000, "BREAK_LOOP wrong command word")
 
-
     def test_call_function(self):
-        self.assertEqual(True, False, "Not implemented yet")
+
+        self.dsg.start_function(0, [])
+        self.dsg.end_function()
+
+        # TODO: check why this throws
+        self.dsg.start_function(1, [True, True, False])
+        self.dsg.end_function()
+
+        self.dsg.define_structure(0, [("test", DataType.U08, 0)])
+        self.dsg.define_structure(1, [("test", DataType.U08, 0)])
+        self.dsg.define_structure(2, [("test", DataType.U08, 0)])
+
+        self.dsg.call_function(0, [])
+        self.dsg.call_function(1, [0, 1, 2])
+
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.call_function, 2, [])
+        self.assertRaises(
+                exceptions.DataSpecificationWrongParameterNumberException,
+                self.dsg.call_function, 1, [])
+        self.assertRaises(
+                exceptions.DataSpecificationWrongParameterNumberException,
+                self.dsg.call_function, 1, [0, 1])
+        self.assertRaises(
+                exceptions.DataSpecificationWrongParameterNumberException,
+                self.dsg.call_function, 1, [0, 1, 2, 3])
+        self.assertRaises(
+                exceptions.DataSpecificationDuplicateParameterException,
+                self.dsg.call_function, 1, [1, 1, 2])
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.call_function, 1, [1, 2, 3])
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.call_function, 1, [3, 2, 1])
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_function, -1, [0, 1, 2])
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_function, constants.MAX_CONSTRUCTORS, [0, 1])
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_function, 1, [0, -1, 2])
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_function, 1, [-1,  1, 2])
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.call_function, 1, [0, 2, constants.MAX_STRUCT_SLOTS])
+
+        self.skip_words(16)
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x04000000, "CONSTRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x14000100, "CONSTRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00002040, "CONSTRUCT command data wrong")
 
     def test_call_logic_operation(self):
         self.assertEqual(True, False, "Not implemented yet")

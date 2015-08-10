@@ -959,12 +959,76 @@ class TestDataSpecGeneration(unittest.TestCase):
                           "Comment generated data specification")
         self.assertEquals(self.report_writer.getvalue(), "test\n")
 
+    def test_copy_structure(self):
+        self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
+        self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
+                                      ("second", DataType.UINT32, 0x12345679),
+                                      ("third", DataType.INT16, None)])
+
+        self.dsg.copy_structure(0, 2, False, False)
+        self.dsg.copy_structure(1, 3, False, False)
+        self.dsg.copy_structure(1, 4, True, False)
+        self.dsg.copy_structure(0, 3, False, True)
+        self.dsg.copy_structure(3, 4, True, True)
+
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.copy_structure, 2, 3)
+        self.assertRaises(
+                exceptions.DataSpecificationDuplicateParameterException,
+                self.dsg.copy_structure, 2, 2)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, -1, 2, True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, constants.MAX_REGISTERS, 2, True,
+                False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, 1, -1, False, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, 1, constants.MAX_REGISTERS, False,
+                True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, -1, 2, False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, constants.MAX_STRUCT_SLOTS, 2, False,
+                False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, 1, -1, False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.copy_structure, 1, constants.MAX_STRUCT_SLOTS, False,
+                True)
+
+        self.skip_words(11)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07002000,
+                          "COPY_STRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07003100,
+                          "COPY_STRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07024100,
+                          "COPY_STRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07043000,
+                          "COPY_STRUCT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07064300,
+                          "COPY_STRUCT command word wrong")
 
 
     def test_call_random_distribution(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_copy_structure(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_copy_structure_parameter(self):

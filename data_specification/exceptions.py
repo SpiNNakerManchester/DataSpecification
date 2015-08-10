@@ -284,6 +284,17 @@ class NestedFunctionException(DataSpecificationException):
         print "Nested function definition not supported"
 
 
+class DataSpecificationTypeMismatchException(DataSpecificationException):
+    """ An exception that indicates that a type mistmatch has occured
+    """
+
+    def __init__(self, command):
+        """
+        :param command: The command that generated the exception
+        :type command: int
+        """
+        print "A type mismatch has occured during command {0:s}"
+
 
 class DataSpecificationUnknownTypeException(DataSpecificationException):
     """ An exception that indicates that the value of the requested type\

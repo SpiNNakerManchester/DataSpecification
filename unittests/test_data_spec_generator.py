@@ -477,6 +477,48 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEqual(command, 0x00002040, "CONSTRUCT command data wrong")
 
+    def test_start_function(self):
+
+        self.dsg.start_function(0, [])
+        self.dsg.no_operation()
+        self.dsg.end_function()
+
+        self.dsg.start_function(1, [True, True, False])
+        self.dsg.no_operation()
+        self.dsg.end_function()
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_function, -1, [True])
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_function, constants.MAX_CONSTRUCTORS, [True])
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_function, 2,
+                [True, True, True, True, True, True])
+        self.assertRaises(exceptions.DataSpecificationFunctionInUse,
+                          self.dsg.start_function, 0, [])
+
+        self.dsg.start_function(2, [False])
+
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.start_function, 3, [])
+
+        self.dsg.end_function()
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x02000000,
+                         "START_CONSTRUCTOR command word wrong")
+
+        self.skip_words(2)
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x02000B03,
+                         "START_CONSTRUCTOR command word wrong")
+
+        self.skip_words(2)
+
     def test_call_logic_operation(self):
         self.assertEqual(True, False, "Not implemented yet")
 
@@ -535,9 +577,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_start_conditional(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_start_function(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_start_loop(self):

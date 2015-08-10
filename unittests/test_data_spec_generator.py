@@ -736,6 +736,74 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06873332,
                           "Logical OR command word wrong")
 
+    def test_logical_xor(self):
+        self.dsg.logical_xor(0, 0x12, 0x34, False, False)
+        self.dsg.logical_xor(1, 0x12345678, 0xABCDEF14, False, False)
+
+        self.dsg.logical_xor(3, 2, 0xABCDEF14, True, False)
+        self.dsg.logical_xor(4, 0x12345678, 5, False, True)
+
+        self.dsg.logical_xor(4, 3, 5, True, True)
+        self.dsg.logical_xor(3, 3, 3, True, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_xor, -1, 0x12, 0x34, False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_xor, constants.MAX_REGISTERS, 0x12, 0x34,
+                False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_xor, 1, -1, 0x34, True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_xor, 1, constants.MAX_REGISTERS, 0x34,
+                True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_xor, 1, 0x12, -1, False, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_xor, 1, 0x34, constants.MAX_REGISTERS,
+                False, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26840004,
+                          "Logical XOR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "Logical XOR data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000034, "Logical XOR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26841004,
+                          "Logical XOR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "Logical XOR data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14, "Logical XOR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16863204,
+                          "Logical XOR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14, "Logical XOR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16854054,
+                          "Logical XOR command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "Logical XOR data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06874354,
+                          "Logical XOR command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06873334,
+                          "Logical XOR command word wrong")
+
 
 
     def test_call_random_distribution(self):

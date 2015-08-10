@@ -804,6 +804,80 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06873334,
                           "Logical XOR command word wrong")
 
+    def test_logical_left_shift(self):
+        self.dsg.logical_left_shift(0, 0x12, 0x34, False, False)
+        self.dsg.logical_left_shift(1, 0x12345678, 0xABCDEF14, False, False)
+
+        self.dsg.logical_left_shift(3, 2, 0xABCDEF14, True, False)
+        self.dsg.logical_left_shift(4, 0x12345678, 5, False, True)
+
+        self.dsg.logical_left_shift(4, 3, 5, True, True)
+        self.dsg.logical_left_shift(3, 3, 3, True, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_left_shift, -1, 0x12, 0x34, False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_left_shift, constants.MAX_REGISTERS, 0x12, 0x34,
+                False, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_left_shift, 1, -1, 0x34, True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_left_shift, 1, constants.MAX_REGISTERS, 0x34,
+                True, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_left_shift, 1, 0x12, -1, False, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.logical_left_shift, 1, 0x34, constants.MAX_REGISTERS,
+                False, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26840000,
+                          "Logical LEFT_SHIFT command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012,
+                          "Logical LEFT_SHIFT data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000034,
+                          "Logical LEFT_SHIFT data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26841000,
+                          "Logical LEFT_SHIFT command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678,
+                          "Logical LEFT_SHIFT data word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14,
+                          "Logical LEFT_SHIFT data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16863200,
+                          "Logical LEFT_SHIFT command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xABCDEF14,
+                          "Logical LEFT_SHIFT data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16854050,
+                          "Logical LEFT_SHIFT command word wrong")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678,
+                          "Logical LEFT_SHIFT data word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06874350,
+                          "Logical LEFT_SHIFT command word wrong")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06873330,
+                          "Logical LEFT_SHIFT command word wrong")
+
 
 
     def test_call_random_distribution(self):

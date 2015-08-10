@@ -2537,6 +2537,14 @@ class DataSpecificationGenerator(object):
                 "source_parameter_index", source_parameter_index, 0,
                 constants.MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
 
+        if self.struct_slot[source_structure_id] == 0:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                    "structure", source_structure_id, "COPY_PARAM")
+
+        if len(self.struct_slot[source_structure_id]) <= source_parameter_index:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                    "parameter", source_parameter_index, "COPY_PARAM")
+
         if not destination_is_register:
             if destination_parameter_index < 0 \
                     or destination_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
@@ -2550,6 +2558,33 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "destination_structure_id", destination_id, 0,
                     constants.MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
+
+            if self.struct_slot[destination_id] == 0:
+                raise exceptions.DataSpecificationNotAllocatedException(
+                        "structure", destination_id, "COPY_PARAM")
+
+            if len(self.struct_slot[source_structure_id]) \
+                                                     <= source_parameter_index:
+                raise exceptions.DataSpecificationNotAllocatedException(
+                        "parameter", destination_parameter_index, "COPY_PARAM")
+
+            if len(self.struct_slot[destination_id]) \
+                                                <= destination_parameter_index:
+                raise exceptions.DataSpecificationNotAllocatedException(
+                        "parameter", destination_parameter_index, "COPY_PARAM")
+
+            if self.struct_slot[source_structure_id][source_parameter_index][1] !=\
+               self.struct_slot[destination_id][destination_parameter_index][1]:
+                raise exceptions.DataSpecificationTypeMismatchException(
+                                                                  "COPY_PARAM")
+
+            if source_structure_id == destination_id and \
+               destination_parameter_index == source_parameter_index:
+                   raise exceptions.DataSpecificationDuplicateParameterException(
+                           "COPY_PARAM", [source_structure_id,
+                                          source_parameter_index,
+                                          destination_id,
+                                          destination_parameter_index])
 
             cmd_word_1 = ((constants.LEN2 << 28) |
                           (Commands.COPY_PARAM.value << 20) |

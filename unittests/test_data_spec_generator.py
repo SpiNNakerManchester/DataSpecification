@@ -1237,6 +1237,11 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEquals(command, 0x05171111, "LOOP wrong command word")
 
+    def test_end_loop(self):
+        self.dsg.end_loop()
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05300000, "END_LOOP wrong command word")
+
 
 
 
@@ -1250,9 +1255,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_end_conditional(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_end_loop(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_end_specification(self):

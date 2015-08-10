@@ -223,17 +223,37 @@ class DataSpecificationNoMoreException(DataSpecificationException):
             .format(space_available, space_required, region)
 
 
-class DataSpecificationNoMoreFunctionsException(DataSpecificationException):
-    """ An exception that indicates that there is no more space available for \
-        functions
+class DataSpecificationFunctionInUse(DataSpecificationException):
+    """ An exception that indicates that a function is already defined
     """
 
-    def __init__(self, max_functions):
+    def __init__(self, function_id):
         """
+        :param function_id: The id of the function
+        :type function_id:int
+        """
+        print "Function {0:d} is already defined".format(function_id)
 
+
+class DataSpecificationWrongParameterNumberException(
+        DataSpecificationException):
+    """ An exception that indicates that a function has been called with a
+        wrong number of parameters.
+    """
+
+    def __init__(self, function_id, no_of_parameters_required, parameters):
         """
-        print "Space unavailable to instantiate a new function. Constructor " \
-              "function used: {0:d}".format(max_functions)
+        :param function_id: The id of the function
+        :type function_id: int
+        :param parameters: The parameters used in the function call
+        :type parameters: list
+        :param no_of_parameters_required: The number of parameters required by
+                                          the function
+        """
+        print "Function {0:d} that requires {1:d} parameters has been called "\
+              "with the following parameters: {2:s}".format(function_id,
+                       no_of_parameters_required, parameters)
+
 
 class DataSpecificationDuplicateParameterException(DataSpecificationException):
     """ And exception that indicates that a function has been called with a

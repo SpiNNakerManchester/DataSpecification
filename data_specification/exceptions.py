@@ -293,7 +293,8 @@ class DataSpecificationTypeMismatchException(DataSpecificationException):
         :param command: The command that generated the exception
         :type command: int
         """
-        print "A type mismatch has occured during command {0:s}"
+        print "A type mismatch has occured during command {0:s}" \
+              .format(command)
 
 
 class DataSpecificationUnknownTypeException(DataSpecificationException):

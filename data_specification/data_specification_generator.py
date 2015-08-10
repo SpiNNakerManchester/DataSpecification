@@ -2058,8 +2058,7 @@ class DataSpecificationGenerator(object):
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def logical_and(self, register_id, operand_1, operand_2,
-                         operand_1_is_register=False,
-                         operand_2_is_register=False):
+                    operand_1_is_register=False, operand_2_is_register=False):
         """ Insert command to perform a logical AND operation, using the
             _call_logic_operation.
         :param register_id: The id of the register to store the result in
@@ -2094,8 +2093,7 @@ class DataSpecificationGenerator(object):
                                    operand_2_is_register)
 
     def logical_or(self, register_id, operand_1, operand_2,
-                        operand_1_is_register=False,
-                        operand_2_is_register=False):
+                   operand_1_is_register=False, operand_2_is_register=False):
         """ Insert command to perform a logical OR operation, using the
             _call_logic_operation.
         :param register_id: The id of the register to store the result in
@@ -2130,8 +2128,8 @@ class DataSpecificationGenerator(object):
                                    operand_2_is_register)
 
     def logical_left_shift(self, register_id, operand_1, operand_2,
-                                operand_1_is_register=False,
-                                operand_2_is_register=False):
+                           operand_1_is_register=False,
+                           operand_2_is_register=False):
         """ Insert command to perform a logical left shift operation, using the
             _call_logic_operation.
         :param register_id: The id of the register to store the result in
@@ -2167,8 +2165,8 @@ class DataSpecificationGenerator(object):
                                    operand_2_is_register)
 
     def logical_right_shift(self, register_id, operand_1, operand_2,
-                                 operand_1_is_register=False,
-                                 operand_2_is_register=False):
+                            operand_1_is_register=False,
+                            operand_2_is_register=False):
         """ Insert command to perform a logical right shift operation, using
             the _call_logic_operation.
         :param register_id: The id of the register to store the result in
@@ -2204,8 +2202,7 @@ class DataSpecificationGenerator(object):
                                    operand_2_is_register)
 
     def logical_xor(self, register_id, operand_1, operand_2,
-                         operand_1_is_register=False,
-                         operand_2_is_register=False):
+                    operand_1_is_register=False, operand_2_is_register=False):
         """ Insert command to perform a logical xor operation, using
             the _call_logic_operation.
         :param register_id: The id of the register to store the result in

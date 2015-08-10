@@ -2057,12 +2057,220 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def call_logic_operation(self, register_id, operand_1, operation,
-                             operand_2, operand_1_is_register=False,
-                             operand_2_is_register=False):
+    def call_logical_and(self, register_id, operand_1, operand_2,
+                         operand_1_is_register=False,
+                         operand_2_is_register=False):
+        """ Insert command to perform a logical AND operation, using the
+            _call_logic_operation.
+        :param register_id: The id of the register to store the result in
+        :type register_id: int
+        :param operand_1:
+            * If operand_1_is_register is True, the id of a register\
+              where the first operand can be found, between 0 and 15
+            * If operand_1_is_register is False, a 32-bit value
+        :type operand_1: int
+        :param operand_2:
+            * If operand_2_is_register is True, the id of a register\
+              where the second operand can be found. between 0 and 15
+            * If operand_2_is_register is False, a 32-bit value
+        :type operand_2: int
+        :param operand_1_is_register: Indicates if operand_1 is a register id
+        :type operand_1_is_register: bool
+        :param operand_2_is_register: Indicates if operand_2 is a register id
+        :type operand_2_is_register: bool
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If operand_1_is_register is True and operand_1 is not a\
+              valid register id
+            * If operand_2_is_register is True and operand_2 is not a\
+              valid register id
+        """
+        self._call_logic_operation(register_id, operand_1, LogicOperation.AND,
+                                   operand_2, operand_1_is_register,
+                                   operand_2_is_register)
+
+    def call_logical_or(self, register_id, operand_1, operand_2,
+                        operand_1_is_register=False,
+                        operand_2_is_register=False):
+        """ Insert command to perform a logical OR operation, using the
+            _call_logic_operation.
+        :param register_id: The id of the register to store the result in
+        :type register_id: int
+        :param operand_1:
+            * If operand_1_is_register is True, the id of a register\
+              where the first operand can be found, between 0 and 15
+            * If operand_1_is_register is False, a 32-bit value
+        :type operand_1: int
+        :param operand_2:
+            * If operand_2_is_register is True, the id of a register\
+              where the second operand can be found. between 0 and 15
+            * If operand_2_is_register is False, a 32-bit value
+        :type operand_2: int
+        :param operand_1_is_register: Indicates if operand_1 is a register id
+        :type operand_1_is_register: bool
+        :param operand_2_is_register: Indicates if operand_2 is a register id
+        :type operand_2_is_register: bool
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If operand_1_is_register is True and operand_1 is not a\
+              valid register id
+            * If operand_2_is_register is True and operand_2 is not a\
+              valid register id
+        """
+        self._call_logic_operation(register_id, operand_1, LogicOperation.OR,
+                                   operand_2, operand_1_is_register,
+                                   operand_2_is_register)
+
+    def call_logical_left_shift(self, register_id, operand_1, operand_2,
+                                operand_1_is_register=False,
+                                operand_2_is_register=False):
+        """ Insert command to perform a logical left shift operation, using the
+            _call_logic_operation.
+        :param register_id: The id of the register to store the result in
+        :type register_id: int
+        :param operand_1:
+            * If operand_1_is_register is True, the id of a register\
+              where the first operand can be found, between 0 and 15
+            * If operand_1_is_register is False, a 32-bit value
+        :type operand_1: int
+        :param operand_2:
+            * If operand_2_is_register is True, the id of a register\
+              where the second operand can be found. between 0 and 15
+            * If operand_2_is_register is False, a 32-bit value
+        :type operand_2: int
+        :param operand_1_is_register: Indicates if operand_1 is a register id
+        :type operand_1_is_register: bool
+        :param operand_2_is_register: Indicates if operand_2 is a register id
+        :type operand_2_is_register: bool
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If operand_1_is_register is True and operand_1 is not a\
+              valid register id
+            * If operand_2_is_register is True and operand_2 is not a\
+              valid register id
+        """
+        self._call_logic_operation(register_id, operand_1,
+                                   LogicOperation.LEFT_SHIFT,
+                                   operand_2, operand_1_is_register,
+                                   operand_2_is_register)
+
+    def call_logical_right_shift(self, register_id, operand_1, operand_2,
+                                 operand_1_is_register=False,
+                                 operand_2_is_register=False):
+        """ Insert command to perform a logical right shift operation, using
+            the _call_logic_operation.
+        :param register_id: The id of the register to store the result in
+        :type register_id: int
+        :param operand_1:
+            * If operand_1_is_register is True, the id of a register\
+              where the first operand can be found, between 0 and 15
+            * If operand_1_is_register is False, a 32-bit value
+        :type operand_1: int
+        :param operand_2:
+            * If operand_2_is_register is True, the id of a register\
+              where the second operand can be found. between 0 and 15
+            * If operand_2_is_register is False, a 32-bit value
+        :type operand_2: int
+        :param operand_1_is_register: Indicates if operand_1 is a register id
+        :type operand_1_is_register: bool
+        :param operand_2_is_register: Indicates if operand_2 is a register id
+        :type operand_2_is_register: bool
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If operand_1_is_register is True and operand_1 is not a\
+              valid register id
+            * If operand_2_is_register is True and operand_2 is not a\
+              valid register id
+        """
+        self._call_logic_operation(register_id, operand_1,
+                                   LogicOperation.RIGHT_SHIFT,
+                                   operand_2, operand_1_is_register,
+                                   operand_2_is_register)
+
+    def call_logical_xor(self, register_id, operand_1, operand_2,
+                         operand_1_is_register=False,
+                         operand_2_is_register=False):
+        """ Insert command to perform a logical xor operation, using
+            the _call_logic_operation.
+        :param register_id: The id of the register to store the result in
+        :type register_id: int
+        :param operand_1:
+            * If operand_1_is_register is True, the id of a register\
+              where the first operand can be found, between 0 and 15
+            * If operand_1_is_register is False, a 32-bit value
+        :type operand_1: int
+        :param operand_2:
+            * If operand_2_is_register is True, the id of a register\
+              where the second operand can be found. between 0 and 15
+            * If operand_2_is_register is False, a 32-bit value
+        :type operand_2: int
+        :param operand_1_is_register: Indicates if operand_1 is a register id
+        :type operand_1_is_register: bool
+        :param operand_2_is_register: Indicates if operand_2 is a register id
+        :type operand_2_is_register: bool
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If operand_1_is_register is True and operand_1 is not a\
+              valid register id
+            * If operand_2_is_register is True and operand_2 is not a\
+              valid register id
+        """
+        self._call_logic_operation(register_id, operand_1,
+                                   LogicOperation.XOR,
+                                   operand_2, operand_1_is_register,
+                                   operand_2_is_register)
+
+    def call_logical_not(self, register_id, operand,
+                         operand_is_register=False):
+        """ Insert command to perform a logical xor operation, using
+            the _call_logic_operation.
+        :param register_id: The id of the register to store the result in
+        :type register_id: int
+        :param operand:
+            * If operand_is_register is True, the id of a register\
+              where the first operand can be found, between 0 and 15
+            * If operand_is_register is False, a 32-bit value
+        :type operand: int
+        :param operand_is_register: Indicates if operand_1 is a register id
+        :type operand_is_register: bool
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If operand_is_register is True and operand_1 is not a\
+              valid register id
+        """
+        self._call_logic_operation(register_id, operand, LogicOperation.NOT,
+                                   0, operand_is_register, False)
+
+    def _call_logic_operation(self, register_id, operand_1, operation,
+                              operand_2, operand_1_is_register=False,
+                              operand_2_is_register=False):
         """ Insert command to perform a logic operation on two signed or\
         unsigned values and store the result in a register
-            
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:

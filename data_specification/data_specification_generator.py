@@ -2377,12 +2377,12 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def copy_structure(self, source_structure_id, destination_structure_id=None,
+    def copy_structure(self, source_structure_id, destination_structure_id,
                        source_id_is_register=False,
                        destination_id_is_register=False):
         """ Insert command to copy a structure, possibly overwriting another\
         structure
-        
+
         :param source_structure_id:
             * If source_id_is_register is True, the id of the register
               holding the source structure id, between 0 and 15
@@ -2390,8 +2390,6 @@ class DataSpecificationGenerator(object):
               0 and 15
         :type source_structure_id: int
         :param destination_structure_id:
-            * If None, indicates that the copy should be to a new\
-              structure id
             * If destination_id_is_register is True, the id of the\
               register holding the destination structure id, between\
               0 and 15
@@ -2420,13 +2418,8 @@ class DataSpecificationGenerator(object):
               is not a valid structure id
             * If destination_id_is_register is False and\
               destination_structure_id is not a valid structure id
-        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
-            If destination_structure_id is None and there are no more\
-            structure ids
         :raise data_specification.exceptions.\
             DataSpecificationNotAllocatedException:\
-            * If destination_structure_id is not None and no structure\
-              with id destination_structure_id has been allocated
             * If no structure with id source_structure_id has been\
               allocated
         """

@@ -40,6 +40,7 @@ class DataSpecificationGenerator(object):
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
         self.function = [0] * constants.MAX_CONSTRUCTORS
         self.struct_slot = [0] * constants.MAX_STRUCT_SLOTS
+        self.conditionals = []
         self.current_region = None
         self.ongoing_function_definition = False
         self.ongoing_loop = False
@@ -1565,18 +1566,7 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationUnknownConditionException(
                 condition, Commands.IF.name)
 
-        if condition == Condition.IS_ZERO.value or \
-           condition == Condition.IS_NON_ZERO.value:
-            bit_field = 0x2
-            cmd_word = ((constants.LEN2 << 28) |
-                        (Commands.IF.value << 20) |
-                        (bit_field << 16) |
-                        (register_id << 8) |
-                        condition.value)
-            cmd_string = "IF reg[{0:d}] {1:s}".format(
-                register_id, condition.operator)
-
-        elif value_is_register:
+        if value_is_register:
             bit_field = 0x3
             cmd_word = ((constants.LEN1 << 28) |
                         (Commands.IF.value << 20) |
@@ -1597,6 +1587,8 @@ class DataSpecificationGenerator(object):
             data_encoded = bytearray(struct.pack("<i", value))
             cmd_string = "IF reg[{0:d}] {1:s} {2:d}".format(
                 register_id, condition.operator, value)
+
+        self.conditionals.append(False)
 
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded + data_encoded

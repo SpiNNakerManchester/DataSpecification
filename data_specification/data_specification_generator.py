@@ -2689,6 +2689,8 @@ class DataSpecificationGenerator(object):
                 cmd_word_length = constants.LEN3
             data_encoding_string = "<{0:s}".format(data_type.struct_encoding)
             data_encoded = bytearray(struct.pack(data_encoding_string, value))
+            while len(data_encoded) % 4:
+                data_encoded += bytearray(struct.pack("<b", 0))
             cmd_string = "PRINT_VAL {0:d}".format(value)
 
         cmd_word = ((cmd_word_length << 28) |

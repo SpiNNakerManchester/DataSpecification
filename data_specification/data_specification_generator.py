@@ -2728,8 +2728,9 @@ class DataSpecificationGenerator(object):
             cmd_word_len = constants.LEN4
 
         text_encoded = bytearray(text)
-        #add final padding to the encoded text
-        text_encoded += bytearray(4 - (text_len % 4))
+        # add final padding to the encoded text
+        if text_len % 4 is not 0:
+            text_encoded += bytearray(4 - (text_len % 4))
 
         cmd_string = "PRINT_TXT \"{0:s}\"".format(text)
 

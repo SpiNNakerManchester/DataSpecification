@@ -1697,6 +1697,49 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06063200, "MV wrong command word")
 
     def test_set_write_pointer(self):
+        self.dsg.set_write_pointer(0x12345678, False, False)
+        self.dsg.set_write_pointer(0x00000078, False, False)
+        self.dsg.set_write_pointer(0x12, False, True)
+        self.dsg.set_write_pointer(-12, False, True)
+        self.dsg.set_write_pointer(1, True, True)
+        self.dsg.set_write_pointer(3, True, False)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_write_pointer, -1, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_write_pointer, constants.MAX_REGISTERS, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_write_pointer, 0x123456789L, False)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16400000, "SET_WR_PTR wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "SET_WR_PTR wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16400000, "SET_WR_PTR wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000078, "SET_WR_PTR wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16400001, "SET_WR_PTR wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "SET_WR_PTR wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16400001, "SET_WR_PTR wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0xFFFFFFF4, "SET_WR_PTR wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06420101, "SET_WR_PTR wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06420300, "SET_WR_PTR wrong command word")
+
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_start_conditional(self):

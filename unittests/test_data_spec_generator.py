@@ -1411,10 +1411,30 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x05600000, "ELSE wrong command word")
 
     def test_end_conditional(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.end_conditional)
 
-    def test_end_specification(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.dsg.start_conditional(0, Condition.EQUAL, 0, True)
+        self.dsg.end_conditional()
+
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.end_conditional)
+
+        self.dsg.start_conditional(0, Condition.EQUAL, 0, False)
+        self.dsg.else_conditional()
+        self.dsg.end_conditional()
+
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.end_conditional)
+
+        self.skip_words(1)
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05700000, "END_IF wrong command word")
+
+        self.skip_words(3)
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05700000, "END_IF wrong command word")
+
 
     def test_print_struct(self):
         self.assertEqual(True, False, "Not implemented yet")

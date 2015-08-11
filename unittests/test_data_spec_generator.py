@@ -1637,10 +1637,64 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(data, 0x01234567, "PRINT_VAL wrong data word")
 
     def test_set_register_value(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.dsg.set_register_value(0, 0, False, DataType.UINT32)
+        self.dsg.set_register_value(1, 0x12345678, False, DataType.UINT32)
+        self.dsg.set_register_value(2, 0x123456789ABCDEFL, False,
+                                    DataType.UINT64)
+        self.dsg.set_register_value(2, 0x01234567, False, DataType.INT32)
+        self.dsg.set_register_value(3, 0x67, False, DataType.UINT8)
 
-    def test_set_structure_value(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.dsg.set_register_value(3, 2, True, DataType.UINT64)
+        self.dsg.set_register_value(3, 2, True, DataType.U88)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_register_value, -1, 0)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_register_value, constants.MAX_REGISTERS, 0)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_register_value, 0, -1, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_register_value, 0, constants.MAX_REGISTERS, True)
+        self.assertRaises(
+                exceptions.DataSpecificationDuplicateParameterException,
+                self.dsg.set_register_value, 0, 0, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16040000, "MV wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000000, "MV wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16041000, "MV wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "MV wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x26042000, "MV wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x89ABCDEF, "MV wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x01234567, "MV wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16042000, "MV wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x01234567, "MV wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x16043000, "MV wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000067, "MV wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06063200, "MV wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x06063200, "MV wrong command word")
 
     def test_set_write_pointer(self):
         self.assertEqual(True, False, "Not implemented yet")

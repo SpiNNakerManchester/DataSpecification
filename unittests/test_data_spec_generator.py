@@ -1894,6 +1894,76 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x04420F0A,
                           "WRITE_STRUCT wrong command word")
 
+    def test_write_array(self):
+        self.assertRaises(exceptions.DataSpecificationNoRegionSelectedException,
+                          self.dsg.write_array, [0, 1, 2, 3], DataType.UINT8)
+
+        self.dsg.reserve_memory_region(0, 100)
+        self.dsg.switch_write_focus(0)
+
+        self.dsg.write_array([], DataType.UINT8)
+        self.dsg.write_array([0, 1, 2, 3], DataType.UINT8)
+        self.dsg.write_array([0, 1, 2, 3], DataType.UINT16)
+        self.dsg.write_array([0, 1, 2, 3], DataType.UINT32)
+        self.dsg.write_array([0, 1, 2, 3, 4], DataType.UINT16)
+        self.dsg.write_array([0, 1, 2, 3, 4], DataType.UINT8)
+
+        self.skip_words(3)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14300001, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000000, "WRITE_ARRAY wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14300001, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x03020100, "WRITE_ARRAY wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14300002, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00010000, "WRITE_ARRAY wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00030002, "WRITE_ARRAY wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14300004, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000000, "WRITE_ARRAY wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000001, "WRITE_ARRAY wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000002, "WRITE_ARRAY wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000003, "WRITE_ARRAY wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14300002, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000005, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00010000, "WRITE_ARRAY wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00030002, "WRITE_ARRAY wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14300001, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000005, "WRITE_ARRAY wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x03020100, "WRITE_ARRAY wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong data word")
+
 
     def test_call_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
@@ -1905,9 +1975,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_set_structure_value(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_write_array(self):
         self.assertEqual(True, False, "Not implemented yet")
 
 

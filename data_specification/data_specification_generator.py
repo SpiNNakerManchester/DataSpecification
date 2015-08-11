@@ -1611,6 +1611,13 @@ class DataSpecificationGenerator(object):
             DataSpecificationInvalidCommandException: If there is no \
             conditional in operation at this point
         """
+
+        if len(self.conditionals) == 0 or \
+                self.conditionals[len(self.conditionals) - 1] is True:
+            raise exceptions.DataSpecificationInvalidCommandException("ELSE")
+
+        self.conditionals[len(self.conditionals) - 1] = True
+
         cmd_word = (constants.LEN1 << 28) | (Commands.ELSE.value << 20)
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded

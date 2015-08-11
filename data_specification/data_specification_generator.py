@@ -1685,8 +1685,22 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.\
             DataSpecificationUnknownTypeException: If the data type is not known
         """
+        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
+                Commands.MV.name)
+
         if data_is_register:
             # Build command to move between registers:
+            if data < 0 or data >= constants.MAX_REGISTERS:
+                raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "data", data, 0, constants.MAX_REGISTERS - 1,
+                    Commands.MV.name)
+
+            if data == register_id:
+                raise exceptions.DataSpecificationDuplicateParameterException(
+                                Commands.MV.name, [register_id, data])
+
             dest_reg = register_id
             src_reg = data
             cmd_word = ((constants.LEN1 << 28) |
@@ -1700,19 +1714,30 @@ class DataSpecificationGenerator(object):
         else:
             # Build command to assign from an immediate:
             # command has a second word (the immediate)
-            dest_reg = register_id
-            cmd_word = ((constants.LEN2 << 28) |
-                        (Commands.MV.value << 20) |
-                        (constants.DEST_ONLY << 16) |
-                        (dest_reg << 12))
             if data_type.min > data or data_type.max < data:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "data", data, data_type.min, data_type.max,
                     Commands.MV.name)
+
+            if data_type.size > 4:
+                length = constants.LEN3
+            else:
+                length = constants.LEN2
+
+            dest_reg = register_id
+            cmd_word = ((length << 28) |
+                        (Commands.MV.value << 20) |
+                        (constants.DEST_ONLY << 16) |
+                        (dest_reg << 12))
+
             scaled_data = int(data * data_type.scale)
             encoding_string = "<{0:s}".format(data_type.struct_encoding)
             encoded_data = bytearray(struct.pack(encoding_string, scaled_data))
+            while len(encoded_data) % 4:
+                encoded_data += bytearray(struct.pack("<b", 0))
+
             encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+
             cmd_word_list = encoded_cmd_word + encoded_data
             cmd_string = "reg[{0:d}] = {1:d} (0x{2:X})".format(
                 dest_reg, data, data)

@@ -1496,7 +1496,51 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06345000, "GET_WR_PTR wrong command word")
 
     def test_print_struct(self):
-        self.assertEqual(True, False, "Not implemented yet")
+
+        self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
+        self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
+                                      ("second", DataType.UINT32, 0x12345679),
+                                      ("third", DataType.INT16, None)])
+
+        self.dsg.print_struct(0)
+        self.dsg.print_struct(1)
+        self.dsg.print_struct(2, True)
+        self.dsg.print_struct(3, True)
+
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.print_struct, 2)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_struct, -1)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_struct, -1, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_struct, constants.MAX_STRUCT_SLOTS)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_struct, constants.MAX_REGISTERS, True)
+
+        self.skip_words(11)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08200000,
+                          "PRINT_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08200001,
+                          "PRINT_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08220200,
+                          "PRINT_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08220300,
+                          "PRINT_STRUCT wrong command word")
 
     def test_print_text(self):
         self.assertEqual(True, False, "Not implemented yet")

@@ -2782,6 +2782,7 @@ class DataSpecificationGenerator(object):
                     "structure_id", structure_id, 0,
                     constants.MAX_REGISTERS - 1, Commands.PRINT_STRUCT.name)
             struct_register = structure_id
+            structure_id = 0
             bit_field = 0x2
             cmd_string = "{0:s} struct(reg[{1:d}])".format(
                 cmd_string, struct_register)

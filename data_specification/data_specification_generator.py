@@ -1014,7 +1014,7 @@ class DataSpecificationGenerator(object):
 
 
     def write_value(
-            self, data, repeats=1, repeats_register=None,
+            self, data, repeats=1, repeats_is_register=False,
             data_type=DataType.UINT32):
         """ Insert command to write a value one or more times to the current
         write pointer, causing the write pointer to move on by the number
@@ -1024,15 +1024,16 @@ class DataSpecificationGenerator(object):
         :param data: the data to write as a float.
         :type data: float
         :param repeats:
-            * If repeats_register is None, this parameter identifies the\
+            * If repeats_is_register is False, this parameter identifies the\
               number of times to repeat the data, between 1 and 255\
               (default 1)
-            * If repeats_register is not None (i.e. has an integer value), the
-              content of this parameter is disregarded
+            * If repeats_is_register is True, this parameter identifies the
+              register that contains the number of repeats.
         :type repeats: int
-        :param repeats_register: Identifies the register containing the number\
-                                 of repeats of the value to write
-        :type repeats_register: None or int
+        :param repeats_is_register: Indicates if the parameter repeats\
+                                    idenfifies the register containing the\
+                                    number of repeats of the value to write
+        :type repeats_is_register: bool
         :param data_type: the type to convert data to
         :type data_type: :py:class:`DataType`
         :return: Nothing is returned
@@ -1054,10 +1055,10 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.\
             DataSpecificationNoRegionSelectedException: If no region has been \
             selected to write to
-        :raise data_specification.exceptions.\
-            DataSpecificationRegionExhaustedException: If the selected region \
-            has no more space
         """
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException("WRITE")
+
         if data_type not in DataType:
             raise exceptions.DataSpecificationUnknownTypeException(
                 data_type.value, Commands.WRITE.name)
@@ -1079,15 +1080,14 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationInvalidSizeException(
                 data_type.name, data_size, Commands.WRITE.name)
 
-        if repeats_register is None:
-            if (repeats < 0) or (repeats > 255):
+        if repeats_is_register is False:
+            if (repeats <= 0) or (repeats > 255):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats_register < 0) or \
-                    (repeats_register >= constants.MAX_REGISTERS):
+            if (repeats < 0) or (repeats >= constants.MAX_REGISTERS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                    "repeats_register", repeats_register, 0,
+                    "repeats_is_register", repeats_is_register, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
 
         if (data_type.min > data) or (data_type.max < data):
@@ -1097,13 +1097,13 @@ class DataSpecificationGenerator(object):
         parameters = 0
         cmd_string = "WRITE data=0x%8.8X" % data
 
-        if repeats_register is not None:
+        if repeats_is_register is not False:
             repeat_reg_usage = 1
-            parameters |= (repeats_register << 4)
+            parameters |= (repeats << 4)
             cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
-                                                            repeats_register)
+                                                            repeats)
         else:
-            repeat_reg_usage = 0
+            repeat_reg_usage = constants.NO_REGS
             parameters |= repeats
             cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
@@ -2819,6 +2819,11 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "structure_id", structure_id, 0,
                     constants.MAX_STRUCT_SLOTS - 1, Commands.PRINT_STRUCT.name)
+
+            if self.struct_slot[structure_id] == 0:
+                raise exceptions.DataSpecificationNotAllocatedException(
+                                     "structure", structure_id, "PRINT_STRUCT")
+
             cmd_string = "{0:s} struct({1:d})".format(
                 cmd_string, structure_id)
 

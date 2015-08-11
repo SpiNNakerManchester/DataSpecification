@@ -1838,19 +1838,19 @@ class TestDataSpecGeneration(unittest.TestCase):
     def test_call_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
 
-    def test_start_conditional(self):
+    def test_declare_uniform_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
 
-    def test_switch_write_focus(self):
+    def test_end_specification(self):
+        self.assertEqual(True, False, "Not implemented yet")
+
+    def test_set_structure_value(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_write_array(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_write_structure(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_write_value(self):
         self.assertEqual(True, False, "Not implemented yet")
 
 

@@ -1832,7 +1832,67 @@ class TestDataSpecGeneration(unittest.TestCase):
         data = self.get_next_word()
         self.assertEquals(data, 0x00000000, "WRITE wrong data word")
 
+    def test_write_structure(self):
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.write_structure, 0)
 
+        self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
+        self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
+                                      ("second", DataType.UINT32, 0x12345679),
+                                      ("third", DataType.INT16, None)])
+        self.dsg.define_structure(0xA, [("first", DataType.UINT8, 0xAB)])
+
+        self.dsg.write_structure(0)
+        self.dsg.write_structure(0, 2)
+        self.dsg.write_structure(0, 5, True)
+        self.dsg.write_structure(1, 5, True)
+        self.dsg.write_structure(0xA, 0xF)
+        self.dsg.write_structure(0xA, 0xF, True)
+
+        self.assertRaises(
+                 exceptions.DataSpecificationParameterOutOfBoundsException,
+                 self.dsg.write_structure, -1)
+        self.assertRaises(
+                 exceptions.DataSpecificationParameterOutOfBoundsException,
+                 self.dsg.write_structure, constants.MAX_STRUCT_SLOTS)
+        self.assertRaises(
+                 exceptions.DataSpecificationParameterOutOfBoundsException,
+                 self.dsg.write_structure, 1, -1, True)
+        self.assertRaises(
+                 exceptions.DataSpecificationParameterOutOfBoundsException,
+                 self.dsg.write_structure, 1, constants.MAX_STRUCT_SLOTS, True)
+        self.assertRaises(
+                 exceptions.DataSpecificationParameterOutOfBoundsException,
+                 self.dsg.write_structure, -1)
+        self.assertRaises(
+                 exceptions.DataSpecificationParameterOutOfBoundsException,
+                 self.dsg.write_structure, 16)
+
+        self.skip_words(15)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04400100,
+                          "WRITE_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04400200,
+                          "WRITE_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04420500,
+                          "WRITE_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04420501,
+                          "WRITE_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04400F0A,
+                          "WRITE_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04420F0A,
+                          "WRITE_STRUCT wrong command word")
 
 
     def test_call_random_distribution(self):
@@ -1848,9 +1908,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_write_array(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_write_structure(self):
         self.assertEqual(True, False, "Not implemented yet")
 
 

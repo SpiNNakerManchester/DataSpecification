@@ -146,7 +146,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
         self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
                                       ("second", DataType.UINT32, 0x12345679),
-                                      ("third", DataType.INT16, None)])
+                                      ("third", DataType.INT16, None),
+                                      ("fourth", DataType.UINT64,
+                                       0x123456789ABCDEFL)])
         self.assertRaises(
             exceptions.DataSpecificationParameterOutOfBoundsException,
             self.dsg.define_structure, -1, [("first", DataType.UINT8, 0xAB)])
@@ -187,6 +189,13 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         command = self.get_next_word()
         self.assertEqual(command, 0x01100005, "STRUCT_ELEM wrong command word")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x21100003, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x89ABCDEF, "STRUCT_ELEM value wrong")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01234567, "STRUCT_ELEM value wrong")
 
         command = self.get_next_word()
         self.assertEqual(command, 0x01200000, "END_STRUCT wrong command word")

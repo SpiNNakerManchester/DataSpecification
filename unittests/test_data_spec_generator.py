@@ -1740,6 +1740,102 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEquals(command, 0x06420300, "SET_WR_PTR wrong command word")
 
+    def test_write_value(self):
+        self.assertRaises(exceptions.DataSpecificationNoRegionSelectedException,
+                          self.dsg.write_value, 0x0)
+
+        self.dsg.reserve_memory_region(0, 100)
+        self.dsg.switch_write_focus(0)
+
+        self.dsg.write_value(0x0)
+        self.dsg.write_value(0x12)
+        self.dsg.write_value(0x12345678)
+        self.dsg.write_value(0x12345678, 2)
+        self.dsg.write_value(0x12, 12)
+        self.dsg.write_value(0x12, 0xFF, False, DataType.UINT8)
+        self.dsg.write_value(0x12, 5, False, DataType.UINT16)
+        self.dsg.write_value(0x123456789ABCDEFL, 5, False, DataType.UINT64)
+        self.dsg.write_value(0x123456789ABCDEFL, 5, True, DataType.UINT64)
+        self.dsg.write_value(0x123, 2, True, DataType.UINT64)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.write_value, 0, -1, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.write_value, 0, 0, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.write_value, 0, constants.MAX_REGISTERS, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.write_value, 0, -1, False)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.write_value, 0, 256, False)
+
+        self.skip_words(3)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14202001, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000000, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14202001, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14202001, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14202002, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x1420200C, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x142000FF, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x14201005, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x24203005, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x89ABCDEF, "WRITE wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x01234567, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x24213050, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x89ABCDEF, "WRITE wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x01234567, "WRITE wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x24213020, "WRITE wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000123, "WRITE wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000000, "WRITE wrong data word")
+
+
+
+
+    def test_call_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
 
     def test_start_conditional(self):

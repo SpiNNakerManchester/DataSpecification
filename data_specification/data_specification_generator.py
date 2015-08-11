@@ -1738,6 +1738,9 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.GET_WR_PTR.name)
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                                                                  "GET_WR_PTR")
         bit_field = 0x4
         cmd_word = (constants.LEN1 << 28) | \
                    (Commands.GET_WR_PTR.value << 20) | \

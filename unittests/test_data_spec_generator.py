@@ -1585,10 +1585,56 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(data, 0x38373635, "PRINT_TEXT wrong data word")
 
     def test_print_value(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.dsg.print_value(0x78, False, DataType.UINT8)
+        self.dsg.print_value(0x12345678)
+        self.dsg.print_value(0, True)
+        self.dsg.print_value(2, True)
+        self.dsg.print_value(2, True, DataType.INT32)
+        self.dsg.print_value(2, True, DataType.INT64)
+        self.dsg.print_value(0x123456789ABCDEFL, False, DataType.UINT64)
+        self.dsg.print_value(2, True, DataType.U88)
 
-    def test_save_write_pointer(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_value, 0x123456789)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_value, -1, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_value, constants.MAX_REGISTERS, True)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_value, 0x12345678, False, DataType.INT16)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x18000000, "PRINT_VAL wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000078, "PRINT_VAL wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x18000002, "PRINT_VAL wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "PRINT_VAL wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08020002, "PRINT_VAL wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08020202, "PRINT_VAL wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08020206, "PRINT_VAL wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x08020207, "PRINT_VAL wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x28000003, "PRINT_VAL wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x89ABCDEF, "PRINT_VAL wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x01234567, "PRINT_VAL wrong data word")
 
     def test_set_register_value(self):
         self.assertEqual(True, False, "Not implemented yet")

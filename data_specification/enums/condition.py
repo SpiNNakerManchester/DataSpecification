@@ -17,10 +17,6 @@ class Condition(Enum):
                              "True if the first operand is >= the second")
     GREATER_THAN = (5, ">",
                     "True if the first operand is >  the second")
-    IS_ZERO = (6, "== 0",
-               "True if the first operand is zero")
-    IS_NON_ZERO = (7, "!= 0",
-                   "True if the first operand is different from zero")
 
     def __new__(cls, value, operator, doc=""):
         obj = object.__new__(cls)

@@ -1387,7 +1387,28 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x05530255, "IF wrong command word")
 
     def test_else_conditional(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.else_conditional)
+
+        self.dsg.start_conditional(0, Condition.EQUAL, 0, True)
+        self.dsg.else_conditional()
+
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.else_conditional)
+
+        self.dsg.start_conditional(0, Condition.EQUAL, 0, False)
+        self.dsg.else_conditional()
+
+        self.assertRaises(exceptions.DataSpecificationInvalidCommandException,
+                          self.dsg.else_conditional)
+
+        self.skip_words(1)
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05600000, "ELSE wrong command word")
+
+        self.skip_words(2)
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05600000, "ELSE wrong command word")
 
     def test_end_conditional(self):
         self.assertEqual(True, False, "Not implemented yet")

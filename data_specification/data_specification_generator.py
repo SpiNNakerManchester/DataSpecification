@@ -1244,8 +1244,15 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
+        :raise data_specification.exceptions.\
+               DataSpecificationNoRegionSelectedException:
+            If no region has been previously selected
         """
-        cmd_len = 0x1
+        cmd_len = constants.LEN2
+
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                                                     Commands.WRITE_ARRAY.name)
 
         cmd_word = (cmd_len << 28)                           \
                    | (Commands.WRITE_ARRAY.value << 20)      \

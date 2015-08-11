@@ -747,6 +747,10 @@ class DataSpecificationGenerator(object):
                 "structure_id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_STRUCT.name)
 
+        if self.struct_slot[structure_id] is 0:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                    "structure", structure_id, Commands.WRITE_STRUCT.name)
+
         if repeats_is_register:
             if repeats < 0 or repeats >= constants.MAX_REGISTERS:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(

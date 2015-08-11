@@ -1435,6 +1435,38 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEquals(command, 0x05700000, "END_IF wrong command word")
 
+    def test_switch_write_focus(self):
+        self.dsg.reserve_memory_region(0, 100)
+        self.dsg.reserve_memory_region(2, 100)
+        self.dsg.reserve_memory_region(1, 100, empty=True)
+
+        self.dsg.switch_write_focus(0)
+        self.dsg.switch_write_focus(2)
+
+        self.assertRaises(
+                exceptions.DataSpecificationNotAllocatedException,
+                self.dsg.switch_write_focus, 3)
+        self.assertRaises(
+                exceptions.DataSpecificationRegionUnfilledException,
+                self.dsg.switch_write_focus, 1)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.switch_write_focus, -1)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.switch_write_focus, constants.MAX_MEM_REGIONS)
+
+        self.skip_words(6)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05000000,
+                          "SWITCH_FOCUS wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05000200,
+                          "SWITCH_FOCUS wrong command word")
+
 
     def test_print_struct(self):
         self.assertEqual(True, False, "Not implemented yet")

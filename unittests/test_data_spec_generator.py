@@ -4,6 +4,7 @@ from io import BytesIO
 from StringIO import StringIO
 
 from data_specification import constants, exceptions
+from data_specification.enums.condition import Condition
 from data_specification.enums.data_type import DataType
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from data_specification.enums.logic_operation import LogicOperation
@@ -1310,14 +1311,80 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEquals(command, 0x05300000, "END_LOOP wrong command word")
 
+    def test_start_conditional(self):
+        self.dsg.start_conditional(0, Condition.EQUAL, 0, False)
+        self.dsg.start_conditional(2, Condition.EQUAL, 1, False)
+        self.dsg.start_conditional(3, Condition.NOT_EQUAL, 1, False)
+        self.dsg.start_conditional(4, Condition.LESS_THAN_OR_EQUAL, 3, False)
+        self.dsg.start_conditional(4, Condition.LESS_THAN, 3, False)
+        self.dsg.start_conditional(4, Condition.GREATER_THAN_OR_EQUAL, 5, False)
+        self.dsg.start_conditional(2, Condition.GREATER_THAN, 5, False)
 
+        self.dsg.start_conditional(0, Condition.EQUAL, 1, True)
+        self.dsg.start_conditional(4, Condition.LESS_THAN, 3, True)
+        self.dsg.start_conditional(2, Condition.GREATER_THAN, 5, True)
 
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_conditional, -1, Condition.EQUAL, 0, False)
 
-    def test_call_random_distribution(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_conditional, constants.MAX_REGISTERS,
+                Condition.EQUAL, 0, False)
 
-    def test_declare_uniform_random_distribution(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_conditional, 0, Condition.EQUAL, -1, True)
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.start_conditional, 0, Condition.EQUAL,
+                constants.MAX_REGISTERS, True)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x15520000, "IF wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000000, "IF wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x15520200, "IF wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000001, "IF wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x15520301, "IF wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000001, "IF wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x15520402, "IF wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000003, "IF wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x15520403, "IF wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000003, "IF wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x15520404, "IF wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000005, "IF wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x15520205, "IF wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000005, "IF wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05530010, "IF wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05530433, "IF wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x05530255, "IF wrong command word")
 
     def test_else_conditional(self):
         self.assertEqual(True, False, "Not implemented yet")

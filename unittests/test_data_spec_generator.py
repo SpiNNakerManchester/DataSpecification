@@ -1543,7 +1543,46 @@ class TestDataSpecGeneration(unittest.TestCase):
                           "PRINT_STRUCT wrong command word")
 
     def test_print_text(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.dsg.print_text("t")
+        self.dsg.print_text("te")
+        self.dsg.print_text("test")
+        self.dsg.print_text("test1234")
+        self.dsg.print_text("test12345678")
+
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.print_text, "test123456789")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x18100000, "PRINT_TEXT wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000074, "PRINT_TEXT wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x18100001, "PRINT_TEXT wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00006574, "PRINT_TEXT wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x18100003, "PRINT_TEXT wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x74736574, "PRINT_TEXT wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x28100007, "PRINT_TEXT wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x74736574, "PRINT_TEXT wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x34333231, "PRINT_TEXT wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x3810000B, "PRINT_TEXT wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x74736574, "PRINT_TEXT wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x34333231, "PRINT_TEXT wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x38373635, "PRINT_TEXT wrong data word")
 
     def test_print_value(self):
         self.assertEqual(True, False, "Not implemented yet")

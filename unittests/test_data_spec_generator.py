@@ -2091,12 +2091,126 @@ class TestDataSpecGeneration(unittest.TestCase):
         data = self.get_next_word()
         self.assertEquals(data, 0x00000012, "DECLARE_RNG wrong data word")
 
+    def test_declare_uniform_random_distribution(self):
+        self.dsg.declare_random_number_generator(
+            3, RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
+
+        self.dsg.declare_uniform_random_distribution(0, 0, 3, 10, 100)
+        self.dsg.declare_uniform_random_distribution(2, 4, 3, 50, 200)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution, -1, 2, 3, 10, 100)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution,
+            constants.MAX_RANDOM_DISTS, 2, 3, 10, 100)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution,
+            1, -1, 3, 10, 100)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution,
+            1, constants.MAX_STRUCT_SLOTS, 3, 10, 100)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution,
+            1, 1, -1, 10, 100)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution,
+            1, 1, constants.MAX_RNGS, 10, 100)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution,
+            1, 4, 3,  DataType.S1615.min - 1, 100)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_uniform_random_distribution,
+            1, 4, 3, 100, DataType.S1615.max + 1)
+
+        self.assertRaises(
+            exceptions.DataSpecificationNotAllocatedException,
+            self.dsg.declare_uniform_random_distribution,
+            1, 1, 1, 100, 200)
+        self.assertRaises(
+            exceptions.DataSpecificationRandomNumberDistributionInUseException,
+            self.dsg.declare_uniform_random_distribution,
+            0, 1, 3, 100, 200)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x10503000, "DECLARE_RNG wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "DECLARE_RNG wrong data word")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01000000, "START_STRUCT wrong command word %d" % command)
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00000000, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00000003, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00050000, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00320000, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01200000, "END_STRUCT wrong command word")
+
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x00600000,
+                          "DECLARE_RANDOM_DIST wrong command word")
+
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01000004, "START_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00000000, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00000003, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00190000, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00640000, "STRUCT_ELEM value wrong")
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x01200000, "END_STRUCT wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x00600204,
+                          "DECLARE_RANDOM_DIST wrong command word")
 
 
     def test_call_random_distribution(self):
-        self.assertEqual(True, False, "Not implemented yet")
-
-    def test_declare_uniform_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
 
 

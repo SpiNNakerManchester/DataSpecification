@@ -1052,15 +1052,14 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def read_value(self, data_len, dest_id):
+    def read_value(self, dest_id, data_type):
         """ Insert command to read a value from the current write pointer,
             causing the write pointer to move by the number of bytes read.
             The data is stored in a register passed as argument.
-        :param data_len: The size of the data to be read, in bytes.
-                         The actual format of the data is ignored.
-        :type data_len: int
         :param dest_id: The id of the destination register.
         :type dest_id: int
+        :param data_type: The type of the data to be read.
+        :type data_type: :py:class:`DataType`
         :param region: The region to read from. If not specified, the current
                        selected region is assumed and the last parameter is
                        ignored.
@@ -1076,25 +1075,25 @@ class DataSpecificationGenerator(object):
         cmd_code = Commands.READ.value
         cmd_field_usage = constants.DEST_ONLY
 
-        if data_len < 0 or data_len > 4:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                    "data_len", data_len, 1, 4, Commands.READ.name)
+        if data_type not in DataType:
+            raise exceptions.DataSpecificationUnknownTypeException(
+                data_type.value, Commands.WRITE.name)
 
         if dest_id < 0 or dest_id > constants.MAX_REGISTERS:
-            raise exception.DataSpecificationParameterOutOfBoundsException(
-                    "register", region, 0, constants.MAX_REGISTERS - 1,
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                    "register", dest_id, 0, constants.MAX_REGISTERS - 1,
                     Commands.READ.name)
 
         cmd_word = ((cmd_len << 28)           |
                     (cmd_code << 20)          |
                     (cmd_field_usage << 16)   |
                     (dest_id << 12)           |
-                    data_len)
+                    data_type.size)
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
 
         cmd_string = "READ {0:d} bytes in register {0:d}" \
-                                                    .format(data_len, dest_id)
+                                            .format(data_type.size, dest_id)
 
         self.write_command_to_files(encoded_cmd_word, cmd_string)
 

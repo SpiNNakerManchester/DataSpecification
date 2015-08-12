@@ -2321,6 +2321,13 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.read_value(5, DataType.UINT8)
         self.dsg.read_value(6, DataType.U88)
 
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.read_value, -1, DataType.UINT32)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.read_value, constants.MAX_REGISTERS, DataType.UINT32)
+
         command = self.get_next_word()
         self.assertEquals(command, 0x04140004, "READ wrong command word")
 

@@ -235,6 +235,19 @@ class DataSpecificationFunctionInUse(DataSpecificationException):
         print "Function {0:d} is already defined".format(function_id)
 
 
+class DataSpecificationRNGInUseException(DataSpecificationException):
+    """ An exception that indicates that a random number generator is
+        already defined
+    """
+
+    def __init__(self, rng_id):
+        """
+        :param rng_id: The id of the rng
+        :type rng_id:int
+        """
+        print "Random number generator {0:d} is already defined".format(rng_id)
+
+
 class DataSpecificationWrongParameterNumberException(
         DataSpecificationException):
     """ An exception that indicates that a function has been called with a

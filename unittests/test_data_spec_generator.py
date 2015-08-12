@@ -2148,7 +2148,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(data, 0x12345678, "DECLARE_RNG wrong data word")
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01000000, "START_STRUCT wrong command word %d" % command)
+        self.assertEqual(command, 0x01000000, "START_STRUCT wrong command word")
 
         command = self.get_next_word()
         self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")

@@ -1079,7 +1079,7 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationUnknownTypeException(
                 data_type.value, Commands.WRITE.name)
 
-        if dest_id < 0 or dest_id > constants.MAX_REGISTERS:
+        if dest_id < 0 or dest_id >= constants.MAX_REGISTERS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "register", dest_id, 0, constants.MAX_REGISTERS - 1,
                     Commands.READ.name)
@@ -1214,7 +1214,7 @@ class DataSpecificationGenerator(object):
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_value_from_register(
-            self, data_register, repeats=1, repeats_register=None,
+            self, data_register, repeats=1, repeats_is_register=False,
             data_type=DataType.UINT32):
         """ Insert command to write a value one or more times at the write
         pointer of the current memory region, causing it to move.
@@ -1259,6 +1259,10 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationUnknownTypeException(
                 data_type.value, Commands.WRITE.name)
 
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                Commands.WRITE.name)
+
         data_size = data_type.size
         if data_size == 1:
             cmd_data_len = 0
@@ -1272,15 +1276,14 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataSpecificationInvalidSizeException(
                 data_type.name, data_size, Commands.WRITE.name)
 
-        if repeats_register is None:
-            if (repeats < 0) or (repeats > 255):
+        if repeats_is_register is False:
+            if repeats <= 0 or repeats > 255:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats_register < 0) \
-                    or (repeats_register >= constants.MAX_REGISTERS):
+            if repeats < 0 or repeats >= constants.MAX_REGISTERS:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                    "repeats_register", repeats_register, 0,
+                    "repeats", repeats, 0,
                     (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
 
         if (data_register < 0) or (data_register >= constants.MAX_REGISTERS):
@@ -1288,24 +1291,26 @@ class DataSpecificationGenerator(object):
                 "data_register", data_register, 0,
                 (constants.MAX_REGISTERS - 1), Commands.WRITE.name)
 
-        cmd_len = 0
         parameters = 0
-        data_reg = 1
         cmd_string = "WRITE data=reg[{0:d}]".format(data_register)
 
-        if repeats_register is not None:
-            repeat_reg_usage = 1
-            parameters |= (repeats_register << 4)
+        if repeats_is_register:
+            reg_usage = constants.SRC1_AND_SRC2
+            parameters |= repeats << 4
             cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
-                                                            repeats_register)
+                                                            repeats)
         else:
-            repeat_reg_usage = 0
+            reg_usage = constants.SRC1_ONLY
             parameters |= repeats
             cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
-        cmd_word = ((cmd_len << 28) | (Commands.WRITE.value << 20) |
-                    (data_reg << 17) | (repeat_reg_usage << 16) |
-                    (cmd_data_len << 12) | (data_register << 8) | parameters)
+        cmd_word = (constants.LEN1 << 28)       | \
+                   (Commands.WRITE.value << 20) | \
+                   (reg_usage << 16)            | \
+                   (cmd_data_len << 12)         | \
+                   (data_register << 8)         | \
+                   parameters
+
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)

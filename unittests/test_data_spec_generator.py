@@ -1987,6 +1987,30 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(16)
 
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.set_structure_value,
+                          0, 1, 0, DataType.UINT8)
+        self.assertRaises(exceptions.DataSpecificationTypeMismatchException,
+                          self.dsg.set_structure_value, 0, 0, 0,
+                          DataType.UINT16)
+        self.assertRaises(exceptions.DataSpecificationTypeMismatchException,
+                          self.dsg.set_structure_value, 1, 1, 0,
+                          DataType.UINT8)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_structure_value, -1, 0, 0, DataType.UINT32)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_structure_value, constants.MAX_STRUCT_SLOTS,
+                0, 0, DataType.UINT32)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_structure_value, 0, -1, 0, DataType.UINT32)
+        self.assertRaises(
+                exceptions.DataSpecificationParameterOutOfBoundsException,
+                self.dsg.set_structure_value, 0, constants.MAX_STRUCT_ELEMENTS,
+                0, DataType.UINT32)
+
         command = self.get_next_word()
         self.assertEquals(command, 0x17200000, "WRITE_PARAM wrong command word")
         data = self.get_next_word()

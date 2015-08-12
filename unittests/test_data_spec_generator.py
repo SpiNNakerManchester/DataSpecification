@@ -2042,6 +2042,16 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEquals(command, 0x0722A501, "WRITE_PARAM wrong command word")
 
+    def test_end_specification(self):
+        self.dsg.end_specification(False)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x0FF00000, "END_SPEC wrong command word")
+
+        self.dsg.end_specification()
+        with self.assertRaises(ValueError):
+            self.get_next_word()
+
 
     def test_call_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
@@ -2049,8 +2059,6 @@ class TestDataSpecGeneration(unittest.TestCase):
     def test_declare_uniform_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
 
-    def test_end_specification(self):
-        self.assertEqual(True, False, "Not implemented yet")
 
 
 

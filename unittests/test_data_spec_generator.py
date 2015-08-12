@@ -2209,13 +2209,40 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x00600204,
                           "DECLARE_RANDOM_DIST wrong command word")
 
-
     def test_call_random_distribution(self):
-        self.assertEqual(True, False, "Not implemented yet")
+        self.dsg.declare_random_number_generator(
+            3, RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
 
+        self.dsg.declare_uniform_random_distribution(3, 0, 3, 10, 100)
 
+        self.dsg.call_random_distribution(3, 1)
+        self.dsg.call_random_distribution(3, 5)
 
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.call_random_distribution, -1, 2)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.call_random_distribution, constants.MAX_RANDOM_DISTS, 2)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.call_random_distribution, 3, -1)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.call_random_distribution, 3, constants.MAX_REGISTERS)
+        self.assertRaises(
+            exceptions.DataSpecificationNotAllocatedException,
+            self.dsg.call_random_distribution, 1, 1)
 
+        self.skip_words(13)
+
+        command = self.get_next_word()
+        print "%x" % command
+        self.assertEquals(command, 0x00741003,
+                          "GET_RANDOM_NUMBER wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x00745003,
+                          "GET_RANDOM_NUMBER wrong command word")
 
 if __name__ == '__main__':
     unittest.main()

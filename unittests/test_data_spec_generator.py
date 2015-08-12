@@ -6,6 +6,8 @@ from StringIO import StringIO
 from data_specification import constants, exceptions
 from data_specification.enums.condition import Condition
 from data_specification.enums.data_type import DataType
+from data_specification.enums.random_number_generator \
+                                              import RandomNumberGenerator
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from data_specification.enums.logic_operation import LogicOperation
 from data_specification.data_specification_generator \
@@ -2051,6 +2053,44 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.end_specification()
         with self.assertRaises(ValueError):
             self.get_next_word()
+
+    def test_declare_random_number_generator(self):
+        self.dsg.declare_random_number_generator(
+            0, RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
+        self.dsg.declare_random_number_generator(
+            3, RandomNumberGenerator.MERSENNE_TWISTER, 0x12)
+
+        self.assertRaises(exceptions.DataSpecificationRNGInUseException,
+                          self.dsg.declare_random_number_generator, 0,
+                          RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_random_number_generator, -1,
+            RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_random_number_generator,
+            constants.MAX_RANDOM_DISTS,
+            RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_random_number_generator, 1,
+            RandomNumberGenerator.MERSENNE_TWISTER, 0x123456789)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.declare_random_number_generator, 2,
+            RandomNumberGenerator.MERSENNE_TWISTER, -1)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x10500000, "DECLARE_RNG wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "DECLARE_RNG wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x10503000, "DECLARE_RNG wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "DECLARE_RNG wrong data word")
+
 
 
     def test_call_random_distribution(self):

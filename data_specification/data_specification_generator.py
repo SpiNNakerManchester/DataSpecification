@@ -4,6 +4,8 @@ import decimal
 
 from data_specification import constants, exceptions
 from data_specification.enums.data_type import DataType
+from data_specification.enums.random_number_generator\
+                                                  import RandomNumberGenerator
 from data_specification.enums.commands import Commands
 from data_specification.enums.condition import Condition
 from data_specification.enums.logic_operation import LogicOperation
@@ -40,6 +42,7 @@ class DataSpecificationGenerator(object):
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
         self.function = [0] * constants.MAX_CONSTRUCTORS
         self.struct_slot = [0] * constants.MAX_STRUCT_SLOTS
+        self.rng = [0] * constants.MAX_RANDOM_DISTS
         self.conditionals = []
         self.current_region = None
         self.ongoing_function_definition = False
@@ -206,9 +209,11 @@ class DataSpecificationGenerator(object):
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         self.write_command_to_files(encoded_cmd_word, cmd_string)
 
-    def declare_random_number_generator(self, rng_type, seed):
+    def declare_random_number_generator(self, rng_id, rng_type, seed):
         """ Insert command to declare a random number generator
 
+        :param rng_id: The id of the random number generator
+        :type rng_id: int
         :param rng_type: The type of the random number generator
         :type rng_type: :py:class:`RandomNumberGenerator`
         :param seed: The seed of the random number generator >= 0
@@ -219,30 +224,51 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.DataSpecification:\
             If there is no more space for a new generator
         :raise data_specification.exceptions.\
             DataSpecificationUnknownTypeException: If the rng_type is not one \
             of the allowed values
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the seed is too \
-            big or too small
+            DataSpecificationParameterOutOfBoundsException:
+            * If the seed is too big or too small
+            * If the rng_id is not in the allowed range
+        :raise data_specification.exceptions.DataSpecificationRNGInUseException:
+            If the random number generator with the given id has already been\
+            defined
         """
 
-        if rng_type < 0 or rng_type >= constants.MAX_RNGS:
+        if rng_id < 0 or rng_id >= constants.MAX_RNGS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "random number generator type", rng_type, 0,
+                "random number generator id", rng_id, 0,
                 (constants.MAX_RNGS - 1), Commands.DECLARE_RNG.name)
-        # Source field is constant for now, may allow multiple different
-        # sources of random numbers later.
-        rng_source = 0x0
-        cmd_word = (constants.LEN2 << 28) | (Commands.DECLARE_RNG.value << 20)
-        cmd_word = cmd_word | (rng_type << 12) | (rng_source << 8)
+
+        if rng_type not in RandomNumberGenerator:
+            raise exceptions.DataSpecificationUnknownTypeException(
+                rng_type.value, Commands.DECLARE_RNG.name)
+
+        if self.rng[rng_id] is not 0:
+            raise exceptions.DataSpecificationRNGInUseException(rng_id)
+
+        if seed > DataType.UINT32.max or seed < DataType.UINT32.min:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "seed", seed, DataType.UINT32.min, DataType.UINT32.max,
+                Commands.DECLARE_RNG.name)
+
+        self.rng[rng_id] = [rng_type, seed]
+
+        cmd_word = (constants.LEN2 << 28)             | \
+                   (Commands.DECLARE_RNG.value << 20) | \
+                   (rng_id << 12)                     | \
+                   (rng_type.value << 8)
+
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_seed = bytearray(struct.pack("<i", seed))
         cmd_word_list = encoded_cmd_word + encoded_seed
+
         cmd_string = "DECLARE_RNG id={0:d}, source={1:d}, seed={2:d}".format(
-            rng_type, rng_source, seed)
+            rng_id, rng_type.value, seed)
+
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def declare_uniform_random_distribution(self, distribution_id, structure_id,

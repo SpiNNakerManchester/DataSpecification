@@ -678,23 +678,19 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "value", value, data_type.min, data_type.max,
                     Commands.WRITE_PARAM.name)
-            if data_type.size <= 4:
-                cmd_word = ((constants.LEN2 << 28) |
-                            (Commands.WRITE_PARAM.value << 20) |
-                            (constants.NO_REGS << 16) |
-                            (structure_id << 12) |
-                            parameter_index)
-            elif data_type.size == 8:
-                cmd_word = ((constants.LEN3 << 28) |
-                            (Commands.WRITE_PARAM.value << 20) |
-                            (constants.NO_REGS << 16) |
-                            (structure_id << 12) |
-                            (value << 8) |
-                            parameter_index)
-            else:
+
+            if (data_type.size > 4 and data_type.size != 8):
                 raise exceptions.DataSpecificationInvalidSizeException(
                     data_type.name, data_type.size,
                     Commands.WRITE_PARAM.name)
+
+            cmd_len = constants.LEN2 if data_type.size <= 4 else constants.LEN3
+
+            cmd_word = ((cmd_len << 28) |
+                        (Commands.WRITE_PARAM.value << 20) |
+                        (constants.NO_REGS << 16) |
+                        (structure_id << 12) |
+                        parameter_index)
 
             encoding_string = "<{0:s}".format(data_type.struct_encoding)
             value_encoded = bytearray(struct.pack(encoding_string, value))

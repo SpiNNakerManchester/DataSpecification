@@ -2237,7 +2237,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(13)
 
         command = self.get_next_word()
-        print "%x" % command
         self.assertEquals(command, 0x00741003,
                           "GET_RANDOM_NUMBER wrong command word")
         command = self.get_next_word()

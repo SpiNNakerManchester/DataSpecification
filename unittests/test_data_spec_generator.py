@@ -2243,5 +2243,75 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x00745003,
                           "GET_RANDOM_NUMBER wrong command word")
 
+    def get_structure_value(self):
+        self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
+        self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
+                                      ("second", DataType.UINT32, 0x12345679),
+                                      ("third", DataType.INT16, None),
+                                      ("fourth", DataType.UINT64,
+                                       0x123456789ABCDEFL)])
+
+        self.dsg.get_structure_value(0, 0, 0, False)
+        self.dsg.get_structure_value(3, 0, 0, False)
+        self.dsg.get_structure_value(2, 1, 1, False)
+        self.dsg.get_structure_value(3, 1, 3, False)
+
+        self.dsg.get_structure_value(3, 1, 3, True)
+        self.dsg.get_structure_value(3, 0, 0, True)
+        self.dsg.get_structure_value(3, 0, 5, True)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, -1, 0, 0, False)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, constants.MAX_REGISTERS, 0, 0, False)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, 0, -1, 0, False)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, 0, constants.MAX_STRUCT_SLOTS, 0,
+            False)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, 0, 0, -1, False)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, 0, 0, constants.MAX_STRUCT_ELEMENTS,
+            False)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, 0, 0, -1, True)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.get_structure_value, 0, 0, constants.MAX_REGISTERS, True)
+
+        self.assertRaises(
+            exceptions.DataSpecificationNotAllocatedException,
+            self.dsg.get_structure_value, 2, 0, 0)
+        self.assertRaises(
+            exceptions.DataSpecificationNotAllocatedException,
+            self.dsg.get_structure_value, 0, 1, 0)
+
+        self.skip_words(14)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07340000, "READ_PARAM wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07343000, "READ_PARAM wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07342011, "READ_PARAM wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07343031, "READ_PARAM wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07363001, "READ_PARAM wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07363500, "READ_PARAM wrong command word")
+
+
+
+
 if __name__ == '__main__':
     unittest.main()

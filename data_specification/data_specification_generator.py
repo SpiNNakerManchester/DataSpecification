@@ -42,7 +42,8 @@ class DataSpecificationGenerator(object):
         self.mem_slot = [0] * constants.MAX_MEM_REGIONS
         self.function = [0] * constants.MAX_CONSTRUCTORS
         self.struct_slot = [0] * constants.MAX_STRUCT_SLOTS
-        self.rng = [0] * constants.MAX_RANDOM_DISTS
+        self.rng = [0] * constants.MAX_RNGS
+        self.random_distribution = [0] * constants.MAX_RANDOM_DISTS
         self.conditionals = []
         self.current_region = None
         self.ongoing_function_definition = False
@@ -302,12 +303,34 @@ class DataSpecificationGenerator(object):
             has not been allocated
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException: If rng_id, \
-            min_value or max_value is out of range
+            structure_id, min_value or max_value is out of range
+        :raise data_specification.exceptions.\
+            DataSpecificationStructureInUseException: If structure \
+            structure_id is already defined
         """
         if distribution_id < 0 or distribution_id >= constants.MAX_RANDOM_DISTS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "distribution id", distribution_id, 0,
                 constants.MAX_RANDOM_DISTS - 1,
+                Commands.DECLARE_RANDOM_DIST.name)
+
+        if rng_id < 0 or rng_id >= constants.MAX_RNGS:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "rng", rng_id, 0, constants.MAX_RNGS - 1,
+                Commands.DECLARE_RANDOM_DIST.name)
+
+        if self.rng[rng_id] is 0:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                "RNG", rng_id, Commands.DECLARE_RANDOM_DIST.name)
+
+        if min_value < DataType.S1615.min:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "min_value", min_value, DataType.S1615.min, DataType.S1615.max,
+                Commands.DECLARE_RANDOM_DIST.name)
+
+        if max_value > DataType.S1615.max:
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "max_value", max_value, DataType.S1615.min, DataType.S1615.max,
                 Commands.DECLARE_RANDOM_DIST.name)
 
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
@@ -316,10 +339,18 @@ class DataSpecificationGenerator(object):
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.DECLARE_RANDOM_DIST.name)
 
+        if self.random_distribution[distribution_id] is not 0:
+            raise exceptions.\
+                    DataSpecificationRandomNumberDistributionInUseException(
+                            distribution_id)
+
         parameters = [("distType", DataType.UINT32, 0),
                       ("rngID", DataType.UINT32, rng_id),
                       ("param1", DataType.S1615, min_value),
                       ("param2", DataType.S1615, max_value)]
+
+        self.random_distribution[distribution_id] = parameters
+
         self.define_structure(structure_id, parameters)
 
         cmd_word = ((constants.LEN1 << 28) |

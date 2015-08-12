@@ -613,7 +613,7 @@ class DataSpecificationGenerator(object):
                 "destination_id", destination_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.READ_PARAM.name)
 
-        if self.struct_slots[structure_id] is 0:
+        if self.struct_slot[structure_id] is 0:
             raise exceptions.DataSpecificationNotAllocatedException(
                 "structure", structure_id, Commands.READ_PARAM)
 
@@ -640,7 +640,7 @@ class DataSpecificationGenerator(object):
                     "parameter_index", parameter_index, 0,
                     constants.MAX_STRUCT_ELEMENTS - 1, Commands.READ_PARAM.name)
 
-            if len(self.struct_slots[structure_id]) <= parameter_index:
+            if len(self.struct_slot[structure_id]) <= parameter_index:
                 raise exceptions.DataSpecificationNotAllocatedException(
                     "structure %d parameter" % structure_id,
                     parameter_index, Commands.READ_PARAM)

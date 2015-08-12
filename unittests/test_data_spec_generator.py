@@ -2243,7 +2243,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x00745003,
                           "GET_RANDOM_NUMBER wrong command word")
 
-    def get_structure_value(self):
+    def test_get_structure_value(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
         self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
                                       ("second", DataType.UINT32, 0x12345679),
@@ -2289,10 +2289,10 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.assertRaises(
             exceptions.DataSpecificationNotAllocatedException,
-            self.dsg.get_structure_value, 2, 0, 0)
+            self.dsg.get_structure_value, 0, 2, 0)
         self.assertRaises(
             exceptions.DataSpecificationNotAllocatedException,
-            self.dsg.get_structure_value, 0, 1, 0)
+            self.dsg.get_structure_value, 0, 0, 1)
 
         self.skip_words(14)
 

@@ -2306,7 +2306,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x07343031, "READ_PARAM wrong command word")
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07363001, "READ_PARAM wrong command word")
+        self.assertEquals(command, 0x07363301, "READ_PARAM wrong command word")
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07363000, "READ_PARAM wrong command word")
         command = self.get_next_word()
         self.assertEquals(command, 0x07363500, "READ_PARAM wrong command word")
 

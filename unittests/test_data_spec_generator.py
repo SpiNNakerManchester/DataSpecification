@@ -1964,6 +1964,60 @@ class TestDataSpecGeneration(unittest.TestCase):
         data = self.get_next_word()
         self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong data word")
 
+    def test_set_structure_value(self):
+        self.assertRaises(exceptions.DataSpecificationNotAllocatedException,
+                          self.dsg.set_structure_value,
+                          0, 0, 0, DataType.UINT32)
+
+        self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
+        self.dsg.define_structure(1, [("first", DataType.UINT8, 0xAB),
+                                      ("second", DataType.UINT32, 0x12345679),
+                                      ("third", DataType.INT16, None)])
+        self.dsg.define_structure(0xA, [("first", DataType.UINT8, 0xAB),
+                                        ("second", DataType.UINT64, None)])
+
+        self.dsg.set_structure_value(0, 0, 0x12, DataType.UINT8)
+        self.dsg.set_structure_value(1, 2, 0x1234, DataType.INT16)
+        self.dsg.set_structure_value(1, 1, 0x12345678, DataType.UINT32)
+        self.dsg.set_structure_value(10, 1, 0x123456789ABCDEFL, DataType.UINT64)
+
+        self.dsg.set_structure_value(1, 0, 2, DataType.UINT8, True)
+        self.dsg.set_structure_value(1, 1, 3, DataType.UINT32, True)
+        self.dsg.set_structure_value(10, 1, 5, DataType.UINT64, True)
+
+        self.skip_words(16)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x17200000, "WRITE_PARAM wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00000012, "WRITE_PARAM wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x17201002, "WRITE_PARAM wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x00001234, "WRITE_PARAM wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x17201001, "WRITE_PARAM wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x12345678, "WRITE_PARAM wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x2720A001, "WRITE_PARAM wrong command word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x89ABCDEF, "WRITE_PARAM wrong data word")
+        data = self.get_next_word()
+        self.assertEquals(data, 0x01234567, "WRITE_PARAM wrong data word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07221200, "WRITE_PARAM wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x07221301, "WRITE_PARAM wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x0722A501, "WRITE_PARAM wrong command word")
+
 
     def test_call_random_distribution(self):
         self.assertEqual(True, False, "Not implemented yet")
@@ -1974,8 +2028,6 @@ class TestDataSpecGeneration(unittest.TestCase):
     def test_end_specification(self):
         self.assertEqual(True, False, "Not implemented yet")
 
-    def test_set_structure_value(self):
-        self.assertEqual(True, False, "Not implemented yet")
 
 
 

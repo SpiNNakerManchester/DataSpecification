@@ -401,6 +401,11 @@ class DataSpecificationGenerator(object):
                     constants.MAX_RANDOM_DISTS - 1,
                     Commands.GET_RANDOM_NUMBER.name)
 
+        if self.random_distribution[distribution_id] is 0:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                    "random number distribution", distribution_id,
+                    Commands.GET_RANDOM_NUMBER.name)
+
         bit_field = 0x4
 
         cmd_string = "GET_RANDOM_NUMBER distribution={0:d} " \

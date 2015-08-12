@@ -1216,10 +1216,9 @@ class DataSpecificationGenerator(object):
     def write_value_from_register(
             self, data_register, repeats=1, repeats_register=None,
             data_type=DataType.UINT32):
-        """ Insert command to write a value one or more times to the current
-        write pointer, causing the write pointer to move on by the number
-        of bytes required to represent the data type. The data is contained in
-        a register whose id is passed to the function
+        """ Insert command to write a value one or more times at the write
+        pointer of the current memory region, causing it to move.
+        The data is contained in a register whose id is passed to the function
 
         :param data_register: Identifies the register in which the data is\
                               stored.

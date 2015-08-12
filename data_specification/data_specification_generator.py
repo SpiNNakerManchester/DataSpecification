@@ -613,7 +613,11 @@ class DataSpecificationGenerator(object):
                 "destination_id", destination_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.READ_PARAM.name)
 
-        if (parameter_index_is_register == True):
+        if self.struct_slots[structure_id] is 0:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                "structure", structure_id, Commands.READ_PARAM)
+
+        if parameter_index_is_register is True:
             if parameter_index < 0 or parameter_index >= constants.MAX_REGISTERS:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                          "parameter_index", parameter_index, 0,
@@ -627,13 +631,20 @@ class DataSpecificationGenerator(object):
             cmd_string = "READ_PARAM structure_id={0:d}, "  \
                          "element_id_from_register={1:d}, " \
                          "destination_register={2:d}".format(structure_id,
-                                               parameter_index, destination_id)
+                                                             parameter_index,
+                                                             destination_id)
         else:
             if (parameter_index < 0
                     or parameter_index >= constants.MAX_STRUCT_ELEMENTS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "parameter_index", parameter_index, 0,
                     constants.MAX_STRUCT_ELEMENTS - 1, Commands.READ_PARAM.name)
+
+            if len(self.struct_slots[structure_id]) <= parameter_index:
+                raise exceptions.DataSpecificationNotAllocatedException(
+                    "structure %d parameter" % structure_id,
+                    parameter_index, Commands.READ_PARAM)
+
 
             cmd_word = (constants.LEN1 << 28)            | \
                        (Commands.READ_PARAM.value << 20) | \

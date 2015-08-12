@@ -645,6 +645,19 @@ class DataSpecificationGenerator(object):
                 "parameter_index", parameter_index, 0,
                 constants.MAX_STRUCT_ELEMENTS - 1, Commands.WRITE_PARAM.name)
 
+        if self.struct_slot[structure_id] is 0:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                "structure", structure_id, Commands.WRITE_PARAM)
+
+        if len(self.struct_slot[structure_id]) <= parameter_index:
+            raise exceptions.DataSpecificationNotAllocatedException(
+                "structure %d parameter" % structure_id, parameter_index,
+                Commands.WRITE_PARAM.name)
+
+        if self.struct_slot[structure_id][parameter_index][1] is not data_type:
+            raise exceptions.DataSpecificationTypeMismatchException(
+                Commands.WRITE_PARAM.name)
+
         if value_is_register:
             if value < 0 or value >= constants.MAX_REGISTERS:
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(

@@ -2310,8 +2310,35 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEquals(command, 0x07363500, "READ_PARAM wrong command word")
 
+    def test_read_value(self):
+        self.dsg.read_value(0, DataType.UINT32)
+        self.dsg.read_value(1, DataType.UINT64)
+        self.dsg.read_value(2, DataType.INT32)
+        self.dsg.read_value(3, DataType.INT64)
+        self.dsg.read_value(4, DataType.INT8)
+        self.dsg.read_value(5, DataType.UINT8)
+        self.dsg.read_value(6, DataType.U88)
 
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04140004, "READ wrong command word")
 
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04141008, "READ wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04142004, "READ wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04143008, "READ wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04144001, "READ wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04145001, "READ wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04146002, "READ wrong command word")
 
 if __name__ == '__main__':
     unittest.main()

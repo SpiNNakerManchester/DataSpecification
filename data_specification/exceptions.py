@@ -347,7 +347,7 @@ class DataSpecificationInvalidSizeException(DataSpecificationException):
         :type command: str
         """
         print "Invalid size {0:d} of the requested type {1:s} during " \
-              "command {%s}".format(type_size, type_name, command)
+              "command {2:s}".format(type_size, type_name, command)
 
 class DataSpecificationInvalidCommandException(DataSpecificationException):
     """ An exception that indicates that the command being requested cannot be

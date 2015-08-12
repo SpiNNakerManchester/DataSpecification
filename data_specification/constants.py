@@ -23,7 +23,8 @@ APP_PTR_TABLE_HEADER_BYTE_SIZE = 8
 
 # Constants used by DSG command encoding:
 LEN1, LEN2, LEN3, LEN4 = 0, 1, 2, 3
-NO_REGS, DEST_ONLY, SRC1_ONLY, DEST_AND_SRC1, ALL_REGS = 0, 4, 2, 6, 7
+NO_REGS, DEST_ONLY, SRC1_ONLY, SRC1_AND_SRC2, DEST_AND_SRC1, ALL_REGS = \
+                                                               0, 4, 2, 3, 6, 7
 
 # return values from functions of the data spec executor
 END_SPEC_EXECUTOR = -1

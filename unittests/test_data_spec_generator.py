@@ -2349,5 +2349,76 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEquals(command, 0x04146002, "READ wrong command word")
 
+    def test_write_value_from_register(self):
+        self.assertRaises(
+            exceptions.DataSpecificationNoRegionSelectedException,
+            self.dsg.write_value_from_register, 0)
+
+        self.dsg.reserve_memory_region(0, 1000)
+        self.dsg.switch_write_focus(0)
+
+        self.dsg.write_value_from_register(0)
+        self.dsg.write_value_from_register(3)
+        self.dsg.write_value_from_register(3, 2)
+        self.dsg.write_value_from_register(3, 10, False, DataType.INT8)
+        self.dsg.write_value_from_register(3, 0xFF)
+        self.dsg.write_value_from_register(0, 0, True)
+        self.dsg.write_value_from_register(2, 10, True)
+        self.dsg.write_value_from_register(5, 3, True)
+        self.dsg.write_value_from_register(5, 3, True, DataType.UINT8)
+        self.dsg.write_value_from_register(5, 3, True, DataType.U88)
+
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.write_value_from_register, -1)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.write_value_from_register, constants.MAX_REGISTERS)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.write_value_from_register, 0, 0)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.write_value_from_register, 0, 256)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.write_value_from_register, 0, -1, True)
+        self.assertRaises(
+            exceptions.DataSpecificationParameterOutOfBoundsException,
+            self.dsg.write_value_from_register, 0,
+            constants.MAX_REGISTERS, True)
+
+        self.skip_words(3)
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04222001, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04222301, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04222302, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x0422030A, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x042223FF, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04232000, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x042322A0, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04232530, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04230530, "WRITE wrong command word")
+
+        command = self.get_next_word()
+        self.assertEquals(command, 0x04231530, "WRITE wrong command word")
+
 if __name__ == '__main__':
     unittest.main()

@@ -2069,9 +2069,11 @@ class DataSpecificationGenerator(object):
         if self.current_region is None:
             raise exceptions.DataSpecificationNoRegionSelectedException(
                                                     Commands.ALIGN_WR_PTR.name)
-        cmd_word = (constants.LEN1 << 28)        |
-                   (Commands.RESET_WR_PTR << 20) |
+        cmd_word = (constants.LEN1 << 28)        | \
+                   (Commands.RESET_WR_PTR.value << 20) | \
                    (constants.NO_REGS << 16)
+
+        cmd_string = Commands.RESET_WR_PTR.name
 
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded

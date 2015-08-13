@@ -1740,6 +1740,8 @@ class TestDataSpecGeneration(unittest.TestCase):
                 exceptions.DataSpecificationParameterOutOfBoundsException,
                 self.dsg.set_write_pointer, 0x123456789L, False)
 
+        self.skip_words(3)
+
         command = self.get_next_word()
         self.assertEquals(command, 0x16400000, "SET_WR_PTR wrong command word")
         data = self.get_next_word()

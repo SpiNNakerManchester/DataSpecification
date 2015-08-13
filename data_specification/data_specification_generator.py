@@ -1854,6 +1854,9 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException: If the register_id \
             is not a valid register id
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected
         """
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
@@ -1900,7 +1903,13 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException: If the \
             address_is_register is True and address is not a valid register id
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected
         """
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                                                      Commands.SET_WR_PTR.name)
         if relative_to_current:
             relative = 1
             relative_string = "RELATIVE"
@@ -2002,7 +2011,7 @@ class DataSpecificationGenerator(object):
 
         if self.current_region is None:
             raise exceptions.DataSpecificationNoRegionSelectedException(
-                                                                "ALIGN_WR_PTR")
+                                                    Commands.ALIGN_WR_PTR.name)
 
         if return_register_id is not None:
             if return_register_id < 0 \

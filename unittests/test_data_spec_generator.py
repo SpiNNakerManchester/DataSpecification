@@ -1699,6 +1699,15 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEquals(command, 0x06063200, "MV wrong command word")
 
     def test_set_write_pointer(self):
+
+        self.assertRaises(
+            exceptions.DataSpecificationNoRegionSelectedException,
+            self.dsg.set_write_pointer, 0x100)
+
+        # Define a memory region and switch focus to it
+        self.dsg.reserve_memory_region(1, 100)
+        self.dsg.switch_write_focus(1)
+
         self.dsg.set_write_pointer(0x12345678, False, False)
         self.dsg.set_write_pointer(0x00000078, False, False)
         self.dsg.set_write_pointer(0x12, False, True)

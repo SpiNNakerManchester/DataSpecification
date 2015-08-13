@@ -1982,9 +1982,8 @@ class DataSpecificationGenerator(object):
             will be written to once it has been updated, between\
             0 and 15or None if no such writing is to be done
         :type return_register_id: int
-        :return: The current write pointer within the current region, in bytes\
-            from the start of the region
-        :rtype: int
+        :return: Nothing is returned
+        :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
         :raise data_specification.exceptions.DataWriteException:\
@@ -2048,6 +2047,32 @@ class DataSpecificationGenerator(object):
                     (return_register_value << 12) |
                     (block_size_reg << 8) |
                     imm_value)
+        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_list = cmd_word_encoded
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
+    def reset_write_pointer(self):
+        """ Insert command to reset the write pointer to the beginning of the
+            selected memory region.
+
+        :return: Nothing is returned
+        :rtype: None
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialized
+        :raise data_specification.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected
+        """
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                                                    Commands.ALIGN_WR_PTR.name)
+        cmd_word = (constants.LEN1 << 28)        |
+                   (Commands.RESET_WR_PTR << 20) |
+                   (constants.NO_REGS << 16)
+
         cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = cmd_word_encoded
 

@@ -43,7 +43,6 @@ typedef uint32_t* address_t;
 struct Command {
     enum OpCode opCode;
     uint8_t dataLength;
-    uint8_t fieldUsage;
     uint32_t cmdWord;
     uint32_t dataWords[3];
 };

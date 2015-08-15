@@ -13,6 +13,9 @@ int command_src2_in_use(uint32_t command);
 struct Command get_next_command();
 
 extern address_t command_pointer;
+extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
+
+void execute_reserve(struct Command cmd);
 
 void test_command_get_length() {
     cut_assert_equal_int(0x00, command_get_length(0x01333567));
@@ -180,6 +183,53 @@ void test_get_next_command() {
     cut_assert_equal_int(0xC5C94996, cmd.dataWords[0]);
     cut_assert_equal_int(0x21ABFBBC, cmd.dataWords[1]);
     cut_assert_equal_int(0x000000F0, cmd.dataWords[2]);
+}
+
+void test_execute_reserve() {
+    uint32_t commands[] = {0x12000000, 0x00000100,
+                           0x12000001, 0x00000200,
+                           0x12000082, 0x00000201,
+                           0x12000083, 0x00000022,
+                           0x12000084, 0x00000000,
+                           0x1200000F, 0x00000011};
+
+    command_pointer = commands;
+
+    for (int i = 0; i < sizeof(commands) / 8; i++)
+        execute_reserve(get_next_command());
+
+    for (int i = 0; i < MAX_MEM_REGIONS; i++)
+        if (i > 4 && i != 0xF)
+            cut_assert_null(memory_regions[i]);
+        else
+            cut_assert_not_null(memory_regions[i]);
+
+    cut_assert_equal_int(memory_regions[0]->size, 0x100);
+    cut_assert_equal_int(memory_regions[1]->size, 0x200);
+    cut_assert_equal_int(memory_regions[2]->size, 0x204);
+    cut_assert_equal_int(memory_regions[3]->size, 0x24);
+    cut_assert_equal_int(memory_regions[4]->size, 0x00);
+    cut_assert_equal_int(memory_regions[0xF]->size, 0x14);
+
+    cut_assert_equal_int(memory_regions[0]->unfilled, 0);
+    cut_assert_equal_int(memory_regions[1]->unfilled, 0);
+    cut_assert_equal_int(memory_regions[2]->unfilled, 1);
+    cut_assert_equal_int(memory_regions[3]->unfilled, 1);
+    cut_assert_equal_int(memory_regions[4]->unfilled, 1);
+    cut_assert_equal_int(memory_regions[0xF]->unfilled, 0);
+
+    cut_assert_equal_pointer(memory_regions[0]->start_address,
+                             memory_regions[0]->write_pointer);
+    cut_assert_equal_pointer(memory_regions[1]->start_address,
+                             memory_regions[1]->write_pointer);
+    cut_assert_equal_pointer(memory_regions[2]->start_address,
+                             memory_regions[2]->write_pointer);
+    cut_assert_equal_pointer(memory_regions[3]->start_address,
+                             memory_regions[3]->write_pointer);
+    cut_assert_equal_pointer(memory_regions[4]->start_address,
+                             memory_regions[4]->write_pointer);
+    cut_assert_equal_pointer(memory_regions[0xF]->start_address,
+                             memory_regions[0xF]->write_pointer);
 }
 
 

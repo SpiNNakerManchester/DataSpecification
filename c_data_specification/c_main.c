@@ -13,6 +13,7 @@
 //! Initialised with 0 (NULL) by default.
 struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
+#ifndef EMULATE
 //! \brief Set the header's start address.
 void set_header_start_address() {
     vcpu_t *sark_virtual_processor_info = (vcpu_t*) SV_VCPU;
@@ -176,4 +177,4 @@ void c_main(void) {
     free_mem_region_info();
 }
 
-
+#endif

@@ -131,10 +131,10 @@ class DataSpecificationRegionOutOfBoundsException(DataSpecificationException):
     def __init__(self, region, region_size, requested_offset, command):
         """
 
-        :param region: The region that was being offset into 
+        :param region: The region that was being offset into
         :type region: int
         :param region_size: The originally requested size of the region in\
-                    question, in bytes 
+                    question, in bytes
         :type region_size: int
         :param requested_offset: The offset being requested, in bytes
         :type requested_offset: int
@@ -204,8 +204,8 @@ class DataSpecificationNoMoreException(DataSpecificationException):
         :type space_required: int
         """
         print "Space unavailable to write all the elements requested by the " \
-              "write operation. Space available: {0:d}; space requested: " \
-              "{1:d} for region {}."\
+              "write operation. Space available: {}; space requested: " \
+              "{} for region {}."\
             .format(space_available, space_required, region)
 
 

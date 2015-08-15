@@ -1,6 +1,5 @@
+#include "data_specification_executor.h"
 #include "struct.h"
-#include <sark.h>
-#include <debug.h>
 
 struct Struct *struct_new(int no_of_elements) {
     struct Struct *newStruct = sark_alloc(1, sizeof(struct Struct));

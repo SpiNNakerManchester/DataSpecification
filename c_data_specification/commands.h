@@ -35,7 +35,7 @@ enum OpCode {
     IF                    = 0x55,
     ELSE                  = 0x56,
     END_IF                = 0x57,
-    MV                    = 0x58,
+    MV                    = 0x60,
     GET_WR_PTR            = 0x63,
     SET_WR_PTR            = 0x64,
     RESET_WR_PTR          = 0x65,

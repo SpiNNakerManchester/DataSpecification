@@ -92,8 +92,6 @@ int command_src2_in_use(uint32_t command) {
     return command_get_fieldUsage(command) & 0x1;
 }
 
-int print_commands = 0;
-
 //! \brief Read the next command from the memory and update the command_pointer
 //!        accordingly.
 //! \return A Command object storing the command.
@@ -111,13 +109,8 @@ struct Command get_next_command() {
     cmd.cmdWord        = cmd_word;
     cmd.dataLength     = command_get_length(cmd_word);
 
-    if (print_commands)
-        log_info("Command %08x", cmd_word);
-
     // Get the data words.
     for (int index = 0; index < command_get_length(cmd_word); index++) {
-        if (print_commands)
-            log_info("\t%08x", *command_pointer);
         cmd.dataWords[index] = *(command_pointer++);
     }
 
@@ -299,7 +292,6 @@ void execute_write_array(struct Command cmd) {
     int length        = cmd.dataWords[0];
     uint8_t data_size = cmd.cmdWord & 0x0F;
 
-
     // Perform some checks and, if everything is fine, write the array to
     // memory.
     if (current_region == -1) {
@@ -319,8 +311,8 @@ void execute_write_array(struct Command cmd) {
             array_writer += data_size;
         }
 
-        command_pointer = ((int)array_writer & 0x03)
-                         ? (uint32_t*)((((uint32_t)array_writer >> 2) + 1) << 2)
+        command_pointer = ((long)array_writer & 0x03)
+                         ? (uint32_t*)((((long)array_writer >> 2) + 1) << 2)
                          : (uint32_t*)array_writer;
     }
 }
@@ -346,7 +338,6 @@ void execute_switch_focus(struct Command cmd) {
         rt_error(RTE_ABORT);
     } else {
         current_region = region;
-        log_info("SWITCH_FOCUS to region %d", region);
     }
 }
 
@@ -382,14 +373,6 @@ void execute_loop(struct Command cmd) {
     // The register used to store the counter.
     int count_reg = cmd.cmdWord & 0xFF;
 
-    char str[10];
-    int i;
-    for (i = 0; i < stack_size; i++)
-        str[i] = ' ';
-    str[i] = '\0';
-    log_info("%sLooping from %d to %d with increment %d", str, loop_start, loop_end,
-             increment);
-
     // If the loop is not going to have any iteration, skip to the first
     // END_LOOP. Otherwise, start iterating.
     if (loop_start >= loop_end) {
@@ -407,11 +390,6 @@ void execute_loop(struct Command cmd) {
         // Pop the return value of the command pointer from the stack.
         stack_pop();
     }
-
- //   print_commands = 0;
-
-    log_info("%sLoop ended", str);
-
 }
 
 //! \brief Execute a START_STRUCT (structure definition) command.
@@ -421,7 +399,7 @@ void execute_start_struct(struct Command cmd) {
     // The id of the new struct.
     int struct_id = cmd.cmdWord & 0x1F;
 
-    log_info("START STRUCT %d", struct_id);
+    log_debug("START STRUCT %d", struct_id);
 
     // Save the command pointer.
     stack_push(command_pointer);
@@ -449,13 +427,14 @@ void execute_start_struct(struct Command cmd) {
         }
         uint8_t elem_type = structEntry.cmdWord & 0x1F;
 
+        uint32_t value = 0;
+        if (structEntry.dataLength == 1)
+            value = structEntry.dataWords[0];
+
+        struct_set_element_value(str, current_element_id, value);
         struct_set_element_type(str, current_element_id, elem_type);
 
-        if (structEntry.dataLength == 1) {
-            struct_set_element_value(str, current_element_id, structEntry.dataWords[0]);
-        } else {
-            struct_set_element_value(str, current_element_id, 0);
-        }
+        log_debug("STRUCT_ELEM type %d value %08x", elem_type, value);
 
         current_element_id++;
     }
@@ -550,18 +529,10 @@ void execute_logic_op(struct Command cmd) {
         case 0x3: registers[dest_id] = source1 &  source2; break;
         case 0x4: registers[dest_id] = source1 ^  source2; break;
         case 0x5: registers[dest_id] =~source1; break;
-        default: 
+        default:
             log_error("Undefined logic operation %d", operation);
             rt_error(RTE_ABORT);
     }
-    log_info("LOGIC_OP %08x%08x %d %08x%08x = %08x%08x",
-            (uint32_t)((source1 & 0xFFFFFFFF00000000LL) >> 32),
-            (uint32_t)(source1  & 0xFFFFFFFFF),
-            operation,
-            (uint32_t)((source2 & 0xFFFFFFFF00000000LL) >> 32),
-            (uint32_t)(source2  & 0xFFFFFFFFF),
-            (uint32_t)((registers[dest_id] & 0xFFFFFFFF00000000LL) >> 32),
-            (uint32_t)(registers[dest_id]  & 0xFFFFFFFFF));
 }
 
 
@@ -590,14 +561,15 @@ void execute_write_param(struct Command cmd) {
         rt_error(RTE_ABORT);
     }
 
-    log_info("Setting %d of struct %d to %08x", elem_id, struct_id, value);
+    log_debug("Setting element %d of struct %d to %08x", elem_id, struct_id,
+                                                        value);
     struct_set_element_value(structs[struct_id], elem_id, value);
 }
 
 //! \brief Execute a READ_PARAM instruction.
 //! \param[in] cmd The command to be executed.
 void execute_read_param(struct Command cmd) {
-    log_info("READ_PARAM %08x", cmd.cmdWord);
+    //log_info("READ_PARAM %08x", cmd.cmdWord);
     uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
     uint8_t struct_id = cmd.cmdWord & 0xF;
     uint8_t elem_id;
@@ -607,7 +579,6 @@ void execute_read_param(struct Command cmd) {
         elem_id = (cmd.cmdWord & 0xFF0) >> 4;
 
     registers[dest_reg] = structs[struct_id]->elements[elem_id].data;
-    log_info("READ PARAM register %d has now value %08x, from element %d of struct %d", dest_reg, (uint32_t)registers[dest_reg], elem_id, struct_id);
 }
 
 //! \brief Execute a COPY_PARAM instruction.
@@ -763,7 +734,6 @@ void execute_construct(struct Command cmd) {
     // Save the return address.
     stack_push(command_pointer);
 
-    print_commands = 1;
     data_specification_executor(constructors[constructor_id].start_address, 0);
 
     // Restore the return address.
@@ -781,7 +751,6 @@ void execute_construct(struct Command cmd) {
         structs[struct_id]     = structs[struct_arg_id];
         structs[struct_arg_id] = tmp;
     }
-    print_commands = 0;
 }
 
 //! \brief Execute a READ command.
@@ -796,17 +765,14 @@ void execute_read(struct Command cmd) {
         case 1:
             registers[dest_id]
                   = *((uint8_t*)memory_regions[current_region]->write_pointer);
-    log_info("READ Register %d has now value %02x", dest_id, (uint32_t)registers[dest_id]);
             break;
         case 2:
             registers[dest_id]
                   = *((uint16_t*)memory_regions[current_region]->write_pointer);
-    log_info("READ Register %d has now value %04x", dest_id, (uint32_t)registers[dest_id]);
             break;
         case 4:
             registers[dest_id]
                   = *((uint32_t*)memory_regions[current_region]->write_pointer);
-    log_info("READ Register %d has now value %08x", dest_id, (uint32_t)registers[dest_id]);
             break;
         default:
             log_info("READ unsupported size");
@@ -821,19 +787,15 @@ void execute_read(struct Command cmd) {
 //! \param[in] cmd The command to be executed.
 void execute_get_wr_ptr(struct Command cmd) {
     int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
-    log_info("GET_WR_PTR %d", dest_reg);
-    registers[dest_reg]
-                     = (uint32_t)memory_regions[current_region]->write_pointer;
-    //print_commands = 1;
+    registers[dest_reg] = (long)memory_regions[current_region]->write_pointer;
 }
 
 //! \brief Execute a SET_WR_PTR command.
 //! \param[in] cmd The command to be executed.
 void execute_set_wr_ptr(struct Command cmd) {
-    int32_t source;
+    int64_t source;
     if (command_src1_in_use(cmd.cmdWord)) {
         source = registers[command_get_src1Reg(cmd.cmdWord)];
-        log_info("SET_WR_PTR %08x %d %d %08x", cmd.cmdWord, (cmd.cmdWord & 0x00000F00) >> 8, command_get_src1Reg(cmd.cmdWord), source);
     } else
         source = cmd.dataWords[0];
 
@@ -844,43 +806,8 @@ void execute_set_wr_ptr(struct Command cmd) {
         memory_regions[current_region]->write_pointer += source;
     else
         memory_regions[current_region]->write_pointer = (uint8_t*)source;
-    log_info("Wr ptr set to %08x", memory_regions[current_region]->write_pointer);
-}
-/*
-//! \brief Execute a GET_RD_PTR command.
-//! \param[in] cmd The command to be executed.
-void execute_get_rd_ptr(struct Command cmd) {
-    int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
-    registers[dest_reg]
-                     = (uint32_t)memory_regions[current_region]->read_pointer;
 }
 
-//! \brief Execute a SET_RD_PTR command.
-//! \param[in] cmd The command to be executed.
-void execute_set_rd_ptr(struct Command cmd) {
-    int32_t source;
-    if (command_src1_in_use(cmd.cmdWord))
-        source = registers[command_get_src1Reg(cmd.cmdWord)];
-    else
-        source = cmd.dataWords[0];
-
-    uint8_t relative_addressing = cmd.cmdWord & 0x01;
-
-    // If relative addressing is used
-    if (relative_addressing)
-        memory_regions[current_region]->read_pointer += source;
-    else
-        memory_regions[current_region]->read_pointer = (uint8_t*)source;
-}
-
-//! \brief Execute a RESET_RD_PTR command.
-//! \param[in] cmd The command to be executed.
-void execute_reset_rd_ptr(struct Command cmd) {
-    log_info("Resetting read pointer");
-    memory_regions[current_region]->read_pointer
-                                = memory_regions[current_region]->start_address;
-}
-*/
 //! \brief Execute a RESET_WR_PTR command.
 //! \param[in] cmd The command to be executed.
 void execute_reset_wr_ptr(struct Command cmd) {
@@ -913,11 +840,6 @@ void execute_if(struct Command cmd) {
         case 0x06: op_result = source1 == 0;       break;
         case 0x07: op_result = source1 != 0;       break;
     }
-
-    log_info("COND %08x %d %08x = %d", source1, operation,
-             source2, op_result);
-
-    //print_commands = 1;
 
     if (op_result == 0) {
         // Skip all instructions up to ELSE or END_IF.
@@ -953,7 +875,6 @@ void execute_print_val(struct Command cmd) {
 //! \brief Execute a ARITH_OP command.
 //! \param[in] cmd The command to be executed.
 void execute_arith_op(struct Command cmd) {
-    log_info("ARITH_OP %08x", cmd.cmdWord);
     uint8_t sgn = (cmd.cmdWord & (0x1 << 19)) >> 19;
 
     uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
@@ -992,7 +913,6 @@ void execute_arith_op(struct Command cmd) {
                    rt_error(RTE_ABORT);
     }
     registers[dest_reg] = result;
-    log_info("ARITH_OP %08x %d %08x = %08x%08x", source1, operation, source2, (uint32_t)((registers[dest_reg] & 0xFFFFFFFF00000000LL) >> 32), (uint32_t)(registers[dest_reg] & 0xFFFFFFFFF));
 }
 
 //! \brief Execute a part of a data specification.
@@ -1052,7 +972,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case START_PACKSPEC:
                 log_error("Unimplemented DSE command START_PACKSPEC");
                 break;
-            case PACK_PARAM: 
+            case PACK_PARAM:
                 log_error("Unimplemented DSE command PACK_PARAM");
                 break;
             case END_PACKSPEC:
@@ -1063,7 +983,6 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 break;
             case END_CONSTRUCTOR:
                 log_debug("Constructor ended");
-                //print_commands = 1;
                 return;
             case CONSTRUCT:
                 execute_construct(cmd);
@@ -1116,15 +1035,6 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case RESET_WR_PTR:
                 execute_reset_wr_ptr(cmd);
                 break;
-//            case GET_RD_PTR:
-//                execute_get_rd_ptr(cmd);
-//                break;
-//            case SET_RD_PTR:
-//                execute_set_rd_ptr(cmd);
-//                break;
-//            case RESET_RD_PTR:
-//                execute_reset_rd_ptr(cmd);
-//                break;
             case ARITH_OP:
                 execute_arith_op(cmd);
                 break;

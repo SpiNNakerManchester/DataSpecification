@@ -5,13 +5,9 @@
 
 #include "commands.h"
 #include "constants.h"
+// data_specification_executor.h includes all the required headers if are
+// needed
 #include "data_specification_executor.h"
-#include <stdint.h>
-#include <sark.h>
-#include <debug.h>
-#include <data_specification.h>
-#include <spinnaker.h>
-#include <spin1_api.h>
 
 //! Array to keep track of allocated memory regions.
 //! Initialised with 0 (NULL) by default.

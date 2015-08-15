@@ -1,6 +1,5 @@
+#include "data_specification_executor.h"
 #include "data_specification_stack.h"
-#include <sark.h>
-#include <debug.h>
 
 void *stack[MAX_STACK_SIZE];
 int stack_size = 0;

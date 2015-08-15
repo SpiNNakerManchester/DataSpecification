@@ -22,9 +22,9 @@ typedef uint32_t* address_t;
 #define spin1_memcpy(destination, source, size) memcpy((destination), (source), (size))
 #define rt_error(error_code) exit((error_code))
 #define RTE_ABORT -1
-#define log_info(message, ...) printf("[INFO]    ", message, ##__VA_ARGS__)
-#define log_error(message, ...) printf("[ERROR]    ", message, ##__VA_ARGS__)
-#define log_debug(message, ...) printf("[DEBUG]    ", message, ##__VA_ARGS__)
+#define log_info(message, ...) printf("[INFO] " message "\n", ##__VA_ARGS__)
+#define log_error(message, ...) printf("[ERROR] " message "\n", ##__VA_ARGS__)
+#define log_debug(message, ...) printf("[DEBUG] " message "\n", ##__VA_ARGS__)
 #define sark_xalloc(heap, size, tag, flag) malloc((size))
 #define sark_alloc(count, size) malloc((count) * (size))
 #define sark_xfree(heap, ptr, flag) free((ptr))
@@ -49,9 +49,8 @@ struct Command {
 
 struct MemoryRegion {
     uint8_t* start_address;
-    int size;
-    int unfilled;
-    int free;
+    uint32_t size;
+    uint8_t unfilled;
     uint8_t* write_pointer;
 };
 

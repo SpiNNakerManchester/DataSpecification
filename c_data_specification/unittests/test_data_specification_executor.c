@@ -16,6 +16,8 @@ extern address_t command_pointer;
 extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
 void execute_reserve(struct Command cmd);
+void execute_free(struct Command cmd);
+void execute_switch_focus(struct Command cmd);
 
 void test_command_get_length() {
     cut_assert_equal_int(0x00, command_get_length(0x01333567));
@@ -230,6 +232,35 @@ void test_execute_reserve() {
                              memory_regions[4]->write_pointer);
     cut_assert_equal_pointer(memory_regions[0xF]->start_address,
                              memory_regions[0xF]->write_pointer);
+}
+
+void test_execute_free() {
+    uint32_t reserve_memory_commands[] = {0x12000000, 0x00000100,
+                                          0x12000001, 0x00000200,
+                                          0x12000082, 0x00000201,
+                                          0x12000083, 0x00000022,
+                                          0x12000084, 0x00000004,
+                                          0x1200000F, 0x00000011};
+
+    command_pointer = reserve_memory_commands;
+
+    for (int i = 0; i < sizeof(reserve_memory_commands) / 8; i++)
+        execute_reserve(get_next_command());
+
+    uint32_t free_memory_commands[] = {0x03000000,
+                                       0x03000001,
+                                       0x03000002,
+                                       0x03000003,
+                                       0x03000004,
+                                       0x0300000F};
+
+    command_pointer = free_memory_commands;
+
+    for (int i = 0; i < sizeof(free_memory_commands) / 4; i++)
+        execute_free(get_next_command());
+
+    for (int i = 0; i < MAX_MEM_REGIONS; i++)
+        cut_assert_null(memory_regions[i]);
 }
 
 

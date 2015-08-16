@@ -14,6 +14,7 @@ struct Command get_next_command();
 
 extern address_t command_pointer;
 extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
+extern int current_region;
 
 void execute_reserve(struct Command cmd);
 void execute_free(struct Command cmd);
@@ -271,6 +272,35 @@ void test_execute_free() {
 
     for (int i = 0; i < MAX_MEM_REGIONS; i++)
         cut_assert_null(memory_regions[i]);
+}
+
+void test_execute_switch_focus() {
+    uint32_t reserve_memory_commands[] = {0x12000000, 0x00000100,
+                                          0x12000001, 0x00000200,
+                                          0x12000082, 0x00000201,
+                                          0x12000083, 0x00000022,
+                                          0x12000084, 0x00000004,
+                                          0x1200000F, 0x00000011};
+
+    command_pointer = reserve_memory_commands;
+
+    for (int i = 0; i < sizeof(reserve_memory_commands) / 8; i++)
+        execute_reserve(get_next_command());
+
+    uint32_t switch_focus_commands[] = {0x05000000,
+                                        0x05000100,
+                                        0x05000200,
+                                        0x05000300,
+                                        0x05000400,
+                                        0x05000F00};
+
+    command_pointer = switch_focus_commands;
+
+    for (int i = 0; i < sizeof(switch_focus_commands) / 4; i++) {
+        execute_switch_focus(get_next_command());
+        cut_assert_equal_int((switch_focus_commands[i] & 0xF00) >> 8,
+                             current_region);
+    }
 }
 
 

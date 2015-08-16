@@ -15,6 +15,7 @@ struct Command get_next_command();
 extern address_t command_pointer;
 extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 extern int current_region;
+extern uint64_t registers[MAX_REGISTERS];
 
 void execute_reserve(struct Command cmd);
 void execute_free(struct Command cmd);
@@ -300,6 +301,27 @@ void test_execute_switch_focus() {
         execute_switch_focus(get_next_command());
         cut_assert_equal_int((switch_focus_commands[i] & 0xF00) >> 8,
                              current_region);
+    }
+
+    registers[5] = 0;
+    registers[6] = 1;
+    registers[7] = 2;
+    registers[8] = 3;
+    registers[9] = 4;
+    registers[10] = 0xF;
+
+    uint32_t switch_focus_register_commands[] = {0x05020500,
+                                                 0x05020600,
+                                                 0x05020700,
+                                                 0x05020800,
+                                                 0x05020900,
+                                                 0x05020A00};
+
+    command_pointer = switch_focus_register_commands;
+
+    for (int i = 5; i <= 10; i++) {
+        execute_switch_focus(get_next_command());
+        cut_assert_equal_int(registers[i], current_region);
     }
 }
 

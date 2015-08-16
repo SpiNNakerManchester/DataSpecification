@@ -20,6 +20,7 @@ extern uint64_t registers[MAX_REGISTERS];
 void execute_reserve(struct Command cmd);
 void execute_free(struct Command cmd);
 void execute_switch_focus(struct Command cmd);
+void execute_write(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -325,5 +326,49 @@ void test_execute_switch_focus() {
     }
 }
 
+void test_execute_write() {
+    uint32_t commands[] = {0x12000000, 0x00000100,
+                           0x05000000,
+                           0x14102001, 0x12345678,
+                           0x14101002, 0xABCD,
+                           0x14100004, 0xAB,
+                           0x24103002, 0x12345678, 0x9ABCDEF0,
+                           0x04122102,
+                           0x04121102,
+                           0x04130230,
+                           0x04130230};
+
+    command_pointer = commands;
+
+    registers[1] = 0x12345678;
+    registers[2] = 0xAB;
+    registers[3] = 2;
+
+    execute_reserve(get_next_command());
+    execute_switch_focus(get_next_command());
+
+    for (int i = 0; i < 8; i++)
+        execute_write(get_next_command());
+
+    const char *memory =
+                    cut_take_memory((void*)(memory_regions[0]->start_address));
+
+    uint32_t out[] = {0x12345678,
+                      0xABCDABCD,
+                      0xABABABAB,
+                      0x9ABCDEF0, 0x12345678,
+                      0x9ABCDEF0, 0x12345678,
+                      0x12345678, 0x12345678,
+                      0x56785678,
+                      0xABABABAB};
+
+    uint32_t *reader = (uint32_t*)memory;
+    for (int i = 0; i < sizeof(out) / 4; i++) {
+//    for (int i = 0; i < 11; i++) {
+        cut_assert_equal_int(out[i], reader[i]);
+    }
+
+    memory_regions[0] = NULL;
+}
 
 

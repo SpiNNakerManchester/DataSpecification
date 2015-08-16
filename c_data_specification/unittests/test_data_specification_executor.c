@@ -19,6 +19,16 @@ void execute_reserve(struct Command cmd);
 void execute_free(struct Command cmd);
 void execute_switch_focus(struct Command cmd);
 
+void cut_teardown() {
+    for (int i = 0; i < MAX_MEM_REGIONS; i++) {
+        if (memory_regions[i] != NULL) {
+            free(memory_regions[i]->start_address);
+            free(memory_regions[i]);
+            memory_regions[i] = NULL;
+        }
+    }
+}
+
 void test_command_get_length() {
     cut_assert_equal_int(0x00, command_get_length(0x01333567));
     cut_assert_equal_int(0x01, command_get_length(0x53234567));

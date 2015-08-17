@@ -774,6 +774,10 @@ void execute_read(struct Command cmd) {
             registers[dest_id]
                   = *((uint32_t*)memory_regions[current_region]->write_pointer);
             break;
+        case 8:
+            registers[dest_id]
+                  = *((uint64_t*)memory_regions[current_region]->write_pointer);
+            break;
         default:
             log_info("READ unsupported size");
             rt_error(RTE_ABORT);

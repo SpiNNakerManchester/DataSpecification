@@ -30,6 +30,7 @@ void execute_read(struct Command cmd);
 void execute_reset_wr_ptr(struct Command cmd);
 void execute_logic_op(struct Command cmd);
 void execute_start_struct(struct Command cmd);
+void execute_mv(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -591,5 +592,27 @@ void test_execute_start_struct() {
     cut_assert_equal_int(0, structs[8]->elements[9].data);
     cut_assert_equal_int(0, structs[8]->elements[10].data);
 
+}
 
+void test_execute_mv() {
+    uint32_t commands[] = {0x26040000, 0xABCDEF12, 0x12345678,
+                           0x16048000, 0x11223344,
+                           0x16045000, 0x12,
+                           0x06062000,
+                           0x06063800,
+                           0x06064500};
+
+    command_pointer = commands;
+
+    for (int i = 0; i < 6; i++)
+        execute_mv(get_next_command());
+
+    cut_assert_equal_int(0xABCDEF1212345678LL, registers[0]);
+    cut_assert_equal_int(0xABCDEF1212345678LL, registers[2]);
+
+    cut_assert_equal_int(0x11223344, registers[8]);
+    cut_assert_equal_int(0x11223344, registers[3]);
+
+    cut_assert_equal_int(0x12, registers[4]);
+    cut_assert_equal_int(0x12, registers[5]);
 }

@@ -486,11 +486,13 @@ void execute_mv(struct Command cmd) {
     uint8_t dest_id = command_get_destReg(cmd.cmdWord);
 
     // The data to be moved.
-    uint32_t data;
+    uint64_t data;
     if (command_src1_in_use(cmd.cmdWord))
         data = registers[command_get_src1Reg(cmd.cmdWord)];
-    else
+    else if (cmd.dataLength == 1)
         data = cmd.dataWords[0];
+    else
+        data = ((uint64_t)cmd.dataWords[0] << 32) | cmd.dataWords[1];
 
     // Perform the actual data move.
     registers[dest_id] = data;

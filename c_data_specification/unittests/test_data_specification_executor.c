@@ -1,5 +1,6 @@
 #include <cutter.h>
 #include "data_specification_executor.h"
+#include "struct.h"
 
 uint8_t command_get_length(uint32_t command);
 enum OpCode command_get_opcode(uint32_t command);
@@ -16,6 +17,7 @@ extern address_t command_pointer;
 extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 extern int current_region;
 extern uint64_t registers[MAX_REGISTERS];
+extern struct Struct *structs[MAX_STRUCTS];
 
 void execute_reserve(struct Command cmd);
 void execute_free(struct Command cmd);
@@ -27,6 +29,7 @@ void execute_set_wr_ptr(struct Command cmd);
 void execute_read(struct Command cmd);
 void execute_reset_wr_ptr(struct Command cmd);
 void execute_logic_op(struct Command cmd);
+void execute_start_struct(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -547,3 +550,46 @@ void test_execute_logic_op() {
     }
 }
 
+void test_execute_start_struct() {
+    uint32_t commands[] = {0x01000004,
+                           0x01200000,
+                           0x01000008,
+                           0x11100000, 0x12,
+                           0x11100001, 0x1234,
+                           0x11100002, 0x12345678,
+                           0x21100003, 0x12345678, 0x90ABCDEF,
+                           0x11100004, -1,
+                           0x11100005, -1,
+                           0x11100006, -1,
+                           0x01100007,
+                           0x01100008,
+                           0x01100009,
+                           0x0110000A,
+                           0x0110000B,
+                           0x01200000};
+
+    command_pointer = commands;
+
+    execute_start_struct(get_next_command());
+    execute_start_struct(get_next_command());
+
+    cut_assert_equal_int(0, structs[4]->size);
+    cut_assert_equal_int(12, structs[8]->size);
+
+    for (int i = 0; i < 12; i++)
+        cut_assert_equal_int(i, structs[8]->elements[i].type);
+
+    cut_assert_equal_int(0x12, structs[8]->elements[0].data);
+    cut_assert_equal_int(0x1234, structs[8]->elements[1].data);
+    cut_assert_equal_int(0x12345678, structs[8]->elements[2].data);
+    cut_assert_equal_int(0x1234567890ABCDEFLL, structs[8]->elements[3].data);
+    cut_assert_equal_int(0xFF, structs[8]->elements[4].data);
+    cut_assert_equal_int(0xFFFF, structs[8]->elements[5].data);
+    cut_assert_equal_int(0xFFFFFFFF, structs[8]->elements[6].data);
+    cut_assert_equal_int(0, structs[8]->elements[7].data);
+    cut_assert_equal_int(0, structs[8]->elements[8].data);
+    cut_assert_equal_int(0, structs[8]->elements[9].data);
+    cut_assert_equal_int(0, structs[8]->elements[10].data);
+
+
+}

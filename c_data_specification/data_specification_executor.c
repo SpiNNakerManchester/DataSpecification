@@ -883,38 +883,58 @@ void execute_arith_op(struct Command cmd) {
 
     uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
 
-    uint32_t source1;
+    uint64_t source1;
     if (command_src1_in_use(cmd.cmdWord))
         source1 = registers[command_get_src1Reg(cmd.cmdWord)];
-    else
+    else {
         source1 = cmd.dataWords[0];
+        source1 |= (source1 & 0x80000000) ? 0xFFFFFFFF00000000LL : 0;
+    }
 
-    uint32_t source2;
+    uint64_t source2;
     if (command_src2_in_use(cmd.cmdWord))
         source2 = registers[command_get_src2Reg(cmd.cmdWord)];
-    else {
-        if (!command_src1_in_use(cmd.cmdWord))
-            source2 = cmd.dataWords[1];
-        else
-            source2 = cmd.dataWords[0];
+    else if (!command_src1_in_use(cmd.cmdWord)) {
+        source2 = cmd.dataWords[1];
+        source2 |= (source2 & 0x80000000) ? 0xFFFFFFFF00000000LL : 0;
+    } else {
+        source2 = cmd.dataWords[0];
+        source2 |= (source2 & 0x80000000) ? 0xFFFFFFFF00000000LL : 0;
     }
 
     uint8_t operation = cmd.cmdWord & 0x0F;
 
     uint64_t result = 0;
-    switch (operation) {
-        case 0x00: result = (sgn == 1 ? (int32_t)source1 + (int32_t)source2 :
-                              source1 + source2);
-                   break;
-        case 0x01: result = (sgn == 1 ? (int32_t)source1 - (int32_t)source2 :
-                              source1 - source2);
-                   break;
-        case 0x02: result = (sgn == 1 ? (int64_t)source1 * (int64_t)source2 :
-                              (uint64_t)source1 * (uint64_t)source2);
-                   break;
-        default:
-                   log_error("Unknown arithmetic operation");
-                   rt_error(RTE_ABORT);
+    if (sgn) {
+        switch (operation) {
+            case 0:
+                result = (int64_t)source1 + (int64_t)source2;
+                break;
+            case 1:
+                result = (int64_t)source1 - (int64_t)source2;
+                break;
+            case 2:
+                result = (int64_t)source1 * (int64_t)source2;
+                break;
+            default:
+                log_error("Unknown arithmetic operation");
+                rt_error(RTE_ABORT);
+        }
+    } else {
+        switch (operation) {
+            case 0:
+                result = source1 + source2;
+                break;
+            case 1:
+                result = source1 - source2;
+                break;
+            case 2:
+                result = source1 * source2;
+                break;
+            default:
+                log_error("Unknown arithmetic operation");
+                rt_error(RTE_ABORT);
+        }
     }
     registers[dest_reg] = result;
 }

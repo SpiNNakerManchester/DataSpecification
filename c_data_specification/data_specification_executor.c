@@ -779,10 +779,9 @@ void execute_read(struct Command cmd) {
                   = *((uint64_t*)memory_regions[current_region]->write_pointer);
             break;
         default:
-            log_info("READ unsupported size");
+            log_error("READ unsupported size %d", data_len);
             rt_error(RTE_ABORT);
     }
-
 
     memory_regions[current_region]->write_pointer += data_len;
 }

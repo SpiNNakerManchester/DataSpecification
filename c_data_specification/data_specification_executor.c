@@ -427,9 +427,12 @@ void execute_start_struct(struct Command cmd) {
         }
         int elem_type = structEntry.cmdWord & 0x1F;
 
-        uint32_t value = 0;
+        uint64_t value = 0;
         if (structEntry.dataLength == 1)
             value = structEntry.dataWords[0];
+        else if (structEntry.dataLength == 2)
+            value = ((uint64_t)structEntry.dataWords[0] << 32)
+                  | structEntry.dataWords[1];
 
         log_debug("STRUCT_ELEM type %d value %08x", elem_type, value);
 

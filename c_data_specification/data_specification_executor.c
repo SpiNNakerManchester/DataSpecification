@@ -787,7 +787,8 @@ void execute_read(struct Command cmd) {
 //! \param[in] cmd The command to be executed.
 void execute_get_wr_ptr(struct Command cmd) {
     int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
-    registers[dest_reg] = (long)memory_regions[current_region]->write_pointer;
+    registers[dest_reg] = (long)(memory_regions[current_region]->write_pointer
+                               - memory_regions[current_region]->start_address);
 }
 
 //! \brief Execute a SET_WR_PTR command.
@@ -805,7 +806,8 @@ void execute_set_wr_ptr(struct Command cmd) {
     if (relative_addressing)
         memory_regions[current_region]->write_pointer += source;
     else
-        memory_regions[current_region]->write_pointer = (uint8_t*)source;
+        memory_regions[current_region]->write_pointer =
+            (uint8_t*)(memory_regions[current_region]->start_address + source);
 }
 
 //! \brief Execute a RESET_WR_PTR command.

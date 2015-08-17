@@ -31,6 +31,7 @@ void execute_reset_wr_ptr(struct Command cmd);
 void execute_logic_op(struct Command cmd);
 void execute_start_struct(struct Command cmd);
 void execute_mv(struct Command cmd);
+void execute_arith_op(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -616,3 +617,75 @@ void test_execute_mv() {
     cut_assert_equal_int(0x12, registers[4]);
     cut_assert_equal_int(0x12, registers[5]);
 }
+
+void test_execute_arith_op() {
+    uint32_t commands[] = {0x2674F000, 0xFF, 4,
+                           0x2674F001, 0xFF, 4,
+                           0x2674F002, 0xF0, 4,
+                           0x267CF000, 0xFE, -1,
+                           0x267CF001, 0xFE, -1,
+                           0x267CF002, 0xFF, -1,
+
+                           0x1676F100, 4,       //6
+                           0x1676F101, -1,
+                           0x1676F002, 0xFF,
+                           0x167EF000, -1,
+                           0x167EF001, 1,
+                           0x167EF002, 0,
+
+                           0x1675F030, 0xFF,    //12
+                           0x1675F031, 0xFF,
+                           0x1675F032, 0xF0,
+                           0x167DF040, 1,
+                           0x167DF041, -3,
+                           0x167DF042, -10,
+
+                           0x0677F130,          //18
+                           0x0677F131,
+                           0x0677F132,
+                           0x0677F050,
+                           0x067FF051,
+                           0x067FF052};
+
+    command_pointer = commands;
+
+    registers[0] = 0xFF;
+    registers[1] = 0x1;
+    registers[2] = -1;
+    registers[3] = 0x24;
+    registers[4] = 0x100;
+    registers[5] = -5;
+
+    long long int out[] = {0xFF + 4,
+                           0xFF - 4,
+                           0xF0 * 4,
+                           0xFD,
+                           0xFF,
+                           (uint64_t)((int64_t)0xFF * -1LL),
+                           5,
+                           2,
+                           0xFF * 0xFF,
+                           (uint64_t)((int64_t)0xFF + -1LL),
+                           0xFE,
+                           0,
+                           0x24 + 0xFF,
+                           0xFF - 0x24,
+                           0x24 * 0xF0,
+                           0x101,
+                           -0x103,
+                           0x100LL * (-10LL),
+                           0x25,
+                           (uint64_t)1 - (uint64_t)0x24,
+                           0x24,
+                           0xFF + (-5),
+                           0xFF - (-5),
+                           0xFF * (-5)
+                          };
+
+    for (int i = 0; i < 24; i++) {
+        execute_arith_op(get_next_command());
+        cut_assert_equal_int(out[i], registers[15]);
+    }
+
+}
+

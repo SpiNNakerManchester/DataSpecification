@@ -26,6 +26,7 @@ void execute_get_wr_ptr(struct Command cmd);
 void execute_set_wr_ptr(struct Command cmd);
 void execute_read(struct Command cmd);
 void execute_reset_wr_ptr(struct Command cmd);
+void execute_logic_op(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -500,10 +501,49 @@ void test_execute_read() {
 }
 
 void test_execute_logic_op() {
-    uint32_t commands[] = {,
+    uint32_t commands[] = {0x2684F000, 0xFF, 4,
+                           0x2684F001, 0xFF, 4,
+                           0x2684F002, 0xF0, 4,
+                           0x2684F003, 0xFE, 5,
+                           0x2684F004, 0xFE, 5,
+                           0x1684F005, 0xFF,
+
+                           0x1686F100, 4,
+                           0x1686F101, 4,
+                           0x1686F002, 0xFF,
+                           0x1686F003, 0xFF,
+                           0x1686F004, 0xFF,
+                           0x0686F005,
+
+                           0x1685F030, 0xFF,
+                           0x1685F031, 0xFF,
+                           0x1685F032, 0xF0,
+                           0x1685F043, 0xFE,
+                           0x1685F044, 0xFE,
+
+                           0x0687F131,
+                           0x0687F132,
+                           0x0687F052,
+                           0x0687F053,
+                           0x0687F054};
 
     registers[0] = 0x12345678;
     registers[1] = 0xFFFFFFFF;
     registers[2] = 0x00000000;
+    registers[3] = 0x00000004;
+    registers[4] = 0x00000005;
+    registers[5] = 0x000000FF;
+
+    command_pointer = commands;
+
+    long long int out[] = {0xFF0, 0xF, 0xF4, 0x4, 0xFB, ~0xFF,
+                           0xFFFFFFFF0, 0x0FFFFFFF, 0x123456FF, 0x78, 0x12345687,
+                           0xFF0, 0xF, 0xF4, 0x5, 0x1, ~0xFF,
+                           0xFFFFFFF0, 0x0FFFFFFF, 0x123456FF, 0x78, 0x12345687};
+
+    for (int i = 0; i < 7; i++) {
+        execute_logic_op(get_next_command());
+        cut_assert_equal_int(out[i], registers[15]);
+    }
 }
 

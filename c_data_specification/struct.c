@@ -39,7 +39,7 @@ int data_type_get_size(enum Type type) {
             || type == U064   || type == S063) {
         return 8;
     } else {
-        log_info("Unknown data type %x", type);
+        log_error("Unknown data type %x", type);
         rt_error(RTE_ABORT);
     }
 }

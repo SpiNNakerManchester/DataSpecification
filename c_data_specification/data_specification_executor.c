@@ -1031,9 +1031,6 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case ALIGN_WR_PTR:
                 log_error("Unimplemented DSE command ALIGN_WR_PTR");
                 break;
-            case RESET_WR_PTR:
-                execute_reset_wr_ptr(cmd);
-                break;
             case ARITH_OP:
                 execute_arith_op(cmd);
                 break;

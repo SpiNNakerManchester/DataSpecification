@@ -379,8 +379,8 @@ void test_execute_write_array() {
                                0x01234567, 0x9ABCDEF0,
                                0xAABBCCDD, 0x11223344,
                            0x14300002, 0x00000004,
-                               0x00001234, 0x0000ABCD,
-                               0x00001234, 0x0000ABCD};
+                               0x1234ABCD,
+                               0xAABB1234};
 
     command_pointer = commands;
 
@@ -397,12 +397,12 @@ void test_execute_write_array() {
                       0x9ABCDEF0,
                       0xAABBCCDD,
                       0x11223344,
-                      0x1234, 0xABCD,
-                      0x1234, 0xABCD};
+                      0x1234ABCD,
+                      0xAABB1234};
 
     uint32_t *reader = (uint32_t*)memory;
 
-    for (int i = 0; i < sizeof(out) / 4; i++) {
+    for (int i = 0; i < 6; i++) {
         cut_assert_equal_int(out[i], reader[i]);
     }
 

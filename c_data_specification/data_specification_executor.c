@@ -425,16 +425,16 @@ void execute_start_struct(struct Command cmd) {
             log_error("A struct definition must contain only struct elements");
             rt_error(RTE_ABORT);
         }
-        uint8_t elem_type = structEntry.cmdWord & 0x1F;
+        int elem_type = structEntry.cmdWord & 0x1F;
 
         uint32_t value = 0;
         if (structEntry.dataLength == 1)
             value = structEntry.dataWords[0];
 
-        struct_set_element_value(str, current_element_id, value);
-        struct_set_element_type(str, current_element_id, elem_type);
-
         log_debug("STRUCT_ELEM type %d value %08x", elem_type, value);
+
+        struct_set_element_type(str, current_element_id, elem_type);
+        struct_set_element_value(str, current_element_id, value);
 
         current_element_id++;
     }

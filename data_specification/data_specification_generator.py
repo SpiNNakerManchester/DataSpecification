@@ -2052,34 +2052,6 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def reset_write_pointer(self):
-        """ Insert command to reset the write pointer to the beginning of the
-            selected memory region.
-
-        :return: Nothing is returned
-        :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
-            If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
-            selected
-        """
-        if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                                                    Commands.ALIGN_WR_PTR.name)
-        cmd_word = (constants.LEN1 << 28)        | \
-                   (Commands.RESET_WR_PTR.value << 20) | \
-                   (constants.NO_REGS << 16)
-
-        cmd_string = Commands.RESET_WR_PTR.name
-
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
-
     def call_arithmetic_operation(self, register_id, operand_1, operation,
                                   operand_2, signed,
                                   operand_1_is_register=False,

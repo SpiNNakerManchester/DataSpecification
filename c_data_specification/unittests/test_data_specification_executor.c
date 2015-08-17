@@ -499,21 +499,11 @@ void test_execute_read() {
     }
 }
 
-void test_execute_reset_wr_ptr() {
-    uint32_t commands[] = {0x12000000, 0x00000100,
-                           0x05000000,
-                           0x06500000};
+void test_execute_logic_op() {
+    uint32_t commands[] = {,
 
-    command_pointer = commands;
-
-    execute_reserve(get_next_command());
-    execute_switch_focus(get_next_command());
-
-    memory_regions[current_region]->write_pointer += 100;
-
-    execute_reset_wr_ptr(get_next_command());
-
-    cut_assert_equal_pointer(memory_regions[current_region]->start_address,
-                             memory_regions[current_region]->write_pointer);
+    registers[0] = 0x12345678;
+    registers[1] = 0xFFFFFFFF;
+    registers[2] = 0x00000000;
 }
 

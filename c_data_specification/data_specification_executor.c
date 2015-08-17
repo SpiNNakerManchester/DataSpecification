@@ -813,12 +813,6 @@ void execute_set_wr_ptr(struct Command cmd) {
             (uint8_t*)(memory_regions[current_region]->start_address + source);
 }
 
-//! \brief Execute a RESET_WR_PTR command.
-//! \param[in] cmd The command to be executed.
-void execute_reset_wr_ptr(struct Command cmd) {
-    memory_regions[current_region]->write_pointer
-                                = memory_regions[current_region]->start_address;
-}
 
 //! \brief Execute an IF command.
 //! \param[in] cmd The command to be executed.

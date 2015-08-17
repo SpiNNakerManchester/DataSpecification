@@ -352,23 +352,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         command = self.get_next_word()
         self.assertEqual(command, 0x067F3342, "ARITH_OP wrong command word")
 
-    def test_reset_write_pointer(self):
-        self.assertRaises(
-            exceptions.DataSpecificationNoRegionSelectedException,
-            self.dsg.reset_write_pointer)
-
-        self.dsg.reserve_memory_region(1, 100)
-        self.dsg.switch_write_focus(1)
-
-        self.dsg.reset_write_pointer()
-
-        self.skip_words(3)
-
-        command = self.get_next_word()
-        self.assertEquals(command, 0x06500000,
-                          "RESET_WR_PTR wrong command word")
-
-
     def test_align_write_pointer(self):
         # Test DataSpecificationNoRegionSelectedException raise
         self.assertRaises(

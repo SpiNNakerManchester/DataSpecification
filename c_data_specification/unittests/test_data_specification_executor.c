@@ -22,6 +22,7 @@ void execute_free(struct Command cmd);
 void execute_switch_focus(struct Command cmd);
 void execute_write(struct Command cmd);
 void execute_write_array(struct Command cmd);
+void execute_get_wr_ptr(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -409,3 +410,32 @@ void test_execute_write_array() {
     memory_regions[0] = NULL;
 
 }
+
+void test_execute_get_wr_ptr() {
+    uint32_t commands[] = {0x12000000, 0x00000100,
+                           0x05000000,
+                           0x14202004, 0x12345678,
+                           0x06340000,
+                           0x14201004, 0xABCD,
+                           0x06341000,
+                           0x14200004, 0xAB,
+                           0x06342000,
+                           0x24203004, 0x12345678, 0x9ABCDEF0,
+                           0x06343000};
+
+    command_pointer = commands;
+
+    execute_reserve(get_next_command());
+    execute_switch_focus(get_next_command());
+
+    int out[] = {16, 24, 28, 60};
+
+    for (int i = 0; i < 4; i++) {
+        execute_write(get_next_command());
+        execute_get_wr_ptr(get_next_command());
+        cut_assert_equal_int(out[i], (uint8_t*)registers[i]
+                                     - memory_regions[0]->start_address);
+    }
+}
+
+

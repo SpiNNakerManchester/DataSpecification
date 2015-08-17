@@ -433,8 +433,7 @@ void test_execute_get_wr_ptr() {
     for (int i = 0; i < 4; i++) {
         execute_write(get_next_command());
         execute_get_wr_ptr(get_next_command());
-        cut_assert_equal_int(out[i], (uint8_t*)registers[i]
-                                     - memory_regions[0]->start_address);
+        cut_assert_equal_int(out[i], registers[i]);
     }
 }
 

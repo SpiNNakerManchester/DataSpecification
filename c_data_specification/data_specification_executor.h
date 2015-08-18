@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 typedef uint32_t* address_t;
-#define spin1_exit(code) exit(code)
+#define spin1_exit(code) return (code);
 #define spin1_memcpy(destination, source, size) memcpy((destination), (source), (size))
 #define rt_error(error_code) exit((error_code))
 #define RTE_ABORT -1

@@ -32,6 +32,7 @@ void execute_logic_op(struct Command cmd);
 void execute_start_struct(struct Command cmd);
 void execute_mv(struct Command cmd);
 void execute_arith_op(struct Command cmd);
+void execute_if(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -212,12 +213,12 @@ void test_get_next_command() {
 }
 
 void test_execute_reserve() {
-    uint32_t commands[] = {0x12000000, 0x00000100,
-                           0x12000001, 0x00000200,
-                           0x12000082, 0x00000201,
-                           0x12000083, 0x00000022,
-                           0x12000084, 0x00000000,
-                           0x1200000F, 0x00000011};
+    uint32_t commands[] = {0x10200000, 0x00000100,
+                           0x10200001, 0x00000200,
+                           0x10200082, 0x00000201,
+                           0x10200083, 0x00000022,
+                           0x10200084, 0x00000000,
+                           0x1020000F, 0x00000011};
 
     command_pointer = commands;
 
@@ -259,12 +260,12 @@ void test_execute_reserve() {
 }
 
 void test_execute_free() {
-    uint32_t reserve_memory_commands[] = {0x12000000, 0x00000100,
-                                          0x12000001, 0x00000200,
-                                          0x12000082, 0x00000201,
-                                          0x12000083, 0x00000022,
-                                          0x12000084, 0x00000004,
-                                          0x1200000F, 0x00000011};
+    uint32_t reserve_memory_commands[] = {0x10200000, 0x00000100,
+                                          0x10200001, 0x00000200,
+                                          0x10200082, 0x00000201,
+                                          0x10200083, 0x00000022,
+                                          0x10200084, 0x00000004,
+                                          0x1020000F, 0x00000011};
 
     command_pointer = reserve_memory_commands;
 
@@ -288,12 +289,12 @@ void test_execute_free() {
 }
 
 void test_execute_switch_focus() {
-    uint32_t reserve_memory_commands[] = {0x12000000, 0x00000100,
-                                          0x12000001, 0x00000200,
-                                          0x12000082, 0x00000201,
-                                          0x12000083, 0x00000022,
-                                          0x12000084, 0x00000004,
-                                          0x1200000F, 0x00000011};
+    uint32_t reserve_memory_commands[] = {0x10200000, 0x00000100,
+                                          0x10200001, 0x00000200,
+                                          0x10200082, 0x00000201,
+                                          0x10200083, 0x00000022,
+                                          0x10200084, 0x00000004,
+                                          0x1020000F, 0x00000011};
 
     command_pointer = reserve_memory_commands;
 
@@ -338,7 +339,7 @@ void test_execute_switch_focus() {
 }
 
 void test_execute_write() {
-    uint32_t commands[] = {0x12000000, 0x00000100,
+    uint32_t commands[] = {0x10200000, 0x00000100,
                            0x05000000,
                            0x14202001, 0x12345678,
                            0x14201002, 0xABCD,
@@ -383,7 +384,7 @@ void test_execute_write() {
 }
 
 void test_execute_write_array() {
-    uint32_t commands[] = {0x12000000, 0x00000100,
+    uint32_t commands[] = {0x10200000, 0x00000100,
                            0x05000000,
                            0x14300004, 0x00000004,
                                0x01234567, 0x9ABCDEF0,
@@ -421,7 +422,7 @@ void test_execute_write_array() {
 }
 
 void test_execute_get_wr_ptr() {
-    uint32_t commands[] = {0x12000000, 0x00000100,
+    uint32_t commands[] = {0x10200000, 0x00000100,
                            0x05000000,
                            0x14202004, 0x12345678,
                            0x06340000,
@@ -447,7 +448,7 @@ void test_execute_get_wr_ptr() {
 }
 
 void test_execute_set_wr_ptr(struct Command cmd) {
-    uint32_t commands[] = {0x12000000, 0x00000100,
+    uint32_t commands[] = {0x10200000, 0x00000100,
                            0x05000000,
                            0x16400000, 5,
                            0x16400000, 99,
@@ -474,7 +475,7 @@ void test_execute_set_wr_ptr(struct Command cmd) {
 }
 
 void test_execute_read() {
-    uint32_t commands[] = {0x12000000, 0x00000100,
+    uint32_t commands[] = {0x10200000, 0x00000100,
                            0x05000000,
                            0x14202003, 0x12345678,
                            0x14201002, 0xABCD,
@@ -688,4 +689,153 @@ void test_execute_arith_op() {
     }
 
 }
+
+void test_execute_if() {
+    uint32_t commands[] = {0x10200000, 0x00000100,
+                           0x05000000,
+
+                           0x15520000, 0x12345678,
+                           0x14200001, 0x1,
+                           0x05700000,
+                           0x15520001, 0x12345678,
+                           0x14200001, 0x2,
+                           0x05700000,
+                           0x15520002, 0x12345678,
+                           0x14200001, 0x3,
+                           0x05700000,
+                           0x15520003, 0x12345678,
+                           0x14200001, 0x4,
+                           0x05700000,
+                           0x15520004, 0x12345678,
+                           0x14200001, 0x5,
+                           0x05700000,
+                           0x15520005, 0x12345678,
+                           0x14200001, 0x6,
+                           0x05700000,
+
+                           0x15520100, 0x12345678,
+                           0x14200001, 0x7,
+                           0x05700000,
+                           0x15520101, 0x12345678,
+                           0x14200001, 0x8,
+                           0x05700000,
+                           0x15520102, 0x12345678,
+                           0x14200001, 0x9,
+                           0x05700000,
+                           0x15520103, 0x12345678,
+                           0x14200001, 0xA,
+                           0x05700000,
+                           0x15520104, 0x12345678,
+                           0x14200001, 0xB,
+                           0x05700000,
+                           0x15520105, 0x12345678,
+                           0x14200001, 0xC,
+                           0x05700000,
+
+                           0x15520200, 0x12345678,
+                           0x14200001, 0x7,
+                           0x05700000,
+                           0x15520201, 0x12345678,
+                           0x14200001, 0x8,
+                           0x05700000,
+                           0x15520202, 0x12345678,
+                           0x14200001, 0x9,
+                           0x05700000,
+                           0x15520203, 0x12345678,
+                           0x14200001, 0xA,
+                           0x05700000,
+                           0x15520204, 0x12345678,
+                           0x14200001, 0xB,
+                           0x05700000,
+                           0x15522005, 0x12345678,
+                           0x14200001, 0xC,
+                           0x05700000,
+
+                           0x15520101, 0x12345678,
+                           0x14200001, 0xF,
+                           0x05600000,
+                           0x14200001, 0x10,
+                           0x05700000,
+
+                           0x15520102, 0x12345678,
+                           0x14200001, 0x11,
+                           0x05600000,
+                           0x14200001, 0x12,
+                           0x05700000,
+
+                           0x15520103, 0x12345678,
+                           0x14200001, 0x13,
+                           0x05600000,
+                           0x14200001, 0x14,
+                           0x05700000,
+
+                           0x15520104, 0x12345678,
+                           0x14200001, 0x15,
+                           0x05600000,
+                           0x14200001, 0x16,
+                           0x05700000,
+
+                           0x15520105, 0x12345678,
+                           0x14200001, 0x18,
+                           0x05600000,
+                           0x14200001, 0x19,
+                           0x05700000,
+
+                           0x15520200, 0x12345678,
+                           0x15520200, 0x12345678,
+                           0x14200001, 0x20,
+                           0x05700000,
+                           0x05700000,
+
+                           0x05520006,
+                           0x14200001, 0x21,
+                           0x05700000,
+                           0x05520106,
+                           0x14200001, 0x22,
+                           0x05700000,
+                           0x05520007,
+                           0x14200001, 0x23,
+                           0x05700000,
+                           0x05520107,
+                           0x14200001, 0x24,
+                           0x05700000,
+
+                           0x05530120,
+                           0x14200001, 0x1,
+                           0x05700000,
+                           0x05530121,
+                           0x14200001, 0x2,
+                           0x05700000,
+                           0x05530122,
+                           0x14200001, 0x3,
+                           0x05700000,
+                           0x05530123,
+                           0x14200001, 0x4,
+                           0x05700000,
+                           0x05530124,
+                           0x14200001, 0x5,
+                           0x05700000,
+                           0x05530125,
+                           0x14200001, 0x6,
+                           0x05700000,
+
+                           0x0FF00000};
+
+    registers[0] = 0;
+    registers[1] = 0xFFFFFFFF;
+    registers[2] = 0x12345678;
+
+    data_specification_executor(commands, 0);
+
+    uint8_t out[] = {0x2, 0x3, 0x4,
+                     0x8, 0xB, 0xC,
+                     0x7, 0x9, 0xB,
+                     0xF, 0x12, 0x14, 0x15, 0x18, 0x20, 0x21, 0x24,
+                     0x2, 0x5, 0x6};
+
+    uint8_t *reader = memory_regions[0]->start_address;
+    for (int i = 0; i < sizeof(out); i++)
+        cut_assert_equal_int(out[i], *(reader++));
+}
+
 

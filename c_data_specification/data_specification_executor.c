@@ -824,15 +824,15 @@ void execute_set_wr_ptr(struct Command cmd) {
 void execute_if(struct Command cmd) {
     uint8_t operation = cmd.cmdWord & 0x0F;
 
-    //print_commands = 1;
-
     uint8_t op_result;
 
-    int32_t source1 = registers[command_get_src1Reg(cmd.cmdWord)];
-    int32_t source2 = 0;
+    int64_t source1 = registers[command_get_src1Reg(cmd.cmdWord)];
+    int64_t source2 = 0;
 
-    if (command_src2_in_use(cmd.cmdWord));
+    if (command_src2_in_use(cmd.cmdWord))
         source2 = registers[command_get_src2Reg(cmd.cmdWord)];
+    else
+        source2 = cmd.dataWords[0];
 
     switch (operation) {
         case 0x00: op_result = source1 == source2; break;

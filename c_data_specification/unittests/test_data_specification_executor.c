@@ -33,6 +33,7 @@ void execute_start_struct(struct Command cmd);
 void execute_mv(struct Command cmd);
 void execute_arith_op(struct Command cmd);
 void execute_if(struct Command cmd);
+void execute_copy_param(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -838,4 +839,47 @@ void test_execute_if() {
         cut_assert_equal_int(out[i], *(reader++));
 }
 
+void test_execute_copy_param() {
+    uint32_t commands[] = {0x01000004,
+                           0x21100003, 0x12345678, 0x90ABCDEF,
+                           0x11100002, 0x12345678,
+                           0x11100001, 0x1234,
+                           0x11100000, 0x12,
+                           0x11100004, -1,
+                           0x11100005, -1,
+                           0x11100006, -1,
+                           0x01200000,
+
+                           0x01000008,
+                           0x01100006,
+                           0x01100005,
+                           0x01100004,
+                           0x01100000,
+                           0x01100001,
+                           0x01100002,
+                           0x01100003,
+                           0x01200000,
+
+                           0x17108400, 0x00000600,
+                           0x17108400, 0x00000501,
+                           0x17108400, 0x00000402,
+                           0x17108400, 0x00000303,
+                           0x17108400, 0x00000204,
+                           0x17108400, 0x00000105,
+                           0x17108400, 0x00000006,
+    };
+
+    command_pointer = commands;
+
+    execute_start_struct(get_next_command());
+    execute_start_struct(get_next_command());
+
+    for (int i = 0; i < 7; i++)
+        execute_copy_param(get_next_command());
+
+    for (int i = 0; i < 7; i++) {
+        cut_assert_equal_int(structs[4]->elements[i].data,
+                             structs[8]->elements[6-i].data);
+    }
+}
 

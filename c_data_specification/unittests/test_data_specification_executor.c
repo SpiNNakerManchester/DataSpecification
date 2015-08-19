@@ -41,6 +41,7 @@ void execute_write_param(struct Command cmd);
 void execute_loop(struct Command cmd);
 void execute_write_struct(struct Command cmd);
 void execute_print_struct(struct Command cmd);
+void execute_copy_struct(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -48,6 +49,13 @@ void cut_teardown() {
             free(memory_regions[i]->start_address);
             free(memory_regions[i]);
             memory_regions[i] = NULL;
+        }
+    }
+    for (int i = 0; i < MAX_STRUCTS; i++) {
+        if (structs[i] != NULL) {
+            free(structs[i]->elements);
+            free(structs[i]);
+            structs[i] = NULL;
         }
     }
 }
@@ -1213,6 +1221,40 @@ void test_constructor() {
     cut_assert_equal_int(0x12121212, *(reader++));
     cut_assert_equal_int(0xABABABAB, *(reader++));
     cut_assert_equal_int(0x12121212, *(reader++));
+
+}
+
+void test_execute_copy_struct() {
+
+    uint32_t commands[] = {0x10200000, 0x00000100,
+                           0x05000000,
+
+                           0x01000004,
+                           0x11100002, 0xABABABAB,
+                           0x01200000,
+
+                           0x07001400,
+                           0x07041400,
+                           0x07023200,
+                           0x07063200,
+
+                           0x04400101,
+                           0x04400102,
+                           0x04400103,
+                           0x04400104,
+                           0x04400105,
+                           0x0FF00000};
+
+    registers[1] = 2;
+    registers[2] = 4;
+    registers[3] = 5;
+
+    data_specification_executor(commands, 0);
+
+    uint32_t *reader = memory_regions[current_region]->start_address;
+
+    for (int i = 0; i < 5; i++)
+        cut_assert_equal_int(0xABABABAB, *(reader++));
 
 }
 

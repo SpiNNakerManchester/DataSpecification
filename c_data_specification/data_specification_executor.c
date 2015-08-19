@@ -121,7 +121,6 @@ struct Command get_next_command() {
 //!        a given size on SDRAM.
 //! \param[in] The command to be executed.
 void execute_reserve(struct Command cmd) {
-
     // Check if the instruction format is correct.
     if (cmd.dataLength != 1) {
         log_error("Data specification RESERVE requires one word as argument");
@@ -312,8 +311,8 @@ void execute_write_array(struct Command cmd) {
         }
 
         command_pointer = ((long)array_writer & 0x03)
-                         ? (uint32_t*)((((long)array_writer >> 2) + 1) << 2)
-                         : (uint32_t*)array_writer;
+                         ? (address_t)((((long)array_writer >> 2) + 1) << 2)
+                         : (address_t)array_writer;
     }
 }
 
@@ -399,8 +398,6 @@ void execute_start_struct(struct Command cmd) {
     // The id of the new struct.
     int struct_id = cmd.cmdWord & 0x1F;
 
-    log_debug("START STRUCT %d", struct_id);
-
     // Save the command pointer.
     stack_push(command_pointer);
 
@@ -433,8 +430,6 @@ void execute_start_struct(struct Command cmd) {
         else if (structEntry.dataLength == 2)
             value = ((uint64_t)structEntry.dataWords[0] << 32)
                   | structEntry.dataWords[1];
-
-        log_debug("STRUCT_ELEM type %d value %08x", elem_type, value);
 
         struct_set_element_type(str, current_element_id, elem_type);
         struct_set_element_value(str, current_element_id, value);
@@ -546,11 +541,13 @@ void execute_logic_op(struct Command cmd) {
 void execute_write_param(struct Command cmd) {
 
     // The value to be written.
-    uint32_t value;
+    uint64_t value;
     if (command_src1_in_use(cmd.cmdWord)) {
         value = registers[command_get_src1Reg(cmd.cmdWord)];
-    } else {
+    } else if (cmd.dataLength == 1) {
         value = cmd.dataWords[0];
+    } else {
+        value = (uint64_t)cmd.dataWords[0] << 32 | cmd.dataWords[1];
     }
 
     uint8_t struct_id = (cmd.cmdWord & 0xF000) >> 12;
@@ -1078,7 +1075,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_write_struct(cmd);
                 break;
             case BLOCK_COPY:
-                log_error("Unimplemented DSE command BLOCK_COPY");
+                execute_block_copy(cmd);
                 break;
             case SWITCH_FOCUS:
                 execute_switch_focus(cmd);

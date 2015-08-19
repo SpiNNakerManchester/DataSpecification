@@ -465,7 +465,7 @@ void test_execute_get_wr_ptr() {
     }
 }
 
-void test_execute_set_wr_ptr(struct Command cmd) {
+void test_execute_set_wr_ptr() {
     uint32_t commands[] = {0x10200000, 0x00000100,
                            0x05000000,
                            0x16400000, 5,

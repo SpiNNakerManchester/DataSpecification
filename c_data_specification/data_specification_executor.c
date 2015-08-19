@@ -371,7 +371,7 @@ void execute_loop(struct Command cmd) {
         increment = cmd.dataWords[used_data_words++];
 
     // The register used to store the counter.
-    int count_reg = cmd.cmdWord & 0xFF;
+    int count_reg = cmd.cmdWord & 0xF;
 
     // If the loop is not going to have any iteration, skip to the first
     // END_LOOP. Otherwise, start iterating.

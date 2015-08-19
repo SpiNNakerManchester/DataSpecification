@@ -1149,7 +1149,7 @@ void test_execute_write_struct() {
     execute_write_struct(get_next_command());
     execute_write_struct(get_next_command());
 
-    uint8_t *reader = memory_regions[0]->start_address;
+    uint8_t *reader = (uint8_t*)memory_regions[0]->start_address;
 
     for (int i = 0; i < 3; i++) {
         cut_assert_equal_int(0xEF, *(reader++));
@@ -1215,7 +1215,7 @@ void test_constructor() {
 
     data_specification_executor(commands, 0);
 
-    uint32_t *reader = memory_regions[current_region]->start_address;
+    uint32_t *reader = (uint32_t*)memory_regions[current_region]->start_address;
 
     cut_assert_equal_int(0xABABABAB, *(reader++));
     cut_assert_equal_int(0x12345678, *(reader++));
@@ -1253,7 +1253,7 @@ void test_execute_copy_struct() {
 
     data_specification_executor(commands, 0);
 
-    uint32_t *reader = memory_regions[current_region]->start_address;
+    uint32_t *reader = (uint32_t*)memory_regions[current_region]->start_address;
 
     for (int i = 0; i < 5; i++)
         cut_assert_equal_int(0xABABABAB, *(reader++));
@@ -1291,14 +1291,14 @@ void test_execute_align_wr_ptr() {
     cut_assert_equal_int(0,
                  (uint64_t)memory_regions[current_region]->write_pointer & 0x3);
     cut_assert_equal_int(registers[3],
-                         memory_regions[current_region]->write_pointer);
+                       (uint64_t)memory_regions[current_region]->write_pointer);
 
     execute_set_wr_ptr(get_next_command());
     execute_align_wr_ptr(get_next_command());
     cut_assert_equal_int(0,
                  (uint64_t)memory_regions[current_region]->write_pointer & 0x1);
     cut_assert_equal_int(registers[4],
-                         memory_regions[current_region]->write_pointer);
+                       (uint64_t)memory_regions[current_region]->write_pointer);
 
 }
 
@@ -1321,20 +1321,20 @@ void test_execute_block_copy() {
     execute_write(get_next_command());
     execute_write(get_next_command());
 
-    registers[1] = memory_regions[current_region]->write_pointer;
-    registers[2] = memory_regions[current_region]->start_address;
+    registers[1] = (uint64_t)memory_regions[current_region]->write_pointer;
+    registers[2] = (uint64_t)memory_regions[current_region]->start_address;
 
     execute_block_copy(get_next_command());
 
     memory_regions[current_region]->write_pointer += 12;
 
-    registers[3] = memory_regions[current_region]->write_pointer;
+    registers[3] = (uint64_t)memory_regions[current_region]->write_pointer;
     registers[4] = 24;
-    registers[5] = memory_regions[current_region]->start_address;
+    registers[5] = (uint64_t)memory_regions[current_region]->start_address;
 
     execute_block_copy(get_next_command());
 
-    uint32_t *reader = memory_regions[current_region]->start_address;
+    uint32_t *reader = (uint32_t*)memory_regions[current_region]->start_address;
 
     for (int i = 0; i < 3; i++) {
         cut_assert_equal_int(0x12345678, *(reader++));

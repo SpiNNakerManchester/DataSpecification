@@ -668,7 +668,9 @@ void execute_print_struct(struct Command cmd) {
 
     log_info("Printing structure %d", struct_id);
     for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++) {
-        log_info("\t%016x", structs[struct_id]->elements[elem_id].data);
+        log_info("\t%08X%08X",
+                 (structs[struct_id]->elements[elem_id].data & 0xFFFFFFFF00000000LL) >> 32,
+                 structs[struct_id]->elements[elem_id].data & 0xFFFFFFFF);
     }
 }
 

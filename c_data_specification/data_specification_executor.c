@@ -958,6 +958,27 @@ void execute_copy_struct(struct Command cmd) {
     structs[dest_struct_id] = struct_create_copy(structs[source_struct_id]);
 }
 
+//! \brief Execute a ALIGN_WR_PTR command.
+//! \param[in] cmd The command to be executed.
+void execute_align_wr_ptr(struct Command cmd) {
+
+    uint8_t padding_value = 0;
+
+    int block_size = cmd.cmdWord & 0x1F;
+    if (command_src1_in_use(cmd.cmdWord))
+        block_size = command_get_src1Reg(cmd.cmdWord);
+
+    uint32_t mask = (~0u << (32 - block_size)) >> (32 - block_size);
+    while ((long)memory_regions[current_region]->write_pointer & mask) {
+        write_value(&padding_value, 1);
+    }
+
+    if (command_dest_in_use(cmd.cmdWord))
+        registers[command_get_destReg(cmd.cmdWord)]
+                      = (long)memory_regions[current_region]->write_pointer;
+
+}
+
 //! \brief Execute a part of a data specification.
 //!        Assumes the given slice of data specification is atomic and
 //!        valid.
@@ -1073,7 +1094,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_set_wr_ptr(cmd);
                 break;
             case ALIGN_WR_PTR:
-                log_error("Unimplemented DSE command ALIGN_WR_PTR");
+                execute_align_wr_ptr(cmd);
                 break;
             case ARITH_OP:
                 execute_arith_op(cmd);

@@ -566,8 +566,6 @@ void execute_write_param(struct Command cmd) {
         rt_error(RTE_ABORT);
     }
 
-    log_debug("Setting element %d of struct %d to %08x", elem_id, struct_id,
-                                                        value);
     struct_set_element_value(structs[struct_id], elem_id, value);
 }
 

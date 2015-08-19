@@ -34,6 +34,7 @@ void execute_mv(struct Command cmd);
 void execute_arith_op(struct Command cmd);
 void execute_if(struct Command cmd);
 void execute_copy_param(struct Command cmd);
+void execute_print_text(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -881,5 +882,23 @@ void test_execute_copy_param() {
         cut_assert_equal_int(structs[4]->elements[i].data,
                              structs[8]->elements[6-i].data);
     }
+}
+
+void test_execute_print_text() {
+    uint32_t commands[] = {0x17300003, 0x54455354,
+                           0x3730000B, 0x44434241, 0x48474645, 0x4C4B4A49};
+
+    command_pointer = commands;
+
+    int pid = cut_fork();
+    if (pid==0) {
+        execute_print_text(get_next_command());
+        execute_print_text(get_next_command());
+        exit(EXIT_SUCCESS);
+    }
+
+    const char *str = cut_fork_get_stdout_message(pid);
+    cut_assert_not_null(strstr(str, "TSET"));
+    cut_assert_not_null(strstr(str, "ABCDEFGHIJKL"));
 }
 

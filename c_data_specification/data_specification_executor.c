@@ -979,6 +979,20 @@ void execute_align_wr_ptr(struct Command cmd) {
 
 }
 
+//! \brief Execute a BLOCK_COPY command.
+//! \param[in] cmd The command to be executed.
+void execute_block_copy(struct Command cmd) {
+
+    address_t source      = (address_t)registers[command_get_src2Reg(cmd.cmdWord)];
+    address_t destination = (address_t)registers[command_get_destReg(cmd.cmdWord)];
+
+    uint32_t size = command_get_src1Reg(cmd.cmdWord);
+    if (command_src1_in_use(cmd.cmdWord))
+        size = registers[size];
+
+    spin1_memcpy(destination, source, size);
+}
+
 //! \brief Execute a part of a data specification.
 //!        Assumes the given slice of data specification is atomic and
 //!        valid.

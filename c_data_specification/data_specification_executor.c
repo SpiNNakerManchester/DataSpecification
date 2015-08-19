@@ -940,6 +940,24 @@ void execute_arith_op(struct Command cmd) {
     registers[dest_reg] = result;
 }
 
+//! \brief Execute a COPY_STRUCT command.
+//! \param[in] cmd The command to be executed.
+void execute_copy_struct(struct Command cmd) {
+    int dest_struct_id   = command_get_destReg(cmd.cmdWord);
+    int source_struct_id = command_get_src1Reg(cmd.cmdWord);
+
+    if (command_dest_in_use(cmd.cmdWord))
+        dest_struct_id = registers[dest_struct_id];
+
+    if (command_src1_in_use(cmd.cmdWord))
+        source_struct_id = registers[source_struct_id];
+
+    if (structs[dest_struct_id] != NULL)
+        log_warning("COPY_STRUCT overwriting struct %d", dest_struct_id);
+
+    structs[dest_struct_id] = struct_create_copy(structs[source_struct_id]);
+}
+
 //! \brief Execute a part of a data specification.
 //!        Assumes the given slice of data specification is atomic and
 //!        valid.
@@ -1067,7 +1085,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 log_error("Unimplemented DSE command REFORMAT");
                 break;
             case COPY_STRUCT:
-                log_error("Unimplemented DSE command COPY_STRUCT");
+                execute_copy_struct(cmd);
                 break;
             case COPY_PARAM:
                 execute_copy_param(cmd);

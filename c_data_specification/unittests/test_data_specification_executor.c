@@ -37,6 +37,7 @@ void execute_copy_param(struct Command cmd);
 void execute_print_text(struct Command cmd);
 void execute_print_val(struct Command cmd);
 void execute_read_param(struct Command cmd);
+void execute_write_param(struct Command cmd);
 void execute_print_struct(struct Command cmd);
 
 void cut_teardown() {
@@ -983,6 +984,47 @@ void test_execute_read_param() {
    cut_assert_equal_int(0xFF,                   registers[0]);
    cut_assert_equal_int(0x1234567890ABCDEFLL,   registers[5]);
    cut_assert_equal_int(0x8A7B,                 registers[4]);
+}
+
+void test_execute_write_param() {
+    uint32_t commands[] = {0x01000004,
+                           0x21100003, 0x12345678, 0x90ABCDEF,
+                           0x11100002, 0x87654321,
+                           0x11100001, 0x8A7B,
+                           0x11100000, 0xFF,
+                           0x01200000,
+                           0x27204000, 0xFBFBFBFB, 0xFBFBFBFB,
+                           0x17204001, 0x12121212,
+                           0x17204002, 0x3434,
+                           0x17204003, 0x56,
+                           0x07224F00,
+                           0x07224E01,
+                           0x07224D02,
+                           0x07224C03};
+
+    registers[0xC] = 0xDB;
+    registers[0xD] = 0xEFFE;
+    registers[0xE] = 0xABCDEFFF;
+    registers[0xF] = 0x1234567812345678LL;
+
+    command_pointer = commands;
+
+    execute_start_struct(get_next_command());
+    for (int i = 0; i < 4; i++)
+        execute_write_param(get_next_command());
+
+    cut_assert_equal_int(0xFBFBFBFBFBFBFBFBLL, structs[4]->elements[0].data);
+    cut_assert_equal_int(0x12121212,           structs[4]->elements[1].data);
+    cut_assert_equal_int(0x3434,               structs[4]->elements[2].data);
+    cut_assert_equal_int(0x56,                 structs[4]->elements[3].data);
+
+    for (int i = 0; i < 4; i++)
+        execute_write_param(get_next_command());
+
+    cut_assert_equal_int(0x1234567812345678LL, structs[4]->elements[0].data);
+    cut_assert_equal_int(0xABCDEFFF,           structs[4]->elements[1].data);
+    cut_assert_equal_int(0xEFFE,               structs[4]->elements[2].data);
+    cut_assert_equal_int(0xDB,                 structs[4]->elements[3].data);
 }
 
 

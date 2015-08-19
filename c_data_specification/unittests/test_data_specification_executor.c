@@ -36,6 +36,7 @@ void execute_if(struct Command cmd);
 void execute_copy_param(struct Command cmd);
 void execute_print_text(struct Command cmd);
 void execute_print_val(struct Command cmd);
+void execute_print_struct(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -923,6 +924,32 @@ void test_execute_print_val() {
     cut_assert_not_null(strstr(str, "12345678"));
     cut_assert_not_null(strstr(str, "8765432190ABCDEF"));
     cut_assert_not_null(strstr(str, "F0F0F0F0"));
+}
+
+void test_execute_print_struct() {
+    uint32_t commands[] = {0x01000004,
+                           0x21100003, 0x12345678, 0x90ABCDEF,
+                           0x11100002, 0x87654321,
+                           0x11100001, 0x8A7B,
+                           0x11100000, 0xFF,
+                           0x01200000,
+                           0x08200004};
+
+    command_pointer = commands;
+
+    execute_start_struct(get_next_command());
+
+    int pid = cut_fork();
+    if (pid==0) {
+        execute_print_struct(get_next_command());
+        exit(EXIT_SUCCESS);
+    }
+
+    char *str = cut_fork_get_stdout_message(pid);
+    cut_assert_not_null(strstr(str, "1234567890ABCDEF"));
+    cut_assert_not_null(strstr(str, "87654321"));
+    cut_assert_not_null(strstr(str, "8A7B"));
+    cut_assert_not_null(strstr(str, "FF"));
 }
 
 

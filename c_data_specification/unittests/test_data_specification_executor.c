@@ -43,6 +43,7 @@ void execute_write_struct(struct Command cmd);
 void execute_print_struct(struct Command cmd);
 void execute_copy_struct(struct Command cmd);
 void execute_align_wr_ptr(struct Command cmd);
+void execute_block_copy(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -1300,5 +1301,47 @@ void test_execute_align_wr_ptr() {
                          memory_regions[current_region]->write_pointer);
 
 }
+
+void test_execute_block_copy() {
+
+    uint32_t commands[] = {0x10200000, 0x00004000,
+                           0x05000000,
+                           0x14202001, 0x12345678,
+                           0x14201002, 0xABCD,
+                           0x14200004, 0xAB,
+                           0x04451C20,
+                           0x04473450};
+
+    command_pointer = commands;
+
+    execute_reserve(get_next_command());
+    execute_switch_focus(get_next_command());
+
+    execute_write(get_next_command());
+    execute_write(get_next_command());
+    execute_write(get_next_command());
+
+    registers[1] = memory_regions[current_region]->write_pointer;
+    registers[2] = memory_regions[current_region]->start_address;
+
+    execute_block_copy(get_next_command());
+
+    memory_regions[current_region]->write_pointer += 12;
+
+    registers[3] = memory_regions[current_region]->write_pointer;
+    registers[4] = 24;
+    registers[5] = memory_regions[current_region]->start_address;
+
+    execute_block_copy(get_next_command());
+
+    uint32_t *reader = memory_regions[current_region]->start_address;
+
+    for (int i = 0; i < 3; i++) {
+        cut_assert_equal_int(0x12345678, *(reader++));
+        cut_assert_equal_int(0xABCDABCD, *(reader++));
+        cut_assert_equal_int(0xABABABAB, *(reader++));
+    }
+}
+
 
 

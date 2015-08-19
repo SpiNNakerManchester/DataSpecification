@@ -38,6 +38,7 @@ void execute_print_text(struct Command cmd);
 void execute_print_val(struct Command cmd);
 void execute_read_param(struct Command cmd);
 void execute_write_param(struct Command cmd);
+void execute_loop(struct Command cmd);
 void execute_print_struct(struct Command cmd);
 
 void cut_teardown() {
@@ -1025,6 +1026,90 @@ void test_execute_write_param() {
     cut_assert_equal_int(0xABCDEFFF,           structs[4]->elements[1].data);
     cut_assert_equal_int(0xEFFE,               structs[4]->elements[2].data);
     cut_assert_equal_int(0xDB,                 structs[4]->elements[3].data);
+}
+
+void test_execute_loop() {
+    uint32_t commands[] = {0x35100001, 0x00000004, 0x00000008, 2,
+                           0x08020100,
+                           0x05300000,
+
+                           0x25143002, 0x00000004, 0x00000001,
+                           0x08020200,
+                           0x05300000,
+
+                           0x15165604, 0x00000001,
+                           0x08020400,
+                           0x05300000,
+
+                           0x051798AB,
+                           0x08020B00,
+                           0x05300000,
+
+                           0x051789A7,
+                           0x08020700,
+                           0x05300000,
+
+    };
+
+    registers[3] = 0x1;
+
+    registers[5] = 0xA;
+    registers[6] = 0x10;
+
+    registers[8] = 0x11;
+    registers[9] = 0x25;
+    registers[10] = 10;
+
+    command_pointer = commands;
+
+    int pid = cut_fork();
+    if (pid==0) {
+        for (int i = 0; i < 5; i++)
+            execute_loop(get_next_command());
+        exit(EXIT_SUCCESS);
+    }
+
+    char *str = cut_fork_get_stdout_message(pid);
+
+    cut_assert_not_null(strstr(str, "0000000000000004"));
+    str = strstr(str, "0000000000000004");
+
+    cut_assert_not_null(strstr(str, "0000000000000006"));
+    str = strstr(str, "0000000000000006");
+
+    cut_assert_not_null(strstr(str, "0000000000000001"));
+    str = strstr(str, "0000000000000001");
+
+    cut_assert_not_null(strstr(str, "0000000000000002"));
+    str = strstr(str, "0000000000000002");
+
+    cut_assert_not_null(strstr(str, "0000000000000003"));
+    str = strstr(str, "0000000000000003");
+
+    cut_assert_not_null(strstr(str, "000000000000000A"));
+    str = strstr(str, "000000000000000A");
+
+    cut_assert_not_null(strstr(str, "000000000000000B"));
+    str = strstr(str, "000000000000000B");
+
+    cut_assert_not_null(strstr(str, "000000000000000C"));
+    str = strstr(str, "000000000000000C");
+
+    cut_assert_not_null(strstr(str, "000000000000000D"));
+    str = strstr(str, "000000000000000D");
+
+    cut_assert_not_null(strstr(str, "000000000000000E"));
+    str = strstr(str, "000000000000000E");
+
+    cut_assert_not_null(strstr(str, "000000000000000F"));
+    str = strstr(str, "000000000000000F");
+
+    cut_assert_not_null(strstr(str, "0000000000000011"));
+    str = strstr(str, "0000000000000011");
+
+    cut_assert_not_null(strstr(str, "000000000000001B"));
+    str = strstr(str, "000000000000001B");
+
 }
 
 

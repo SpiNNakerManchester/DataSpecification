@@ -452,7 +452,6 @@ void execute_start_struct(struct Command cmd) {
 void execute_write_struct(struct Command cmd) {
 
     // The number of repetitions of the same struct.
-    log_info("WRITE STRUCT in region %d", current_region);
     uint8_t n_repeats;
     if (command_src1_in_use(cmd.cmdWord)) {
         n_repeats = registers[command_get_src1Reg(cmd.cmdWord)];
@@ -468,14 +467,15 @@ void execute_write_struct(struct Command cmd) {
         rt_error(RTE_ABORT);
     }
 
+
     // Iterate over all elements of the struct n times and print all the
     // defined elements.
-    for (int count = 0; count < n_repeats; count++) {
-        for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++)
-                write_value(&(structs[struct_id]->elements[elem_id].data),
-                            data_type_get_size(
+    for (int count = 0; count < n_repeats; count++)
+        for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++) {
+            write_value(&(structs[struct_id]->elements[elem_id].data),
+                        data_type_get_size(
                                 structs[struct_id]->elements[elem_id].type));
-    }
+        }
 }
 
 //! \brief Execute a MV instruction.

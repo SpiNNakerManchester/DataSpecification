@@ -23,6 +23,7 @@ typedef uint32_t* address_t;
 #define rt_error(error_code) exit((error_code))
 #define RTE_ABORT -1
 #define log_info(message, ...) printf("[INFO] " message "\n", ##__VA_ARGS__)
+#define log_warning(message, ...) printf("[WARNING] " message "\n", ##__VA_ARGS__)
 #define log_error(message, ...) printf("[ERROR] " message "\n", ##__VA_ARGS__)
 #define log_debug(message, ...) printf("[DEBUG] " message "\n", ##__VA_ARGS__)
 #define sark_xalloc(heap, size, tag, flag) malloc((size))

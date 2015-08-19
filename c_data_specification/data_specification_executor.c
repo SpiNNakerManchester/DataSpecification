@@ -867,12 +867,14 @@ void execute_else(struct Command cmd) {
 void execute_print_val(struct Command cmd) {
     if (command_src1_in_use(cmd.cmdWord)) {
         uint64_t data = registers[command_get_src1Reg(cmd.cmdWord)];
-        log_info("Register %d has value %08x%08x",
+        log_info("Register %d has value %08X%08X",
                  command_get_src1Reg(cmd.cmdWord),
                  (uint32_t)((data % 0xFFFFFFFF00000000LL) >> 32),
                  (uint32_t)(data & 0xFFFFFFFFF));
+    } else if (cmd.dataLength == 1) {
+        log_info("Value %08X", cmd.dataWords[0]);
     } else {
-        log_info("Value %08x", cmd.dataWords[0]);
+        log_info("Value %08X%08X", cmd.dataWords[0], cmd.dataWords[1]);
     }
 }
 

@@ -1172,4 +1172,48 @@ void test_execute_write_struct() {
     }
 }
 
+void test_constructor() {
+    uint32_t commands[] = {0x10200000, 0x00000100,
+                           0x05000000,
+
+                           0x01000004,
+                           0x11100002, 0xABABABAB,
+                           0x01200000,
+
+                           0x01000002,
+                           0x11100002, 0x12345678,
+                           0x01200000,
+
+                           0x02001A01,
+
+                           0x04400100,
+                           0x04400101,
+
+                           0x17200000, 0x11111111,
+                           0x17201000, 0x12121212,
+
+                           0x04400100,
+                           0x04400101,
+
+                           0x02500000,
+
+                           0x14000300, 0x00000084,
+
+                           0x04400104,
+                           0x04400102,
+                           0x0FF00000};
+
+    data_specification_executor(commands, 0);
+
+    uint32_t *reader = memory_regions[current_region]->start_address;
+
+    cut_assert_equal_int(0xABABABAB, *(reader++));
+    cut_assert_equal_int(0x12345678, *(reader++));
+    cut_assert_equal_int(0x11111111, *(reader++));
+    cut_assert_equal_int(0x12121212, *(reader++));
+    cut_assert_equal_int(0xABABABAB, *(reader++));
+    cut_assert_equal_int(0x12121212, *(reader++));
+
+}
+
 

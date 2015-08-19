@@ -35,6 +35,7 @@ void execute_arith_op(struct Command cmd);
 void execute_if(struct Command cmd);
 void execute_copy_param(struct Command cmd);
 void execute_print_text(struct Command cmd);
+void execute_print_val(struct Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -901,4 +902,27 @@ void test_execute_print_text() {
     cut_assert_not_null(strstr(str, "TSET"));
     cut_assert_not_null(strstr(str, "ABCDEFGHIJKL"));
 }
+
+void test_execute_print_val() {
+    uint32_t commands[] = {0x18000000, 0x12345678,
+                           0x28000000, 0x87654321, 0x90ABCDEF,
+                           0x08020300};
+
+    command_pointer = commands;
+    registers[3] = 0xF0F0F0F0;
+
+    int pid = cut_fork();
+    if (pid==0) {
+        execute_print_val(get_next_command());
+        execute_print_val(get_next_command());
+        execute_print_val(get_next_command());
+        exit(EXIT_SUCCESS);
+    }
+
+    const char *str = cut_fork_get_stdout_message(pid);
+    cut_assert_not_null(strstr(str, "12345678"));
+    cut_assert_not_null(strstr(str, "8765432190ABCDEF"));
+    cut_assert_not_null(strstr(str, "F0F0F0F0"));
+}
+
 

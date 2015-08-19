@@ -36,6 +36,7 @@ void execute_if(struct Command cmd);
 void execute_copy_param(struct Command cmd);
 void execute_print_text(struct Command cmd);
 void execute_print_val(struct Command cmd);
+void execute_read_param(struct Command cmd);
 void execute_print_struct(struct Command cmd);
 
 void cut_teardown() {
@@ -950,6 +951,38 @@ void test_execute_print_struct() {
     cut_assert_not_null(strstr(str, "87654321"));
     cut_assert_not_null(strstr(str, "8A7B"));
     cut_assert_not_null(strstr(str, "FF"));
+}
+
+void test_execute_read_param() {
+    uint32_t commands[] = {0x01000004,
+                           0x21100003, 0x12345678, 0x90ABCDEF,
+                           0x11100002, 0x87654321,
+                           0x11100001, 0x8A7B,
+                           0x11100000, 0xFF,
+                           0x01200000,
+                           0x07340034,
+                           0x07341024,
+                           0x07342014,
+                           0x07343004,
+                           0x07364F04,
+                           0x07365E04,
+    };
+
+    registers[0xE] = 0;
+    registers[0xF] = 2;
+
+    command_pointer = commands;
+
+    execute_start_struct(get_next_command());
+    for (int i = 0; i < 6; i++)
+        execute_read_param(get_next_command());
+
+   cut_assert_equal_int(0x1234567890ABCDEFLL,   registers[3]);
+   cut_assert_equal_int(0x87654321,             registers[2]);
+   cut_assert_equal_int(0x8A7B,                 registers[1]);
+   cut_assert_equal_int(0xFF,                   registers[0]);
+   cut_assert_equal_int(0x1234567890ABCDEFLL,   registers[5]);
+   cut_assert_equal_int(0x8A7B,                 registers[4]);
 }
 
 

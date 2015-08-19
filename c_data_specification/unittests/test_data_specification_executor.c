@@ -39,6 +39,7 @@ void execute_print_val(struct Command cmd);
 void execute_read_param(struct Command cmd);
 void execute_write_param(struct Command cmd);
 void execute_loop(struct Command cmd);
+void execute_write_struct(struct Command cmd);
 void execute_print_struct(struct Command cmd);
 
 void cut_teardown() {
@@ -1110,6 +1111,65 @@ void test_execute_loop() {
     cut_assert_not_null(strstr(str, "000000000000001B"));
     str = strstr(str, "000000000000001B");
 
+}
+
+void test_execute_write_struct() {
+    uint32_t commands[] = {0x10200000, 0x00000100,
+                           0x05000000,
+                           0x01000004,
+                           0x21100003, 0x12345678, 0x90ABCDEF,
+                           0x11100002, 0x12345678,
+                           0x11100001, 0x1234,
+                           0x11100000, 0x12,
+                           0x11100004, -1,
+                           0x11100005, -1,
+                           0x11100006, -1,
+                           0x01200000,
+                           0x04300204,
+                           0x04320304};
+
+    registers[3] = 1;
+
+    command_pointer = commands;
+
+    execute_reserve(get_next_command());
+    execute_switch_focus(get_next_command());
+    execute_start_struct(get_next_command());
+
+    execute_write_struct(get_next_command());
+    execute_write_struct(get_next_command());
+
+    uint8_t *reader = memory_regions[0]->start_address;
+
+    for (int i = 0; i < 3; i++) {
+        cut_assert_equal_int(0xEF, *(reader++));
+        cut_assert_equal_int(0xCD, *(reader++));
+        cut_assert_equal_int(0xAB, *(reader++));
+        cut_assert_equal_int(0x90, *(reader++));
+
+        cut_assert_equal_int(0x78, *(reader++));
+        cut_assert_equal_int(0x56, *(reader++));
+        cut_assert_equal_int(0x34, *(reader++));
+        cut_assert_equal_int(0x12, *(reader++));
+
+        cut_assert_equal_int(0x78, *(reader++));
+        cut_assert_equal_int(0x56, *(reader++));
+        cut_assert_equal_int(0x34, *(reader++));
+        cut_assert_equal_int(0x12, *(reader++));
+
+        cut_assert_equal_int(0x34, *(reader++));
+        cut_assert_equal_int(0x12, *(reader++));
+
+        cut_assert_equal_int(0x12, *(reader++));
+
+        cut_assert_equal_int(0xFF, *(reader++));
+        cut_assert_equal_int(0xFF, *(reader++));
+        cut_assert_equal_int(0xFF, *(reader++));
+        cut_assert_equal_int(0xFF, *(reader++));
+        cut_assert_equal_int(0xFF, *(reader++));
+        cut_assert_equal_int(0xFF, *(reader++));
+        cut_assert_equal_int(0xFF, *(reader++));
+    }
 }
 
 

@@ -574,7 +574,6 @@ void execute_write_param(struct Command cmd) {
 //! \brief Execute a READ_PARAM instruction.
 //! \param[in] cmd The command to be executed.
 void execute_read_param(struct Command cmd) {
-    //log_info("READ_PARAM %08x", cmd.cmdWord);
     uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
     uint8_t struct_id = cmd.cmdWord & 0xF;
     uint8_t elem_id;

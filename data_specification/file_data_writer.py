@@ -10,9 +10,9 @@ class FileDataWriter(AbstractDataWriter):
         :raise data_specification.exceptions.DataWriteException: If the file\
                     cannot found or opened for writing
         """
-        self.filename = filename
+        self._filename = filename
         try:
-            self.file_handle = open(self.filename, "wb")
+            self.file_handle = open(self._filename, "wb")
         except:
             raise DataWriteException(
                 "Unable to open file {} for writing\n".format(filename))
@@ -25,7 +25,7 @@ class FileDataWriter(AbstractDataWriter):
         except:
             raise IOError(
                 "FileDataWriter.write: unable to write {0:d} bytes to file {1:s}".format(
-                    len(data), self.filename))
+                    len(data), self._filename))
 
     def tell(self):
         """ Returns the position of the file cursor
@@ -43,11 +43,18 @@ class FileDataWriter(AbstractDataWriter):
         :raise data_specification.exceptions.DataWriteException: If the file\
                     cannot be closed
         """
-        self.filename = None
 
         try:
             self.file_handle.close()
         except:
             raise IOError(
                 "FileDataWriter.close: unable to close file {}"
-                .format(self.filename))
+                .format(self._filename))
+
+    @property
+    def filename(self):
+        """
+        property method
+        :return:
+        """
+        return self._filename

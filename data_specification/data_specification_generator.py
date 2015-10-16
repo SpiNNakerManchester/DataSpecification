@@ -9,6 +9,8 @@ from data_specification.enums.condition import Condition
 from data_specification.enums.logic_operation import LogicOperation
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from spinn_machine import sdram
+import numpy
+import binascii
 
 
 logger = logging.getLogger(__name__)
@@ -44,7 +46,7 @@ class DataSpecificationGenerator(object):
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\
             Note that this is ignored by the binary file
-        
+
         :param comment: The comment to write
         :type comment: str
         :return: Nothing is returned
@@ -75,7 +77,7 @@ class DataSpecificationGenerator(object):
 
     def no_operation(self):
         """ Insert command to execute nothing
-        
+
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
@@ -92,7 +94,7 @@ class DataSpecificationGenerator(object):
 
     def reserve_memory_region(self, region, size, label=None, empty=False):
         """ Insert command to reserve a memory region
-        
+
         :param region: The number of the region to reserve, from 0 to 15
         :type region: int
         :param size: The size to reserve for the region in bytes
@@ -1062,23 +1064,13 @@ class DataSpecificationGenerator(object):
         """
         cmd_len = 0xF
         cmd_word = (cmd_len << 28) | (Commands.WRITE_ARRAY.value << 20)
-        len_array = len(array_values)
-        size = len_array + 1
+        data = numpy.array(array_values, dtype='uint32')
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
-        encoded_size = bytearray(struct.pack("<I", size))
+        cmd_string = "WRITE_ARRAY, %d elements\n" % (data.size + 1)
 
-        encoded_array = bytearray()
-        cmd_string = "WRITE_ARRAY, %d elements:\n" % len_array
-        index = 0
-        for i in array_values:
-            cmd_string += "%16d %8.8X\n" % (index, i)
-            index += 1
-            encoded_array += bytearray(struct.pack("<I", i))
-
-        cmd_word_list = encoded_cmd_word + encoded_size + encoded_array
-
+        cmd_word_list = bytearray(struct.pack("<II", cmd_word, data.size + 1))
         self.write_command_to_files(cmd_word_list, cmd_string)
+        self.spec_writer.write(data.tobytes())
 
     def switch_write_focus(self, region):
         """ Insert command to switch the region being written to
@@ -1718,7 +1710,7 @@ class DataSpecificationGenerator(object):
                                   operand_2_is_register=False):
         """ Insert command to perform an arithmetic operation on two signed or\
         unsigned values and store the result in a register
-            
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:
@@ -1859,7 +1851,7 @@ class DataSpecificationGenerator(object):
                              operand_2_is_register=False):
         """ Insert command to perform a logic operation on two signed or\
         unsigned values and store the result in a register
-            
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:
@@ -1974,7 +1966,7 @@ class DataSpecificationGenerator(object):
                        destination_id_is_register=False):
         """ Insert command to copy a structure, possibly overwriting another\
         structure
-        
+
         :param source_structure_id:
             * If source_id_is_register is True, the id of the register
               holding the source structure id, between 0 and 15
@@ -2077,7 +2069,7 @@ class DataSpecificationGenerator(object):
                                  destination_parameter_index):
         """ Insert command to copy the value of a parameter from one structure
         to another
-        
+
         :param source_structure_id: The id of the source structure,\
             between 0 and 15
         :type source_structure_id: int
@@ -2158,7 +2150,7 @@ class DataSpecificationGenerator(object):
     def print_value(self, value, value_is_register=False,
                     data_type=DataType.UINT32):
         """ Insert command to print out a value (for debugging)
-        
+
         :param value:
             * If value_is_register is True, the id of the register\
               containing the value to print
@@ -2226,7 +2218,7 @@ class DataSpecificationGenerator(object):
 
     def print_text(self, text):
         """ Insert command to print some text (for debugging)
-        
+
         :param text: The text to write (max 12 characters)
         :type text: str
         :return: Nothing is returned
@@ -2265,7 +2257,7 @@ class DataSpecificationGenerator(object):
 
     def print_struct(self, structure_id, structure_id_is_register=False):
         """ Insert command to print out a structure (for debugging)
-        
+
         :param structure_id:
             * If structure_id_is_register is True, the id of the\
               register containing the id of the structure to print,\
@@ -2329,7 +2321,7 @@ class DataSpecificationGenerator(object):
     def end_specification(self, close_writer=True):
         """ Insert a command to indicate that the specification has finished\
         and finish writing
-        
+
         :param close_writer: Indicates whether to close the underlying writer(s)
         :type close_writer: bool
         :return: Nothing is returned

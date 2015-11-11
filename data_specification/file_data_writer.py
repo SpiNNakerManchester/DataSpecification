@@ -18,14 +18,15 @@ class FileDataWriter(AbstractDataWriter):
                 "Unable to open file {} for writing\n".format(filename))
 
     def write(self, data):
-        """ See :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write`
+        """ See \
+            :py:meth:`data_specification.abstract_data_writer.AbstractDataWriter.write`
         """
         try:
             self.file_handle.write(data)
         except:
-            raise IOError(
-                "FileDataWriter.write: unable to write {0:d} bytes to file {1:s}".format(
-                    len(data), self._filename))
+            raise IOError("FileDataWriter.write: unable to write {0:d}"
+                          " bytes to file {1:s}".format(
+                              len(data), self._filename))
 
     def tell(self):
         """ Returns the position of the file cursor
@@ -37,7 +38,7 @@ class FileDataWriter(AbstractDataWriter):
 
     def close(self):
         """ Closes the file
-        
+
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataWriteException: If the file\

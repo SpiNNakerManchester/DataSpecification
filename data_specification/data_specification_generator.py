@@ -5,7 +5,7 @@ import decimal
 from data_specification import constants, exceptions
 from data_specification.enums.data_type import DataType
 from data_specification.enums.random_number_generator\
-                                                  import RandomNumberGenerator
+    import RandomNumberGenerator
 from data_specification.enums.commands import Commands
 from data_specification.enums.condition import Condition
 from data_specification.enums.logic_operation import LogicOperation

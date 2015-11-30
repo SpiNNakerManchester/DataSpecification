@@ -1143,7 +1143,8 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case END_SPEC:
                 log_info("End of spec has been reached");
                 spin1_exit(0);
-                break;
+                return;
+                //break;
             default:
                 log_error("Not a DSE command: %x", cmd.opCode);
                 rt_error(RTE_ABORT);

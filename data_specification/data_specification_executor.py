@@ -12,7 +12,7 @@ class DataSpecificationExecutor(object):
     """
     
     def __init__(self, spec_reader, mem_writer, space_available,
-                 start_address, report_writer=None):
+                 report_writer=None):
         """
         :param spec_reader: The object to read the specification language file\
                     from
@@ -41,11 +41,10 @@ class DataSpecificationExecutor(object):
         self.space_available = space_available
         self.space_used = 0
         self.space_written = 0
-        self.start_address = start_address
         self.dsef = Dsef(
             self.spec_reader, self.mem_writer, self.space_available)
     
-    def execute(self):
+    def execute(self, start_address=0):
         """ Executes the specification
         
         :return: The number of bytes used by the image and \
@@ -86,7 +85,7 @@ class DataSpecificationExecutor(object):
         self.write_header()
 
         # write the table pointer
-        self.write_pointer_table()
+        self.write_pointer_table(start_address)
 
         # take into account what has just been written to file
         self.space_written = self.space_used
@@ -131,7 +130,7 @@ class DataSpecificationExecutor(object):
 
         self.space_used = 0
 
-    def write_pointer_table(self):
+    def write_pointer_table(self, start_address):
         """ writes the pointer table which defines at what memory address
         each memory region starts at as well as the size of each region
 
@@ -150,7 +149,7 @@ class DataSpecificationExecutor(object):
         for i in xrange(constants.MAX_MEM_REGIONS):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
-                pointer_table[i] = next_free_offset + self.start_address
+                pointer_table[i] = next_free_offset + start_address
                 region_size = memory_region.allocated_size
             else:
                 pointer_table[i] = 0

@@ -235,7 +235,7 @@ class DataSpecificationExecutorFunctions:
 #            value_encoded = self.spec_reader.read(4)
 #            value = struct.unpack("<I", str(value_encoded))[0]
 #            self._write_to_mem(value, 4, 1, "WRITE_ARRAY")
-        value_encoded = self.spec_reader.read(4 * (length - 1))
+        value_encoded = self.spec_reader.read(4 * length)
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
     def execute_write_struct(self, cmd):

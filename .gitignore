@@ -3,6 +3,7 @@
 /.idea
 /.settings
 *.pyc
+*.aplx
 build/
 dist/
 DataSpecification.egg-info

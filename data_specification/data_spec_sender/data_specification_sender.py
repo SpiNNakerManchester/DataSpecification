@@ -6,6 +6,7 @@ import constants
 from commands import Commands
 from command import Command
 
+
 class DataSpecificationSender(object):
     """ Used to send a data specification language file to SpiNNaker to produce\
         a memory image
@@ -36,7 +37,8 @@ class DataSpecificationSender(object):
             # process the received command
             cmd = Command(struct.unpack("<I", str(instruction_spec))[0])
 
-            return_value = Commands(cmd.get_opcode()).send_function(self.dssf, cmd)
+            return_value = Commands(cmd.get_opcode()).send_function(
+                self.dssf, cmd)
             self.spec_sender.send()
 
             if return_value == constants.END_SPEC_SENDER:

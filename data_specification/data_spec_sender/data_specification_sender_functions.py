@@ -2,6 +2,7 @@ import struct
 import constants
 from command import Command
 
+
 class DataSpecificationSenderFunctions:
 
     def __init__(self, spec_reader, spec_sender):
@@ -9,27 +10,27 @@ class DataSpecificationSenderFunctions:
         self.spec_sender = spec_sender
 
     def send_break(self, cmd):
-        #print "Sending break"
+        # print "Sending break"
         self.spec_sender.add(cmd.get_value())
 
     def send_nop(self, cmd):
-        #print "Sending nop"
+        # print "Sending nop"
         self.spec_sender.add(cmd.get_value())
 
     def send_reserve(self, cmd):
-        #print "Sending reserve"
+        # print "Sending reserve"
         self.spec_sender.add(cmd.get_value())
         self.spec_sender.add(self.spec_reader.read(4))
 
     def send_write(self, cmd):
-        #print "Sending write"
+        # print "Sending write"
 
         self.spec_sender.add(cmd.get_value())
         for count in range(cmd.get_length()):
             self.spec_sender.add(self.spec_reader.read(4))
 
     def send_write_array(self, cmd):
-        #print "Sending write array"
+        # print "Sending write array"
 
         self.spec_sender.add(cmd.get_value())
 
@@ -43,11 +44,11 @@ class DataSpecificationSenderFunctions:
             self.spec_sender.add(value_encoded)
 
     def send_switch_focus(self, cmd):
-        #print "Sending switch focus"
+        # print "Sending switch focus"
         self.spec_sender.add(cmd.get_value())
 
     def send_end_spec(self, cmd):
-        #print "Sending end spec"
+        # print "Sending end spec"
         self.spec_sender.add(cmd.get_value())
         return constants.END_SPEC_SENDER
 

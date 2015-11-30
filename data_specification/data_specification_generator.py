@@ -201,10 +201,12 @@ class DataSpecificationGenerator(object):
 
         self.mem_slot[region] = 0
 
-        cmd_word   = (constants.LEN1 << 28)      | \
-                     (Commands.FREE.value << 20) | \
-                     (constants.NO_REGS << 16)   | \
-                     region
+        cmd_word = (
+                    (constants.LEN1 << 28) |
+                    (Commands.FREE.value << 20) |
+                    (constants.NO_REGS << 16) |
+                    region
+                   )
         cmd_string = "FREE memRegion={0:d}".format(region)
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
@@ -258,10 +260,12 @@ class DataSpecificationGenerator(object):
 
         self.rng[rng_id] = [rng_type, seed]
 
-        cmd_word = (constants.LEN2 << 28)             | \
-                   (Commands.DECLARE_RNG.value << 20) | \
-                   (rng_id << 12)                     | \
-                   (rng_type.value << 8)
+        cmd_word = (
+                    (constants.LEN2 << 28) |
+                    (Commands.DECLARE_RNG.value << 20) |
+                    (rng_id << 12) |
+                    (rng_type.value << 8)
+                   )
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_seed = bytearray(struct.pack("<i", seed))
@@ -585,6 +589,9 @@ class DataSpecificationGenerator(object):
         :type structure_id: int
         :param parameter_index: The id of the parameter/element to copy
         :type parameter_index: int
+        :param parameter_index_is_register: True if the index of the structure\
+            is contained in a register
+        :type parameter_index_is_register: bool
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
@@ -610,32 +617,35 @@ class DataSpecificationGenerator(object):
 
         if destination_id < 0 or destination_id >= constants.MAX_REGISTERS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "destination_id", destination_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.READ_PARAM.name)
+                "destination_id", destination_id, 0,
+                constants.MAX_REGISTERS - 1, Commands.READ_PARAM.name)
 
         if self.struct_slot[structure_id] is 0:
             raise exceptions.DataSpecificationNotAllocatedException(
                 "structure", structure_id, Commands.READ_PARAM)
 
         if parameter_index_is_register is True:
-            if parameter_index < 0 or parameter_index >= constants.MAX_REGISTERS:
+            if (parameter_index < 0 or
+                    parameter_index >= constants.MAX_REGISTERS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                          "parameter_index", parameter_index, 0,
                          constants.MAX_REGISTERS - 1, Commands.READ_PARAM.name)
-            cmd_word = (constants.LEN1 << 28)            |  \
-                       (Commands.READ_PARAM.value << 20) |  \
-                       (constants.DEST_AND_SRC1 << 16)   |  \
-                       (destination_id << 12)            |  \
-                       (parameter_index << 8)            |  \
-                       structure_id
+            cmd_word = (
+                        (constants.LEN1 << 28) |
+                        (Commands.READ_PARAM.value << 20) |
+                        (constants.DEST_AND_SRC1 << 16) |
+                        (destination_id << 12) |
+                        (parameter_index << 8) |
+                        structure_id
+                       )
             cmd_string = "READ_PARAM structure_id={0:d}, "  \
                          "element_id_from_register={1:d}, " \
                          "destination_register={2:d}".format(structure_id,
                                                              parameter_index,
                                                              destination_id)
         else:
-            if (parameter_index < 0
-                    or parameter_index >= constants.MAX_STRUCT_ELEMENTS):
+            if (parameter_index < 0 or
+                    parameter_index >= constants.MAX_STRUCT_ELEMENTS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "parameter_index", parameter_index, 0,
                     constants.MAX_STRUCT_ELEMENTS - 1, Commands.READ_PARAM.name)
@@ -645,20 +655,20 @@ class DataSpecificationGenerator(object):
                     "structure %d parameter" % structure_id,
                     parameter_index, Commands.READ_PARAM)
 
-
-            cmd_word = (constants.LEN1 << 28)            | \
-                       (Commands.READ_PARAM.value << 20) | \
-                       (constants.DEST_ONLY << 16)       | \
-                       (destination_id << 12)            | \
-                       (parameter_index << 4)            | \
-                       structure_id
+            cmd_word = (
+                        (constants.LEN1 << 28) |
+                        (Commands.READ_PARAM.value << 20) |
+                        (constants.DEST_ONLY << 16) |
+                        (destination_id << 12) |
+                        (parameter_index << 4) |
+                        structure_id
+                       )
             cmd_string = "READ_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "destination_register={2:d}".format(structure_id,
-                                                parameter_index, destination_id)
+                         "destination_register={2:d}".\
+                format(structure_id, parameter_index, destination_id)
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         self.write_command_to_files(encoded_cmd_word, cmd_string)
-
 
     def set_structure_value(self, structure_id, parameter_index, value,
                             data_type, value_is_register=False):
@@ -712,8 +722,8 @@ class DataSpecificationGenerator(object):
                 "structure_id", structure_id, 0, constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_PARAM.name)
 
-        if (parameter_index < 0
-                or parameter_index >= constants.MAX_STRUCT_ELEMENTS):
+        if (parameter_index < 0 or
+                parameter_index >= constants.MAX_STRUCT_ELEMENTS):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "parameter_index", parameter_index, 0,
                 constants.MAX_STRUCT_ELEMENTS - 1, Commands.WRITE_PARAM.name)
@@ -752,7 +762,7 @@ class DataSpecificationGenerator(object):
                     "value", value, data_type.min, data_type.max,
                     Commands.WRITE_PARAM.name)
 
-            if (data_type.size > 4 and data_type.size != 8):
+            if data_type.size > 4 and data_type.size != 8:
                 raise exceptions.DataSpecificationInvalidSizeException(
                     data_type.name, data_type.size,
                     Commands.WRITE_PARAM.name)
@@ -1004,8 +1014,8 @@ class DataSpecificationGenerator(object):
                 Commands.CONSTRUCT.name)
 
         if self.function[function_id] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException("function",
-                    function_id, Commands.CONSTRUCT.name)
+            raise exceptions.DataSpecificationNotAllocatedException(
+                "function", function_id, Commands.CONSTRUCT.name)
 
         if len(structure_ids) != len(self.function[function_id]):
             raise exceptions.DataSpecificationWrongParameterNumberException(
@@ -1060,18 +1070,11 @@ class DataSpecificationGenerator(object):
         :type dest_id: int
         :param data_type: The type of the data to be read.
         :type data_type: :py:class:`DataType`
-        :param region: The region to read from. If not specified, the current
-                       selected region is assumed and the last parameter is
-                       ignored.
-        :type region: int
-        :param region_is_register: True, if the region parameter identifies a
-                                   register; False, otherwise
-        :type region_is_register: Boolean
         :return: Nothing is returned
         :rtype: None
         """
 
-        cmd_len  = constants.LEN1
+        cmd_len = constants.LEN1
         cmd_code = Commands.READ.value
         cmd_field_usage = constants.DEST_ONLY
 
@@ -1084,19 +1087,20 @@ class DataSpecificationGenerator(object):
                     "register", dest_id, 0, constants.MAX_REGISTERS - 1,
                     Commands.READ.name)
 
-        cmd_word = ((cmd_len << 28)           |
-                    (cmd_code << 20)          |
-                    (cmd_field_usage << 16)   |
-                    (dest_id << 12)           |
-                    data_type.size)
+        cmd_word = (
+                    (cmd_len << 28) |
+                    (cmd_code << 20) |
+                    (cmd_field_usage << 16) |
+                    (dest_id << 12) |
+                    data_type.size
+                   )
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
 
         cmd_string = "READ {0:d} bytes in register {0:d}" \
-                                            .format(data_type.size, dest_id)
+            .format(data_type.size, dest_id)
 
         self.write_command_to_files(encoded_cmd_word, cmd_string)
-
 
     def write_value(
             self, data, repeats=1, repeats_is_register=False,
@@ -1116,7 +1120,7 @@ class DataSpecificationGenerator(object):
               register that contains the number of repeats.
         :type repeats: int
         :param repeats_is_register: Indicates if the parameter repeats\
-                                    idenfifies the register containing the\
+                                    identifies the register containing the\
                                     number of repeats of the value to write
         :type repeats_is_register: bool
         :param data_type: the type to convert data to
@@ -1230,9 +1234,9 @@ class DataSpecificationGenerator(object):
             * If repeats_register is not None (i.e. has an integer value), the\
               content of this parameter is disregarded
         :type repeats: int
-        :param repeats_register: Identifies the register containing the number\
-            of repeats of the value to write
-        :type repeats_register: None or int
+        :param repeats_is_register: Identifies the register containing the\
+            number of repeats of the value to write
+        :type repeats_is_register: None or int
         :param data_type: the type of the data held in the register
         :type data_type: :py:class:`DataType`
         :return: Nothing is returned
@@ -1304,12 +1308,14 @@ class DataSpecificationGenerator(object):
             parameters |= repeats
             cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
-        cmd_word = (constants.LEN1 << 28)       | \
-                   (Commands.WRITE.value << 20) | \
-                   (reg_usage << 16)            | \
-                   (cmd_data_len << 12)         | \
-                   (data_register << 8)         | \
+        cmd_word = (
+                   (constants.LEN1 << 28) |
+                   (Commands.WRITE.value << 20) |
+                   (reg_usage << 16) |
+                   (cmd_data_len << 12) |
+                   (data_register << 8) |
                    parameters
+                   )
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         cmd_word_list = encoded_cmd_word
@@ -1322,6 +1328,8 @@ class DataSpecificationGenerator(object):
 
         :param array_values: An array of words to be written
         :type array_values: list of unsigned int
+        :param data_type: Type of data contained in the array
+        :type data_type: data_specification.enums.data_type.DataType
         :return: The position of the write pointer within the current region,\
             in bytes from the start of the region
         :rtype: int
@@ -1337,11 +1345,13 @@ class DataSpecificationGenerator(object):
 
         if self.current_region is None:
             raise exceptions.DataSpecificationNoRegionSelectedException(
-                                                     Commands.WRITE_ARRAY.name)
+                Commands.WRITE_ARRAY.name)
 
-        cmd_word = (cmd_len << 28)                           \
-                   | (Commands.WRITE_ARRAY.value << 20)      \
-                   | data_type.size
+        cmd_word = (
+            (cmd_len << 28) |
+            (Commands.WRITE_ARRAY.value << 20) |
+            data_type.size
+            )
 
         len_array = len(array_values)
         size = len_array
@@ -1352,7 +1362,7 @@ class DataSpecificationGenerator(object):
         encoded_array = bytearray()
         cmd_string = "WRITE_ARRAY, {0:d} elements of size {1:d}:\n" \
                      .format(len_array, data_type.size)
-        encoding_string = "<{0:s}".format(data_type.struct_encoding)
+        # encoding_string = "<{0:s}".format(data_type.struct_encoding)
 
         index = 0
         data_format = "<{}".format(data_type.struct_encoding)
@@ -2374,8 +2384,7 @@ class DataSpecificationGenerator(object):
                                    operand_2, operand_1_is_register,
                                    operand_2_is_register)
 
-    def logical_not(self, register_id, operand,
-                         operand_is_register=False):
+    def logical_not(self, register_id, operand, operand_is_register=False):
         """ Insert command to perform a logical xor operation, using
             the _call_logic_operation.
         :param register_id: The id of the register to store the result in
@@ -2434,8 +2443,8 @@ class DataSpecificationGenerator(object):
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidOperationException: If operation is not a known \
-            operation
+            DataSpecificationInvalidOperationException: If operation is not a\
+            known operation
         """
         cmd_length = 0
         bit_field = 0x4
@@ -2492,8 +2501,8 @@ class DataSpecificationGenerator(object):
                     cmd_string, register_op_2)
             else:
                 cmd_length += 1
-                if (operand_2 < DataType.UINT32.min
-                        or operand_2 > DataType.UINT32.max):
+                if (operand_2 < DataType.UINT32.min or
+                        operand_2 > DataType.UINT32.max):
                     raise exceptions.\
                         DataSpecificationParameterOutOfBoundsException(
                             "operand_2", operand_2, DataType.UINT32.min,
@@ -2683,8 +2692,9 @@ class DataSpecificationGenerator(object):
                     "parameter", source_parameter_index, "COPY_PARAM")
 
         if not destination_is_register:
-            if destination_parameter_index < 0 \
-                    or destination_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
+            if (destination_parameter_index < 0 or
+                    destination_parameter_index >=
+                    constants.MAX_STRUCT_ELEMENTS):
                 raise exceptions.DataSpecificationParameterOutOfBoundsException(
                     "destination_parameter_index", destination_parameter_index,
                     0, constants.MAX_STRUCT_ELEMENTS - 1,
@@ -2705,34 +2715,38 @@ class DataSpecificationGenerator(object):
                 raise exceptions.DataSpecificationNotAllocatedException(
                         "parameter", destination_parameter_index, "COPY_PARAM")
 
-            if len(self.struct_slot[destination_id]) \
-                                                <= destination_parameter_index:
+            if (len(self.struct_slot[destination_id]) <=
+                    destination_parameter_index):
                 raise exceptions.DataSpecificationNotAllocatedException(
                         "parameter", destination_parameter_index, "COPY_PARAM")
 
-            if self.struct_slot[source_structure_id][source_parameter_index][1] !=\
-               self.struct_slot[destination_id][destination_parameter_index][1]:
+            if (self.struct_slot[source_structure_id]
+                    [source_parameter_index][1] !=
+                    self.struct_slot[destination_id]
+                    [destination_parameter_index][1]):
                 raise exceptions.DataSpecificationTypeMismatchException(
                                                                   "COPY_PARAM")
 
-            if source_structure_id == destination_id and \
-               destination_parameter_index == source_parameter_index:
-                   raise exceptions.DataSpecificationDuplicateParameterException(
-                           "COPY_PARAM", [source_structure_id,
-                                          source_parameter_index,
-                                          destination_id,
-                                          destination_parameter_index])
+            if (source_structure_id == destination_id and
+                    destination_parameter_index == source_parameter_index):
+                raise exceptions.DataSpecificationDuplicateParameterException(
+                    "COPY_PARAM", [source_structure_id,
+                                   source_parameter_index,
+                                   destination_id,
+                                   destination_parameter_index])
 
             cmd_word_1 = ((constants.LEN2 << 28) |
                           (Commands.COPY_PARAM.value << 20) |
                           (constants.NO_REGS << 16) |
                           (destination_id << 12) |
                           (source_structure_id << 8))
-            cmd_word_2 = (destination_parameter_index << 8) | source_parameter_index
+            cmd_word_2 = ((destination_parameter_index << 8) |
+                          source_parameter_index)
 
             cmd_string = "COPY_PARAM source_structure_id = {0:d}, " \
-                         "source_parameter_id = {1:d}, destination_structure_id " \
-                         "= {2:d}, destination_parameter_id = {3:d}".format(
+                         "source_parameter_id = {1:d}, " \
+                         "destination_structure_id = {2:d}, " \
+                         "destination_parameter_id = {3:d}".format(
                              source_structure_id, source_parameter_index,
                              destination_id, destination_parameter_index)
         else:
@@ -2748,12 +2762,13 @@ class DataSpecificationGenerator(object):
                           (constants.DEST_ONLY << 16) |
                           (destination_id << 12) |
                           (source_structure_id << 8))
-            cmd_word_2 =  source_parameter_index
+            cmd_word_2 = source_parameter_index
 
             cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
-                         "source_parameter_id = {1:d}, destination_register_id " \
-                         "= {2:d}".format(source_structure_id,
-                                       source_parameter_index, destination_id)
+                         "source_parameter_id = {1:d}, " \
+                         "destination_register_id = {2:d}"\
+                .format(source_structure_id,
+                        source_parameter_index, destination_id)
 
         cmd_word_1_encoded = bytearray(struct.pack("<I", cmd_word_1))
         cmd_word_2_encoded = bytearray(struct.pack("<I", cmd_word_2))

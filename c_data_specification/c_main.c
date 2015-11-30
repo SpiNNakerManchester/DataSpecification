@@ -61,11 +61,17 @@ int currentBlock_size = 0;
 //! \param[in] mailbox The mailbox where the packet is received.
 //! \param[in] mailbox The packet's port.
 void sdp_packet_callback(uint mailbox, uint port) {
+    sdp_msg_t *msg = (sdp_msg_t *)mailbox;
 
+    if (get_core_state() == CORE_BUSY)
+    {
+        io_printf (IO_BUF, "packet dropped - cpu state %d\n", get_core_state());
+        spin1_msg_free(msg);
+        return;
+    }
+    
     // Go in a busy state while executing.
     set_core_state(CORE_BUSY);
-
-    sdp_msg_t *msg = (sdp_msg_t *)mailbox;
 
     if (execRegion == NULL) {
         // Allocate memory of a data spec chunk and go in the WAITING_FOR_DATA
@@ -123,7 +129,7 @@ void write_header() {
     address_t header_writer =
                      (address_t)((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user0;
 
-    log_info("Header address %x", header_writer);
+    log_info("Header address 0x%08x", header_writer);
 
     // Write the headers.
     *header_writer       = APPDATA_MAGIC_NUM;
@@ -134,22 +140,22 @@ void write_header() {
 //! Must be called after the DSE has finished its execution so that the memory
 //! regions are allocated.
 void write_pointer_table() {
-
+  
     // Pointer to write the pointer table.
-    address_t pt_writer =
-       (address_t)(((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user0) + HEADER_SIZE;
+    address_t base_ptr = (address_t)(((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user0);
+    address_t pt_writer = base_ptr + HEADER_SIZE;
 
     // Iterate over the memory regions and write their start address in the
     // memory location pointed at by the pt_writer.
     // If a memory region has not been defined, 0 is written.
     for (int i = 0; i < MAX_MEM_REGIONS; i++, pt_writer++) {
         if (memory_regions[i] != NULL) {
-            *pt_writer = (uint32_t)memory_regions[i]->start_address;
+            *pt_writer = (uint32_t) memory_regions[i]->start_address;
 
-            log_info("Region %d address %x size %x %s", i,
-                     (uint32_t)memory_regions[i]->start_address,
+            log_info("Region %d address 0x%08x size %d bytes, %s", i,
+                     *pt_writer,
                      memory_regions[i]->size,
-                     memory_regions[i]->unfilled ? "unfilled" : "");
+                     memory_regions[i]->unfilled ? "unfilled" : "filled");
         } else {
             *pt_writer = 0;
         }

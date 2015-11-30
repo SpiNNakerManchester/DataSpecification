@@ -11,6 +11,7 @@ import constants
 import binascii
 import time
 
+
 class SpecSender:
     """ Class for sending a data spec to a core.
         The data is added to a buffer using the add method and then sent using
@@ -52,11 +53,9 @@ class SpecSender:
     def send(self):
 
         # Wait for the core to get into the READY_TO_RECEIVE state.
-        while self.transceiver. \
-               get_cpu_information_from_core(self.placement.x,
-                                             self.placement.y,
-                                             self.placement.p).user[1] \
-                                                  != constants.READY_TO_RECEIVE:
+        while self.transceiver.get_cpu_information_from_core(
+                self.placement.x, self.placement.y,
+                self.placement.p).user[1] != constants.READY_TO_RECEIVE:
             time.sleep(0.01)
         # Send a packet containing the length of the data (the length of the
         # internal buffer).
@@ -65,11 +64,10 @@ class SpecSender:
         self.transceiver.send_sdp_message(SDPMessage(self.header, msg_data_len))
 
         # Wait for the core to get into the WAITING_FOR_DATA state.
-        while self.transceiver. \
-               get_cpu_information_from_core(self.placement.x,
-                                             self.placement.y,
-                                             self.placement.p).user[1] \
-                                                  != constants.WAITING_FOR_DATA:
+        while self.transceiver.\
+            get_cpu_information_from_core(
+                self.placement.x, self.placement.y,
+                self.placement.p).user[1] != constants.WAITING_FOR_DATA:
             time.sleep(0.01)
 
 

@@ -1070,7 +1070,7 @@ class DataSpecificationGenerator(object):
 
         cmd_word_list = bytearray(struct.pack("<II", cmd_word, data.size + 1))
         self.write_command_to_files(cmd_word_list, cmd_string)
-        self.spec_writer.write(data.tobytes())
+        self.spec_writer.write(data.tostring())
 
     def switch_write_focus(self, region):
         """ Insert command to switch the region being written to

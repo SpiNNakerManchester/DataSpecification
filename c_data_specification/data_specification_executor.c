@@ -243,7 +243,9 @@ void execute_write(struct Command cmd) {
     // Otherwise, the number of repetitions is stored into the last significant
     // byte.
     if (command_src2_in_use(cmd.cmdWord))
+    {
         n_repeats = registers[command_get_src2Reg(cmd.cmdWord)];
+    }
     else {
         n_repeats = cmd.cmdWord & 0xFF;
     }
@@ -1009,8 +1011,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
 
     // Dummy value of the opCode.
     cmd.opCode = 0x00;
-
-    while ((ds_size != 0 ? command_pointer < ds_end : 1) && cmd.opCode != END_SPEC) {
+    while (ds_size != 0 ? command_pointer < ds_end : 1) {
         cmd = get_next_command();
         switch (cmd.opCode) {
             case BREAK:

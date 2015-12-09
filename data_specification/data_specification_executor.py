@@ -30,9 +30,9 @@ class DataSpecificationExecutor(object):
         :type report_writer:\
                     :py:class:`data_specification.abstract_data_writer.
                     AbstractDataWriter`
-        :raise data_specification.exceptions.DataReadException:\
+        :raise spinn_storage_handlers.exceptions.DataReadException:\
                     If a read from external storage fails
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
                     If a write to external storage fails
         """
         self.spec_reader = spec_reader
@@ -50,9 +50,9 @@ class DataSpecificationExecutor(object):
         :return: The number of bytes used by the image and \
                 the number of bytes written by the image
         :rtype: int
-        :raise data_specification.exceptions.DataReadException:\
+        :raise spinn_storage_handlers.exceptions.DataReadException:\
                     If a read from external storage fails
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
                     If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationException:\
                     If there is an error when executing the specification

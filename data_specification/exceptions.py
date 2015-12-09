@@ -1,12 +1,12 @@
-class DataWriteException(Exception):
-    """ An exception that indicates that there was an error writing\
-        to the underlying medium
+class DataSpecificationException(Exception):
+    """ A general purpose exception indicating that something went\
+        wrong when interacting with a Data Specification
     """
 
     def __init__(self, message):
         """
 
-        :param message: A message to indicate what when wrong
+        :param message: message reporting the exception occurred
         :type message: str
         """
         print message
@@ -21,34 +21,6 @@ class DataUndefinedWriterException(Exception):
         """
 
         :param message: A message to indicate what when wrong
-        :type message: str
-        """
-        print message
-
-
-class DataReadException(Exception):
-    """ An exception that indicates that there was an error reading\
-        from the underlying medium
-    """
-
-    def __init__(self, message):
-        """
-
-        :param message: A message to indicate what when wrong
-        :type message: str
-        """
-        print message
-
-
-class DataSpecificationException(Exception):
-    """ A general purpose exception indicating that something went\
-        wrong when interacting with a Data Specification
-    """
-
-    def __init__(self, message):
-        """
-
-        :param message: message reporting the exception occurred
         :type message: str
         """
         print message

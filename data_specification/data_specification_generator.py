@@ -12,7 +12,6 @@ from data_specification.enums.logic_operation import LogicOperation
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from spinn_machine import sdram
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +31,7 @@ class DataSpecificationGenerator(object):
         is to be written
         :type report_writer: Implementation of\
         :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
         If a write to external storage fails
         """
         self.spec_writer = spec_writer
@@ -58,7 +57,7 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
         self.write_command_to_files(
@@ -71,7 +70,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.BREAK.value << 20)
@@ -88,7 +87,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
         cmd_word = (constants.LEN1 << 28) | (Commands.NOP.value << 20)
@@ -113,7 +112,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationRegionInUseException: If the region was already \
@@ -182,7 +181,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationNotAllocatedException: If the region was not\
@@ -225,7 +224,7 @@ class DataSpecificationGenerator(object):
         :rtype: int
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecification:\
             If there is no more space for a new generator
@@ -298,7 +297,7 @@ class DataSpecificationGenerator(object):
         :rtype: int
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If there is no more space for a new random distribution
@@ -385,7 +384,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationNotAllocatedException: If the random distribution \
@@ -440,7 +439,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If there are no more spaces for new structures
@@ -596,7 +595,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -700,7 +699,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -819,7 +818,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -990,7 +989,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -1129,7 +1128,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -1243,7 +1242,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -1335,7 +1334,7 @@ class DataSpecificationGenerator(object):
         :rtype: int
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
                DataSpecificationNoRegionSelectedException:
@@ -1389,7 +1388,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException: If the region \
@@ -1471,7 +1470,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -1575,7 +1574,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationInvalidCommandException: If there is no loop in \
@@ -1601,7 +1600,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationInvalidCommandException: If there is no loop in \
@@ -1638,7 +1637,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -1711,7 +1710,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationInvalidCommandException: If there is no \
@@ -1739,7 +1738,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationInvalidCommandException: If there is no \
@@ -1777,7 +1776,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -1859,7 +1858,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException: If the register_id \
@@ -1908,7 +1907,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException: If the \
@@ -1996,7 +1995,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2092,7 +2091,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been\
             initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2226,7 +2225,7 @@ class DataSpecificationGenerator(object):
         :type operand_2_is_register: bool
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2261,7 +2260,7 @@ class DataSpecificationGenerator(object):
         :type operand_2_is_register: bool
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2297,7 +2296,7 @@ class DataSpecificationGenerator(object):
         :type operand_2_is_register: bool
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2334,7 +2333,7 @@ class DataSpecificationGenerator(object):
         :type operand_2_is_register: bool
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2370,7 +2369,7 @@ class DataSpecificationGenerator(object):
         :type operand_2_is_register: bool
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2398,7 +2397,7 @@ class DataSpecificationGenerator(object):
         :type operand_is_register: bool
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2434,7 +2433,7 @@ class DataSpecificationGenerator(object):
         :type operand_2_is_register: bool
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2552,7 +2551,7 @@ class DataSpecificationGenerator(object):
         :rtype: int
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2654,7 +2653,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2795,7 +2794,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2857,7 +2856,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
         text_len = len(text)
@@ -2906,7 +2905,7 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been\
             initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
@@ -2967,7 +2966,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
         self.comment("\nEnd of specification:")
@@ -3013,7 +3012,7 @@ class DataSpecificationGenerator(object):
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialized
-        :raise data_specification.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
 

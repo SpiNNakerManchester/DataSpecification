@@ -11,5 +11,6 @@ setup(
     license="GNU GPLv3.0",
     packages=['data_specification',
               'data_specification.enums'],
-    install_requires=['six', 'enum34']
+    install_requires=['SpiNNStorageHandlers >= 2016.001.01',
+                      'six', 'enum34']
 )

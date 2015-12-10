@@ -1,14 +1,10 @@
 from spinnman.messages.sdp.sdp_message import SDPMessage
 from spinnman.messages.sdp.sdp_header import SDPHeader
-from spinnman.connections.udp_packet_connections.udp_spinnaker_connection \
-    import UDPSpinnakerConnection
 from spinnman.messages.sdp.sdp_flag import SDPFlag
 
-from pacman.model.placements import placement as Placement
 
 import struct
 import constants
-import binascii
 import time
 
 
@@ -28,14 +24,14 @@ class SpecSender:
         """
         self.transceiver = transceiver
 
-        self.placement   = placement
+        self.placement = placement
 
-        self.header      = SDPHeader(flags = SDPFlag.REPLY_NOT_EXPECTED,
-                                     destination_cpu    = placement.p,
-                                     destination_chip_x = placement.x,
-                                     destination_chip_y = placement.y,
-                                     destination_port   = 1)
-        self.msg_data    = bytearray()
+        self.header = SDPHeader(flags=SDPFlag.REPLY_NOT_EXPECTED,
+                                destination_cpu=placement.p,
+                                destination_chip_x=placement.x,
+                                destination_chip_y=placement.y,
+                                destination_port=1)
+        self.msg_data = bytearray()
 
     def add(self, data):
         """ Add data to an internal buffer.
@@ -70,12 +66,9 @@ class SpecSender:
                 self.placement.p).user[1] != constants.WAITING_FOR_DATA:
             time.sleep(0.01)
 
-
         # Write data at the address pointed at by user2.
-        destination_address = self.transceiver. \
-               get_cpu_information_from_core(self.placement.x,
-                                             self.placement.y,
-                                             self.placement.p).user[2]
+        destination_address = self.transceiver.get_cpu_information_from_core(
+                self.placement.x, self.placement.y, self.placement.p).user[2]
 
         self.transceiver.write_memory(self.placement.x,
                                       self.placement.y,
@@ -88,5 +81,4 @@ class SpecSender:
                                                      struct.pack("<I", 0)))
 
         # Clear the internal buffer.
-        self.msg_data           = bytearray()
-
+        self.msg_data = bytearray()

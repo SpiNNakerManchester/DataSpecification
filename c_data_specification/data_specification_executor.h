@@ -62,6 +62,11 @@ struct Constructor {
     uint8_t arg_read_only;
 };
 
+extern uint8_t current_app_id;
+extern uint8_t future_app_id;
+extern uint32_t current_sark_xalloc_flags;
+extern uint32_t future_sark_xalloc_flags;
+
 void data_specification_executor(address_t, uint32_t);
 
 #endif

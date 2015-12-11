@@ -20,6 +20,7 @@ uint64_t registers[MAX_REGISTERS];
 
 //! Pointer to the next command to be analysed.
 address_t command_pointer;
+address_t dsf_pointer;
 
 struct Struct *structs[MAX_STRUCTS];
 struct Constructor constructors[MAX_CONSTRUCTORS];
@@ -92,6 +93,10 @@ int command_src2_in_use(uint32_t command) {
     return command_get_fieldUsage(command) & 0x1;
 }
 
+uint32_t available_region_space(uint8_t region) {
+    return (uint32_t)memory_regions[region]->size - (uint32_t)(memory_regions[region]->start_address - memory_regions[region]->write_pointer);
+}
+
 //! \brief Read the next command from the memory and update the command_pointer
 //!        accordingly.
 //! \return A Command object storing the command.
@@ -144,8 +149,9 @@ void execute_reserve(struct Command cmd) {
                                (((cmd.dataWords[0] >> 2) + 1) << 2) :
                                                     cmd.dataWords[0];
 
-    void *mem_region_start = sark_xalloc(((sv_t*)SV_SV)->sdram_heap,
-                                         mem_region_size, 0, 0x01);
+    void *mem_region_start = sark_xalloc(sv->sdram_heap,
+                                         mem_region_size, 0, 
+					 future_sark_xalloc_flags);
 
     if (mem_region_start == NULL) {
         log_error("RESERVE unable to allocate %d bytes of SDRAM memory.",
@@ -170,6 +176,12 @@ void execute_reserve(struct Command cmd) {
     memory_regions[region_id]->write_pointer  = mem_region_start;
     memory_regions[region_id]->unfilled       = read_only;
 
+    /*
+    log_info("region start pointer: 0x%08x", memory_regions[region_id]->start_address);
+    log_info("region write pointer: 0x%08x", memory_regions[region_id]->write_pointer);
+    log_info("region size: %d", memory_regions[region_id]->size);
+    */
+    
     if (memory_regions[region_id]->unfilled) {
         for (int i = 0; i < (memory_regions[region_id]->size >> 2); i++)
             *(memory_regions[region_id]->start_address + i) = 0;
@@ -205,6 +217,9 @@ void execute_free(struct Command cmd) {
 //                  The supported sizes are 1, 2, 4 and 8 bytes.
 void write_value(void *value, int size) {
 
+    //log_info("current write pointer: 0x%08x", memory_regions[current_region]->write_pointer);
+    //log_error("size of the data to be written: %d", size);
+    
     switch (size) {
         case 1:
             *(memory_regions[current_region]->write_pointer) =
@@ -228,6 +243,8 @@ void write_value(void *value, int size) {
     }
 
     ((memory_regions[current_region]->write_pointer)) += size;
+    
+    //log_info("final write pointer: 0x%08x", memory_regions[current_region]->write_pointer);
 }
 
 //! \brief Execute a WRITE command, which writes 1, 2, 4 or 8 bytes of data from
@@ -275,8 +292,17 @@ void execute_write(struct Command cmd) {
     } else if (memory_regions[current_region] == NULL) {
         log_error("WRITE the current memory region has not been allocated");
         rt_error(RTE_ABORT);
-    } else if (memory_regions[current_region]->size - data_len < 0) {
+    } else if (available_region_space(current_region) < data_len) {
         log_error("WRITE the current memory region is full");
+	/*
+	log_error("current region: %d", current_region);
+	log_error("start region address: 0x%08x", memory_regions[current_region]->start_address);
+	log_error("current write pointer: 0x%08x", memory_regions[current_region]->write_pointer);
+	log_error("size of the data to be written: %d", data_len);
+	log_error("available space: %d", available_region_space(current_region));
+	log_error("address of the data specification file: 0x%08x", dsf_pointer);
+	log_error("address of the instruction executed: 0x%08x", command_pointer);
+	*/
         rt_error(RTE_ABORT);
     } else {
         for (int count = 0; count < n_repeats; count++)
@@ -301,8 +327,17 @@ void execute_write_array(struct Command cmd) {
     } else if (memory_regions[current_region] == NULL) {
         log_error("WRITE_ARRAY the current memory region has not been allocated");
         rt_error(RTE_ABORT);
-    } else if (memory_regions[current_region]->size - length * data_size < 0) {
+    } else if (available_region_space(current_region) < length * data_size) {
         log_error("WRITE_ARRAY the current memory region is full");
+	/*
+	log_error("current region: %d", current_region);
+	log_error("start region address: 0x%08x", memory_regions[current_region]->start_address);
+	log_error("current write pointer: 0x%08x", memory_regions[current_region]->write_pointer);
+	log_error("size of the data to be written: %d", length * data_size);
+	log_error("available space: %d", available_region_space(current_region));
+	log_error("address of the data specification file: 0x%08x", dsf_pointer);
+	log_error("address of the instruction executed: 0x%08x", command_pointer);
+	*/
         rt_error(RTE_ABORT);
     } else {
 
@@ -1002,6 +1037,7 @@ void execute_block_copy(struct Command cmd) {
 void data_specification_executor(address_t ds_start, uint32_t ds_size) {
 
     // Pointer to the next command to be executed.
+    dsf_pointer = ds_start;
     command_pointer = ds_start;
 
     // Pointer to the end of the data spec memory region.

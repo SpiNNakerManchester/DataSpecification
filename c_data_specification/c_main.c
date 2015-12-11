@@ -46,6 +46,21 @@ address_t execRegion = NULL;
 //! \brief The size of the execRegion memory block.
 int currentBlock_size = 0;
 
+//! \brief The app identifier of the current executable.
+uint8_t current_app_id;
+
+//! \brief The app identifier of the following executable for which the 
+//!        data is being prepared.
+uint8_t future_app_id;
+
+//! \brief Pre-computed identifier for memory allocation for 
+//         current executable
+uint32_t current_sark_xalloc_flags;
+
+//! \brief Pre-computed identifier for memory allocation for 
+//         following application for which the data is being prepared
+uint32_t future_sark_xalloc_flags;
+
 //! \brief Callback for sdp packets.
 //! 
 //! The data spec is passed to the DSE in atomic chunks (the smallest chunks
@@ -72,22 +87,32 @@ void sdp_packet_callback(uint mailbox, uint port) {
     
     // Go in a busy state while executing.
     set_core_state(CORE_BUSY);
-
+    log_info("Processing received packet");
+    
     if (execRegion == NULL) {
         // Allocate memory of a data spec chunk and go in the WAITING_FOR_DATA
         // state.
+        log_info("Allocating memory to receive dataSpec");
         currentBlock_size = ((int*)&(msg->cmd_rc))[0];
+	future_app_id = (uint8_t) ((int*)&(msg->cmd_rc))[1];
+	future_sark_xalloc_flags = (future_app_id << 8) | ALLOC_ID | ALLOC_LOCK;
 
+	pointer_table_header_alloc();
+	
 //        execRegion = sark_alloc(1, currentBlock_size);
         log_info("Allocating %d bytes", currentBlock_size);
-        execRegion = sark_xalloc(((sv_t*)SV_SV)->sdram_heap, currentBlock_size, 0, 0x01);
-        set_user2_value((uint32_t)execRegion);
+        execRegion = sark_xalloc(sv->sdram_heap, 
+				 currentBlock_size,
+				 0,
+				 current_sark_xalloc_flags);
 
         if (execRegion == NULL) {
             log_error("Could not allocate memory for the execution of an "
                       "instruction block of %d words.", currentBlock_size);
             spin1_exit(-1);
         }
+        
+	set_user2_value((uint32_t)execRegion);
 
         // free the message to stop overload
         spin1_msg_free(msg);
@@ -96,9 +121,10 @@ void sdp_packet_callback(uint mailbox, uint port) {
     } else {
         // Execute the data spec, free memory and go in the READY_TO_RECEIVE
         // state.
+        log_info("Executing dataSpec");
         data_specification_executor(execRegion, currentBlock_size);
 
-        sark_xfree(((sv_t*)SV_SV)->sdram_heap, execRegion, 0x01);
+        //sark_xfree(sv->sdram_heap, execRegion, 0x01);
         execRegion = NULL;
         currentBlock_size = 0;
 
@@ -111,10 +137,11 @@ void sdp_packet_callback(uint mailbox, uint port) {
 
 //! \brief Allocate memory for the header and the pointer table.
 void pointer_table_header_alloc() {
-    void *header_start = sark_xalloc(((sv_t*)SV_SV)->sdram_heap,
+    log_info("Allocating memory for pointer table");
+    void *header_start = sark_xalloc(sv->sdram_heap,
                                      HEADER_SIZE + POINTER_TABLE_SIZE,
-                                     0x00,                // tag
-                                     0x01);               // flag
+                                     0x00,                       // tag
+                                     future_sark_xalloc_flags);  // flag
     if (header_start == NULL) {
         log_error("Could not allocate memory for the header and pointer table");
         spin1_exit(-1);
@@ -171,10 +198,13 @@ void free_mem_region_info() {
 }
 
 void c_main(void) {
-    pointer_table_header_alloc();
+    current_app_id = sark_app_id();
+    current_sark_xalloc_flags = (current_app_id << 8) | ALLOC_ID | ALLOC_LOCK;
 
     spin1_callback_on(SDP_PACKET_RX, sdp_packet_callback, 1);
     set_core_state(READY_TO_RECEIVE);
+    
+    log_info("DSE ready to receive specs");
     spin1_start(FALSE);
 
     write_header();

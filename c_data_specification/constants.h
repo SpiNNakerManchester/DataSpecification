@@ -27,7 +27,7 @@
 // The start address of the pointer table.
 #define POINTER_TABLE_START_ADDRESS    HEADER_START_ADDRESS +  APP_PTR_TABLE_HEADER_BYTE_SIZE
 
-#define HEADER_SIZE 2
+#define HEADER_SIZE                    2 * 4
 
 // The start address of the stack.
 #define STACK_START_ADDRESS            POINTER_TABLE_START_ADDRESS + POINTER_TABLE_SIZE

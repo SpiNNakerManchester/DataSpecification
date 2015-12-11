@@ -217,9 +217,9 @@ void execute_free(struct Command cmd) {
 //                  The supported sizes are 1, 2, 4 and 8 bytes.
 void write_value(void *value, int size) {
 
-    //log_info("current write pointer: 0x%08x", memory_regions[current_region]->write_pointer);
+    //io_printf(IO_BUF, "wp: 0x%08x\n", memory_regions[current_region]->write_pointer);
     //log_error("size of the data to be written: %d", size);
-    
+
     switch (size) {
         case 1:
             *(memory_regions[current_region]->write_pointer) =
@@ -1179,7 +1179,6 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 break;
             case END_SPEC:
                 log_info("End of spec has been reached");
-                spin1_exit(0);
                 return;
                 //break;
             default:

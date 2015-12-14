@@ -19,7 +19,8 @@
 #define MAX_MEM_REGIONS                16
 
 // The size of the pointer table, computed from the number of memory regions.
-#define POINTER_TABLE_SIZE             4 * MAX_MEM_REGIONS
+#define POINTER_TABLE_SIZE             MAX_MEM_REGIONS
+#define POINTER_TABLE_SIZE_BYTES       POINTER_TABLE_SIZE * 4
 
 // The start address of the header table.
 #define HEADER_START_ADDRESS           SDRAM_TOP
@@ -27,7 +28,8 @@
 // The start address of the pointer table.
 #define POINTER_TABLE_START_ADDRESS    HEADER_START_ADDRESS +  APP_PTR_TABLE_HEADER_BYTE_SIZE
 
-#define HEADER_SIZE                    2 * 4
+#define HEADER_SIZE                    2
+#define HEADER_SIZE_BYTES              HEADER_SIZE * 4
 
 // The start address of the stack.
 #define STACK_START_ADDRESS            POINTER_TABLE_START_ADDRESS + POINTER_TABLE_SIZE
@@ -38,19 +40,6 @@
 #define MAX_STRUCT_ARGS 5
 
 #define PRINT_TEXT_MAX_CHARACTERS 11
-
-// The states of a core.
-//   READY_TO_RECEIVE - The core can receive new information about a data
-//                      block.
-//   WAITING_FOR_DATA - The core has allocated memory for the new block and
-//                      waits for its content.
-//   CORE_BUSY        - The core cannot receive any packets.
-enum Core_states {
-    READY_TO_RECEIVE = 1,
-    WAITING_FOR_DATA = 2,
-    CORE_BUSY = 3
-};
-
 
 #endif
 

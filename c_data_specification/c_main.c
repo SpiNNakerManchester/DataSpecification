@@ -61,7 +61,7 @@ uint32_t future_sark_xalloc_flags;
 void pointer_table_header_alloc() {
     log_info("Allocating memory for pointer table");
     address_t *header_start = sark_xalloc(sv->sdram_heap,
-                                     HEADER_SIZE + POINTER_TABLE_SIZE,
+                                     HEADER_SIZE_BYTES + POINTER_TABLE_SIZE_BYTES,
                                      0x00,                       // tag
                                      future_sark_xalloc_flags);  // flag
     if (header_start == NULL) {
@@ -112,21 +112,33 @@ void free_mem_region_info() {
 }
 
 void c_main(void) {
-  
+    //user0 contains the address of the data specification to execute
     execRegion = (address_t) get_user0_value();
+    
+    //user1 contains the length of the dataspecification to execute
     currentBlock_size = (uint32_t) get_user1_value();
+    
+    //user2 contains the future application id for which the data
+    //specification is currently being executed
     future_app_id = (uint8_t) get_user2_value();
     
+    //compute a few constants, valid for the entire DSE
     current_app_id = sark_app_id();
     current_sark_xalloc_flags = (current_app_id << 8) | ALLOC_ID | ALLOC_LOCK;
     future_sark_xalloc_flags = (future_app_id << 8) | ALLOC_ID | ALLOC_LOCK;
     
+    //allocate memory for the table pointer
     pointer_table_header_alloc();
     
+    //executing data specification
     log_info("Executing dataSpec");
     data_specification_executor(execRegion, currentBlock_size);
 
+    //writing the content of the table pointer
     write_pointer_table();
 
+    //freeing used memory structures in DTCM
+    //this may be discarded if needed: the app_stop on this executable
+    //would get rid of the data in DTCM
     free_mem_region_info();
 }

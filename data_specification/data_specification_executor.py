@@ -10,7 +10,7 @@ class DataSpecificationExecutor(object):
     """ Used to execute a data specification language file to produce a memory\
         image
     """
-    
+
     def __init__(self, spec_reader, mem_writer, space_available,
                  report_writer=None):
         """
@@ -43,10 +43,10 @@ class DataSpecificationExecutor(object):
         self.space_written = 0
         self.dsef = Dsef(
             self.spec_reader, self.mem_writer, self.space_available)
-    
+
     def execute(self):
         """ Executes the specification
-        
+
         :return: The number of bytes used by the image and \
                 the number of bytes written by the image
         :rtype: int
@@ -97,7 +97,11 @@ class DataSpecificationExecutor(object):
                 if ((memory_region.unfilled and
                     self.dsef.mem_regions.needs_to_write_region(i)) or
                         not memory_region.unfilled):
-                    self.mem_writer.write(memory_region.region_data)
+                    if memory_region.shrink_to_fit:
+                        self.mem_writer.write(memory_region.region_data[
+                            :memory_region.max_write_pointer])
+                    else:
+                        self.mem_writer.write(memory_region.region_data)
                 else:
                     self.space_written -= memory_region.allocated_size
         return self.space_used, self.space_written
@@ -150,7 +154,10 @@ class DataSpecificationExecutor(object):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
                 pointer_table[i] = next_free_offset
-                region_size = memory_region.allocated_size
+                if memory_region.shrink_to_fit:
+                    region_size = memory_region.max_write_pointer
+                else:
+                    region_size = memory_region.allocated_size
             else:
                 pointer_table[i] = 0
                 region_size = 0

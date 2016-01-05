@@ -4,19 +4,24 @@ class MemoryRegion(object):
 
     """
 
-    def __init__(self, memory_pointer, unfilled, size):
-        """constrctor for the memory region
+    def __init__(self, memory_pointer, unfilled, size, shrink_to_fit):
+        """
 
         :param memory_pointer: the write pointer position
         :param unfilled: if the region needs to be filled when written
+        :param shrink_to_fit: Indicates that the region should be shrunk to\
+            actual size when writing the final data
         :return: None
         :rtype: None
         :raise None: this method does not raise any known exception
         """
         self._mem_pointer = memory_pointer
         self._unfilled = unfilled
+        self._shink_to_fit = shrink_to_fit
         self._allocated_size = size
         self._region_data = bytearray(size)
+        self._write_pointer = 0
+        self._max_write_pointer = 0
 
     @property
     def memory_pointer(self):
@@ -58,5 +63,25 @@ class MemoryRegion(object):
         """
         return self._region_data
 
+    @property
+    def shrink_to_fit(self):
+        return self._shink_to_fit
 
+    @property
+    def write_pointer(self):
+        return self._write_pointer
 
+    @write_pointer.setter
+    def write_pointer(self, write_pointer):
+        self._write_pointer = write_pointer
+        self._max_write_pointer = max((
+            self._write_pointer, self._max_write_pointer))
+
+    @property
+    def max_write_pointer(self):
+        return self._max_write_pointer
+
+    def increment_write_pointer(self, n_bytes):
+        self._write_pointer += n_bytes
+        self._max_write_pointer = max((
+            self._write_pointer, self._max_write_pointer))

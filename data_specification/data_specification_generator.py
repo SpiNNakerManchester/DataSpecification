@@ -92,7 +92,8 @@ class DataSpecificationGenerator(object):
         self.write_command_to_files(cmd_word_list, cmd_string)
         return
 
-    def reserve_memory_region(self, region, size, label=None, empty=False):
+    def reserve_memory_region(
+            self, region, size, label=None, empty=False, shrink_to_fit=False):
         """ Insert command to reserve a memory region
 
         :param region: The number of the region to reserve, from 0 to 15
@@ -141,12 +142,16 @@ class DataSpecificationGenerator(object):
         unfilled = False
         if empty:
             unfilled = True
+        shrink = 0
+        if shrink_to_fit:
+            shrink = 1
         self.mem_slot[region] = [size, label, unfilled]
 
         cmd_word = ((constants.LEN2 << 28) |
                     (Commands.RESERVE.value << 20) |
                     (constants.NO_REGS << 16) |
                     (unfilled << 7) |
+                    (shrink << 6) |
                     region)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_size = bytearray(struct.pack("<I", size))

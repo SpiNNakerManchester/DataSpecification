@@ -11,7 +11,7 @@
 
 //! Array to keep track of allocated memory regions.
 //! Initialised with 0 (NULL) by default.
-struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
+MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
 //! \brief Get the value of user2 register.
 //!
@@ -38,6 +38,9 @@ uint32_t get_user0_value() {
 //!        data spec.
 address_t execRegion = NULL;
 
+//! \brief The parameter structure for the DSE
+dse_data *dse_exec_data_struct;
+
 //! \brief The size of the execRegion memory block.
 int currentBlock_size = 0;
 
@@ -56,11 +59,18 @@ uint32_t current_sark_xalloc_flags;
 //         following application for which the data is being prepared
 uint32_t future_sark_xalloc_flags;
 
+//! \brief boolean to identify if the data structure for the memory map
+//         report should be produced
+uint8_t generate_report;
+
+//! \brief memory are to store info related to the regions, to be used for
+//         memory map report
+MemoryRegion *report_header_start = NULL;
 
 //! \brief Allocate memory for the header and the pointer table.
 void pointer_table_header_alloc() {
     log_info("Allocating memory for pointer table");
-    address_t *header_start = sark_xalloc(sv->sdram_heap,
+    address_t header_start = sark_xalloc(sv->sdram_heap,
                                      HEADER_SIZE_BYTES + POINTER_TABLE_SIZE_BYTES,
                                      0x00,                       // tag
                                      future_sark_xalloc_flags);  // flag
@@ -75,6 +85,21 @@ void pointer_table_header_alloc() {
     header_start[1] = DSE_VERSION;
     
     log_info("Header address 0x%08x", header_start);
+    
+    if (generate_report)
+    {
+      report_header_start = sark_xalloc(sv->sdram_heap,
+               sizeof(MemoryRegion) * MAX_MEM_REGIONS,
+               0x00,                       // tag
+               future_sark_xalloc_flags);  // flag
+      
+      if (report_header_start == NULL) {
+          log_error("Could not allocate memory to store reporting information");
+          spin1_exit(-1);
+      }
+      ((vcpu_t*)SV_VCPU)[spin1_get_core_id()].user1 = (uint)report_header_start;
+      log_info("Report address 0x%08x", report_header_start);
+    }
 }
 
 //! \brief Write the pointer table in the memory region specified by user0.
@@ -103,6 +128,23 @@ void write_pointer_table() {
     }
 }
 
+void write_memory_structs_for_report() {
+    MemoryRegion region_zero;
+    
+    region_zero.start_address = NULL;
+    region_zero.size = 0;
+    region_zero.unfilled = 0;
+    region_zero.write_pointer = NULL;
+    
+    for (int i = 0; i < MAX_MEM_REGIONS; i++) {
+        if (memory_regions[i] != NULL) {
+            spin1_memcpy(&report_header_start[i], memory_regions[i], sizeof(MemoryRegion));
+        } else {
+            spin1_memcpy(&report_header_start[i], &region_zero, sizeof(MemoryRegion));
+        }
+    }
+}
+
 //! \brief Free all the allocated structures in the memory_regions array, used
 //!        to store information about the allocated memory regions.
 void free_mem_region_info() {
@@ -112,15 +154,22 @@ void free_mem_region_info() {
 }
 
 void c_main(void) {
-    //user0 contains the address of the data specification to execute
-    execRegion = (address_t) get_user0_value();
+    //user0 contains the address of the data specification
+    //structure with the relevant parameters
+    dse_exec_data_struct = (dse_data*) get_user0_value();
     
-    //user1 contains the length of the dataspecification to execute
-    currentBlock_size = (uint32_t) get_user1_value();
+    //address of the data specification to execute
+    execRegion = (address_t) dse_exec_data_struct -> execRegion;
     
-    //user2 contains the future application id for which the data
+    //length of the data specification to execute
+    currentBlock_size = (uint32_t) dse_exec_data_struct -> currentBlock_size;
+    
+    //the future application id for which the data
     //specification is currently being executed
-    future_app_id = (uint8_t) get_user2_value();
+    future_app_id = (uint8_t) dse_exec_data_struct -> future_app_id;
+    
+    //generate data structure for memory map report
+    generate_report = (uint8_t) dse_exec_data_struct -> generate_report;
     
     //compute a few constants, valid for the entire DSE
     current_app_id = sark_app_id();
@@ -137,6 +186,11 @@ void c_main(void) {
     //writing the content of the table pointer
     write_pointer_table();
 
+    //write data structure, if required, with the data
+    //for the memory map report
+    if (generate_report)
+      write_memory_structs_for_report();
+    
     //freeing used memory structures in DTCM
     //this may be discarded if needed: the app_stop on this executable
     //would get rid of the data in DTCM

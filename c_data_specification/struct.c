@@ -1,24 +1,24 @@
 #include "data_specification_executor.h"
 #include "struct.h"
 
-struct Struct *struct_new(int no_of_elements) {
-    struct Struct *newStruct = sark_alloc(1, sizeof(struct Struct));
-    newStruct->elements = sark_alloc(1, no_of_elements * sizeof(struct StructElement));
+Struct *struct_new(int no_of_elements) {
+    Struct *newStruct = sark_alloc(1, sizeof(Struct));
+    newStruct->elements = sark_alloc(1, no_of_elements * sizeof(StructElement));
     newStruct->size = no_of_elements;
     return newStruct;
 }
 
-void struct_delete(struct Struct *str) {
+void struct_delete(Struct *str) {
     for (int index = 0; index < str->size; index++)
         sark_free(str->elements);
     sark_free(str);
 }
 
-void struct_set_element_type(struct Struct *str, int elem_id, enum Type type) {
+void struct_set_element_type(Struct *str, int elem_id, enum Type type) {
     str->elements[elem_id].type = type;
 }
 
-void struct_set_element_value(struct Struct *str, int id, uint64_t value) {
+void struct_set_element_value(Struct *str, int id, uint64_t value) {
     // Clear the most significant bits so that just the required bits are
     // kept.
     uint64_t mask = ~0;
@@ -44,11 +44,11 @@ int data_type_get_size(enum Type type) {
     }
 }
 
-struct Struct *struct_create_copy(struct Struct *source) {
-    struct Struct *new_struct = struct_new(source->size);
+Struct *struct_create_copy(Struct *source) {
+    Struct *new_struct = struct_new(source->size);
     for (int element_id = 0; element_id < source->size; element_id++) {
             spin1_memcpy(new_struct->elements, source->elements,
-                         sizeof(struct StructElement) * source->size);
+                         sizeof(StructElement) * source->size);
     }
     return new_struct;
 }

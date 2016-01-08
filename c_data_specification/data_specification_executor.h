@@ -41,26 +41,33 @@ typedef uint32_t* address_t;
 #endif
 
 // Stores the details of a command.
-struct Command {
+typedef struct {
     enum OpCode opCode;
     uint8_t dataLength;
     uint32_t cmdWord;
     uint32_t dataWords[3];
-};
+} Command;
 
-struct MemoryRegion {
+typedef struct {
     uint8_t* start_address;
     uint32_t size;
-    uint8_t unfilled;
+    uint32_t unfilled;
     uint8_t* write_pointer;
-};
+} MemoryRegion;
 
 
-struct Constructor {
+typedef struct {
     address_t start_address;
     int arg_count;
     uint8_t arg_read_only;
-};
+} Constructor;
+
+typedef struct {
+    address_t execRegion;
+    uint32_t currentBlock_size;
+    uint32_t future_app_id;
+    uint32_t generate_report;
+} dse_data;
 
 extern uint8_t current_app_id;
 extern uint8_t future_app_id;

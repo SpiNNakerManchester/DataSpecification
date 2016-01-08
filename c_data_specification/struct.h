@@ -30,21 +30,21 @@ enum Type {
     S063   = 0x17
 };
 
-struct StructElement {
+typedef struct {
     uint64_t data;
     enum Type type;
-};
+} StructElement;
 
-struct Struct {
-    struct StructElement *elements;
+typedef struct {
+    StructElement *elements;
     uint8_t size;
-};
+} Struct;
 
-struct Struct *struct_new();
-void struct_delete(struct Struct *str);
-void struct_set_element_type(struct Struct *str, int elem_id, enum Type type);
-void struct_set_element_value(struct Struct *str, int id, uint64_t value);
+Struct *struct_new();
+void struct_delete(Struct *str);
+void struct_set_element_type(Struct *str, int elem_id, enum Type type);
+void struct_set_element_value(Struct *str, int id, uint64_t value);
 int data_type_get_size(enum Type type);
-struct Struct *struct_create_copy(struct Struct *source);
+Struct *struct_create_copy(Struct *source);
 
 #endif

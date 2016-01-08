@@ -9,7 +9,7 @@
 #include <math.h>
 
 // Load external variables defined in data_specification_executor.c
-extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
+extern MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
 //! The current memory region.
 //! Initialised with -1, since no context switch has been performed.
@@ -22,8 +22,8 @@ uint64_t registers[MAX_REGISTERS];
 address_t command_pointer;
 address_t dsf_pointer;
 
-struct Struct *structs[MAX_STRUCTS];
-struct Constructor constructors[MAX_CONSTRUCTORS];
+Struct *structs[MAX_STRUCTS];
+Constructor constructors[MAX_CONSTRUCTORS];
 
 //! \brief Find the length of a command (bits 29:28).
 //! \param[in] The command word (the first word of a command).
@@ -100,10 +100,10 @@ uint32_t available_region_space(uint8_t region) {
 //! \brief Read the next command from the memory and update the command_pointer
 //!        accordingly.
 //! \return A Command object storing the command.
-struct Command get_next_command() {
+Command get_next_command() {
 
     // The command object.
-    struct Command cmd;
+    Command cmd;
 
     // Get the command word (the first word of the command).
     uint32_t cmd_word = *command_pointer;
@@ -125,7 +125,7 @@ struct Command get_next_command() {
 //! \brief Execute a reserve memory command, which allocates a memory region of
 //!        a given size on SDRAM.
 //! \param[in] The command to be executed.
-void execute_reserve(struct Command cmd) {
+void execute_reserve(Command cmd) {
     // Check if the instruction format is correct.
     if (cmd.dataLength != 1) {
         log_error("Data specification RESERVE requires one word as argument");
@@ -159,7 +159,7 @@ void execute_reserve(struct Command cmd) {
         rt_error(RTE_ABORT);
     }
 
-    memory_regions[region_id] = sark_alloc(1, sizeof(struct MemoryRegion));
+    memory_regions[region_id] = sark_alloc(1, sizeof(MemoryRegion));
 
     if (memory_regions[region_id] == NULL) {
         log_error("RESERVE unable to allocate memory on DTCM");
@@ -175,7 +175,7 @@ void execute_reserve(struct Command cmd) {
     memory_regions[region_id]->start_address   = mem_region_start;
     memory_regions[region_id]->write_pointer  = mem_region_start;
     memory_regions[region_id]->unfilled       = read_only;
-
+    
     /*
     log_info("region start pointer: 0x%08x", memory_regions[region_id]->start_address);
     log_info("region write pointer: 0x%08x", memory_regions[region_id]->write_pointer);
@@ -190,7 +190,7 @@ void execute_reserve(struct Command cmd) {
 
 //! \brief Execute a FREE command.
 //! \param[in] cmd The command to be executed.
-void execute_free(struct Command cmd) {
+void execute_free(Command cmd) {
 
     uint8_t region_id = cmd.cmdWord & 0x0F;
 
@@ -250,7 +250,7 @@ void write_value(void *value, int size) {
 //! \brief Execute a WRITE command, which writes 1, 2, 4 or 8 bytes of data from
 //!        a parameter to memory, with the possibility of data to be repeated.
 //! \param[in] cmd The command to be executed.
-void execute_write(struct Command cmd) {
+void execute_write(Command cmd) {
 
     // The number of repetitions.
     int n_repeats;
@@ -313,7 +313,7 @@ void execute_write(struct Command cmd) {
 //! \brief Execute a WRITE_ARRAY command, which writes an array of 32 bit words
 //!        to memory.
 //! \param[in] cmd The command to be executed.
-void execute_write_array(struct Command cmd) {
+void execute_write_array(Command cmd) {
 
     // The length of the array is specified in the second word of the command.
     int length        = cmd.dataWords[0];
@@ -356,7 +356,7 @@ void execute_write_array(struct Command cmd) {
 //! \brief Execute a SWITCH_FOCUS command, which changes the selected memory
 //!        region.
 //! \param[in] cmd The command to be executed.
-void execute_switch_focus(struct Command cmd) {
+void execute_switch_focus(Command cmd) {
 
     // The region to be selected.
     int region;
@@ -381,7 +381,7 @@ extern int stack_size;
 
 //! \brief Execute a LOOP command.
 //! \param[in] cmd The command to be executed.
-void execute_loop(struct Command cmd) {
+void execute_loop(Command cmd) {
 
     int used_data_words = 0;
 
@@ -412,7 +412,7 @@ void execute_loop(struct Command cmd) {
     // If the loop is not going to have any iteration, skip to the first
     // END_LOOP. Otherwise, start iterating.
     if (loop_start >= loop_end) {
-        struct Command command;
+        Command command;
         while((command = get_next_command()).opCode != END_LOOP);
     } else {
         // Push the return value of the command pointer on the stack.
@@ -431,7 +431,7 @@ void execute_loop(struct Command cmd) {
 //! \brief Execute a START_STRUCT (structure definition) command.
 //!        Reads the entire structure definition, up to the END_STRUCT command.
 //! \param[in] cmd The command to be executed.
-void execute_start_struct(struct Command cmd) {
+void execute_start_struct(Command cmd) {
     // The id of the new struct.
     int struct_id = cmd.cmdWord & 0x1F;
 
@@ -439,7 +439,7 @@ void execute_start_struct(struct Command cmd) {
     stack_push(command_pointer);
 
     // Count the number of struct elements.
-    struct Command command;
+    Command command;
     int no_of_elements = 0;
     while ((command = get_next_command()).opCode != END_STRUCT)
         no_of_elements++;
@@ -448,11 +448,11 @@ void execute_start_struct(struct Command cmd) {
     command_pointer = stack_pop();
 
     // Allocate memory for the new struct definition.
-    struct Struct *str = struct_new(no_of_elements);
+    Struct *str = struct_new(no_of_elements);
 
     // Read all the entries in the struct definition and create the requested
     // structure.
-    struct Command structEntry;
+    Command structEntry;
     int current_element_id = 0;
     while ((structEntry = get_next_command()).opCode != END_STRUCT) {
         if (structEntry.opCode != STRUCT_ELEM) {
@@ -481,7 +481,7 @@ void execute_start_struct(struct Command cmd) {
 //! \brief Execute a WRITE_STRUCT command, which writes a struct to the current
 //!        memory region.
 //! \param[in] cmd The command to be executed.
-void execute_write_struct(struct Command cmd) {
+void execute_write_struct(Command cmd) {
 
     // The number of repetitions of the same struct.
     uint8_t n_repeats;
@@ -512,7 +512,7 @@ void execute_write_struct(struct Command cmd) {
 
 //! \brief Execute a MV instruction.
 //! \param[in] cmd The command to be executed.
-void execute_mv(struct Command cmd) {
+void execute_mv(Command cmd) {
 
     // The id of the destination register.
     uint8_t dest_id = command_get_destReg(cmd.cmdWord);
@@ -532,7 +532,7 @@ void execute_mv(struct Command cmd) {
 
 //! \brief Execute a LOGIC_OP instruction.
 //! \param[in] cmd The command to be executed.
-void execute_logic_op(struct Command cmd) {
+void execute_logic_op(Command cmd) {
 
     // The operation to be performend.
     uint8_t operation = cmd.cmdWord & 0xF;
@@ -575,7 +575,7 @@ void execute_logic_op(struct Command cmd) {
 
 //! \brief Execute a WRITE_PARAM instruction.
 //! \param[in] cmd The command to be executed.
-void execute_write_param(struct Command cmd) {
+void execute_write_param(Command cmd) {
 
     // The value to be written.
     uint64_t value;
@@ -605,7 +605,7 @@ void execute_write_param(struct Command cmd) {
 
 //! \brief Execute a READ_PARAM instruction.
 //! \param[in] cmd The command to be executed.
-void execute_read_param(struct Command cmd) {
+void execute_read_param(Command cmd) {
     uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
     uint8_t struct_id = cmd.cmdWord & 0xF;
     uint8_t elem_id;
@@ -619,7 +619,7 @@ void execute_read_param(struct Command cmd) {
 
 //! \brief Execute a COPY_PARAM instruction.
 //! \param[in] cmd The command to be executed.
-void execute_copy_param(struct Command cmd) {
+void execute_copy_param(Command cmd) {
 
     uint8_t dest_id = (cmd.cmdWord & 0xF000) >> 12;
     uint8_t src_struct_id  = (cmd.cmdWord & 0x0F00) >> 8;
@@ -659,7 +659,7 @@ void execute_copy_param(struct Command cmd) {
 
 //! \brief Execute a PRINT_TEXT command.
 //! \param[in] cmd The command to be executed.
-void execute_print_text(struct Command cmd) {
+void execute_print_text(Command cmd) {
 
     // The number of characters to be printed.
     uint8_t n_characters = cmd.cmdWord & 0xFF;
@@ -684,7 +684,7 @@ void execute_print_text(struct Command cmd) {
 
 //! \brief Execute a PRINT_STRUCT command.
 //! \param[in] cmd The command to be executed.
-void execute_print_struct(struct Command cmd) {
+void execute_print_struct(Command cmd) {
 
     uint8_t struct_id;
     if (command_src1_in_use(cmd.cmdWord))
@@ -723,13 +723,13 @@ int param_read_only(int constructor_id, int param_id) {
 //!
 //! \return The id of the structure used as the nth parameter in this
 //!         constructor.
-int get_nth_struct_arg(struct Command cmd, int param_n) {
+int get_nth_struct_arg(Command cmd, int param_n) {
     return (cmd.dataWords[0] & (0x1F << (6 * param_n))) >> (6 * param_n);
 }
 
 //! \brief Execute a START_CONSTRUCTOR command.
 //! \param[in] cmd The command to be executed.
-void execute_start_constructor(struct Command cmd) {
+void execute_start_constructor(Command cmd) {
 
     int constructor_id = (cmd.cmdWord & 0xF800) >> 11;
     int arg_count      = (cmd.cmdWord & 0x0700) >> 8;
@@ -740,19 +740,19 @@ void execute_start_constructor(struct Command cmd) {
     constructors[constructor_id].arg_read_only = read_only_mask;
 
     // Skip all instructions up to END_CONSTRUCTOR.
-    struct Command constructorEntry;
+    Command constructorEntry;
     while ((constructorEntry = get_next_command()).opCode != END_CONSTRUCTOR);
 }
 
 
 //! \brief Execute a CONSTRUCT command.
 //! \param[in] cmd The command to be executed.
-void execute_construct(struct Command cmd) {
+void execute_construct(Command cmd) {
 
     int constructor_id = (cmd.cmdWord & 0x1F00) >> 8;
 
     // Space to temporarly save the read only structs.
-    struct Struct *temp[MAX_STRUCT_ARGS];
+    Struct *temp[MAX_STRUCT_ARGS];
 
     // Save read only structs and swap struct ids such that the first
     // 5 elements of the structs array point to the arguments of the
@@ -764,7 +764,7 @@ void execute_construct(struct Command cmd) {
         if (param_read_only(constructor_id, struct_arg_id)) {
             temp[struct_arg_id] = struct_create_copy(structs[struct_id]);
         }
-        struct Struct *tmp     = structs[struct_id];
+        Struct *tmp     = structs[struct_id];
         structs[struct_id]     = structs[struct_arg_id];
         structs[struct_arg_id] = tmp;
     }
@@ -785,7 +785,7 @@ void execute_construct(struct Command cmd) {
         if (param_read_only(constructor_id, struct_arg_id)) {
             structs[struct_arg_id] = temp[struct_arg_id];
         }
-        struct Struct *tmp     = structs[struct_id];
+        Struct *tmp     = structs[struct_id];
         structs[struct_id]     = structs[struct_arg_id];
         structs[struct_arg_id] = tmp;
     }
@@ -793,7 +793,7 @@ void execute_construct(struct Command cmd) {
 
 //! \brief Execute a READ command.
 //! \param[in] cmd The command to be executed.
-void execute_read(struct Command cmd) {
+void execute_read(Command cmd) {
 
     int dest_id = command_get_destReg(cmd.cmdWord);
 
@@ -826,7 +826,7 @@ void execute_read(struct Command cmd) {
 
 //! \brief Execute a GET_WR_PTR command.
 //! \param[in] cmd The command to be executed.
-void execute_get_wr_ptr(struct Command cmd) {
+void execute_get_wr_ptr(Command cmd) {
     int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
     registers[dest_reg] = (long)(memory_regions[current_region]->write_pointer
                                - memory_regions[current_region]->start_address);
@@ -834,7 +834,7 @@ void execute_get_wr_ptr(struct Command cmd) {
 
 //! \brief Execute a SET_WR_PTR command.
 //! \param[in] cmd The command to be executed.
-void execute_set_wr_ptr(struct Command cmd) {
+void execute_set_wr_ptr(Command cmd) {
     int64_t source;
     if (command_src1_in_use(cmd.cmdWord)) {
         source = registers[command_get_src1Reg(cmd.cmdWord)];
@@ -854,7 +854,7 @@ void execute_set_wr_ptr(struct Command cmd) {
 
 //! \brief Execute an IF command.
 //! \param[in] cmd The command to be executed.
-void execute_if(struct Command cmd) {
+void execute_if(Command cmd) {
     uint8_t operation = cmd.cmdWord & 0x0F;
 
     uint8_t op_result;
@@ -880,7 +880,7 @@ void execute_if(struct Command cmd) {
 
     if (op_result == 0) {
         // Skip all instructions up to ELSE or END_IF.
-        struct Command command = get_next_command();
+        Command command = get_next_command();
         while (command.opCode != ELSE && command.opCode != END_IF) {
              command = get_next_command();
         }
@@ -889,15 +889,15 @@ void execute_if(struct Command cmd) {
 
 //! \brief Execute an ELSE command.
 //! \param[in] cmd The command to be executed.
-void execute_else(struct Command cmd) {
+void execute_else(Command cmd) {
     // Skip all instructions up to END_IF.
-    struct Command command;
+    Command command;
     while ((command = get_next_command()).opCode != END_IF);
 }
 
 //! \brief Execute a PRINT_VAL command.
 //! \param[in] cmd The command to be executed.
-void execute_print_val(struct Command cmd) {
+void execute_print_val(Command cmd) {
     if (command_src1_in_use(cmd.cmdWord)) {
         uint64_t data = registers[command_get_src1Reg(cmd.cmdWord)];
         log_info("Register %d has value %08X%08X",
@@ -913,7 +913,7 @@ void execute_print_val(struct Command cmd) {
 
 //! \brief Execute a ARITH_OP command.
 //! \param[in] cmd The command to be executed.
-void execute_arith_op(struct Command cmd) {
+void execute_arith_op(Command cmd) {
     uint8_t sgn = (cmd.cmdWord & (0x1 << 19)) >> 19;
 
     uint8_t dest_reg = command_get_destReg(cmd.cmdWord);
@@ -976,7 +976,7 @@ void execute_arith_op(struct Command cmd) {
 
 //! \brief Execute a COPY_STRUCT command.
 //! \param[in] cmd The command to be executed.
-void execute_copy_struct(struct Command cmd) {
+void execute_copy_struct(Command cmd) {
     int dest_struct_id   = command_get_destReg(cmd.cmdWord);
     int source_struct_id = command_get_src1Reg(cmd.cmdWord);
 
@@ -994,7 +994,7 @@ void execute_copy_struct(struct Command cmd) {
 
 //! \brief Execute a ALIGN_WR_PTR command.
 //! \param[in] cmd The command to be executed.
-void execute_align_wr_ptr(struct Command cmd) {
+void execute_align_wr_ptr(Command cmd) {
 
     uint8_t padding_value = 0;
 
@@ -1015,10 +1015,10 @@ void execute_align_wr_ptr(struct Command cmd) {
 
 //! \brief Execute a BLOCK_COPY command.
 //! \param[in] cmd The command to be executed.
-void execute_block_copy(struct Command cmd) {
+void execute_block_copy(Command cmd) {
 
-    address_t source      = (address_t)registers[command_get_src2Reg(cmd.cmdWord)];
-    address_t destination = (address_t)registers[command_get_destReg(cmd.cmdWord)];
+    address_t source      = (address_t)(uint32_t)registers[command_get_src2Reg(cmd.cmdWord)];
+    address_t destination = (address_t)(uint32_t)registers[command_get_destReg(cmd.cmdWord)];
 
     uint32_t size = command_get_src1Reg(cmd.cmdWord);
     if (command_src1_in_use(cmd.cmdWord))
@@ -1043,7 +1043,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
     // Pointer to the end of the data spec memory region.
     address_t ds_end = ds_start + (ds_size >> 2);
 
-    struct Command cmd;
+    Command cmd;
 
     // Dummy value of the opCode.
     cmd.opCode = 0x00;

@@ -9,7 +9,7 @@ class DataSpecificationExecutorFunctions:
     of the data specification file.
     """
 
-    def __init__(self, spec_reader, mem_writer, space_available):
+    def __init__(self, spec_reader, mem_writer, memory_space):
         """
 
         :param spec_reader: The object to read the specification language file\
@@ -27,7 +27,7 @@ class DataSpecificationExecutorFunctions:
         """
         self.spec_reader = spec_reader
         self.mem_writer = mem_writer
-        self.space_available = space_available
+        self.memory_space = memory_space
 
         self.space_allocated = 0
         self.current_region = None
@@ -119,12 +119,9 @@ class DataSpecificationExecutorFunctions:
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
-        if (size <= 0) or size > (self.space_available - self.space_allocated):
+        if (size <= 0) or (size > self.memory_space):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "region size", size, 1,
-                (self.space_available - self.space_allocated),
-                "RESERVE"
-            )
+                "region size", size, 1, self.memory_space, "RESERVE")
 
         self.mem_regions[region] = MemoryRegion(memory_pointer=0,
                                                 unfilled=unfilled, size=size)

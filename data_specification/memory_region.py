@@ -34,7 +34,7 @@ class MemoryRegion(object):
 
         :return: the size of the region
         :rtype: int
-        :raise None: this method does not raise any knwon exception
+        :raise None: this method does not raise any known exception
         """
         return self._allocated_size
 

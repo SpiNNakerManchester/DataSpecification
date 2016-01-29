@@ -921,37 +921,34 @@ class DataSpecificationGenerator(object):
                 "data", data, data_type.min, data_type.max, Commands.WRITE.name)
 
         parameters = 0
-        cmd_string = "WRITE data=0x%8.8X" % data
+        cmd_string = None
+        if self.report_writer is not None:
+            cmd_string = "WRITE data=0x%8.8X" % data
 
         if repeats_register is not None:
             repeat_reg_usage = 1
             parameters |= (repeats_register << 4)
-            cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
-                                                            repeats_register)
+            if self.report_writer is not None:
+                cmd_string = "{0:s}, repeats=reg[{1:d}]".format(
+                    cmd_string, repeats_register)
         else:
             repeat_reg_usage = 0
             parameters |= repeats
-            cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
+            if self.report_writer is not None:
+                cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
         cmd_word = (cmd_data_len << 28) | (Commands.WRITE.value << 20) | \
                    (repeat_reg_usage << 16) | (data_len << 12) | parameters
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        data_value = decimal.Decimal("{}".format(data)) * data_type.scale
+        padding = 4 - data_type.size
 
-        data_format = "<{}".format(data_type.struct_encoding)
-        text_value = "{}".format(data)
-        data_value = decimal.Decimal(text_value) * data_type.scale
-        data_encoded = bytearray(struct.pack(data_format, data_value))
-
-        if data_type.size == 1:
-            padding = bytearray(3)
-        elif data_type.size == 2:
-            padding = bytearray(2)
-        else:
-            padding = bytearray()
-
-        cmd_word_list = encoded_cmd_word + data_encoded + padding
-        cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
+        cmd_word_list = struct.pack(
+            "<I{}{}x".format(data_type.struct_encoding, padding),
+            cmd_word, data_value)
+        if self.report_writer is not None:
+            cmd_string = "{0:s}, dataType={1:s}".format(
+                cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_value_from_register(

@@ -128,18 +128,18 @@ Command get_next_command() {
 void execute_reserve(Command cmd) {
     // Check if the instruction format is correct.
     if (cmd.dataLength != 1) {
-        log_error("Data specification RESERVE requires one word as argument");
+        //log_error("Data specification RESERVE requires one word as argument");
         rt_error(RTE_ABORT);
     }
 
     // Get the region id and perform some checks on it.
     uint8_t region_id = cmd.cmdWord & 0x1F;
     if (region_id > MAX_MEM_REGIONS) {
-        log_error("RESERVE memory region id %d out of bounds", region_id);
+        //log_error("RESERVE memory region id %d out of bounds", region_id);
         rt_error(RTE_ABORT);
     }
     if (memory_regions[region_id] != NULL) {
-        log_error("RESERVE region %d already in use", region_id);
+        //log_error("RESERVE region %d already in use", region_id);
         rt_error(RTE_ABORT);
     }
 
@@ -154,19 +154,20 @@ void execute_reserve(Command cmd) {
 					 future_sark_xalloc_flags);
 
     if (mem_region_start == NULL) {
-        log_error("RESERVE unable to allocate %d bytes of SDRAM memory.",
-                  mem_region_size);
+        //log_error("RESERVE unable to allocate %d bytes of SDRAM memory.",
+                  //mem_region_size);
         rt_error(RTE_ABORT);
     }
 
     memory_regions[region_id] = sark_alloc(1, sizeof(MemoryRegion));
 
     if (memory_regions[region_id] == NULL) {
-        log_error("RESERVE unable to allocate memory on DTCM");
+        //log_error("RESERVE unable to allocate memory on DTCM");
         rt_error(RTE_ABORT);
     }
 
     uint8_t read_only = (cmd.cmdWord >> 7) & 0x1;
+
 
     log_debug("RESERVE %smemory region %d of %d bytes",
               read_only ? "read-only " : "", region_id, mem_region_size);
@@ -199,7 +200,7 @@ void execute_free(Command cmd) {
         rt_error(RTE_ABORT);
     }
 
-    log_debug("FREE memory region %d.", region_id);
+    //log_debug("FREE memory region %d.", region_id);
 
     sark_xfree(((sv_t*)SV_SV)->sdram_heap,
                 memory_regions[region_id]->start_address, 0x01);
@@ -1053,7 +1054,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case BREAK:
                 // This command stops the execution of the data spec and
                 // outputs an error in the log.
-                log_error("BREAK encountered");
+                log_error("BREAK");
                 rt_error(RTE_ABORT);
                 return;
             case NOP:
@@ -1066,13 +1067,13 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_free(cmd);
                 break;
             case DECLARE_RNG:
-                log_error("Unimplemented DSE command DECLARE_RNG");
+                //log_error("Unimpl DECLARE_RNG");
                 break;
             case DECLARE_RANDOM_DIST:
-                log_error("Unimplemented DSE command DECLARE_RANDOM_DIST");
+                //log_error("Unimpl DECLARE_RANDOM_DIST");
                 break;
             case GET_RANDOM_NUMBER:
-                log_error("Unimplemented DSE command GET_RANDOM_NUMBER");
+                //log_error("Unimpl GET_RANDOM_NUMBER");
                 break;
             case START_STRUCT:
                 execute_start_struct(cmd);
@@ -1082,19 +1083,19 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case END_STRUCT:
                 break;
             case START_PACKSPEC:
-                log_error("Unimplemented DSE command START_PACKSPEC");
+                //log_error("Unimpl START_PACKSPEC");
                 break;
             case PACK_PARAM:
-                log_error("Unimplemented DSE command PACK_PARAM");
+                //log_error("Unimpl PACK_PARAM");
                 break;
             case END_PACKSPEC:
-                log_error("Unimplemented DSE command END_PACKSPEC");
+                //log_error("Unimpl END_PACKSPEC");
                 break;
             case START_CONSTRUCTOR:
                 execute_start_constructor(cmd);
                 break;
             case END_CONSTRUCTOR:
-                log_debug("Constructor ended");
+                //log_debug("Constructor ended");
                 return;
             case CONSTRUCT:
                 execute_construct(cmd);
@@ -1151,7 +1152,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_logic_op(cmd);
                 break;
             case REFORMAT:
-                log_error("Unimplemented DSE command REFORMAT");
+                log_error("Unimpl REFORMAT");
                 break;
             case COPY_STRUCT:
                 execute_copy_struct(cmd);
@@ -1166,7 +1167,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_read_param(cmd);
                 break;
             case WRITE_PARAM_COMPONENT:
-                log_error("Unimplemented DSE command WRITE_PARAM_COMPONENT");
+                //log_error("Unimplemented DSE command WRITE_PARAM_COMPONENT");
                 break;
             case PRINT_VAL:
                 execute_print_val(cmd);
@@ -1178,11 +1179,12 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_print_struct(cmd);
                 break;
             case END_SPEC:
-                log_info("End of spec has been reached");
+                log_info("End of spec");
+                spin1_exit(0);
                 return;
                 //break;
             default:
-                log_error("Not a DSE command: %x", cmd.opCode);
+                log_error("Not DSE cmd: %x", cmd.opCode);
                 rt_error(RTE_ABORT);
         }
     }

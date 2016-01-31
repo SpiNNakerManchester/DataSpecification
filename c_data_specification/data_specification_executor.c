@@ -128,18 +128,18 @@ Command get_next_command() {
 void execute_reserve(Command cmd) {
     // Check if the instruction format is correct.
     if (cmd.dataLength != 1) {
-        //log_error("Data specification RESERVE requires one word as argument");
+        log_error("Data specification RESERVE requires one word as argument");
         rt_error(RTE_ABORT);
     }
 
     // Get the region id and perform some checks on it.
     uint8_t region_id = cmd.cmdWord & 0x1F;
     if (region_id > MAX_MEM_REGIONS) {
-        //log_error("RESERVE memory region id %d out of bounds", region_id);
+        log_error("RESERVE memory region id %d out of bounds", region_id);
         rt_error(RTE_ABORT);
     }
     if (memory_regions[region_id] != NULL) {
-        //log_error("RESERVE region %d already in use", region_id);
+        log_error("RESERVE region %d already in use", region_id);
         rt_error(RTE_ABORT);
     }
 
@@ -150,39 +150,38 @@ void execute_reserve(Command cmd) {
                                                     cmd.dataWords[0];
 
     void *mem_region_start = sark_xalloc(sv->sdram_heap,
-                                         mem_region_size, 0, 
+                                         mem_region_size, 0,
 					 future_sark_xalloc_flags);
 
     if (mem_region_start == NULL) {
-        //log_error("RESERVE unable to allocate %d bytes of SDRAM memory.",
-                  //mem_region_size);
+        log_error("RESERVE unable to allocate %d bytes of SDRAM memory.",
+                  mem_region_size);
         rt_error(RTE_ABORT);
     }
 
     memory_regions[region_id] = sark_alloc(1, sizeof(MemoryRegion));
 
     if (memory_regions[region_id] == NULL) {
-        //log_error("RESERVE unable to allocate memory on DTCM");
+        log_error("RESERVE unable to allocate memory on DTCM");
         rt_error(RTE_ABORT);
     }
 
     uint8_t read_only = (cmd.cmdWord >> 7) & 0x1;
-
-
+    /*
     log_debug("RESERVE %smemory region %d of %d bytes",
               read_only ? "read-only " : "", region_id, mem_region_size);
-
+*/
     memory_regions[region_id]->size           = mem_region_size;
     memory_regions[region_id]->start_address   = mem_region_start;
     memory_regions[region_id]->write_pointer  = mem_region_start;
     memory_regions[region_id]->unfilled       = read_only;
-    
+
     /*
     log_info("region start pointer: 0x%08x", memory_regions[region_id]->start_address);
     log_info("region write pointer: 0x%08x", memory_regions[region_id]->write_pointer);
     log_info("region size: %d", memory_regions[region_id]->size);
     */
-    
+
     if (memory_regions[region_id]->unfilled) {
         for (int i = 0; i < (memory_regions[region_id]->size >> 2); i++)
             *(memory_regions[region_id]->start_address + i) = 0;
@@ -221,6 +220,7 @@ void write_value(void *value, int size) {
     //io_printf(IO_BUF, "wp: 0x%08x\n", memory_regions[current_region]->write_pointer);
     //log_error("size of the data to be written: %d", size);
 
+    //log_debug("val: 0x%08x", (*((uint32_t*)value)) );
     switch (size) {
         case 1:
             *(memory_regions[current_region]->write_pointer) =
@@ -244,7 +244,7 @@ void write_value(void *value, int size) {
     }
 
     ((memory_regions[current_region]->write_pointer)) += size;
-    
+
     //log_info("final write pointer: 0x%08x", memory_regions[current_region]->write_pointer);
 }
 
@@ -275,6 +275,7 @@ void execute_write(Command cmd) {
     uint64_t data_val;
     if (command_src1_in_use(cmd.cmdWord) && cmd.dataLength == 0) {
         data_val = registers[command_get_src1Reg(cmd.cmdWord)];
+
     } else if (cmd.dataLength == 1 && data_len != 8) {
         data_val = cmd.dataWords[0];
     } else if (cmd.dataLength == 2 && data_len == 8) {
@@ -308,7 +309,9 @@ void execute_write(Command cmd) {
     } else {
         for (int count = 0; count < n_repeats; count++)
             write_value(&data_val, data_len);
+        //log_info("writed 0x%08x", data_val);
     }
+
 }
 
 //! \brief Execute a WRITE_ARRAY command, which writes an array of 32 bit words
@@ -319,17 +322,17 @@ void execute_write_array(Command cmd) {
     // The length of the array is specified in the second word of the command.
     int length        = cmd.dataWords[0];
     uint8_t data_size = cmd.cmdWord & 0x0F;
-
+    //log_debug("WARR len: %d", len);
     // Perform some checks and, if everything is fine, write the array to
     // memory.
     if (current_region == -1) {
-        log_error("WRITE_ARRAY the current memory region has not been selected");
+        log_error("WRITE_ARRAY the current mem region has not been selected");
         rt_error(RTE_ABORT);
     } else if (memory_regions[current_region] == NULL) {
-        log_error("WRITE_ARRAY the current memory region has not been allocated");
+        log_error("WRITE_ARRAY the current mem region has not been allocated");
         rt_error(RTE_ABORT);
     } else if (available_region_space(current_region) < length * data_size) {
-        log_error("WRITE_ARRAY the current memory region is full");
+        log_error("WRITE_ARRAY the current mem region is full");
 	/*
 	log_error("current region: %d", current_region);
 	log_error("start region address: 0x%08x", memory_regions[current_region]->start_address);
@@ -367,11 +370,11 @@ void execute_switch_focus(Command cmd) {
         region = registers[command_get_src1Reg(cmd.cmdWord)];
     else
         region = (cmd.cmdWord >> 8) & 0xF;
-
+    //log_debug("swt to %d",region);
     // Perform some checks and, if everything is fine, change the value of
     // current_region.
     if (memory_regions[region] == NULL) {
-        log_error("SWITCH_FOCUS unallocated memory region");
+        //log_error("SWITCH_FOCUS unallocated memory region");
         rt_error(RTE_ABORT);
     } else {
         current_region = region;
@@ -457,7 +460,7 @@ void execute_start_struct(Command cmd) {
     int current_element_id = 0;
     while ((structEntry = get_next_command()).opCode != END_STRUCT) {
         if (structEntry.opCode != STRUCT_ELEM) {
-            log_error("A struct definition must contain only struct elements");
+            //log_error("A struct definition must contain only struct elements");
             rt_error(RTE_ABORT);
         }
         int elem_type = structEntry.cmdWord & 0x1F;
@@ -496,7 +499,7 @@ void execute_write_struct(Command cmd) {
     uint8_t struct_id = cmd.cmdWord & 0xF;
 
     if (structs[struct_id] == NULL) {
-        log_error("WRITE_STRUCT structure %d has not been defined", struct_id);
+        //log_error("WRITE_STRUCT structure %d has not been defined", struct_id);
         rt_error(RTE_ABORT);
     }
 
@@ -568,7 +571,7 @@ void execute_logic_op(Command cmd) {
         case 0x4: registers[dest_id] = source1 ^  source2; break;
         case 0x5: registers[dest_id] =~source1; break;
         default:
-            log_error("Undefined logic operation %d", operation);
+            //log_error("Undefined logic operation %d", operation);
             rt_error(RTE_ABORT);
     }
 }
@@ -592,12 +595,12 @@ void execute_write_param(Command cmd) {
     uint8_t elem_id   = cmd.cmdWord & 0xFF;
 
     if (structs[struct_id] == NULL) {
-        log_error("WRITE_PARAM structure %d has not been defined", struct_id);
+        //log_error("WRITE_PARAM structure %d has not been defined", struct_id);
         rt_error(RTE_ABORT);
     }
     if (structs[struct_id]->size <= elem_id) {
-        log_error("WRITE_PARAM %d is not a valid element id in structure %d",
-                  struct_id, elem_id);
+        //log_error("WRITE_PARAM %d is not a valid element id in structure %d",
+        //          struct_id, elem_id);
         rt_error(RTE_ABORT);
     }
 
@@ -629,12 +632,12 @@ void execute_copy_param(Command cmd) {
     uint8_t src_elem_id   = (cmd.dataWords[0] & 0x00FF);
 
     if (structs[src_struct_id] == NULL) {
-        log_error("COPY_PARAM source structure %d not defined.", src_struct_id);
+        //log_error("COPY_PARAM source structure %d not defined.", src_struct_id);
         rt_error(RTE_ABORT);
     }
     if (structs[src_struct_id]->size <= src_elem_id) {
-        log_error("COPY_PARAM source element %d of structure %d not defined.",
-                  dest_elem_id, dest_id);
+        //log_error("COPY_PARAM source element %d of structure %d not defined.",
+          //        dest_elem_id, dest_id);
         rt_error(RTE_ABORT);
     }
 
@@ -643,13 +646,13 @@ void execute_copy_param(Command cmd) {
     } else {
 
         if (structs[src_struct_id] == NULL) {
-            log_error("COPY_PARAM destination structure %d not defined.",
-                      dest_id);
+            //log_error("COPY_PARAM destination structure %d not defined.",
+             //         dest_id);
             rt_error(RTE_ABORT);
         }
         if (structs[src_struct_id]->size <= dest_elem_id) {
-            log_error("COPY_PARAM destination element %d of structure %d "
-                      "not defined.", dest_elem_id, dest_id);
+            //log_error("COPY_PARAM destination element %d of structure %d "
+             //         "not defined.", dest_elem_id, dest_id);
             rt_error(RTE_ABORT);
         }
 
@@ -1027,7 +1030,7 @@ void execute_block_copy(Command cmd) {
 
     spin1_memcpy(destination, source, size);
 }
-
+int flag=0;
 //! \brief Execute a part of a data specification.
 //!        Assumes the given slice of data specification is atomic and
 //!        valid.
@@ -1048,13 +1051,16 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
 
     // Dummy value of the opCode.
     cmd.opCode = 0x00;
-    while (ds_size != 0 ? command_pointer < ds_end : 1) {
+    //while (ds_size != 0 ? command_pointer < ds_end : 1) {
         cmd = get_next_command();
+        if(flag!=0){
+            log_error("cmd 0x%08x", cmd.opCode );
+        }
         switch (cmd.opCode) {
             case BREAK:
                 // This command stops the execution of the data spec and
                 // outputs an error in the log.
-                log_error("BREAK");
+                log_error("BREAK encountered");
                 rt_error(RTE_ABORT);
                 return;
             case NOP:
@@ -1067,13 +1073,13 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_free(cmd);
                 break;
             case DECLARE_RNG:
-                //log_error("Unimpl DECLARE_RNG");
+                //log_error("Unimplemented DSE command DECLARE_RNG");
                 break;
             case DECLARE_RANDOM_DIST:
-                //log_error("Unimpl DECLARE_RANDOM_DIST");
+                log_error("Unimplemented DSE command DECLARE_RANDOM_DIST");
                 break;
             case GET_RANDOM_NUMBER:
-                //log_error("Unimpl GET_RANDOM_NUMBER");
+                log_error("Unimplemented DSE command GET_RANDOM_NUMBER");
                 break;
             case START_STRUCT:
                 execute_start_struct(cmd);
@@ -1083,19 +1089,19 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
             case END_STRUCT:
                 break;
             case START_PACKSPEC:
-                //log_error("Unimpl START_PACKSPEC");
+                log_error("Unimplemented DSE command START_PACKSPEC");
                 break;
             case PACK_PARAM:
-                //log_error("Unimpl PACK_PARAM");
+                log_error("Unimplemented DSE command PACK_PARAM");
                 break;
             case END_PACKSPEC:
-                //log_error("Unimpl END_PACKSPEC");
+                log_error("Unimplemented DSE command END_PACKSPEC");
                 break;
             case START_CONSTRUCTOR:
                 execute_start_constructor(cmd);
                 break;
             case END_CONSTRUCTOR:
-                //log_debug("Constructor ended");
+                log_debug("Constructor ended");
                 return;
             case CONSTRUCT:
                 execute_construct(cmd);
@@ -1152,7 +1158,7 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_logic_op(cmd);
                 break;
             case REFORMAT:
-                log_error("Unimpl REFORMAT");
+                log_error("Unimplemented DSE command REFORMAT");
                 break;
             case COPY_STRUCT:
                 execute_copy_struct(cmd);
@@ -1179,14 +1185,18 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
                 execute_print_struct(cmd);
                 break;
             case END_SPEC:
-                log_info("End of spec");
-                spin1_exit(0);
-                return;
-                //break;
+                if(flag==0){
+                    log_info("End of spec has been reached");
+                    spin1_exit(0);
+                    flag=1;
+                }else{
+                    log_info("End of spec again");
+                }
+                //return;
+                break;
             default:
-                log_error("Not DSE cmd: %x", cmd.opCode);
+                log_error("Not a DSE command: %x", cmd.opCode);
                 rt_error(RTE_ABORT);
         }
-    }
+    //}
 }
-

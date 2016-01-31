@@ -2984,7 +2984,7 @@ class DataSpecificationGenerator(object):
         cmd_word_list = encoded_cmd_word + encoded_parameter
         cmd_string = "END_SPEC"
         self.write_command_to_files(cmd_word_list, cmd_string)
-        self.PacketListCreator.writeCommand(cmd_word_list)
+        #self.PacketListCreator.writeCommand(cmd_word_list)
 
         if close_writer:
             self.spec_writer.close()

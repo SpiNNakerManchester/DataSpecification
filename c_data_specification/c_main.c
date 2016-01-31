@@ -155,7 +155,7 @@ void free_mem_region_info() {
 
 
 //MACROS
-#define RESERVED_SDRAM_MEMORY 1024 * 30 //8000 //(in bytes!!) 1KB
+#define RESERVED_SDRAM_MEMORY 1024 * 15 //8000 //(in bytes!!) 1KB
 #define MAX_PACKET_SIZE 3000 //3KB //! the maximum size of a packet
 #define MAX_SEQUENCE_NO 0xFF; // The maximum sequence number
 
@@ -245,7 +245,7 @@ void timer_callback(uint unused0, uint unused1) {
                 uint32_t treshold=10;
                 log_info("available space %d", space_available);
                 //I am here and the communication did not end
-                send_sdp_pkt();
+                //send_sdp_pkt();
 
         }
         //log_info("incorrect packets-> %d", incorrect_packets);
@@ -323,8 +323,8 @@ void fetch_and_process_packet() {
                 //log_info("content length-> %d", pkt_len);
                 //last_len = len;
                 if (len > MAX_PACKET_SIZE ) {
-                    log_error("pkt big for DTCM resrvd", len);
-                    //rt_error(RTE_SWERR);
+                    log_error("pkt big for DTCM allc", len);
+                    rt_error(RTE_SWERR);
                     continue;
                 }
 
@@ -376,15 +376,21 @@ void fetch_and_process_packet() {
                         if(flag==2){
                             //stored_command = *((uint32_t*)(cmd+2)); //command
                             spin1_memcpy(stored_command, cmd+2, 4);
-                            log_debug("first frag");
+                            //log_debug("first frag");
                             el_type_size=(cmd[5] & 0b1111);
                         }
                         uint8_t cmd_len=cmd[1]; //length of fragment of command
-                        uint8_t values_len=cmd_len+residual_size;
+                        uint8_t values_len;
+                        if(flag==2){
+                            values_len=cmd_len-8;
+                        }else{
+                            values_len=cmd_len+residual_size;
+                        }
                         int new_residual_size=values_len%el_type_size;
 
                         uint32_t numel=values_len/el_type_size;
-                        //log_debug("values len %d and numel %d", values_len, numel);
+                        log_debug("numl %d , resid %d", numel, residual_size);
+
                         /*
                         address_t addr;
                         if(flag==2){
@@ -422,11 +428,13 @@ void fetch_and_process_packet() {
 
                         if(flag==2){
                             spin1_memcpy(actual_status, ((uint32_t*)(cmd+2))+2, (cmd_len-new_residual_size-8));
+                            data_specification_executor(addr, (cmd_len-new_residual_size));
                         }else{
                             spin1_memcpy(actual_status, (cmd+2), (cmd_len-new_residual_size));
+                            data_specification_executor(addr, (cmd_len+8+residual_size-new_residual_size));
                         }
                         //log_info("Executing dataSpec");
-    					data_specification_executor(addr, (cmd_len+8+residual_size-new_residual_size));
+    					//data_specification_executor(addr, (cmd_len+8+residual_size-new_residual_size));
 
                         //sark_xfree(((sv_t*)SV_SV)->sdram_heap, addr, 0); //free
                         //sark_free(addr); //free
@@ -644,7 +652,7 @@ void sdp_packet_callback(uint mailbox, uint port) {
 void initialize(){
     //log_debug("initializing");
     //alloc the space for process command
-    addr=sark_xalloc(((sv_t*)SV_SV)->sdram_heap, 256, 0, current_sark_xalloc_flags);
+    addr=sark_xalloc(((sv_t*)SV_SV)->sdram_heap, 250, 0, current_sark_xalloc_flags);
     //alloc the memory for load into memory the fragmented command
     stored_command=sark_xalloc(((sv_t*)SV_SV)->sdram_heap, 4, 0, current_sark_xalloc_flags);
     //alloc the buffer
@@ -724,5 +732,5 @@ void c_main(void) {
     //freeing used memory structures in DTCM
     //this may be discarded if needed: the app_stop on this executable
     //would get rid of the data in DTCM
-    //free_mem_region_info();
+    free_mem_region_info();
 }

@@ -70,20 +70,19 @@ class SenderPool(object):
         #print state
         #if isinstance(q, Queue()):
         while True:
-            if not q.empty():
-                curr_params=q.get()
-                if(curr_params == 'stop'):
-                    break
-                else:
-                    counter += 1
-                    if (counter%40) == 0: #75
-                        time.sleep(0.008) #0.0015
-                        counter = 0
-                    hdr = curr_params[0]
-                    pkt = curr_params[1]
-                    trns.send_sdp_message(SDPMessage(hdr, pkt))
-                    #time.sleep(0.0010) #0.00319
-                    time.sleep(0.0015) #0.00319
+            curr_params=q.get()
+            if(curr_params == 'stop'):
+                break
+            else:
+                counter += 1
+                if (counter%40) == 0: #75
+                    time.sleep(0.008) #0.0015
+                    counter = 0
+                hdr = curr_params[0]
+                pkt = curr_params[1]
+                trns.send_sdp_message(SDPMessage(hdr, pkt))
+                #time.sleep(0.0010) #0.00319
+                time.sleep(0.0015) #0.00319
     '''
     @staticmethod
     def work_perpacket(q, state, trns):

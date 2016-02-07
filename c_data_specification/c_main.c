@@ -155,7 +155,7 @@ void free_mem_region_info() {
 
 
 //MACROS
-#define RESERVED_SDRAM_MEMORY 1024 * 15 //8000 //(in bytes!!) 1KB
+#define RESERVED_SDRAM_MEMORY 1024 * 16 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
 #define MAX_PACKET_SIZE 3000 //3KB //! the maximum size of a packet
 #define MAX_SEQUENCE_NO 0xFF; // The maximum sequence number
 
@@ -243,13 +243,13 @@ void timer_callback(uint unused0, uint unused1) {
                 }
 
                 uint32_t treshold=10;
-                log_info("available space %d", space_available);
+                //log_info("available space %d", space_available);
                 //I am here and the communication did not end
                 //send_sdp_pkt();
 
         }
         //log_info("incorrect packets-> %d", incorrect_packets);
-        log_info("last seq seen: %d", pkt_last_sequence_seen);
+        //log_info("last seq seen: %d", pkt_last_sequence_seen);
         //log_info("dumpd pkts: %d", dumped_packets);
         //fetch_and_process_packet();
 
@@ -389,7 +389,7 @@ void fetch_and_process_packet() {
                         int new_residual_size=values_len%el_type_size;
 
                         uint32_t numel=values_len/el_type_size;
-                        log_debug("numl %d , resid %d", numel, residual_size);
+                        //log_debug("numl %d , resid %d", numel, residual_size);
 
                         /*
                         address_t addr;
@@ -548,7 +548,7 @@ static inline bool add_payload_to_sdram(uint8_t* eieio_msg_ptr, uint32_t length)
             (uint32_t) read_pointer - (uint32_t) write_pointer;
 
         if (middle_space < length) {
-            log_info("No enough spc middle %d B", middle_space);
+            log_info("No enough spc middle %d B %d", middle_space, pkt_last_sequence_seen);
             return false;
         } else {
             //log_debug("Packet fits in middle of %d", middle_space);

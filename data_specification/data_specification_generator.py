@@ -11,7 +11,7 @@ from data_specification.enums.condition import Condition
 from data_specification.enums.logic_operation import LogicOperation
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from spinn_machine import sdram
-from data_specification.communicate_classes import CorePacketListCreator
+from data_specification.communicate_classes import CorePacketListCreatorAsyncSend
 logger = logging.getLogger(__name__)
 
 
@@ -22,7 +22,7 @@ class DataSpecificationGenerator(object):
     MAGIC_NUMBER = 0xAD130AD6
     VERSION = 1
 
-    def __init__(self, spec_writer, report_writer=None, placement=None, reverse_iptags=0):
+    def __init__(self, spec_writer, report_writer=None, placement=None, reverse_iptags=0, queue=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
@@ -38,7 +38,7 @@ class DataSpecificationGenerator(object):
             reverse_iptags=0
         elif reverse_iptags is list:
             reverse_iptags=reverse_iptags[0]
-        self.PacketListCreator=CorePacketListCreator(placement.x, placement.y, placement.p, reverse_iptags, 30)
+        self.PacketListCreator=CorePacketListCreatorAsyncSend(placement.x, placement.y, placement.p, reverse_iptags, 30, queue=queue)
         self.spec_writer = spec_writer
         self.report_writer = report_writer
         self.txt_indent = 0
@@ -2985,13 +2985,16 @@ class DataSpecificationGenerator(object):
         cmd_string = "END_SPEC"
         self.write_command_to_files(cmd_word_list, cmd_string)
         #self.PacketListCreator.writeCommand(cmd_word_list)
+        #ls=self.PacketListCreator.get_commands();
 
         if close_writer:
             self.spec_writer.close()
             if self.report_writer is not None:
                 self.report_writer.close()
 
-        return self.PacketListCreator
+        #return self.PacketListCreator
+        #return  ls
+        return []
 
     def write_command_to_files(self, cmd_word_list, cmd_string, indent=False,
                                outdent=False, no_instruction_number=False):
@@ -3029,7 +3032,7 @@ class DataSpecificationGenerator(object):
                 "The spec file writer has not been initialized")
         elif len(cmd_word_list) > 0:
             self.PacketListCreator.writeCommand(cmd_word_list)
-            self.spec_writer.write(cmd_word_list)
+            #self.spec_writer.write(cmd_word_list)
 
         if self.report_writer is not None:
             if outdent is True:

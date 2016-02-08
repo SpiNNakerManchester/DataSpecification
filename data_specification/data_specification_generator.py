@@ -1056,7 +1056,7 @@ class DataSpecificationGenerator(object):
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def write_array(self, array_values):
+    def write_array(self, array_values, data_type=DataType.UINT32):
         """ Insert command to write an array of words, causing the write pointer
         to move on by (4 * the array size), in bytes
 
@@ -1070,21 +1070,41 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-        cmd_len = 0xF
-        cmd_word = (cmd_len << 28) | (Commands.WRITE_ARRAY.value << 20)
+        cmd_len = constants.LEN2
+
+        #if self.current_region is None:
+           # raise exceptions.DataSpecificationNoRegionSelectedException(
+           #     Commands.WRITE_ARRAY.name)
+            #pass
+
+        cmd_word = (
+            (cmd_len << 28) |
+            (Commands.WRITE_ARRAY.value << 20) |
+            data_type.size
+            )
+
         len_array = len(array_values)
-        size = len_array + 1
+        size = len_array
 
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_size = bytearray(struct.pack("<I", size))
 
         encoded_array = bytearray()
-        cmd_string = "WRITE_ARRAY, %d elements:\n" % len_array
+        cmd_string = "WRITE_ARRAY, {0:d} elements of size {1:d}:\n" \
+                     .format(len_array, data_type.size)
+        # encoding_string = "<{0:s}".format(data_type.struct_encoding)
+
         index = 0
+        data_format = "<{}".format(data_type.struct_encoding)
         for i in array_values:
             cmd_string += "%16d %8.8X\n" % (index, i)
             index += 1
-            encoded_array += bytearray(struct.pack("<I", i))
+            text_value = "{}".format(i)
+            data_value = decimal.Decimal(text_value) * data_type.scale
+            encoded_array += bytearray(struct.pack(data_format, data_value))
+
+        while (len(encoded_array) % 4) != 0:
+            encoded_array += bytearray(struct.pack("x"))
 
         cmd_word_list = encoded_cmd_word + encoded_size + encoded_array
 

@@ -218,7 +218,7 @@ void execute_free(Command cmd) {
 void write_value(void *value, int size) {
 
     //io_printf(IO_BUF, "wp: 0x%08x\n", memory_regions[current_region]->write_pointer);
-    //log_error("size of the data to be written: %d", size);
+    //log_error("data_sz: %d", size);
 
     //log_debug("val: 0x%08x", (*((uint32_t*)value)) );
     switch (size) {
@@ -325,6 +325,7 @@ void execute_write_array(Command cmd) {
     //log_debug("WARR len: %d", len);
     // Perform some checks and, if everything is fine, write the array to
     // memory.
+    //log_debug("write_arr");
     if (current_region == -1) {
         log_error("WRITE_ARRAY the current mem region has not been selected");
         rt_error(RTE_ABORT);

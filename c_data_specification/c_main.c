@@ -373,6 +373,7 @@ void fetch_and_process_packet() {
                 uint8_t i=0;
                 uint8_t flag= cmd[0] & 0b11;
                 if(flag!=0){ //if the command is fragment it will take the whole packet (also the last if it is incomplete)
+                        //log_debug("fragm");
                         if(flag==2){
                             //stored_command = *((uint32_t*)(cmd+2)); //command
                             spin1_memcpy(stored_command, cmd+2, 4);

@@ -76,13 +76,13 @@ class SenderPool(object):
             else:
                 counter += 1
                 if (counter%40) == 0: #75
-                    time.sleep(0.008) #0.0015
+                    #time.sleep(0.012) #0.0015
                     counter = 0
                 hdr = curr_params[0]
                 pkt = curr_params[1]
                 trns.send_sdp_message(SDPMessage(hdr, pkt))
                 #time.sleep(0.0010) #0.00319
-                time.sleep(0.0015) #0.00319
+                time.sleep(0.002) #0.00319
     '''
     @staticmethod
     def work_perpacket(q, state, trns):

@@ -155,7 +155,7 @@ void free_mem_region_info() {
 
 
 //MACROS
-#define RESERVED_SDRAM_MEMORY 1024 * 16 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
+#define RESERVED_SDRAM_MEMORY 1024 * 15 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
 #define MAX_PACKET_SIZE 3000 //3KB //! the maximum size of a packet
 #define MAX_SEQUENCE_NO 0xFF; // The maximum sequence number
 
@@ -244,6 +244,7 @@ void timer_callback(uint unused0, uint unused1) {
 
                 uint32_t treshold=10;
                 //log_info("available space %d", space_available);
+                //log_info("lst_seq: %d", pkt_last_sequence_seen);
                 //I am here and the communication did not end
                 //send_sdp_pkt();
 
@@ -333,7 +334,7 @@ void fetch_and_process_packet() {
 
                 if (len > final_space) { //len or cmd_len?
                     // If the packet is split, get the bits
-                    log_debug("splitted packet");
+                    //log_debug("splitted packet");
                     //log_debug("1 - reading packet to %08x from %08x length: %d", (uint32_t) dst_ptr, (uint32_t) (src_ptr+2), final_space);
                     spin1_memcpy(dst_ptr, src_ptr, final_space);//skip first two bits of flags
 

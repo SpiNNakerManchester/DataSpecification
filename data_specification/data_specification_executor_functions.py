@@ -9,7 +9,7 @@ class DataSpecificationExecutorFunctions:
     of the data specification file.
     """
 
-    def __init__(self, spec_reader, mem_writer, memory_space):
+    def __init__(self, spec_reader, mem_writer, space_available):
         """
 
         :param spec_reader: The object to read the specification language file\
@@ -27,7 +27,7 @@ class DataSpecificationExecutorFunctions:
         """
         self.spec_reader = spec_reader
         self.mem_writer = mem_writer
-        self.memory_space = memory_space
+        self.space_available = space_available
 
         self.space_allocated = 0
         self.current_region = None
@@ -119,9 +119,12 @@ class DataSpecificationExecutorFunctions:
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
-        if (size <= 0) or (size > self.memory_space):
+        if (size <= 0) or size > (self.space_available - self.space_allocated):
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "region size", size, 1, self.memory_space, "RESERVE")
+                "region size", size, 1,
+                (self.space_available - self.space_allocated),
+                "RESERVE"
+            )
 
         self.mem_regions[region] = MemoryRegion(memory_pointer=0,
                                                 unfilled=unfilled, size=size)
@@ -158,9 +161,6 @@ class DataSpecificationExecutorFunctions:
     def execute_construct(self, cmd):
         raise exceptions.UnimplementedDSECommand("CONSTRUCT")
 
-    def execute_read(self, cmd):
-        raise exceptions.UnimplementedDSECommand("READ")
-
     def execute_write(self, cmd):
         """
         This command writes the given value in the specified region a number\
@@ -183,16 +183,6 @@ class DataSpecificationExecutorFunctions:
 
         # Convert data length to bytes
         data_len = (1 << self.data_len)
-
-        #data_len = 0
-        #if self.data_len == 0:
-        #    data_len = 1
-        #elif self.data_len == 1:
-        #    data_len = 2
-        #elif self.data_len == 2:
-        #    data_len = 4
-        #elif self.data_len == 3:
-        #    data_len = 8
 
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
@@ -228,11 +218,7 @@ class DataSpecificationExecutorFunctions:
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", str(length_encoded))[0]
-#        for i in xrange(length):
-#            value_encoded = self.spec_reader.read(4)
-#            value = struct.unpack("<I", str(value_encoded))[0]
-#            self._write_to_mem(value, 4, 1, "WRITE_ARRAY")
-        value_encoded = self.spec_reader.read(4 * length)
+        value_encoded = self.spec_reader.read(4 * (length - 1))
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
     def execute_write_struct(self, cmd):
@@ -339,9 +325,6 @@ class DataSpecificationExecutorFunctions:
         # update write pointer
         self.wr_ptr[self.current_region] = address
 
-    def execute_reset_wr_ptr(self, cmd):
-        raise exceptions.UnimplementedDSECommand("RESET_RW_PTR")
-
     def execute_align_wr_ptr(self, cmd):
         raise exceptions.UnimplementedDSECommand("ALIGN_WR_PTR")
 
@@ -374,9 +357,6 @@ class DataSpecificationExecutorFunctions:
 
     def execute_print_struct(self, cmd):
         raise exceptions.UnimplementedDSECommand("PRINT_STRUCT")
-
-    def execute_read_param(self, cmd):
-        raise exceptions.UnimplementedDSECommand("READ_PARAM")
 
     def execute_end_spec(self, cmd):
         """Returns the value which terminates the data spec executor

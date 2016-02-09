@@ -22,7 +22,7 @@ class DataSpecificationGenerator(object):
     MAGIC_NUMBER = 0xAD130AD6
     VERSION = 1
 
-    def __init__(self, spec_writer, report_writer=None, placement=None, reverse_iptags=0, queue=None):
+    def __init__(self, spec_writer, report_writer=None, placement=None, reverse_iptags=0, send_async=False, queue=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
@@ -38,7 +38,10 @@ class DataSpecificationGenerator(object):
             reverse_iptags=0
         elif reverse_iptags is list:
             reverse_iptags=reverse_iptags[0]
-        self.PacketListCreator=CorePacketListCreatorAsyncSend(placement.x, placement.y, placement.p, reverse_iptags, 30, queue=queue)
+
+        if send_async:
+            self.PacketListCreator=CorePacketListCreatorAsyncSend(placement.x, placement.y, placement.p, reverse_iptags, 30, queue=queue)
+        self.send_async=send_async
         self.spec_writer = spec_writer
         self.report_writer = report_writer
         self.txt_indent = 0
@@ -2994,7 +2997,7 @@ class DataSpecificationGenerator(object):
 
         #return self.PacketListCreator
         #return  ls
-        return []
+        return self.spec_writer
 
     def write_command_to_files(self, cmd_word_list, cmd_string, indent=False,
                                outdent=False, no_instruction_number=False):
@@ -3031,8 +3034,10 @@ class DataSpecificationGenerator(object):
             raise exceptions.DataUndefinedWriterException(
                 "The spec file writer has not been initialized")
         elif len(cmd_word_list) > 0:
-            self.PacketListCreator.writeCommand(cmd_word_list)
-            #self.spec_writer.write(cmd_word_list)
+            if self.send_async:
+                self.PacketListCreator.writeCommand(cmd_word_list)
+            else:
+                self.spec_writer.write(cmd_word_list)
 
         if self.report_writer is not None:
             if outdent is True:

@@ -1376,9 +1376,9 @@ class DataSpecificationGenerator(object):
         for i in array_values:
             cmd_string += "%16d %8.8X\n" % (index, i)
             index += 1
-            text_value = "{}".format(i)
-            data_value = decimal.Decimal(text_value) * data_type.scale
-            encoded_array += bytearray(struct.pack(data_format, data_value))
+            #text_value = "{}".format(i)
+            #data_value = decimal.Decimal(text_value) * data_type.scale
+            encoded_array += bytearray(struct.pack(data_format, i))
 
         while (len(encoded_array) % 4) != 0:
             encoded_array += bytearray(struct.pack("x"))

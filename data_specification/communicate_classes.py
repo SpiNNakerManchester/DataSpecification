@@ -278,7 +278,7 @@ class CorePacketListCreatorAsyncSend():
                 last_packet_len=(len(cmdW)%200) #calc the size of the last packet
                 m = 200
                 for i in range(0, complete_pkts_to_do): #iterate the number of complete packets
-                    lastpacket.clean()
+                    #lastpacket.clean()
                     if(i is 0):
                         lastpacket.addFormattedCommand(cmdW[(i*m):((i*m)+m)], is_fragmented=True, is_first_frag=True)
                     else:
@@ -292,7 +292,7 @@ class CorePacketListCreatorAsyncSend():
                     counter+=1
                     was_last_stored = True
                 if last_packet_len is not 0: #last packet
-                    lastpacket = DataSpecMessage()
+                    #lastpacket = DataSpecMessage()
                     lastpacket.addFormattedCommand(cmdW[-last_packet_len:], is_fragmented=True, is_last_frag=True)
                     r=HostSendSequencedData(region_id=region, sequence_no=(counter % 256), eieio_data_message=lastpacket)
                     queue1.put([header, r.bytestring])
@@ -309,7 +309,7 @@ class CorePacketListCreatorAsyncSend():
                     if(was_last_stored==False and lastpacket._len!=0):
                         r=HostSendSequencedData(region_id=region, sequence_no=(counter % 256), eieio_data_message=lastpacket)
                         queue1.put([header, r.bytestring])
-                        lastpacket.clean() #once sent create one new
+                        #lastpacket.clean() #once sent create one new
                         counter+=1
                         was_last_stored=True
                     #and create a new one
@@ -319,7 +319,7 @@ class CorePacketListCreatorAsyncSend():
                         #case final command that not fitted in the packet
                         r=HostSendSequencedData(region_id=3, sequence_no=(counter % 256), eieio_data_message=lastpacket)
                         queue1.put([header, r.bytestring])
-                        lastpacket.clean() #once sent create one new
+                        #lastpacket.clean() #once sent create one new
                         counter+=1
                         was_last_stored=True
                         break
@@ -330,7 +330,7 @@ class CorePacketListCreatorAsyncSend():
                         #case final command that fitted in the last packet
                         r=HostSendSequencedData(region_id=3, sequence_no=(counter % 256), eieio_data_message=lastpacket)
                         queue1.put([header, r.bytestring])
-                        lastpacket.clean() #once sent create one new
+                        #lastpacket.clean() #once sent create one new
                         counter+=1
                         was_last_stored=True
                         break

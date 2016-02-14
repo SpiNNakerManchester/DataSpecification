@@ -22,7 +22,7 @@ class DataSpecificationGenerator(object):
     MAGIC_NUMBER = 0xAD130AD6
     VERSION = 1
 
-    def __init__(self, spec_writer, report_writer=None, placement=None, reverse_iptags=0, send_async=False, queue=None):
+    def __init__(self, spec_writer, report_writer=None, queue=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
@@ -34,14 +34,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
         If a write to external storage fails
         """
-        if reverse_iptags is None:
-            reverse_iptags=0
-        elif reverse_iptags is list:
-            reverse_iptags=reverse_iptags[0]
-
-        if send_async:
-            self.PacketListCreator=CorePacketListCreatorAsyncSend(placement.x, placement.y, placement.p, reverse_iptags, 30, queue=queue)
-        self.send_async=send_async
+        self.send_async=False
+        if queue is not None:
+            self.send_async=True
+            self.cmd_queue = queue
         self.spec_writer = spec_writer
         self.report_writer = report_writer
         self.txt_indent = 0
@@ -1373,20 +1369,14 @@ class DataSpecificationGenerator(object):
 
         index = 0
         data_format = "<{}".format(data_type.struct_encoding)
-        dts=data_type.scale
 
-        if dts==decimal.Decimal("1"):
-            for i in array_values:
-                cmd_string += "%16d %8.8X\n" % (index, i)
-                index += 1
-                encoded_array += bytearray(struct.pack(data_format, i))
-        else:
-            for i in array_values:
-                cmd_string += "%16d %8.8X\n" % (index, i)
-                index += 1
-                text_value = "{}".format(i)
-                data_value = decimal.Decimal(text_value) * data_type.scale
-                encoded_array += bytearray(struct.pack(data_format, data_value))
+        for i in array_values:
+            cmd_string += "%16d %8.8X\n" % (index, i)
+            index += 1
+            #text_value = "{}".format(i)
+            #data_value = decimal.Decimal(text_value) * data_type.scale
+            #encoded_array += bytearray(struct.pack(data_format, data_value))
+            encoded_array += bytearray(struct.pack(data_format, i))
 
         while (len(encoded_array) % 4) != 0:
             encoded_array += bytearray(struct.pack("x"))
@@ -3043,7 +3033,7 @@ class DataSpecificationGenerator(object):
                 "The spec file writer has not been initialized")
         elif len(cmd_word_list) > 0:
             if self.send_async:
-                self.PacketListCreator.writeCommand(cmd_word_list)
+                self.cmd_queue.put(cmd_word_list)
             else:
                 self.spec_writer.write(cmd_word_list)
 

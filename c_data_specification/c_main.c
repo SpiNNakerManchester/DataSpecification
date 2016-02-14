@@ -155,7 +155,7 @@ void free_mem_region_info() {
 
 
 //MACROS
-#define RESERVED_SDRAM_MEMORY 1024 * 15 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
+#define RESERVED_SDRAM_MEMORY 1024 * 16 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
 #define MAX_PACKET_SIZE 300 //3KB //! the maximum size of a packet
 #define MAX_SEQUENCE_NO 0xFF; // The maximum sequence number
 
@@ -333,7 +333,7 @@ void fetch_and_process_packet() {
 
                 if (len > final_space) { //len or cmd_len?
                     // If the packet is split, get the bits
-                    log_debug("splitted packet");
+                    //log_debug("splitted packet");
                     //log_debug("1 - reading packet to %08x from %08x length: %d", (uint32_t) dst_ptr, (uint32_t) (src_ptr+2), final_space);
                     spin1_memcpy(dst_ptr, src_ptr, final_space);//skip first two bits of flags
 
@@ -358,10 +358,10 @@ void fetch_and_process_packet() {
 
                 //CRITICAL SECTION
                 //update the read pointer and the status (atomically, avoid inconsistency)
-                uint cpsr = spin1_int_disable (); //START critical section
-                    last_buffer_operation = BUFFER_OPERATION_READ;
+                //uint cpsr = spin1_int_disable (); //START critical section
                     read_pointer=tem_rp;
-                spin1_mode_restore(cpsr); //END critical section
+                    last_buffer_operation = BUFFER_OPERATION_READ;
+                //spin1_mode_restore(cpsr); //END critical section
 
                 //log_debug("command unpacking");
 
@@ -487,14 +487,17 @@ void fetch_and_process_packet() {
 
 }
 
+uint8_t *msg_ptr;
+//uint8_t *wp;
+//uint8_t *rp;
 
 static inline bool add_payload_to_sdram(uint8_t* eieio_msg_ptr, uint32_t length) {
 
-    uint8_t *msg_ptr = eieio_msg_ptr;
+    msg_ptr = eieio_msg_ptr;
     msg_ptr[0]=length-1;
-    uint8_t *wp=write_pointer;
-    uint8_t *rp=read_pointer;
-    bool lbo=last_buffer_operation;
+    //wp=write_pointer;
+    //rp=read_pointer;
+    //bool lbo=last_buffer_operation;
     /*
     log_debug("read_pointer = 0x%.8x, write_pointer= = 0x%.8x,"
               "last_buffer_operation == read = %d, packet length = %d",
@@ -524,8 +527,9 @@ static inline bool add_payload_to_sdram(uint8_t* eieio_msg_ptr, uint32_t length)
                 final_space +
                 ((uint32_t) read_pointer - (uint32_t) buffer_region);
             if (total_space < length) {
-                log_debug("No space %d B", total_space);
-                return false;
+                log_debug("No spc %d B", total_space);
+                rt_error(RTE_ABORT);
+                //return false;
             }
 
             //log_debug("Copying first %d bytes to final space of %d", final_space);
@@ -548,7 +552,7 @@ static inline bool add_payload_to_sdram(uint8_t* eieio_msg_ptr, uint32_t length)
             (uint32_t) read_pointer - (uint32_t) write_pointer;
 
         if (middle_space < length) {
-            log_info("No enough spc middle %d B %d", middle_space, pkt_last_sequence_seen);
+            log_info("No spc middle %d B %d", middle_space, pkt_last_sequence_seen);
             return false;
         } else {
             //log_debug("Packet fits in middle of %d", middle_space);
@@ -566,22 +570,29 @@ static inline bool add_payload_to_sdram(uint8_t* eieio_msg_ptr, uint32_t length)
 }
 
 
+uint16_t data_hdr_value;
+uint8_t pkt_type;
+uint16_t sequence_value_region_id;
+uint16_t region_id;
+uint16_t sequence_value;
+uint8_t next_expected_sequence_no;
+uint16_t* eieio_content_pkt;
 
 static inline void eieio_command_parse_sequenced_data(
         uint16_t* eieio_msg_ptr, uint16_t length) { //it sees the HostSendSequencedData
 
-    uint16_t data_hdr_value = eieio_msg_ptr[0];
-    uint8_t pkt_type = (data_hdr_value >> 14) && 0x03;
-    if (pkt_type != 0x01) return;   //if is not a command packet drop it!
-    uint16_t pkt_command = data_hdr_value & (~0xC000);
-    if(pkt_command!=7) return;      //if is not a command_sequenced_data
+    //data_hdr_value = (eieio_msg_ptr[0]);
+    //pkt_type = ((data_hdr_value >> 14) && 0x03);
+    //if ((((eieio_msg_ptr[0]) >> 14) && 0x03) != 0x01) return;   //if is not a command packet drop it!
+    //uint16_t pkt_command = data_hdr_value & (~0xC000);
+    //if(pkt_command!=7) return;      //if is not a command_sequenced_data
 
-    uint16_t sequence_value_region_id = eieio_msg_ptr[1];
-    uint16_t region_id = sequence_value_region_id & 0xFF;
-    uint16_t sequence_value = (sequence_value_region_id >> 8) & 0xFF;
-    uint8_t next_expected_sequence_no =
+    sequence_value_region_id = eieio_msg_ptr[1];
+    region_id = sequence_value_region_id & 0xFF;
+    sequence_value = (sequence_value_region_id >> 8) & 0xFF;
+    next_expected_sequence_no =
         (pkt_last_sequence_seen + 1) & MAX_SEQUENCE_NO;
-    uint16_t* eieio_content_pkt = &eieio_msg_ptr[2];
+    eieio_content_pkt = &eieio_msg_ptr[2];
 
 
     //log_debug("Received packet: %d", sequence_value);
@@ -603,7 +614,7 @@ static inline void eieio_command_parse_sequenced_data(
             generate_report = eieio_content_pkt[2];
             future_sark_xalloc_flags = (future_app_id << 8) | ALLOC_ID | ALLOC_LOCK;
             //allocate memory for the table pointer
-            log_info("set IPTAG %d, fut_id %d, rep_fl %d", iptag, future_app_id, generate_report);
+            //log_info("set IPTAG %d, fut_id %d, rep_fl %d", iptag, future_app_id, generate_report);
             pointer_table_header_alloc();
             sdp_to_send.tag=iptag;
             pkt_last_sequence_seen = sequence_value;
@@ -613,11 +624,10 @@ static inline void eieio_command_parse_sequenced_data(
         // parse_event_pkt returns false in case there is an error and the
         // packet is dropped (i.e. as it was never received)
         //log_debug("add_payload_to_sdram");
-        bool ret_value = add_payload_to_sdram((((uint8_t*)eieio_msg_ptr)+3),
-                                                   length - 3);
+        //bool ret_value = add_payload_to_sdram((((uint8_t*)eieio_msg_ptr)+3), length - 3);
         //log_debug("add_payload_to_sdram return value: %d", ret_value);
 
-        if (ret_value) {
+        if (add_payload_to_sdram((((uint8_t*)eieio_msg_ptr)+3), length - 3)) {
             pkt_last_sequence_seen = sequence_value;
             /*
             log_debug("Updating last sequence seen to %d",
@@ -630,6 +640,7 @@ static inline void eieio_command_parse_sequenced_data(
         dumped_packets+=1;
         //NotExpectedSequence
         log_info("NES n: %d , exp: %d", sequence_value, next_expected_sequence_no);
+        rt_error(RTE_ABORT);
     }
 
 }

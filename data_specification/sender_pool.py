@@ -71,6 +71,7 @@ class SenderPool(object):
     @staticmethod
     def work_perpacket(q, state, trns):
         counter = 0
+        counter2 = 0
         flag_queue=False
         #print state
         #if isinstance(q, Queue()):
@@ -81,48 +82,57 @@ class SenderPool(object):
                 while True:
                     try:
                         curr_params=q.get(timeout=2)
+                        #'''
                         counter += 1
-                        if (counter%45) == 0: #75
-                            time.sleep(0.0015) #0.0015
-                            counter = 0
-                        #hdr = curr_params[0]
-                        #pkt = curr_params[1]
-                        #trns.send_sdp_message(SDPMessage(hdr, pkt))
-                        trns.send_sdp_message(SDPMessage(curr_params[0], curr_params[1]))
-                        time.sleep(0.001) #0.00319
+                        if (counter%49) == 0: #75
+                             time.sleep(0.009) #0.0015
+                             counter = 0
+                        hdr = curr_params[0]
+                        pkt = curr_params[1]
+                        trns.send_sdp_message(SDPMessage(hdr, pkt))
+                        time.sleep(0.0015) #0.00319
+                        '''
+                        counter2 +=1
+
+                        if (counter2%6) == 0: #75
+                             time.sleep(0.006) #0.0015
+                             counter2 = 0
+
+                        counter += 1
+                        if (counter%5) == 0: #75
+                             time.sleep(0.01) #0.0015
+                             counter = 0
+                        hdr = curr_params[0]
+                        pkt = curr_params[1]
+                        trns.send_sdp_message(SDPMessage(hdr, pkt))
+                        '''
                     except:
                         return
 
             else:
+                #'''
                 counter += 1
-                if (counter%45) == 0: #75
-                    time.sleep(0.0015) #0.0015
-                    counter = 0
-                #hdr = curr_params[0]
-                #pkt = curr_params[1]
-                #trns.send_sdp_message(SDPMessage(hdr, pkt))
-                trns.send_sdp_message(SDPMessage(curr_params[0], curr_params[1]))
-                time.sleep(0.001) #0.00319
+                if (counter%40) == 0: #75
+                     time.sleep(0.009) #0.0015
+                     counter = 0
+                hdr = curr_params[0]
+                pkt = curr_params[1]
+                trns.send_sdp_message(SDPMessage(hdr, pkt))
+                time.sleep(0.0016) #0.00319
 
-    '''
-    @staticmethod
-    def work_perpacket(q, state, trns):
-        counter = 0
-        #print state
-        #if isinstance(q, Queue()):
-        while True:
-            if not q.empty():
-                curr_params=q.get()
-                if(curr_params == 'stop'):
-                    break
-                else:
-                    counter += 1
-                    if (counter%45) == 0: #75
-                        time.sleep(10) #0.0015
-                        counter = 0
-                    hdr = curr_params[0]
-                    pkt = curr_params[1]
-                    trns.send_sdp_message(SDPMessage(hdr, pkt))
-                    #time.sleep(0.0010) #0.00319
-                    time.sleep(0.050) #0.00319
-    '''
+                '''
+                counter2 +=1
+
+                if (counter2%6) == 0: #75
+                     time.sleep(0.006) #0.0015
+                     counter2 = 0
+
+                counter += 1
+                if (counter%5) == 0: #75
+                     time.sleep(0.01) #0.0015
+                     counter = 0
+
+                hdr = curr_params[0]
+                pkt = curr_params[1]
+                trns.send_sdp_message(SDPMessage(hdr, pkt))
+                '''

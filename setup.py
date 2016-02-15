@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="SpiNNaker_DataSpecification",
-    version="2015.004",
+    version="2016.001.01",
     description="Specification of Memory Images",
     url="https://github.com/SpiNNakerManchester/DataSpecification",
     license="GNU GPLv3.0",

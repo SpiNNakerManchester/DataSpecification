@@ -155,7 +155,7 @@ void free_mem_region_info() {
 
 
 //MACROS
-#define RESERVED_SDRAM_MEMORY 1024 * 16 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
+#define RESERVED_SDRAM_MEMORY 1024 * 5 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
 #define MAX_PACKET_SIZE 300 //3KB //! the maximum size of a packet
 #define MAX_SEQUENCE_NO 0xFF; // The maximum sequence number
 
@@ -654,7 +654,7 @@ void sdp_packet_callback(uint mailbox, uint port) {
     uint16_t length = msg->length;
     uint16_t* eieio_msg_ptr = (uint16_t*) &(msg->cmd_rc);
     eieio_command_parse_sequenced_data(eieio_msg_ptr, length - 8); //parse command and enqueue in SDRAM (making a copy of the content)
-    uint8_t ret=spin1_trigger_user_event(0, 0); //trigger the queue server (if another one is still working it will fail)
+    spin1_trigger_user_event(0, 0); //trigger the queue server (if another one is still working it will fail)
     //log_debug("USER event returned %d", ret);
     spin1_msg_free(msg); //free memory (DTCM allocated)
 }

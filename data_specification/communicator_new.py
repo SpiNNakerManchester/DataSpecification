@@ -42,20 +42,17 @@ class CorePacketListCreatorAsyncSend_2():
 
 class CommunicatorsPool(object):
 
-    def __init__(self, num_processes, trns):
+    def __init__(self, num_processes, dictionary, trns):
         self.semaphore=multiprocessing.Semaphore(num_processes)
-        self.pkts_queue = Queue()
-        self.processes = list()
         self.awake = True
         self.num_processes = num_processes
         self.trs=trns
         self.core_packet_sender=list()
+        self.pkts_queue = Queue()
         self.sending_process=Process(target=self.packet_sender, args=(self.pkts_queue, self.awake, self.trs))
         self.sending_process.start()
         self.queue_of_processes = Queue()
-        #self.man_process=Process(target=self.manager_process, args=(self.queue_of_processes,))
-        #self.man_process.start()
-        self.process_queue=Queue()
+        self.creators_queue=Queue()
 
 
     def get_queue(self):

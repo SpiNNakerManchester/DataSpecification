@@ -254,7 +254,7 @@ class CommunicatorsPool(object):
             #logger.info(str(x)+" "+str(y)+" "+str(p)+ " has "+ str(counter) + " packets")
             #time.sleep(1)
             if debug:
-                filename= "./serialized_packets/"+str(ds_chip_y) +"_"+ str(ds_chip_y)+"_" + str(ds_p)
+                filename= "./serialized_packets/"+str(ds_chip_x) +"_"+ str(ds_chip_y)+"_" + str(ds_p)
                 output = open(filename, 'wb')
                 pickle.dump(pkts_list, output)
                 output.close()

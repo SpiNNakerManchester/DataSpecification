@@ -47,20 +47,39 @@ class CommunicatorSender(object):
         self.trs=trns
         self.num_processes = num_processes
         self.involved_plmnt = dictionary
-
         self.semaphore=multiprocessing.Semaphore(num_processes)
         self.awake = True
-        self.queue_of_writers = Queue()
+        self.queue_per_chip = dict()
+        self.processes= list()
+        #self.queue_of_writers = Queue()
         self.core_packet_sender=list()
         self.pkts_queue = Queue()
         self.sending_process=Process(target=self.packet_sender, args=(self.pkts_queue, self.trs))
         self.sending_process.start()
-        self.receiver=Process(target=self.process_work, args=(self.pkts_queue, self.involved_plmnt,self.queue_of_writers, self.semaphore,  0, 30, 0))
-        self.receiver.start()
-        self.creators_queue=Queue()
+
+        assert(isinstance(dictionary, dict))
+
+        involveds_per_chip = dict()
+
+        for k in dictionary:
+            # for each placement in a chip create a key in the dictionary involved_placements
+            # with as value an empty list that will be used by the process
+            for plcmnt in dictionary[k]:
+                involveds_per_chip[plcmnt] = list()
+            self.queue_per_chip[k] = Queue()
+            p= Process(target=self.process_work,
+                                          args=(self.pkts_queue, involveds_per_chip,
+                                                self.queue_per_chip[k], self.semaphore,  0, 30, 0))
+            self.processes.append(p)
+            p.start()  #start the process
+            involveds_per_chip = dict()  #make the current ivolved chips empty again
+
+        #self.receiver=Process(target=self.process_work, args=(self.pkts_queue, self.involved_plmnt,self.queue_of_writers, self.semaphore,  0, 30, 0))
+        #self.receiver.start()
+        #self.creators_queue=Queue()
 
 
-    def get_queue(self):
+    def get_queue(self, x, y):
         return self.pkts_queue
 
     def stop_and_wait_the_end(self):
@@ -71,26 +90,23 @@ class CommunicatorSender(object):
 
 
     def stop(self):
-        #for i in range(0,self.num_processes):
         self.pkts_queue.put("stop")
         self.sending_process.join()
-        self.receiver.join()
+        for pr in self.processes:
+            pr.join()
 
     def emergency_stop(self):
-        try:
-            self.sending_process.terminate()
-        except:
-            pass
+        self.pkts_queue.put("stop")
 
-        for p in self.processes:
-            try:
-                p.terminate()
-            except:
-                pass
+        for pr in self.processes:
+            assert isinstance(pr, Process)
+            pr.terminate()
+
+        self.sending_process.join()
 
     def add_communicate_packet(self, x,y,p, iptag, future_id=30, report_flag=0):
-        cplc=CorePacketListCreatorAsyncSend_2(x, y, p, iptag,future_id, report_flag)
-        return self.queue_of_writers
+        #cplc=CorePacketListCreatorAsyncSend_2(x, y, p, iptag,future_id, report_flag)
+        return self.queue_per_chip[(x,y)]
 
     @staticmethod
     def manager_process(q):
@@ -124,17 +140,22 @@ class CommunicatorSender(object):
                         hdr = curr_params[0]
                         pkt = curr_params[1]
                         trns.send_sdp_message(SDPMessage(hdr, pkt))
-                        time.sleep(0.002)
+                        time.sleep(0.0023)
                     except:
                         return
             else:
                 hdr = curr_params[0]
                 pkt = curr_params[1]
                 trns.send_sdp_message(SDPMessage(hdr, pkt))
-                time.sleep(0.003)
+                time.sleep(0.0023)
 
     @staticmethod
     def process_work(packets_queue, involveds, queue_from_spec, semaphore, iptag,future_id, report_flag):
+
+        store = True
+        if store is True:
+            import pickle
+
         ENCODED_DELIMITERS = bytearray(struct.pack("<I", ((0x00 << 28) | (0XFF << 20)))) + struct.pack("<i", -1)
         laspacket_dict=dict()
         region_counter_flag_dict=dict()
@@ -222,7 +243,7 @@ class CommunicatorSender(object):
                     region_counter_flag_dict[actual_target][1] += 1
                     region_counter_flag_dict[actual_target][2] = True
             else:
-                #if many commands can be added put them in the same packet,
+                # if many commands can be added put them in the same packet,
                 # if you reach the measure limit (addFormattedCommand returns -1)
                 # send the packet and add the current command (rejected from the other) to the next
                 # or if you have to write the last sequence (isthelast=True) write and send it
@@ -244,6 +265,13 @@ class CommunicatorSender(object):
                         ended_status[actual_target]=True
                         for i in involveds[actual_target]:
                             packets_queue.put([headers[actual_target], i])
+
+                        if store is True:
+                            filename= "./serialized_packets/"+str(actual_target[0]) +"_"+ str(actual_target[1])+"_" + str(actual_target[2])
+                            output = open(filename, 'wb')
+                            pickle.dump(involveds[actual_target], output)
+                            output.close()
+
                         #counter+=1
                         region_counter_flag_dict[actual_target][1] += 1
                         region_counter_flag_dict[actual_target][2]=True
@@ -273,6 +301,14 @@ class CommunicatorSender(object):
                             packets_queue.put([headers[actual_target], i])
                             if nc == 20:
                                 packets_queue.put("pause")
+
+                        if store is True:
+                            filename= "./serialized_packets/"+str(actual_target[0]) +"_"+ str(actual_target[1])+"_" + str(actual_target[2])
+                            output = open(filename, 'wb')
+                            pickle.dump(involveds[actual_target], output)
+                            output.close()
+
+
                         packets_queue.put("pause_long")
                         all_ended=True
                         for k in ended_status:

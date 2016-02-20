@@ -22,7 +22,7 @@ class DataSpecificationGenerator(object):
     MAGIC_NUMBER = 0xAD130AD6
     VERSION = 1
 
-    def __init__(self, spec_writer, report_writer=None, queue=None):
+    def __init__(self, spec_writer, report_writer=None, queue=None, pt=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: Implementation of\
@@ -35,6 +35,7 @@ class DataSpecificationGenerator(object):
         If a write to external storage fails
         """
         self.send_async=False
+        self.placement_tuple = pt
         if queue is not None:
             self.send_async=True
             self.cmd_queue = queue
@@ -3033,7 +3034,10 @@ class DataSpecificationGenerator(object):
                 "The spec file writer has not been initialized")
         elif len(cmd_word_list) > 0:
             if self.send_async:
-                self.cmd_queue.put(cmd_word_list)
+                if self.placement_tuple is not None:
+                    self.cmd_queue.put([self.placement_tuple, cmd_word_list])
+                else:
+                    self.cmd_queue.put(cmd_word_list)
             else:
                 self.spec_writer.write(cmd_word_list)
 

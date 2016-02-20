@@ -155,7 +155,7 @@ void free_mem_region_info() {
 
 
 //MACROS
-#define RESERVED_SDRAM_MEMORY 1024 * 5 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
+#define RESERVED_SDRAM_MEMORY 1024 * 20 //8000 //(in bytes!!) 1KB  //15 OK per Brunell
 #define MAX_PACKET_SIZE 300 //3KB //! the maximum size of a packet
 #define MAX_SEQUENCE_NO 0xFF; // The maximum sequence number
 

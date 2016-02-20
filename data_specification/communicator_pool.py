@@ -11,7 +11,7 @@ import logging
 import multiprocessing
 logger=logging.getLogger(__name__)
 
-debug=False
+debug=True
 
 if debug:
     import pickle
@@ -120,7 +120,7 @@ class CommunicatorsPool(object):
                         hdr = curr_params[0]
                         pkt = curr_params[1]
                         trns.send_sdp_message(SDPMessage(hdr, pkt))
-                        time.sleep(0.0011)
+                        time.sleep(0.003)
                     except:
                         return
             else:
@@ -133,11 +133,12 @@ class CommunicatorsPool(object):
                 hdr = curr_params[0]
                 pkt = curr_params[1]
                 trns.send_sdp_message(SDPMessage(hdr, pkt))
-                time.sleep(0.0011)
+                time.sleep(0.003)
 
     @staticmethod
     def process_work(awake, packets_queue, x, y, p, iptag,future_id, report_flag, queue_from_spec, semaphore):
 
+        #assert(isinstance(semaphore, multiprocessing.Semaphore))
         with semaphore:
             ds_p=p
             ds_chip_x=x
@@ -148,7 +149,7 @@ class CommunicatorsPool(object):
             ENCODED_DELIMITERS = bytearray(struct.pack("<I", ((0x00 << 28) | (0XFF << 20)))) + struct.pack("<i", -1)
             #while awake == True:
             #useful_datas=list()
-            time.sleep(0.2)
+            #time.sleep(0.2)
             iptag=iptag
             lastpacket = DataSpecMessage()
             datatoadd=struct.pack("<H", iptag)+struct.pack("<H", future_id)+struct.pack("<H", report_flag)
@@ -251,7 +252,7 @@ class CommunicatorsPool(object):
                         else: #if it is not the last packet and the add did not fail set that was not sent yet
                             was_last_stored=False
             #logger.info(str(x)+" "+str(y)+" "+str(p)+ " has "+ str(counter) + " packets")
-            time.sleep(1)
+            #time.sleep(1)
             if debug:
                 filename= "./serialized_packets/"+str(ds_chip_y) +"_"+ str(ds_chip_y)+"_" + str(ds_p)
                 output = open(filename, 'wb')

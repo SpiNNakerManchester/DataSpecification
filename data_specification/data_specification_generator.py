@@ -184,7 +184,7 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialized
+            If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
@@ -2699,7 +2699,7 @@ class DataSpecificationGenerator(object):
         :return: The id of the copied structure, between 0 and 15
         :rtype: int
         :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialized
+            If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
@@ -3027,7 +3027,7 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialized
+            If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
@@ -3144,7 +3144,7 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialized
+            If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
@@ -3182,7 +3182,7 @@ class DataSpecificationGenerator(object):
         :type cmd_string: str
         :param indent: if the following lines need to be indented
         :type indent: bool
-        :param outdent: if the following lines need to be outdented
+        :param outdent: if the following lines need to be out-dented
         :type outdent: bool
         :param no_instruction_number: if each report line should include also\
             the address of the command in the file

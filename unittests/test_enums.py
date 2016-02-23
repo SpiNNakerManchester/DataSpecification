@@ -1,4 +1,5 @@
 import unittest
+import decimal
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from data_specification.enums.commands import Commands
 from data_specification.enums.condition import Condition
@@ -48,11 +49,12 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(Commands.START_CONSTRUCTOR.value, 0x20)
         self.assertEqual(Commands.END_CONSTRUCTOR.value, 0x25)
         self.assertEqual(Commands.CONSTRUCT.value, 0x40)
-        self.assertEqual(Commands.WRITE.value, 0x41)
+        self.assertEqual(Commands.READ.value, 0x41)
+        self.assertEqual(Commands.WRITE.value, 0x42)
 
-        self.assertEqual(Commands.WRITE_ARRAY.value, 0x42)
-        self.assertEqual(Commands.WRITE_STRUCT.value, 0x43)
-        self.assertEqual(Commands.BLOCK_COPY.value, 0x44)
+        self.assertEqual(Commands.WRITE_ARRAY.value, 0x43)
+        self.assertEqual(Commands.WRITE_STRUCT.value, 0x44)
+        self.assertEqual(Commands.BLOCK_COPY.value, 0x45)
         self.assertEqual(Commands.SWITCH_FOCUS.value, 0x50)
         self.assertEqual(Commands.LOOP.value, 0x51)
 
@@ -65,7 +67,8 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(Commands.MV.value, 0x60)
         self.assertEqual(Commands.GET_WR_PTR.value, 0x63)
         self.assertEqual(Commands.SET_WR_PTR.value, 0x64)
-        self.assertEqual(Commands.ALIGN_WR_PTR.value, 0x65)
+        self.assertEqual(Commands.RESET_WR_PTR.value, 0x65)
+        self.assertEqual(Commands.ALIGN_WR_PTR.value, 0x66)
 
         self.assertEqual(Commands.ARITH_OP.value, 0x67)
         self.assertEqual(Commands.LOGIC_OP.value, 0x68)
@@ -74,7 +77,8 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(Commands.COPY_PARAM.value, 0x71)
 
         self.assertEqual(Commands.WRITE_PARAM.value, 0x72)
-        self.assertEqual(Commands.WRITE_PARAM_COMPONENT.value, 0x73)
+        self.assertEqual(Commands.READ_PARAM.value, 0x73)
+        self.assertEqual(Commands.WRITE_PARAM_COMPONENT.value, 0x74)
         self.assertEqual(Commands.PRINT_VAL.value, 0x80)
         self.assertEqual(Commands.PRINT_TXT.value, 0X81)
 
@@ -124,77 +128,82 @@ class TestingEnums(unittest.TestCase):
 
         self.assertEqual(DataType.U88.value, 8)
         self.assertEqual(DataType.U88.size, 2)
-        self.assertEqual(DataType.U88.min, 0)
-        self.assertEqual(DataType.U88.max, 255.99609375)
+        self.assertEqual(DataType.U88.min, decimal.Decimal("0"))
+        self.assertEqual(DataType.U88.max, decimal.Decimal("255.99609375"))
 
         self.assertEqual(DataType.U1616.value, 9)
         self.assertEqual(DataType.U1616.size, 4)
-        self.assertEqual(DataType.U1616.min, 0)
-        self.assertEqual(DataType.U1616.max, 65535.9999847)
+        self.assertEqual(DataType.U1616.min, decimal.Decimal("0"))
+        self.assertEqual(DataType.U1616.max, decimal.Decimal("65535.9999847"))
 
         self.assertEqual(DataType.U3232.value, 10)
         self.assertEqual(DataType.U3232.size, 8)
-        self.assertEqual(DataType.U3232.min, 0)
+        self.assertEqual(DataType.U3232.min, decimal.Decimal("0"))
         self.assertEqual(DataType.U3232.max,
-                         4294967295.99999999976716935634613037109375)
+            decimal.Decimal("4294967295.99999999976716935634613037109375"))
 
         self.assertEqual(DataType.S87.value, 11)
         self.assertEqual(DataType.S87.size, 2)
-        self.assertEqual(DataType.S87.min, -256)
-        self.assertEqual(DataType.S87.max, 255.9921875)
+        self.assertEqual(DataType.S87.min, decimal.Decimal("-256"))
+        self.assertEqual(DataType.S87.max, decimal.Decimal("255.9921875"))
 
         self.assertEqual(DataType.S1615.value, 12)
         self.assertEqual(DataType.S1615.size, 4)
-        self.assertEqual(DataType.S1615.min, -32768)
-        self.assertEqual(DataType.S1615.max, 32767.9999847)
+        self.assertEqual(DataType.S1615.min, decimal.Decimal("-32768"))
+        self.assertEqual(DataType.S1615.max, decimal.Decimal("32767.9999847"))
 
         self.assertEqual(DataType.S3231.value, 13)
         self.assertEqual(DataType.S3231.size, 8)
-        self.assertEqual(DataType.S3231.min, -4294967296)
+        self.assertEqual(DataType.S3231.min, decimal.Decimal("-4294967296"))
         self.assertEqual(DataType.S3231.max,
-                         4294967295.9999999995343387126922607421875)
+            decimal.Decimal("4294967295.9999999995343387126922607421875"))
 
         self.assertEqual(DataType.U08.value, 16)
         self.assertEqual(DataType.U08.size, 1)
-        self.assertEqual(DataType.U08.min, 0)
-        self.assertEqual(DataType.U08.max, 0.99609375)
+        self.assertEqual(DataType.U08.min, decimal.Decimal("0"))
+        self.assertEqual(DataType.U08.max, decimal.Decimal("0.99609375"))
 
         self.assertEqual(DataType.U016.value, 17)
         self.assertEqual(DataType.U016.size, 2)
-        self.assertEqual(DataType.U016.min, 0)
-        self.assertEqual(DataType.U016.max, 0.999984741211)
+        self.assertEqual(DataType.U016.min, decimal.Decimal("0"))
+        self.assertEqual(DataType.U016.max, decimal.Decimal("0.999984741211"))
 
         self.assertEqual(DataType.U032.value, 18)
         self.assertEqual(DataType.U032.size, 4)
-        self.assertEqual(DataType.U032.min, 0)
-        self.assertEqual(DataType.U032.max, 0.99999999976716935634613037109375)
+        self.assertEqual(DataType.U032.min, decimal.Decimal("0"))
+        self.assertEqual(DataType.U032.max,
+            decimal.Decimal("0.99999999976716935634613037109375"))
 
         self.assertEqual(DataType.U064.value, 19)
         self.assertEqual(DataType.U064.size, 8)
-        self.assertEqual(DataType.U064.min, 0)
+        self.assertEqual(DataType.U064.min, decimal.Decimal("0"))
         self.assertEqual(DataType.U064.max,
-                         0.9999999999999999999457898913757247782996273599565029)
+            decimal.Decimal("0.999999999999999999945789891375724"
+                            "7782996273599565029"))
 
         self.assertEqual(DataType.S07.value, 20)
         self.assertEqual(DataType.S07.size, 1)
-        self.assertEqual(DataType.S07.min, -1)
-        self.assertEqual(DataType.S07.max, 0.9921875)
+        self.assertEqual(DataType.S07.min, decimal.Decimal("-1"))
+        self.assertEqual(DataType.S07.max, decimal.Decimal("0.9921875"))
 
         self.assertEqual(DataType.S015.value, 21)
         self.assertEqual(DataType.S015.size, 2)
-        self.assertEqual(DataType.S015.min, -1)
-        self.assertEqual(DataType.S015.max, 0.999969482421875)
+        self.assertEqual(DataType.S015.min, decimal.Decimal("-1"))
+        self.assertEqual(DataType.S015.max,
+            decimal.Decimal("0.999969482421875"))
 
         self.assertEqual(DataType.S031.value, 22)
         self.assertEqual(DataType.S031.size, 4)
-        self.assertEqual(DataType.S031.min, -1)
-        self.assertEqual(DataType.S031.max, 0.99999999976716935634613037109375)
+        self.assertEqual(DataType.S031.min, decimal.Decimal("-1"))
+        self.assertEqual(DataType.S031.max,
+            decimal.Decimal("0.99999999976716935634613037109375"))
 
         self.assertEqual(DataType.S063.value, 23)
         self.assertEqual(DataType.S063.size, 8)
-        self.assertEqual(DataType.S063.min, -1)
+        self.assertEqual(DataType.S063.min, decimal.Decimal("-1"))
         self.assertEqual(DataType.S063.max,
-                         0.9999999999999999998915797827514495565992547199130058)
+            decimal.Decimal("0.99999999999999999989157978275144"
+                            "95565992547199130058"))
 
 
 if __name__ == '__main__':

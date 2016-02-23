@@ -116,12 +116,14 @@ class DataType(Enum):
                 4,
                 decimal.Decimal("-3.4028234e38"),
                 decimal.Decimal("3.4028234e38"),
+                decimal.Decimal("1"),
                 "f",
                 "32-bit floating point number")
     FLOAT_64 = (15,
                 8,
                 decimal.Decimal("-1.7976931348623157e+308"),
                 decimal.Decimal("1.7976931348623157e+308"),
+                decimal.Decimal("1"),
                 "d",
                 "64-bit floating point number")
     U08 = (16,

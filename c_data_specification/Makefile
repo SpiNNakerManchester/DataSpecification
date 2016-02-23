@@ -8,12 +8,14 @@ LIBRARIES = $(SPINN_DIRS)/lib/libspinn_frontend_common.a -lspinn_common $(SPINN_
 APP_OUTPUT_DIR = ../data_specification/data_spec_sender/
 
 # Directory to place compilation artefacts (must include trailing slash)
-BUILD_DIR = ./
+BUILD_DIR = build/
 
 # A space-separated list of object files to be built into the executable. These
 # .o files will be created from corresponding .c files (e.g. example.c in this
 # case).
 OBJECTS = data_specification_executor.o data_specification_stack.o struct.o c_main.o
+
+CFLAGS += -DPRODUCTION_CODE
 
 # The spinnaker_tools standard makefile
 include $(SPINN_DIRS)/Makefile.common

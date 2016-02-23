@@ -6,22 +6,24 @@ from data_specification_sender_functions \
 class Commands(Enum):
     """set of opcodes for the spec executor"""
 
-    BREAK                   = (0x00, dssf.send_break,                          \
-                               "Halts spec execution with an error")
-    NOP                     = (0x01, dssf.send_nop,                            \
-                               "No operation. Can be used as a filler")
-    RESERVE                 = (0x02, dssf.send_reserve,                        \
-                               "Reserves a block of memory ready for filling")
-    WRITE                   = (0x41, dssf.send_write,                          \
-                               "Performs a simple write or block               \
-                                write operation")
-    WRITE_ARRAY             = (0x42, dssf.send_write_array,                    \
-                               "Performs a write from an array")
-    SWITCH_FOCUS            = (0x50, dssf.send_switch_focus,                   \
-                               "Swap between different reserved memory regions \
-                                to work on several at the same time")
-    END_SPEC                = (0XFF, dssf.send_end_spec,                       \
-                               "Cleanly ends the parsing of the data specs")
+    BREAK = (
+        0x00, dssf.send_break, "Halts spec execution with an error")
+    NOP = (
+        0x01, dssf.send_nop, "No operation. Can be used as a filler")
+    RESERVE = (
+        0x02, dssf.send_reserve,
+        "Reserves a block of memory ready for filling")
+    WRITE = (
+        0x41, dssf.send_write,
+        "Performs a simple write or block write operation")
+    WRITE_ARRAY = (
+        0x42, dssf.send_write_array, "Performs a write from an array")
+    SWITCH_FOCUS = (
+        0x50, dssf.send_switch_focus,
+        "Swap between different reserved memory regions to work on several"
+        " at the same time")
+    END_SPEC = (
+        0XFF, dssf.send_end_spec, "Cleanly ends the parsing of the data specs")
 
     def __new__(cls, value, send_function, doc=""):
         obj = object.__new__(cls)
@@ -34,4 +36,3 @@ class Commands(Enum):
         self._value_ = value
         self.send_function = send_function
         self.__doc__ = doc
-

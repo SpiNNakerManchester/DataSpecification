@@ -7,11 +7,11 @@ from data_specification import constants, exceptions
 from data_specification.enums.condition import Condition
 from data_specification.enums.data_type import DataType
 from data_specification.enums.random_number_generator \
-                                              import RandomNumberGenerator
+    import RandomNumberGenerator
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from data_specification.enums.logic_operation import LogicOperation
 from data_specification.data_specification_generator \
-                                              import DataSpecificationGenerator
+    import DataSpecificationGenerator
 
 
 class TestDataSpecGeneration(unittest.TestCase):

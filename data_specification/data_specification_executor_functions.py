@@ -4,9 +4,8 @@ from data_specification.memory_region import MemoryRegion
 
 
 class DataSpecificationExecutorFunctions:
-    """
-    This class includes the function related to each of the commands
-    of the data specification file.
+    """ This class includes the function related to each of the commands\
+        of the data specification file.
     """
 
     def __init__(self, spec_reader, mem_writer, memory_space):
@@ -184,16 +183,6 @@ class DataSpecificationExecutorFunctions:
         # Convert data length to bytes
         data_len = (1 << self.data_len)
 
-        #data_len = 0
-        #if self.data_len == 0:
-        #    data_len = 1
-        #elif self.data_len == 1:
-        #    data_len = 2
-        #elif self.data_len == 2:
-        #    data_len = 4
-        #elif self.data_len == 3:
-        #    data_len = 8
-
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
         else:
@@ -217,8 +206,7 @@ class DataSpecificationExecutorFunctions:
             value, data_len, n_repeats, "WRITE")
 
     def execute_write_array(self, cmd):
-        """
-        This command writes an array of values in the specified region
+        """ This command writes an array of values in the specified region
 
         :param cmd: the command which triggered the function call
         :type cmd: int
@@ -228,10 +216,6 @@ class DataSpecificationExecutorFunctions:
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", str(length_encoded))[0]
-#        for i in xrange(length):
-#            value_encoded = self.spec_reader.read(4)
-#            value = struct.unpack("<I", str(value_encoded))[0]
-#            self._write_to_mem(value, 4, 1, "WRITE_ARRAY")
         value_encoded = self.spec_reader.read(4 * length)
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
@@ -242,9 +226,8 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("BLOCK_COPY")
 
     def execute_switch_focus(self, cmd):
-        """
-        This command switches the focus to the desired, already allocated,\
-        memory region
+        """ This command switches the focus to the desired, already allocated,\
+            memory region
 
         :param cmd: the command which triggered the function call
         :type cmd: int
@@ -287,9 +270,8 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("ENDIF")
 
     def execute_mv(self, cmd):
-        """
-        This command moves an immediate value to a register or copies the \
-        value of a register to another register
+        """ This command moves an immediate value to a register or copies the \
+            value of a register to another register
 
         :param cmd: the command which triggered the function call
         :type cmd: int
@@ -319,23 +301,32 @@ class DataSpecificationExecutorFunctions:
     def execute_set_wr_ptr(self, cmd):
         address = None
         self.__unpack_cmd__(cmd)
-        # check that the data is a register
         if self.use_src1_reg == 1:
+
+            # the data is a register
             future_address = self.registers[self.dest_reg]
-        else:  # the data is a raw address
+        else:
+
+            # the data is a raw address
             data_encoded = self.spec_reader.read(4)
             future_address = struct.unpack("<I", str(data_encoded))[0]
 
         # check that the address is relative or absolute
-        if cmd & 0x1 == 1:  # relative to its current write pointer
+        if cmd & 0x1 == 1:
+
+            # relative to its current write pointer
             if self.wr_ptr[self.current_region] is None:
+
                 raise exceptions.DataSpecificationNoRegionSelectedException(
                     "the write pointer for this region is currently undefined")
-            else:  # relative to the base address of the region (obsolete)
+            else:
+
+                # relative to the base address of the region (obsolete)
                 # noinspection PyTypeChecker
                 address = self.wr_ptr[self.current_region] + future_address
         else:
             address = future_address
+
         # update write pointer
         self.wr_ptr[self.current_region] = address
 
@@ -379,7 +370,7 @@ class DataSpecificationExecutorFunctions:
         raise exceptions.UnimplementedDSECommand("READ_PARAM")
 
     def execute_end_spec(self, cmd):
-        """Returns the value which terminates the data spec executor
+        """ Return the value which terminates the data spec executor
 
         :param cmd: the command which triggered the function call
         :type cmd: int
@@ -396,10 +387,10 @@ class DataSpecificationExecutorFunctions:
         return constants.END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):
-        """Write the specified value to data memory the specified amount of\
-        times.
+        """ Write the specified value to data memory the specified amount of\
+            times.
 
-        The selected memory region needs to be already allocated
+            The selected memory region needs to be already allocated
 
         :param value: the value to be written in the data memory region
         :type value: int
@@ -435,6 +426,7 @@ class DataSpecificationExecutorFunctions:
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
         space_used = self.wr_ptr[self.current_region]
+
         # noinspection PyTypeChecker
         space_available = space_allocated - space_used
         space_required = n_bytes * repeat
@@ -457,6 +449,7 @@ class DataSpecificationExecutorFunctions:
 
         encoded_array = encoded_value * repeat
         current_write_ptr = self.wr_ptr[self.current_region]
+
         # noinspection PyTypeChecker
         self.mem_regions[self.current_region].region_data[
             current_write_ptr:current_write_ptr + len(
@@ -464,9 +457,9 @@ class DataSpecificationExecutorFunctions:
         self.wr_ptr[self.current_region] += len(encoded_array)
 
     def _write_bytes_to_mem(self, data, command):
-        """Write raw bytes to data memory
+        """ Write raw bytes to data memory
 
-        The selected memory region needs to be already allocated
+            The selected memory region needs to be already allocated
 
         :param data: the value to be written in the data memory region
         :type value: bytestring
@@ -496,6 +489,7 @@ class DataSpecificationExecutorFunctions:
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
         space_used = self.wr_ptr[self.current_region]
+
         # noinspection PyTypeChecker
         space_available = space_allocated - space_used
         space_required = data_length
@@ -505,6 +499,7 @@ class DataSpecificationExecutorFunctions:
                 space_available, space_required, self.current_region)
 
         current_write_ptr = self.wr_ptr[self.current_region]
+
         # noinspection PyTypeChecker
         self.mem_regions[self.current_region].region_data[
             current_write_ptr:current_write_ptr + data_length] = data

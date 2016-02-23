@@ -7,7 +7,7 @@ int stack_size = 0;
 void stack_push(void *new) {
     if (stack_size + 1 > MAX_STACK_SIZE) {
         log_error("DSE stack is full.");
-        spin1_exit(-1);
+        rt_error(RTE_ABORT);
     }
     stack[stack_size++] = new;
 }
@@ -15,7 +15,7 @@ void stack_push(void *new) {
 void *stack_pop() {
     if (stack_size == 0) {
         log_error("DSE stack is empty.");
-        spin1_exit(-1);
+        rt_error(RTE_ABORT);
     }
     return stack[--stack_size];
 }
@@ -23,7 +23,7 @@ void *stack_pop() {
 void *stack_top() {
     if (stack_size == 0) {
         log_error("DSE stack is empty.");
-        spin1_exit(-1);
+        rt_error(RTE_ABORT);
     }
     return stack[stack_size - 1];
 }

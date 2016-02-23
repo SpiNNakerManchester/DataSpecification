@@ -1,6 +1,3 @@
-# An example Makefile suitable for use in SpiNNaker applications using the
-# spinnaker_tools libraries and makefiles.
-
 # The name of the application to be built (binary will be this with a `.aplx`
 # extension)
 APP = data_specification_executor
@@ -27,14 +24,9 @@ clean:
 	$(RM) $(OBJECTS) $(BUILD_DIR)$(APP).elf $(BUILD_DIR)$(APP).txt $(APP_OUTPUT_DIR)$(APP).aplx $(TEST_TARGET) $(BUILD_TEST_DIR)*
 
 
-
-
-
-
-
-
 # The directory which contains the source files
 SRC_DIR=./
+
 # The source files to be tested
 SRCS = data_specification_executor.c data_specification_stack.c struct.c c_main.c
 OBJS = data_specification_executor.o data_specification_stack.o struct.o c_main.o

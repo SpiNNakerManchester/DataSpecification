@@ -1,11 +1,11 @@
 
 class MemoryRegion(object):
-    """ memory region storage object
+    """ Memory region storage object
 
     """
 
     def __init__(self, memory_pointer, unfilled, size):
-        """constrctor for the memory region
+        """
 
         :param memory_pointer: the write pointer position
         :param unfilled: if the region needs to be filled when written
@@ -50,13 +50,10 @@ class MemoryRegion(object):
 
     @property
     def region_data(self):
-        """the container which holds the data written in this region
+        """ the container which holds the data written in this region
 
         :return: the region data container
         :rtype: bytearray
         :raise None: this method does not raise any known exception
         """
         return self._region_data
-
-
-

@@ -19,11 +19,13 @@
 #include <string.h>
 typedef uint32_t* address_t;
 #define spin1_exit(code) return (code);
-#define spin1_memcpy(destination, source, size) memcpy((destination), (source), (size))
+#define spin1_memcpy(destination, source, size)\
+    memcpy((destination), (source), (size))
 #define rt_error(error_code) exit((error_code))
 #define RTE_ABORT -1
 #define log_info(message, ...) printf("[INFO] " message "\n", ##__VA_ARGS__)
-#define log_warning(message, ...) printf("[WARNING] " message "\n", ##__VA_ARGS__)
+#define log_warning(message, ...) \
+    printf("[WARNING] " message "\n", ##__VA_ARGS__)
 #define log_error(message, ...) printf("[ERROR] " message "\n", ##__VA_ARGS__)
 #define log_debug(message, ...) printf("[DEBUG] " message "\n", ##__VA_ARGS__)
 #define sark_xalloc(heap, size, tag, flag) malloc((size))
@@ -73,6 +75,9 @@ extern uint8_t current_app_id;
 extern uint8_t future_app_id;
 extern uint32_t current_sark_xalloc_flags;
 extern uint32_t future_sark_xalloc_flags;
+
+// The tag to give to memory regions reserved
+#define TAG 0x00
 
 void data_specification_executor(address_t, uint32_t);
 

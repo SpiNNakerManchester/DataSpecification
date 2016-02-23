@@ -1,22 +1,22 @@
 import struct
 
-from data_specification_sender_functions \
-        import DataSpecificationSenderFunctions as Dssf
+from data_specification_sender_functions import \
+    DataSpecificationSenderFunctions as Dssf
 import constants
 from commands import Commands
 from command import Command
 
 
 class DataSpecificationSender(object):
-    """ Used to send a data specification language file to SpiNNaker to produce\
-        a memory image
+    """ Used to send a data specification language file to SpiNNaker to\
+        produce a memory image
     """
 
     """
     :param spec_reader: Reads from the DSG file.
     :type spec_reader: FileDataReader
-    :param spec_sender: Buffer used to send reliably data specification commands
-                        to the SpiNNaker board.
+    :param spec_sender: Buffer used to send reliably data specification\
+                        commands to the SpiNNaker board.
     :type spec_sender: SpecSender
     :param report_writer: DSE report writer.
     :return:
@@ -27,10 +27,11 @@ class DataSpecificationSender(object):
         self.report_writer = report_writer
         self.dssf = Dssf(self.spec_reader, self.spec_sender)
 
-    """ Parse the data specification form self.spec_reader, split it into atomic
-        chunks and send it using the spec_sender.
+    """ Parse the data specification form self.spec_reader, split it into\
+        atomic chunks and send it using the spec_sender.
     """
     def sendSpec(self):
+
         # read a new command
         instruction_spec = self.spec_reader.read(4)
         while len(instruction_spec) != 0:
@@ -44,4 +45,3 @@ class DataSpecificationSender(object):
             if return_value == constants.END_SPEC_SENDER:
                 break
             instruction_spec = self.spec_reader.read(4)
-

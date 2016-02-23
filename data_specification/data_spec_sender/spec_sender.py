@@ -2,7 +2,6 @@ from spinnman.messages.sdp.sdp_message import SDPMessage
 from spinnman.messages.sdp.sdp_header import SDPHeader
 from spinnman.messages.sdp.sdp_flag import SDPFlag
 
-
 import struct
 import constants
 import time
@@ -57,7 +56,8 @@ class SpecSender:
         # internal buffer).
         msg_data_len = struct.pack("<I", len(self.msg_data))
 
-        self.transceiver.send_sdp_message(SDPMessage(self.header, msg_data_len))
+        self.transceiver.send_sdp_message(
+            SDPMessage(self.header, msg_data_len))
 
         # Wait for the core to get into the WAITING_FOR_DATA state.
         while self.transceiver.\
@@ -68,7 +68,7 @@ class SpecSender:
 
         # Write data at the address pointed at by user2.
         destination_address = self.transceiver.get_cpu_information_from_core(
-                self.placement.x, self.placement.y, self.placement.p).user[2]
+            self.placement.x, self.placement.y, self.placement.p).user[2]
 
         self.transceiver.write_memory(self.placement.x,
                                       self.placement.y,

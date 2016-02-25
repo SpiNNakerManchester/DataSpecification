@@ -1,6 +1,7 @@
 import unittest
-from data_specification.file_data_writer import FileDataWriter
-from data_specification.file_data_reader import FileDataReader
+
+from spinn_storage_handlers.file_data_reader import FileDataReader
+from spinn_storage_handlers.file_data_writer import FileDataWriter
 
 
 class MyTestCase(unittest.TestCase):

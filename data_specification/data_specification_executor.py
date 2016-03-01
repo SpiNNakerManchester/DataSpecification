@@ -5,6 +5,8 @@ from data_specification.data_specification_executor_functions \
 from data_specification import exceptions, constants
 from data_specification.enums import commands
 
+import traceback
+
 
 class DataSpecificationExecutor(object):
     """ Used to execute a data specification language file to produce a memory\
@@ -70,7 +72,13 @@ class DataSpecificationExecutor(object):
                 # noinspection PyArgumentList
                 return_value = \
                     commands.Commands(opcode).exec_function(self.dsef, cmd)
-            except ValueError:
+            except ValueError as e:
+                traceback.print_exc()
+                raise exceptions.DataSpecificationException(
+                    "Invalid command 0x{0:X} while reading file {1:s}".format(
+                        cmd, self.spec_reader.filename))
+            except TypeError as e:
+                traceback.print_exc()
                 raise exceptions.DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(
                         cmd, self.spec_reader.filename))

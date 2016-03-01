@@ -9,7 +9,7 @@ class DataSpecificationException(Exception):
         :param message: message reporting the exception occurred
         :type message: str
         """
-        Exception.__init__(message)
+        Exception.__init__(self, message)
 
 
 class DataUndefinedWriterException(Exception):
@@ -23,7 +23,7 @@ class DataUndefinedWriterException(Exception):
         :param message: A message to indicate what when wrong
         :type message: str
         """
-        Exception.__init__(message)
+        Exception.__init__(self, message)
 
 
 class DataSpecificationRegionInUseException(DataSpecificationException):
@@ -37,7 +37,8 @@ class DataSpecificationRegionInUseException(DataSpecificationException):
         :param region: The region that was already allocated
         :type region: int
         """
-        Exception.__init__("Region {0:d} was already allocated".format(region))
+        Exception.__init__(
+            self, "Region {0:d} was already allocated".format(region))
 
 
 class DataSpecificationStructureInUseException(DataSpecificationException):
@@ -51,8 +52,9 @@ class DataSpecificationStructureInUseException(DataSpecificationException):
         :param structure: The structure that was already allocated
         :type structure: int
         """
-        Exception.__init__("Structure {0:d} was already allocated".format(
-            structure))
+        Exception.__init__(
+            self, "Structure {0:d} was already allocated".format(
+                structure))
 
 
 class DataSpecificationRegionUnfilledException(DataSpecificationException):
@@ -69,7 +71,7 @@ class DataSpecificationRegionUnfilledException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Region {0:d} was requested unfilled, but command {1:s} "
+            self, "Region {0:d} was requested unfilled, but command {1:s} "
             "requests its use".format(region, command))
 
 
@@ -84,7 +86,7 @@ class DataSpecificationNoRegionSelectedException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Command {0:s} tries to operate on an unspecified memory "
+            self, "Command {0:s} tries to operate on an unspecified memory "
             "region".format(command))
 
 
@@ -108,7 +110,7 @@ class DataSpecificationRegionExhaustedException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Region {0:d} with size {1:d} ran out of allocated memory "
+            self, "Region {0:d} with size {1:d} ran out of allocated memory "
             "(space already occupied {2:d}) during command {3:s}".format(
                 region, region_size, allocated_size, command))
 
@@ -132,7 +134,7 @@ class DataSpecificationRegionOutOfBoundsException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Requesting offset {0:d} into region {1:d} with size {2:d} "
+            self, "Requesting offset {0:d} into region {1:d} with size {2:d} "
             "during command {3:s}".format(
                 requested_offset, region, region_size, command))
 
@@ -157,9 +159,11 @@ class DataSpecificationParameterOutOfBoundsException(
         :param command: The command being executed
         :type command: str
         """
-        print "Requesting value {} for parameter {} whose allowed range " \
-              "is from {} to {} during command {}".format(
-                  value, parameter, range_min, range_max, command)
+        Exception.__init__(
+            self,
+            "Requesting value {} for parameter {} whose allowed range "
+            "is from {} to {} during command {}".format(
+                value, parameter, range_min, range_max, command))
 
 
 class DataSpecificationNotAllocatedException(DataSpecificationException):
@@ -178,7 +182,7 @@ class DataSpecificationNotAllocatedException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Using unallocated item with type {0:s} and id {1:d} during "
+            self, "Using unallocated item with type {0:s} and id {1:d} during "
             "command {2:s}".format(item_type, item_id, command))
 
 
@@ -196,6 +200,7 @@ class DataSpecificationNoMoreException(DataSpecificationException):
         :type space_required: int
         """
         Exception.__init__(
+            self,
             "Space unavailable to write all the elements requested by the "
             "write operation. Space available: {}; space requested: "
             "{} for region {}.".format(
@@ -212,7 +217,7 @@ class DataSpecificationFunctionInUse(DataSpecificationException):
         :type function_id:int
         """
         Exception.__init__(
-            "Function {0:d} is already defined".format(function_id))
+            self, "Function {0:d} is already defined".format(function_id))
 
 
 class DataSpecificationRNGInUseException(DataSpecificationException):
@@ -226,6 +231,7 @@ class DataSpecificationRNGInUseException(DataSpecificationException):
         :type rng_id:int
         """
         Exception.__init__(
+            self,
             "Random number generator {0:d} is already defined".format(rng_id))
 
 
@@ -241,6 +247,7 @@ class DataSpecificationRandomNumberDistributionInUseException(
         :type id: int
         """
         Exception.__init__(
+            self,
             "Random number distribution {0:d} is already defined".format(
                 rng_id))
 
@@ -261,6 +268,7 @@ class DataSpecificationWrongParameterNumberException(
                                           the function
         """
         Exception.__init__(
+            self,
             "Function {0:d} that requires {1:d} parameters has been called "
             "with the following parameters: {2:s}".format(
                 function_id, no_of_parameters_required, parameters))
@@ -280,6 +288,7 @@ class DataSpecificationDuplicateParameterException(DataSpecificationException):
         """
 
         Exception.__init__(
+            self,
             "The command {0:s} has been called with duplicate parameters: "
             "{1:s}".format(command, repr(parameters)))
 
@@ -293,7 +302,7 @@ class NestedFunctionException(DataSpecificationException):
         """
 
         """
-        Exception.__init__("Nested function definition not supported")
+        Exception.__init__(self, "Nested function definition not supported")
 
 
 class DataSpecificationTypeMismatchException(DataSpecificationException):
@@ -306,7 +315,7 @@ class DataSpecificationTypeMismatchException(DataSpecificationException):
         :type command: int
         """
         Exception.__init__(
-            "A type mismatch has occurred during command {0:s}".format(
+            self, "A type mismatch has occurred during command {0:s}".format(
                 command))
 
 
@@ -324,7 +333,7 @@ class DataSpecificationUnknownTypeException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Unknown id value {0:d} for data type during command "
+            self, "Unknown id value {0:d} for data type during command "
             "{1:s}".format(type_id, command))
 
 
@@ -342,7 +351,7 @@ class DataSpecificationUnknownTypeLengthException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Unknown data length {0:d} during command {1:s}".format(
+            self, "Unknown data length {0:d} during command {1:s}".format(
                 data_length, command))
 
 
@@ -362,7 +371,7 @@ class DataSpecificationInvalidSizeException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "Invalid size {0:d} of the requested type {1:s} during "
+            self, "Invalid size {0:d} of the requested type {1:s} during "
             "command {2:s}".format(type_size, type_name, command))
 
 
@@ -378,6 +387,7 @@ class DataSpecificationInvalidCommandException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
+            self,
             "The requested command {0:s} cannot be executed at this point "
             "in the specification".format(command))
 
@@ -396,6 +406,7 @@ class DataSpecificationUnknownConditionException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
+            self,
             "The requested condition with id {0:d} does not belong to the "
             "list of possible tests during command {1:s}".format(
                 condition_id, command))
@@ -418,7 +429,7 @@ class DataSpecificationInvalidOperationException(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
-            "The {0:s} operation requested with id {1:d} does not match "
+            self, "The {0:s} operation requested with id {1:d} does not match "
             "the possible operations available during command {2:s}".format(
                 operation_type, requested_operation_id, command))
 
@@ -438,7 +449,7 @@ class ExecuteBreakInstruction(DataSpecificationException):
         :param filename: str
         """
         Exception.__init__(
-            "Executing BREAK instruction at address {0:d} of file "
+            self, "Executing BREAK instruction at address {0:d} of file "
             "{1:s}".format(address, filename))
 
 
@@ -453,7 +464,7 @@ class DataSpecificationSyntaxError(DataSpecificationException):
         :param message: message describing the error occurred
         :type message: str
         """
-        Exception.__init__(message)
+        Exception.__init__(self, message)
 
 
 class DataSpecificationTablePointerOutOfMemory(DataSpecificationException):
@@ -473,6 +484,7 @@ class DataSpecificationTablePointerOutOfMemory(DataSpecificationException):
         :type memory_required: int
         """
         Exception.__init__(
+            self,
             "The memory available {0:d} is not sufficient for the allocated"
             " regions plus the header table pointer {1:d}".format(
                 memory_available, memory_required))
@@ -492,7 +504,7 @@ class DataSpecificationRegionNotAllocated(DataSpecificationException):
         :type command:
         """
         Exception.__init__(
-            "Region {0:d} has not been allocated during execution of "
+            self, "Region {0:d} has not been allocated during execution of "
             "command {1:s}".format(region, command))
 
 
@@ -508,6 +520,7 @@ class UnimplementedDSECommand(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
+            self,
             "Command {0:s} in the data specification executor has not yet "
             "been implemented".format(command))
 
@@ -524,5 +537,6 @@ class UnimplementedDSGCommand(DataSpecificationException):
         :type command: str
         """
         Exception.__init__(
+            self,
             "Command {0:s} in the data specification generator has not yet "
             "been implemented".format(command))

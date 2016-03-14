@@ -1,6 +1,6 @@
 
 class MemoryRegion(object):
-    """ memory region storage object
+    """ Memory region storage object
 
     """
 
@@ -39,7 +39,7 @@ class MemoryRegion(object):
 
         :return: the size of the region
         :rtype: int
-        :raise None: this method does not raise any knwon exception
+        :raise None: this method does not raise any known exception
         """
         return self._allocated_size
 
@@ -55,7 +55,7 @@ class MemoryRegion(object):
 
     @property
     def region_data(self):
-        """the container which holds the data written in this region
+        """ the container which holds the data written in this region
 
         :return: the region data container
         :rtype: bytearray

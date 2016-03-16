@@ -4,20 +4,17 @@ class MemoryRegion(object):
 
     """
 
-    def __init__(self, memory_pointer, unfilled, size, shrink_to_fit):
+    def __init__(self, memory_pointer, unfilled, size):
         """
 
         :param memory_pointer: the write pointer position
         :param unfilled: if the region needs to be filled when written
-        :param shrink_to_fit: Indicates that the region should be shrunk to\
-            actual size when writing the final data
         :return: None
         :rtype: None
         :raise None: this method does not raise any known exception
         """
         self._mem_pointer = memory_pointer
         self._unfilled = unfilled
-        self._shink_to_fit = shrink_to_fit
         self._allocated_size = size
         self._region_data = bytearray(size)
         self._write_pointer = 0
@@ -62,10 +59,6 @@ class MemoryRegion(object):
         :raise None: this method does not raise any known exception
         """
         return self._region_data
-
-    @property
-    def shrink_to_fit(self):
-        return self._shink_to_fit
 
     @property
     def write_pointer(self):

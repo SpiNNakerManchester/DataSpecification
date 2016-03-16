@@ -104,11 +104,8 @@ class DataSpecificationExecutor(object):
                 if ((memory_region.unfilled and
                     self.dsef.mem_regions.needs_to_write_region(i)) or
                         not memory_region.unfilled):
-                    if memory_region.shrink_to_fit:
-                        self.mem_writer.write(memory_region.region_data[
-                            :memory_region.max_write_pointer])
-                    else:
-                        self.mem_writer.write(memory_region.region_data)
+                    self.mem_writer.write(memory_region.region_data[
+                        :memory_region.max_write_pointer])
                 else:
                     self.space_written -= memory_region.allocated_size
 
@@ -163,10 +160,10 @@ class DataSpecificationExecutor(object):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
                 pointer_table[i] = next_free_offset + start_address
-                if memory_region.shrink_to_fit:
-                    region_size = memory_region.max_write_pointer
-                else:
+                if memory_region.unfilled:
                     region_size = memory_region.allocated_size
+                else:
+                    region_size = memory_region.max_write_pointer
             else:
                 pointer_table[i] = 0
                 region_size = 0

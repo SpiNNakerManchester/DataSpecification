@@ -35,7 +35,6 @@ class DataSpecificationExecutorFunctions:
         self.mem_regions = memory_region_collection.MemoryRegionCollection(
             constants.MAX_MEM_REGIONS)
         self.struct_slots = [0] * constants.MAX_STRUCT_SLOTS
-        self.wr_ptr = [None] * constants.MAX_MEM_REGIONS
 
     def __unpack_cmd__(self, cmd):
         """ Routine to unpack the command read from the data spec file. The\
@@ -122,9 +121,8 @@ class DataSpecificationExecutorFunctions:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "region size", size, 1, self.memory_space, "RESERVE")
 
-        self.mem_regions[region] = MemoryRegion(memory_pointer=0,
-                                                unfilled=unfilled, size=size)
-        self.wr_ptr[region] = 0
+        self.mem_regions[region] = MemoryRegion(
+            memory_pointer=0, unfilled=unfilled, size=size)
         self.space_allocated += size
 
     def execute_free(self, cmd):
@@ -315,7 +313,7 @@ class DataSpecificationExecutorFunctions:
         if cmd & 0x1 == 1:
 
             # relative to its current write pointer
-            if self.wr_ptr[self.current_region] is None:
+            if self.mem_regions[self.current_region] is None:
 
                 raise exceptions.DataSpecificationNoRegionSelectedException(
                     "the write pointer for this region is currently undefined")
@@ -323,12 +321,14 @@ class DataSpecificationExecutorFunctions:
 
                 # relative to the base address of the region (obsolete)
                 # noinspection PyTypeChecker
-                address = self.wr_ptr[self.current_region] + future_address
+                address = (
+                    self.mem_regions[self.current_region].write_pointer +
+                    future_address)
         else:
             address = future_address
 
         # update write pointer
-        self.wr_ptr[self.current_region] = address
+        self.mem_regions[self.current_region].write_pointer = address
 
     def execute_reset_wr_ptr(self, cmd):
         raise exceptions.UnimplementedDSECommand("RESET_RW_PTR")
@@ -425,7 +425,7 @@ class DataSpecificationExecutorFunctions:
                 self.current_region, command)
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
-        space_used = self.wr_ptr[self.current_region]
+        space_used = self.mem_regions[self.current_region].write_pointer
 
         # noinspection PyTypeChecker
         space_available = space_allocated - space_used
@@ -448,13 +448,14 @@ class DataSpecificationExecutorFunctions:
                 n_bytes, command)
 
         encoded_array = encoded_value * repeat
-        current_write_ptr = self.wr_ptr[self.current_region]
+        current_write_ptr = self.mem_regions[self.current_region].write_pointer
 
         # noinspection PyTypeChecker
         self.mem_regions[self.current_region].region_data[
             current_write_ptr:current_write_ptr + len(
                 encoded_array)] = encoded_array
-        self.wr_ptr[self.current_region] += len(encoded_array)
+        self.mem_regions[self.current_region].increment_write_pointer(
+            len(encoded_array))
 
     def _write_bytes_to_mem(self, data, command):
         """ Write raw bytes to data memory
@@ -488,7 +489,7 @@ class DataSpecificationExecutorFunctions:
                 self.current_region, command)
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
-        space_used = self.wr_ptr[self.current_region]
+        space_used = self.mem_regions[self.current_region].write_pointer
 
         # noinspection PyTypeChecker
         space_available = space_allocated - space_used
@@ -498,9 +499,10 @@ class DataSpecificationExecutorFunctions:
             raise exceptions.DataSpecificationNoMoreException(
                 space_available, space_required, self.current_region)
 
-        current_write_ptr = self.wr_ptr[self.current_region]
+        current_write_ptr = self.mem_regions[self.current_region].write_pointer
 
         # noinspection PyTypeChecker
         self.mem_regions[self.current_region].region_data[
             current_write_ptr:current_write_ptr + data_length] = data
-        self.wr_ptr[self.current_region] += data_length
+        self.mem_regions[self.current_region].increment_write_pointer(
+            data_length)

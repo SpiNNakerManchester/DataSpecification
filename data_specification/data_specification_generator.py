@@ -11,6 +11,7 @@ from data_specification.enums.condition import Condition
 from data_specification.enums.logic_operation import LogicOperation
 from data_specification.enums.arithemetic_operation import ArithmeticOperation
 from spinn_machine import sdram
+import numpy
 
 logger = logging.getLogger(__name__)
 
@@ -150,12 +151,14 @@ class DataSpecificationGenerator(object):
         unfilled = False
         if empty:
             unfilled = True
+
         self.mem_slot[region] = [size, label, unfilled]
 
         cmd_word = ((constants.LEN2 << 28) |
                     (Commands.RESERVE.value << 20) |  # @UndefinedVariable
                     (constants.NO_REGS << 16) |
                     (unfilled << 7) |
+                    (1 << 6) |
                     region)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_size = bytearray(struct.pack("<I", size))
@@ -1246,39 +1249,36 @@ class DataSpecificationGenerator(object):
                 Commands.WRITE.name)  # @UndefinedVariable
 
         parameters = 0
-        cmd_string = "WRITE data=0x%8.8X" % data
+        cmd_string = None
+        if self.report_writer is not None:
+            cmd_string = "WRITE data=0x%8.8X" % data
 
         if repeats_is_register is not False:
             repeat_reg_usage = 1
             parameters |= (repeats << 4)
-            cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
-                                                            repeats)
+            if self.report_writer is not None:
+                cmd_string = "{0:s}, repeats=reg[{1:d}]".format(
+                    cmd_string, repeats)
         else:
             repeat_reg_usage = constants.NO_REGS
             parameters |= repeats
-            cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
+            if self.report_writer is not None:
+                cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
         cmd_word = (
             (cmd_data_len << 28) |
             (Commands.WRITE.value << 20) |  # @UndefinedVariable
             (repeat_reg_usage << 16) | (data_len << 12) | parameters)
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        data_value = decimal.Decimal("{}".format(data)) * data_type.scale
+        padding = 4 - data_type.size
 
-        data_format = "<{}".format(data_type.struct_encoding)
-        text_value = "{}".format(data)
-        data_value = decimal.Decimal(text_value) * data_type.scale
-        data_encoded = bytearray(struct.pack(data_format, data_value))
-
-        if data_type.size == 1:
-            padding = bytearray(3)
-        elif data_type.size == 2:
-            padding = bytearray(2)
-        else:
-            padding = bytearray()
-
-        cmd_word_list = encoded_cmd_word + data_encoded + padding
-        cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
+        cmd_word_list = struct.pack(
+            "<I{}{}x".format(data_type.struct_encoding, padding),
+            cmd_word, data_value)
+        if self.report_writer is not None:
+            cmd_string = "{0:s}, dataType={1:s}".format(
+                cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_value_from_register(
@@ -1422,32 +1422,13 @@ class DataSpecificationGenerator(object):
             (Commands.WRITE_ARRAY.value << 20) |  # @UndefinedVariable
             data_type.size)
 
-        len_array = len(array_values)
-        size = len_array
+        data = numpy.array(array_values, dtype='uint32')
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
-        encoded_size = bytearray(struct.pack("<I", size))
+        cmd_string = "WRITE_ARRAY, %d elements\n" % (data.size)
 
-        encoded_array = bytearray()
-        cmd_string = "WRITE_ARRAY, {0:d} elements of size {1:d}:\n" \
-                     .format(len_array, data_type.size)
-        # encoding_string = "<{0:s}".format(data_type.struct_encoding)
-
-        index = 0
-        data_format = "<{}".format(data_type.struct_encoding)
-        for i in array_values:
-            cmd_string += "%16d %8.8X\n" % (index, i)
-            index += 1
-            text_value = "{}".format(i)
-            data_value = decimal.Decimal(text_value) * data_type.scale
-            encoded_array += bytearray(struct.pack(data_format, data_value))
-
-        while (len(encoded_array) % 4) != 0:
-            encoded_array += bytearray(struct.pack("x"))
-
-        cmd_word_list = encoded_cmd_word + encoded_size + encoded_array
-
+        cmd_word_list = bytearray(struct.pack("<II", cmd_word, data.size))
         self.write_command_to_files(cmd_word_list, cmd_string)
+        self.spec_writer.write(data.tostring())
 
     def switch_write_focus(self, region):
         """ Insert command to switch the region being written to

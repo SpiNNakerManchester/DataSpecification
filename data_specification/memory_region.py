@@ -17,6 +17,8 @@ class MemoryRegion(object):
         self._unfilled = unfilled
         self._allocated_size = size
         self._region_data = bytearray(size)
+        self._write_pointer = 0
+        self._max_write_pointer = 0
 
     @property
     def memory_pointer(self):
@@ -57,3 +59,22 @@ class MemoryRegion(object):
         :raise None: this method does not raise any known exception
         """
         return self._region_data
+
+    @property
+    def write_pointer(self):
+        return self._write_pointer
+
+    @write_pointer.setter
+    def write_pointer(self, write_pointer):
+        self._write_pointer = write_pointer
+        self._max_write_pointer = max((
+            self._write_pointer, self._max_write_pointer))
+
+    @property
+    def max_write_pointer(self):
+        return self._max_write_pointer
+
+    def increment_write_pointer(self, n_bytes):
+        self._write_pointer += n_bytes
+        self._max_write_pointer = max((
+            self._write_pointer, self._max_write_pointer))

@@ -4,6 +4,15 @@ from data_specification import exceptions
 class MemoryRegionCollection(object):
     """Collection of memory regions.
     """
+
+    __slots__ = [
+        # the max number of regions avilable
+        "_n_regions",
+
+        # map of region id to region data
+        "_regions"
+    ]
+
     def __init__(self, n_regions):
         """Create a new MemoryRegionCollection with the given number of regions.
         """

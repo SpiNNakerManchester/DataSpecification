@@ -7,11 +7,25 @@ import constants
 import time
 
 
-class SpecSender:
+class SpecSender(object):
     """ Class for sending a data spec to a core.
         The data is added to a buffer using the add method and then sent using
         the send method.
     """
+
+    __slots__ = [
+        # The transceiver used to communicate with the board.
+        "transceiver",
+
+        # The destination of the data specification.
+        "placement",
+
+        # ???????????
+        "header",
+
+        # ???????????
+        "msg_data"
+    ]
 
     def __init__(self, transceiver, placement):
         """ Create a new SpecSender

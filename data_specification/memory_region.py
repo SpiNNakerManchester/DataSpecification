@@ -4,6 +4,26 @@ class MemoryRegion(object):
 
     """
 
+    __slots__ = [
+        # the write pointer position
+        "_mem_pointer",
+
+        # flag that states if the region is filled or not
+        "_unfilled",
+
+        # the amount of memory allocated to this dsg
+        "_allocated_size",
+
+        # the region address map????
+        "_region_data",
+
+        # the posiiton in the memory where the writing is currently occuring
+        "_write_pointer",
+
+        # the max point where if written over, it will cause an error
+        "_max_write_pointer"
+    ]
+
     def __init__(self, memory_pointer, unfilled, size):
         """
 

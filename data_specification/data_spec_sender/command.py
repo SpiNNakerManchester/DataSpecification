@@ -1,4 +1,9 @@
-class Command:
+class Command(object):
+
+    __slots__ = [
+        # value of the command
+        '_value'
+    ]
 
     def __init__(self, cmd):
         self._value = cmd

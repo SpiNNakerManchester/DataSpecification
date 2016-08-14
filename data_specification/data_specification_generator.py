@@ -20,6 +20,48 @@ class DataSpecificationGenerator(object):
     """ Used to generate a data specification language file that can be\
         executed to produce a memory image
     """
+
+    __slots__ = [
+        # The object to write the specification to
+        "spec_writer",
+
+        # the writer for the human readable report
+        "report_writer",
+
+        # ????????
+        "txt_indent",
+
+        # how many instructions has been executed ?????
+        "instruction_counter",
+
+        # ???????
+        "mem_slot",
+
+        # ???????
+        "function",
+
+        # ???????
+        "struct_slot",
+
+        # ????????
+        "rng",
+
+        # ????????
+        "random_distribution",
+
+        # ???????
+        "conditionals",
+
+        # the current dsg region we're writing to
+        "current_region",
+
+        # ?????????
+        "ongoing_function_definition",
+
+        # ????????
+        "ongoing_loop"
+    ]
+
     MAGIC_NUMBER = 0xAD130AD6
     VERSION = 1
 

@@ -13,6 +13,28 @@ class DataSpecificationExecutor(object):
         image
     """
 
+    __slots__ = [
+        # The object to read the specification language file
+        "spec_reader",
+
+        # The object to write the memory image to
+        "mem_writer",
+
+        # The object to write the report of the data specification executor
+        "report_writer",
+
+        # The amount of space used by the dsg script.
+        "space_used",
+
+        # the amount of space written by the dsg script (different from used,
+        # as empty data regions are not counted as written)
+        "space_written",
+
+        # ???????????
+        "dsef"
+
+    ]
+
     def __init__(self, spec_reader, mem_writer, memory_space,
                  report_writer=None):
         """
@@ -72,12 +94,12 @@ class DataSpecificationExecutor(object):
                 # noinspection PyArgumentList
                 return_value = \
                     commands.Commands(opcode).exec_function(self.dsef, cmd)
-            except ValueError as e:
+            except ValueError:
                 traceback.print_exc()
                 raise exceptions.DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(
                         cmd, self.spec_reader.filename))
-            except TypeError as e:
+            except TypeError:
                 traceback.print_exc()
                 raise exceptions.DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(

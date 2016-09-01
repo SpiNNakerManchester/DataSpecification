@@ -4,7 +4,17 @@ from command import Command
 from data_specification.data_spec_sender.commands import Commands
 
 
-class DataSpecificationSenderFunctions:
+class DataSpecificationSenderFunctions(object):
+
+    __slots__ = [
+        
+        # the reader for the spec file
+        "spec_reader",
+
+        # Buffer used to send reliably data specification commands to the
+        #  SpiNNaker board.
+        "spec_sender"
+    ]
 
     def __init__(self, spec_reader, spec_sender):
         self.spec_reader = spec_reader

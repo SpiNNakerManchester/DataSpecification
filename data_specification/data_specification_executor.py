@@ -94,12 +94,12 @@ class DataSpecificationExecutor(object):
                 # noinspection PyArgumentList
                 return_value = \
                     commands.Commands(opcode).exec_function(self.dsef, cmd)
-            except ValueError as e:
+            except ValueError:
                 traceback.print_exc()
                 raise exceptions.DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(
                         cmd, self.spec_reader.filename))
-            except TypeError as e:
+            except TypeError:
                 traceback.print_exc()
                 raise exceptions.DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(

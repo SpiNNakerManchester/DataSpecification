@@ -6,7 +6,8 @@ class MemoryRegionCollection(object):
     """
 
     __slots__ = [
-        # the max number of regions avilable
+
+        # the max number of regions available
         "_n_regions",
 
         # map of region id to region data
@@ -65,14 +66,14 @@ class MemoryRegionCollection(object):
         if region_id > self._n_regions:
             raise exceptions.DataSpecificationNoRegionSelectedException(
                 "the region id requested is beyond the supported number of"
-                "avilable region ids")
+                "available region ids")
         if not self._regions[region_id].unfilled:
             return True
         else:
             needs_writing = False
             for region in range(region_id, self._n_regions):
-                if (self._regions[region_id] is not None
-                        and not self._regions[region_id].unfilled):
+                if (self._regions[region] is not None and
+                        not self._regions[region].unfilled):
                     needs_writing = True
         return needs_writing
 

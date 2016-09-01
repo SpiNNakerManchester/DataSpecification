@@ -20,7 +20,7 @@ class DataSpecificationSender(object):
         #  SpiNNaker board.
         "spec_sender",
 
-        # report writer for human consumptuon
+        # report writer for human consumption
         "report_writer",
 
         # ?????????

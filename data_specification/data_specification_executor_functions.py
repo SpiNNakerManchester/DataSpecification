@@ -9,6 +9,7 @@ class DataSpecificationExecutorFunctions(object):
     """
 
     __slots__ = [
+
         # ????????????
         "spec_reader",
 

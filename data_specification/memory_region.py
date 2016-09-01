@@ -17,7 +17,7 @@ class MemoryRegion(object):
         # the region address map????
         "_region_data",
 
-        # the posiiton in the memory where the writing is currently occuring
+        # the position in the memory where the writing is currently occurring
         "_write_pointer",
 
         # the max point where if written over, it will cause an error

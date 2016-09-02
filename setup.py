@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name="SpiNNaker_DataSpecification",
-    version="2016.001",
+    version="3.0.0",
     description="Specification of Memory Images",
     url="https://github.com/SpiNNakerManchester/DataSpecification",
     license="GNU GPLv3.0",
@@ -13,6 +13,6 @@ setup(
               'data_specification.data_spec_sender',
               'data_specification.enums'],
     package_data={'data_specification.data_spec_sender': ['*.aplx']},
-    install_requires=['SpiNNStorageHandlers >= 2016.001',
+    install_requires=['SpiNNStorageHandlers >= 3.0.0, < 4.0.0',
                       'six', 'enum34']
 )

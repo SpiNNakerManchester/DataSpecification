@@ -3242,3 +3242,13 @@ class DataSpecificationGenerator(object):
             if indent is True:
                 self.txt_indent += 1
         return
+
+    @property
+    def region_sizes(self):
+        """ A list of sizes of each region that has been reserved.  Note that\
+            the list will include 0s for each non-reserved region.
+        """
+        return [
+            self.mem_slot[i] if self.mem_slot[i] == 0 else self.mem_slot[i][0]
+            for i in range(len(self.mem_slot))
+        ]

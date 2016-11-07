@@ -1313,7 +1313,8 @@ class DataSpecificationGenerator(object):
             (repeat_reg_usage << 16) | (data_len << 12) | parameters)
 
         data_value = decimal.Decimal("{}".format(data)) * data_type.scale
-        padding = 4 - data_type.size
+
+        padding = (4 - (data_type.size % 4)) % 4
 
         cmd_word_list = struct.pack(
             "<I{}{}x".format(data_type.struct_encoding, padding),

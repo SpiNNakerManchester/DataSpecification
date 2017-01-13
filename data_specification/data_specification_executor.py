@@ -157,8 +157,7 @@ class DataSpecificationExecutor(object):
                     self.mem_writer.tell(), constants.APPDATA_MAGIC_NUM))
         self.mem_writer.write(magic_number_encoded)
 
-        version_encoded = bytearray(
-            struct.pack("<I", constants.DSE_VERSION))
+        version_encoded = bytearray(struct.pack("<I", constants.DSE_VERSION))
         if self.report_writer is not None:
             self.report_writer.write(
                 "{} File structure version: {} \n".format(

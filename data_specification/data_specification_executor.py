@@ -140,6 +140,11 @@ class DataSpecificationExecutor(object):
                     self.space_written -= memory_region.allocated_size
 
     def write_dse_region_output_file(self, region_to_write):
+        """ supports writing a specific region instead of the entire dse file
+
+        :param region_to_write: the dsg region to write
+        :return: None
+        """
         memory_region = self.dsef.mem_regions[region_to_write]
         if memory_region is not None:
             if ((memory_region.unfilled and

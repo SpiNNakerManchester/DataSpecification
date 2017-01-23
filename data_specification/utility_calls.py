@@ -30,16 +30,29 @@ def get_data_spec_and_file_writer_filename(
         processor_chip_x, processor_chip_y, processor_id,
         hostname, report_directory, write_text_specs,
         application_run_time_report_folder):
-    """
+    """ encapsulates the creation of the dsg writer and the file paths
 
-    :param processor_chip_x:
-    :param processor_chip_y:
-    :param processor_id:
-    :param hostname:
-    :param report_directory:
-    :param write_text_specs:
-    :param application_run_time_report_folder:
-    :return:
+    :param processor_chip_x: the chip coord for x axis to which this dsg is
+    being written for
+    :type processor_chip_x: int
+    :param processor_chip_y: the chip coord for y axis to which the dsg is
+     being written for
+     :type processor_chip_y: int
+    :param processor_id: the processor id for which this dsg is being written
+    for
+    :type processor_id: int (0, 16)
+    :param hostname: The hostname of the spinnaker machine
+    :type hostname: str
+    :param report_directory: the directory for the reports folder
+    :type report_directory: file path
+    :param write_text_specs: bool that dicates if the text version of the dsg
+    should be generated
+    :type write_text_specs: bool
+    :param application_run_time_report_folder: the folder where to store the
+    dsg data
+    :type application_run_time_report_folder: file path
+    :return: the filename of the data writer and the data specification object
+    :rtype file_path, DataSpecificationGenerator
     """
 
     binary_file_path = get_data_spec_file_path(
@@ -77,13 +90,20 @@ def get_data_spec_and_file_writer_filename(
 def get_data_spec_file_path(processor_chip_x, processor_chip_y,
                             processor_id, hostname,
                             application_run_time_folder):
-    """
-    :param processor_chip_x:
-    :param processor_chip_y:
-    :param processor_id:
-    :param hostname:
-    :param application_run_time_folder:
-    :return:
+    """ gets the filepath for storing the dsg data
+    :param processor_chip_x: the chip coord for x axis to which this dsg is
+    being written for
+    :type processor_chip_x: int
+    :param processor_chip_y: the chip coord for y axis to which the dsg is
+     being written for
+     :type processor_chip_y: int
+    :param processor_id: the processor id for which this dsg is being written
+    for
+    :type processor_id: int (0, 16)
+    :param hostname: The hostname of the spinnaker machine
+    :type hostname: str
+    :return: the filename of the data writer and the data specification object
+    :rtype file_path, DataSpecificationGenerator
     """
 
     if application_run_time_folder == "TEMP":

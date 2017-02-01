@@ -1292,20 +1292,17 @@ class DataSpecificationGenerator(object):
 
         parameters = 0
         cmd_string = None
-        if self.report_writer is not None:
-            cmd_string = "WRITE data=0x%8.8X" % data
 
         if repeats_is_register is not False:
             repeat_reg_usage = 1
             parameters |= (repeats << 4)
             if self.report_writer is not None:
-                cmd_string = "{0:s}, repeats=reg[{1:d}]".format(
-                    cmd_string, repeats)
+                cmd_string = "repeats=reg[{0:d}]".format(repeats)
         else:
             repeat_reg_usage = constants.NO_REGS
             parameters |= repeats
             if self.report_writer is not None:
-                cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
+                cmd_string = "repeats={0:d}".format(repeats)
 
         cmd_word = (
             (cmd_data_len << 28) |
@@ -1320,6 +1317,11 @@ class DataSpecificationGenerator(object):
             "<I{}{}x".format(data_type.struct_encoding, padding),
             cmd_word, data_value)
         if self.report_writer is not None:
+            bytes = [hex(val) for val in bytearray(cmd_word_list)]
+            data_elements = ""
+            for element in bytes:
+                data_elements += "{}, ".format(element)
+            cmd_string = "WRITE data={}".format(data_elements + cmd_string)
             cmd_string = "{0:s}, dataType={1:s}".format(
                 cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)

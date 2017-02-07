@@ -109,7 +109,7 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None
+        :raise None:
         """
         self._cmd_size = (cmd >> 28) & 0x3
         self.opcode = (cmd >> 20) & 0xFF
@@ -144,7 +144,7 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None
+        :raise None:
         """
         pass
 
@@ -159,7 +159,7 @@ class DataSpecificationExecutorFunctions(object):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If there is an error in the command syntax
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\ If the requested \
+            DataSpecificationParameterOutOfBoundsException: If the requested \
             size of the region is beyond the available memory space
         """
         self.__unpack_cmd__(cmd)
@@ -275,7 +275,7 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None
+        :raise None:
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", str(length_encoded))[0]
@@ -439,9 +439,10 @@ class DataSpecificationExecutorFunctions(object):
 
         :param cmd: the command which triggered the function call
         :type cmd: int
-        :return: constants.END_SPEC_EXECUTOR
+        :return: constants. END_SPEC_EXECUTOR
         :rtype: int
-        :raise None
+        :raise data_specification.exceptions.DataSpecificationSyntaxError:\
+            If command END_SPEC != -1
         """
         read_data = self.spec_reader.read(4)
         value = struct.unpack("<i", str(read_data))[0]

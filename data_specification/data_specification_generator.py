@@ -3205,7 +3205,7 @@ class DataSpecificationGenerator(object):
             the text version to the text file.\
             Setting the optional parameter 'indent' to True causes subsequent\
             commands to be indented by two spaces relative to this one.\
-            Similarly, setting 'outdent' to True, reverses this spacing.\
+            Similarly, setting 'outdent' to True, reverses this spacing.
 
         :param cmd_word_list: list of binary words to be added to the binary\
             data specification file

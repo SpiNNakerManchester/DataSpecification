@@ -529,7 +529,7 @@ class DataSpecificationExecutorFunctions(object):
             The selected memory region needs to be already allocated
 
         :param data: the value to be written in the data memory region
-        :type value: bytestring
+        :type value: str
         :param command: the command which is being executed
         :type command: str
         :return: No value returned

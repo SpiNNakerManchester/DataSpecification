@@ -1,7 +1,13 @@
-.. data_allocation documentation master file, created by
-   sphinx-quickstart on Thu Jun 19 12:21:24 2014.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+These pages document the python code for the DataSpecification_ module
+which is part of the SpiNNaker_ Project.
+
+This code depends on SpiNNMachine_ and SpiNNStorageHandlers_ .
+
+.. _SpiNNaker: http://apt.cs.manchester.ac.uk/projects/SpiNNaker/
+.. _DataSpecification: https://github.com/SpiNNakerManchester/DataSpecification
+.. _SpiNNMachine: http://spinnmachine.readthedocs.io
+.. _SpiNNStorageHandlers: https://github.com/SpiNNakerManchester/SpiNNStorageHandlers
+
 
 Data Specification
 ==================

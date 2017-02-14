@@ -14,6 +14,7 @@
 
 import sys
 import os
+from sphinx import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -48,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'DataSpecification'
-copyright = u'2014'
+copyright = u'2014-2017'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -268,7 +269,7 @@ texinfo_documents = [
 epub_title = u'DataSpecification'
 epub_author = u''
 epub_publisher = u''
-epub_copyright = u'2014'
+epub_copyright = u'2014-2017'
 
 # The basename for the epub file. It defaults to the project name.
 #epub_basename = u'data_allocation'
@@ -333,13 +334,9 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-# Do the rst generation if in READ_THE_DOCS
-if os.environ.get('READTHEDOCS', None) == 'True':
-    from sphinx_python_api_utils.make_rst import make_rst
-
-    for f in os.listdir("."):
-        if (os.path.isfile(f) and f.endswith(".rst")
-                and f != "index.rst" and f != "modules.rst"):
-            os.remove(f)
-    make_rst(rootpath="../../data_specification", excludes=[], destdir=".",
-            force=True, separatemodules=True)
+# Do the rst generation
+for f in os.listdir("."):
+    if (os.path.isfile(f) and f.endswith(
+            ".rst") and f != "index.rst" and f != "modules.rst"):
+        os.remove(f)
+apidoc.main([None, '-o', ".", "../../data_specification"])

@@ -339,4 +339,4 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../data_specification"])
+apidoc.main([None, '-o', ".", "../../data_specification", "../../data_specification/data_spec_sender"])

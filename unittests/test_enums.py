@@ -67,8 +67,7 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(Commands.MV.value, 0x60)
         self.assertEqual(Commands.GET_WR_PTR.value, 0x63)
         self.assertEqual(Commands.SET_WR_PTR.value, 0x64)
-        self.assertEqual(Commands.RESET_WR_PTR.value, 0x65)
-        self.assertEqual(Commands.ALIGN_WR_PTR.value, 0x66)
+        self.assertEqual(Commands.ALIGN_WR_PTR.value, 0x65)
 
         self.assertEqual(Commands.ARITH_OP.value, 0x67)
         self.assertEqual(Commands.LOGIC_OP.value, 0x68)

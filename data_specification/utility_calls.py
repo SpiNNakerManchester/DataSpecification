@@ -14,4 +14,3 @@ def get_region_base_address_offset(app_data_base_address, region):
     """
     return (app_data_base_address +
             constants.APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
-

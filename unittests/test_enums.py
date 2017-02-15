@@ -5,7 +5,8 @@ from data_specification.enums.commands import Commands
 from data_specification.enums.condition import Condition
 from data_specification.enums.data_type import DataType
 from data_specification.enums.logic_operation import LogicOperation
-from data_specification.enums.random_number_generator import RandomNumberGenerator
+from data_specification.enums.random_number_generator \
+    import RandomNumberGenerator
 
 
 class TestingEnums(unittest.TestCase):
@@ -138,7 +139,8 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(DataType.U3232.value, 10)
         self.assertEqual(DataType.U3232.size, 8)
         self.assertEqual(DataType.U3232.min, decimal.Decimal("0"))
-        self.assertEqual(DataType.U3232.max,
+        self.assertEqual(
+            DataType.U3232.max,
             decimal.Decimal("4294967295.99999999976716935634613037109375"))
 
         self.assertEqual(DataType.S87.value, 11)
@@ -154,7 +156,8 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(DataType.S3231.value, 13)
         self.assertEqual(DataType.S3231.size, 8)
         self.assertEqual(DataType.S3231.min, decimal.Decimal("-4294967296"))
-        self.assertEqual(DataType.S3231.max,
+        self.assertEqual(
+            DataType.S3231.max,
             decimal.Decimal("4294967295.9999999995343387126922607421875"))
 
         self.assertEqual(DataType.U08.value, 16)
@@ -170,13 +173,15 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(DataType.U032.value, 18)
         self.assertEqual(DataType.U032.size, 4)
         self.assertEqual(DataType.U032.min, decimal.Decimal("0"))
-        self.assertEqual(DataType.U032.max,
+        self.assertEqual(
+            DataType.U032.max,
             decimal.Decimal("0.99999999976716935634613037109375"))
 
         self.assertEqual(DataType.U064.value, 19)
         self.assertEqual(DataType.U064.size, 8)
         self.assertEqual(DataType.U064.min, decimal.Decimal("0"))
-        self.assertEqual(DataType.U064.max,
+        self.assertEqual(
+            DataType.U064.max,
             decimal.Decimal("0.999999999999999999945789891375724"
                             "7782996273599565029"))
 
@@ -188,19 +193,22 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(DataType.S015.value, 21)
         self.assertEqual(DataType.S015.size, 2)
         self.assertEqual(DataType.S015.min, decimal.Decimal("-1"))
-        self.assertEqual(DataType.S015.max,
+        self.assertEqual(
+            DataType.S015.max,
             decimal.Decimal("0.999969482421875"))
 
         self.assertEqual(DataType.S031.value, 22)
         self.assertEqual(DataType.S031.size, 4)
         self.assertEqual(DataType.S031.min, decimal.Decimal("-1"))
-        self.assertEqual(DataType.S031.max,
+        self.assertEqual(
+            DataType.S031.max,
             decimal.Decimal("0.99999999976716935634613037109375"))
 
         self.assertEqual(DataType.S063.value, 23)
         self.assertEqual(DataType.S063.size, 8)
         self.assertEqual(DataType.S063.min, decimal.Decimal("-1"))
-        self.assertEqual(DataType.S063.max,
+        self.assertEqual(
+            DataType.S063.max,
             decimal.Decimal("0.99999999999999999989157978275144"
                             "95565992547199130058"))
 

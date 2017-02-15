@@ -57,35 +57,30 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.spec_writer.read(4 * words)
 
     def test_new_data_spec_generator(self):
-        self.assertEqual(self.dsg.spec_writer, self.spec_writer,
-                         "DSG spec writer not initialized correctly")
-        self.assertEqual(self.dsg.report_writer, self.report_writer,
-                         "DSG report writer not initialized correctly")
-        self.assertEqual(self.dsg.instruction_counter, 0,
-                         "DSG instruction counter not initialized correctly")
-        self.assertEqual(self.dsg.mem_slot, constants.MAX_MEM_REGIONS * [0],
-                         "DSG memory slots not initialized correctly")
-        self.assertEqual(self.dsg.function, constants.MAX_CONSTRUCTORS * [0],
-                         "DSG constructor slots not initialized correctly")
+        self.assertEqual(self.dsg.spec_writer, self.spec_writer)  # DSG spec writer not initialized correctly
+        self.assertEqual(self.dsg.report_writer, self.report_writer)  # DSG report writer not initialized correctly
+        self.assertEqual(self.dsg.instruction_counter, 0)  # DSG instruction counter not initialized correctly
+        self.assertEqual(self.dsg.mem_slot, constants.MAX_MEM_REGIONS * [0])  # DSG memory slots not initialized correctly
+        self.assertEqual(self.dsg.function, constants.MAX_CONSTRUCTORS * [0])  # DSG constructor slots not initialized correctly
 
     def test_define_break(self):
         self.dsg.define_break()
 
         command = self.get_next_word()
 
-        self.assertEqual(command, 0x00000000, "BREAK wrong command word")
+        self.assertEqual(command, 0x00000000)  # BREAK wrong command word
 
         command = self.spec_writer.read(1)
-        self.assertEqual(command, "", "BREAK added more words")
+        self.assertEqual(command, "")  # BREAK added more words
 
     def test_no_operation(self):
         self.dsg.no_operation()
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x00100000, "NOP wrong command word")
+        self.assertEqual(command, 0x00100000)  # NOP wrong command word
 
         command = self.spec_writer.read(1)
-        self.assertEqual(command, "", "NOP added more words")
+        self.assertEqual(command, "")  # NOP added more words
 
     def test_reserve_memory_region(self):
         self.dsg.reserve_memory_region(1, 0x111)
@@ -101,38 +96,26 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.reserve_memory_region(1, 0x100)
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x10200001,
-                         "RESERVE wrong command word for memory region 1")
+        self.assertEqual(command, 0x10200001)  # RESERVE wrong command word for memory region 1
         command = self.get_next_word()
-        self.assertEqual(command, 0x111,
-                         "RESERVE size word wrong for memory region 1")
+        self.assertEqual(command, 0x111)  # RESERVE size word wrong for memory region 1
         command = self.get_next_word()
-        self.assertEqual(command, 0x10200002,
-                         "RESERVE wrong command word for memory region 2")
+        self.assertEqual(command, 0x10200002)  # RESERVE wrong command word for memory region 2
         command = self.get_next_word()
-        self.assertEqual(command, 0x1122,
-                         "RESERVE size word wrong for memory region 2")
+        self.assertEqual(command, 0x1122)  # RESERVE size word wrong for memory region 2
         command = self.get_next_word()
-        self.assertEqual(command, 0x10200083,
-                         "RESERVE wrong command word for memory region 3")
+        self.assertEqual(command, 0x10200083)  # RESERVE wrong command word for memory region 3
         command = self.get_next_word()
-        self.assertEqual(command, 0x1122,
-                         "RESERVE size word wrong for memory region 3")
+        self.assertEqual(command, 0x1122)  # RESERVE size word wrong for memory region 3
         command = self.get_next_word()
-        self.assertEqual(command, 0x10200004,
-                         "RESERVE wrong command word for memory region 4")
+        self.assertEqual(command, 0x10200004)  # RESERVE wrong command word for memory region 4
         command = self.get_next_word()
-        self.assertEqual(command, 0x3344,
-                         "RESERVE size word wrong for memory region 4")
+        self.assertEqual(command, 0x3344)  # RESERVE size word wrong for memory region 4
 
-        self.assertEqual(self.dsg.mem_slot[1], [0x111, None, False],
-                         "Memory region 0 DSG data wrong")
-        self.assertEqual(self.dsg.mem_slot[2], [0x1122, None, False],
-                         "Memory region 1 DSG data wrong")
-        self.assertEqual(self.dsg.mem_slot[3], [0x1122, None, True],
-                         "Memory region 2 DSG data wrong")
-        self.assertEqual(self.dsg.mem_slot[4], [0x3344, "test", False],
-                         "Memory region 3 DSG data wrong")
+        self.assertEqual(self.dsg.mem_slot[1], [0x111, None, False])  # Memory region 0 DSG data wrong
+        self.assertEqual(self.dsg.mem_slot[2], [0x1122, None, False])  # Memory region 1 DSG data wrong
+        self.assertEqual(self.dsg.mem_slot[3], [0x1122, None, True])  # Memory region 2 DSG data wrong
+        self.assertEqual(self.dsg.mem_slot[4], [0x3344, "test", False])  # Memory region 3 DSG data wrong
 
     def test_free_memory_region(self):
         self.dsg.reserve_memory_region(1, 0x111)
@@ -141,7 +124,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(2)
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x00300001, "FREE wrong command word")
+        self.assertEqual(command, 0x00300001)  # FREE wrong command word
 
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
             self.dsg.free_memory_region(-1)
@@ -151,8 +134,7 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.free_memory_region(2)
         with self.assertRaises(DataSpecificationNotAllocatedException):
             self.dsg.free_memory_region(1)
-        self.assertEqual(self.dsg.mem_slot[1], 0,
-                         "FREE not cleared mem slot entry")
+        self.assertEqual(self.dsg.mem_slot[1], 0)  # FREE not cleared mem slot entry
 
     def test_define_structure(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -172,55 +154,41 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01000000,
-                         "START_STRUCT wrong command word")
+        self.assertEqual(command, 0x01000000)  # START_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x11100000,
-                         "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x11100000)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x000000AB,
-                         "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x000000AB)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01200000,
-                         "END_STRUCT wrong command word")
+        self.assertEqual(command, 0x01200000)  # END_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01000001,
-                         "START_STRUCT wrong command word")
+        self.assertEqual(command, 0x01000001)  # START_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x11100000,
-                         "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x11100000)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x000000AB,
-                         "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x000000AB)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x11100002,
-                         "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x11100002)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x12345679,
-                         "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x12345679)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01100005,
-                         "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x01100005)  # STRUCT_ELEM wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x21100003,
-                         "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x21100003)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x89ABCDEF,
-                         "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x89ABCDEF)  # STRUCT_ELEM value wrong
         command = self.get_next_word()
-        self.assertEqual(command, 0x01234567,
-                         "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x01234567)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01200000,
-                         "END_STRUCT wrong command word")
+        self.assertEqual(command, 0x01200000)  # END_STRUCT wrong command word
 
     def test_call_arithmetic_operation(self):
         # Call addition signed and unsigned
@@ -300,74 +268,74 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         # Test addition signed and unsigned
         command = self.get_next_word()
-        self.assertEqual(command, 0x26742000, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x26742000)  # ARITH_OP wrong command word
 
         data = self.get_next_word()
-        self.assertEqual(data, 0x12, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x12)  # ARITH_OP wrong data word
         data = self.get_next_word()
-        self.assertEqual(data, 0x34, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x34)  # ARITH_OP wrong data word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x267C2000, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x267C2000)  # ARITH_OP wrong command word
 
         data = self.get_next_word()
-        self.assertEqual(data, 0x1234, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x1234)  # ARITH_OP wrong data word
         data = self.get_next_word()
-        self.assertEqual(data, 0x5678, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x5678)  # ARITH_OP wrong data word
 
         # Test subtraction signed and unsigned
         command = self.get_next_word()
-        self.assertEqual(command, 0x26743001, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x26743001)  # ARITH_OP wrong command word
 
         data = self.get_next_word()
-        self.assertEqual(data, 0x1234, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x1234)  # ARITH_OP wrong data word
         data = self.get_next_word()
-        self.assertEqual(data, 0x3456, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x3456)  # ARITH_OP wrong data word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x267C3001, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x267C3001)  # ARITH_OP wrong command word
 
         data = self.get_next_word()
-        self.assertEqual(data, 0x1234, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x1234)  # ARITH_OP wrong data word
         data = self.get_next_word()
-        self.assertEqual(data, 0x3456, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x3456)  # ARITH_OP wrong data word
 
         # Test multiplication signed and unsigned
         command = self.get_next_word()
-        self.assertEqual(command, 0x26743002, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x26743002)  # ARITH_OP wrong command word
 
         data = self.get_next_word()
-        self.assertEqual(data, 0x12345678, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x12345678)  # ARITH_OP wrong data word
         data = self.get_next_word()
-        self.assertEqual(data, 0x3456, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x3456)  # ARITH_OP wrong data word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x267C3002, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x267C3002)  # ARITH_OP wrong command word
 
         data = self.get_next_word()
-        self.assertEqual(data, 0x1234, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x1234)  # ARITH_OP wrong data word
         data = self.get_next_word()
-        self.assertEqual(data, 0x3456ABCD, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x3456ABCD)  # ARITH_OP wrong data word
 
         # Test register arguments
         command = self.get_next_word()
-        self.assertEqual(command, 0x16763100, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x16763100)  # ARITH_OP wrong command word
         data = self.get_next_word()
-        self.assertEqual(data, 0x3456, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x3456)  # ARITH_OP wrong data word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x16753020, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x16753020)  # ARITH_OP wrong command word
         data = self.get_next_word()
-        self.assertEqual(data, 0x1, "ARITH_OP wrong data word")
+        self.assertEqual(data, 0x1)  # ARITH_OP wrong data word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x06773340, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x06773340)  # ARITH_OP wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x06773342, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x06773342)  # ARITH_OP wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x067F3342, "ARITH_OP wrong command word")
+        self.assertEqual(command, 0x067F3342)  # ARITH_OP wrong command word
 
     def test_align_write_pointer(self):
         # Test DataSpecificationNoRegionSelectedException raise
@@ -405,24 +373,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(3)
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x06600001,
-                         "WRITE_POINTER wrong command word")
+        self.assertEqual(command, 0x06600001)  # WRITE_POINTER wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x0660001F,
-                         "WRITE_POINTER wrong command word")
+        self.assertEqual(command, 0x0660001F)  # WRITE_POINTER wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x06620500,
-                         "WRITE_POINTER wrong command word")
+        self.assertEqual(command, 0x06620500)  # WRITE_POINTER wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x06642001,
-                         "WRITE_POINTER wrong command word")
+        self.assertEqual(command, 0x06642001)  # WRITE_POINTER wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x06663500,
-                         "WRITE_POINTER wrong command word")
+        self.assertEqual(command, 0x06663500)  # WRITE_POINTER wrong command word
 
     def test_break_loop(self):
         with self.assertRaises(DataSpecificationInvalidCommandException):
@@ -435,7 +398,7 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         command = self.get_next_word()
 
-        self.assertEqual(command, 0x05200000, "BREAK_LOOP wrong command word")
+        self.assertEqual(command, 0x05200000)  # BREAK_LOOP wrong command word
 
     def test_call_function(self):
         self.dsg.start_function(0, [])
@@ -479,13 +442,13 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(16)
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x04000000, "CONSTRUCT wrong command word")
+        self.assertEqual(command, 0x04000000)  # CONSTRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x14000100, "CONSTRUCT wrong command word")
+        self.assertEqual(command, 0x14000100)  # CONSTRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x00002040, "CONSTRUCT command data wrong")
+        self.assertEqual(command, 0x00002040)  # CONSTRUCT command data wrong
 
     def test_start_function(self):
 
@@ -514,14 +477,12 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.end_function()
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x02000000,
-                         "START_CONSTRUCTOR wrong command word")
+        self.assertEqual(command, 0x02000000)  # START_CONSTRUCTOR wrong command word
 
         self.skip_words(2)
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x02000B03,
-                         "START_CONSTRUCTOR wrong command word")
+        self.assertEqual(command, 0x02000B03)  # START_CONSTRUCTOR wrong command word
 
         self.skip_words(2)
 
@@ -535,8 +496,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(1)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x02500000,
-                          "END_CONSTRUCTOR wrong command word")
+        self.assertEqual(command, 0x02500000)  # END_CONSTRUCTOR wrong command word
 
     def test_logical_and(self):
         self.dsg.logical_and(0, 0x12, 0x34, False, False)
@@ -565,40 +525,34 @@ class TestDataSpecGeneration(unittest.TestCase):
                                  False, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26840003,
-                          "Logical AND wrong command word")
+        self.assertEqual(command, 0x26840003)  # Logical AND wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "Logical AND wrong data word")
+        self.assertEqual(data, 0x00000012)  # Logical AND wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000034, "Logical AND wrong data word")
+        self.assertEqual(data, 0x00000034)  # Logical AND wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26841003,
-                          "Logical AND wrong command word")
+        self.assertEqual(command, 0x26841003)  # Logical AND wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "Logical AND wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical AND wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14, "Logical AND wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical AND wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16863203,
-                          "Logical AND wrong command word")
+        self.assertEqual(command, 0x16863203)  # Logical AND wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14, "Logical AND wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical AND wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16854053,
-                          "Logical AND wrong command word")
+        self.assertEqual(command, 0x16854053)  # Logical AND wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "Logical AND wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical AND wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06874353,
-                          "Logical AND wrong command word")
+        self.assertEqual(command, 0x06874353)  # Logical AND wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06873333,
-                          "Logical AND wrong command word")
+        self.assertEqual(command, 0x06873333)  # Logical AND wrong command word
 
     def test_logical_or(self):
         self.dsg.logical_or(0, 0x12, 0x34, False, False)
@@ -627,40 +581,34 @@ class TestDataSpecGeneration(unittest.TestCase):
                                 False, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26840002,
-                          "Logical OR wrong command word")
+        self.assertEqual(command, 0x26840002)  # Logical OR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "Logical OR wrong data word")
+        self.assertEqual(data, 0x00000012)  # Logical OR wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000034, "Logical OR wrong data word")
+        self.assertEqual(data, 0x00000034)  # Logical OR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26841002,
-                          "Logical OR wrong command word")
+        self.assertEqual(command, 0x26841002)  # Logical OR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "Logical OR wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical OR wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14, "Logical OR wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical OR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16863202,
-                          "Logical OR wrong command word")
+        self.assertEqual(command, 0x16863202)  # Logical OR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14, "Logical OR wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical OR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16854052,
-                          "Logical OR wrong command word")
+        self.assertEqual(command, 0x16854052)  # Logical OR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "Logical OR wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical OR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06874352,
-                          "Logical OR wrong command word")
+        self.assertEqual(command, 0x06874352)  # Logical OR wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06873332,
-                          "Logical OR wrong command word")
+        self.assertEqual(command, 0x06873332)  # Logical OR wrong command word
 
     def test_logical_xor(self):
         self.dsg.logical_xor(0, 0x12, 0x34, False, False)
@@ -689,40 +637,34 @@ class TestDataSpecGeneration(unittest.TestCase):
                                  False, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26840004,
-                          "Logical XOR wrong command word")
+        self.assertEqual(command, 0x26840004)  # Logical XOR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "Logical XOR wrong data word")
+        self.assertEqual(data, 0x00000012)  # Logical XOR wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000034, "Logical XOR wrong data word")
+        self.assertEqual(data, 0x00000034)  # Logical XOR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26841004,
-                          "Logical XOR wrong command word")
+        self.assertEqual(command, 0x26841004)  # Logical XOR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "Logical XOR wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical XOR wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14, "Logical XOR wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical XOR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16863204,
-                          "Logical XOR wrong command word")
+        self.assertEqual(command, 0x16863204)  # Logical XOR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14, "Logical XOR wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical XOR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16854054,
-                          "Logical XOR wrong command word")
+        self.assertEqual(command, 0x16854054)  # Logical XOR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "Logical XOR wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical XOR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06874354,
-                          "Logical XOR wrong command word")
+        self.assertEqual(command, 0x06874354)  # Logical XOR wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06873334,
-                          "Logical XOR wrong command word")
+        self.assertEqual(command, 0x06873334)  # Logical XOR wrong command word
 
     def test_logical_left_shift(self):
         self.dsg.logical_left_shift(0, 0x12, 0x34, False, False)
@@ -751,46 +693,34 @@ class TestDataSpecGeneration(unittest.TestCase):
                                         False, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26840000,
-                          "Logical LEFT_SHIFT wrong command word")
+        self.assertEqual(command, 0x26840000)  # Logical LEFT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012,
-                          "Logical LEFT_SHIFT wrong data word")
+        self.assertEqual(data, 0x00000012)  # Logical LEFT_SHIFT wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000034,
-                          "Logical LEFT_SHIFT wrong data word")
+        self.assertEqual(data, 0x00000034)  # Logical LEFT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26841000,
-                          "Logical LEFT_SHIFT wrong command word")
+        self.assertEqual(command, 0x26841000)  # Logical LEFT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678,
-                          "Logical LEFT_SHIFT wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical LEFT_SHIFT wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14,
-                          "Logical LEFT_SHIFT wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical LEFT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16863200,
-                          "Logical LEFT_SHIFT wrong command word")
+        self.assertEqual(command, 0x16863200)  # Logical LEFT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14,
-                          "Logical LEFT_SHIFT wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical LEFT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16854050,
-                          "Logical LEFT_SHIFT wrong command word")
+        self.assertEqual(command, 0x16854050)  # Logical LEFT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678,
-                          "Logical LEFT_SHIFT wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical LEFT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06874350,
-                          "Logical LEFT_SHIFT wrong command word")
+        self.assertEqual(command, 0x06874350)  # Logical LEFT_SHIFT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06873330,
-                          "Logical LEFT_SHIFT wrong command word")
+        self.assertEqual(command, 0x06873330)  # Logical LEFT_SHIFT wrong command word
 
     def test_logical_not(self):
         self.dsg.logical_not(1, 0x12345678, False)
@@ -807,15 +737,12 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.logical_not(1, constants.MAX_REGISTERS, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16841005,
-                          "Logical NOT wrong command word")
+        self.assertEqual(command, 0x16841005)  # Logical NOT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678,
-                          "Logical NOT wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical NOT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06863205,
-                          "Logical NOT wrong command word")
+        self.assertEqual(command, 0x06863205)  # Logical NOT wrong command word
 
     def test_logical_right_shift(self):
         self.dsg.logical_right_shift(0, 0x12, 0x34, False, False)
@@ -844,53 +771,40 @@ class TestDataSpecGeneration(unittest.TestCase):
                                          False, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26840001,
-                          "Logical RIGHT_SHIFT wrong command word")
+        self.assertEqual(command, 0x26840001)  # Logical RIGHT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012,
-                          "Logical RIGHT_SHIFT wrong data word")
+        self.assertEqual(data, 0x00000012)  # Logical RIGHT_SHIFT wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000034,
-                          "Logical RIGHT_SHIFT wrong data word")
+        self.assertEqual(data, 0x00000034)  # Logical RIGHT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26841001,
-                          "Logical RIGHT_SHIFT wrong command word")
+        self.assertEqual(command, 0x26841001)  # Logical RIGHT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678,
-                          "Logical RIGHT_SHIFT wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical RIGHT_SHIFT wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14,
-                          "Logical RIGHT_SHIFT wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical RIGHT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16863201,
-                          "Logical RIGHT_SHIFT wrong command word")
+        self.assertEqual(command, 0x16863201)  # Logical RIGHT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0xABCDEF14,
-                          "Logical RIGHT_SHIFT wrong data word")
+        self.assertEqual(data, 0xABCDEF14)  # Logical RIGHT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16854051,
-                          "Logical RIGHT_SHIFT wrong command word")
+        self.assertEqual(command, 0x16854051)  # Logical RIGHT_SHIFT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678,
-                          "Logical RIGHT_SHIFT wrong data word")
+        self.assertEqual(data, 0x12345678)  # Logical RIGHT_SHIFT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06874351,
-                          "Logical RIGHT_SHIFT wrong command word")
+        self.assertEqual(command, 0x06874351)  # Logical RIGHT_SHIFT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06873331,
-                          "Logical RIGHT_SHIFT wrong command word")
+        self.assertEqual(command, 0x06873331)  # Logical RIGHT_SHIFT wrong command word
 
     def test_comment(self):
         self.dsg.comment("test")
 
-        self.assertEquals(self.spec_writer.tell(), 0,
-                          "Comment generated data specification")
-        self.assertEquals(self.report_writer.getvalue(), "test\n")
+        self.assertEqual(self.spec_writer.tell(), 0)  # Comment generated data specification
+        self.assertEqual(self.report_writer.getvalue(), "test\n")
 
     def test_copy_structure(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -929,24 +843,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(11)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07002000,
-                          "COPY_STRUCT wrong command word")
+        self.assertEqual(command, 0x07002000)  # COPY_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07003100,
-                          "COPY_STRUCT wrong command word")
+        self.assertEqual(command, 0x07003100)  # COPY_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07024100,
-                          "COPY_STRUCT wrong command word")
+        self.assertEqual(command, 0x07024100)  # COPY_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07043000,
-                          "COPY_STRUCT wrong command word")
+        self.assertEqual(command, 0x07043000)  # COPY_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07064300,
-                          "COPY_STRUCT wrong command word")
+        self.assertEqual(command, 0x07064300)  # COPY_STRUCT wrong command word
 
     def test_copy_structure_parameter(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB),
@@ -1012,34 +921,34 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(13)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17101000, "COPY_PARAM wrong command word")
+        self.assertEqual(command, 0x17101000)  # COPY_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "COPY_PARAM wrong data word")
+        self.assertEqual(data, 0x00000000)  # COPY_PARAM wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17140000, "COPY_PARAM wrong command word")
+        self.assertEqual(command, 0x17140000)  # COPY_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "COPY_PARAM wrong data word")
+        self.assertEqual(data, 0x00000000)  # COPY_PARAM wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17101000, "COPY_PARAM wrong command word")
+        self.assertEqual(command, 0x17101000)  # COPY_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000201, "COPY_PARAM wrong data word")
+        self.assertEqual(data, 0x00000201)  # COPY_PARAM wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17142000, "COPY_PARAM wrong command word")
+        self.assertEqual(command, 0x17142000)  # COPY_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "COPY_PARAM wrong command word")
+        self.assertEqual(data, 0x00000001)  # COPY_PARAM wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17143100, "COPY_PARAM wrong command word")
+        self.assertEqual(command, 0x17143100)  # COPY_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "COPY_PARAM wrong command word")
+        self.assertEqual(data, 0x00000000)  # COPY_PARAM wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17142100, "COPY_PARAM wrong command word")
+        self.assertEqual(command, 0x17142100)  # COPY_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000002, "COPY_PARAM wrong command word")
+        self.assertEqual(data, 0x00000002)  # COPY_PARAM wrong command word
 
     def test_start_loop(self):
         self.dsg.start_loop(0, 1, 2)
@@ -1073,90 +982,90 @@ class TestDataSpecGeneration(unittest.TestCase):
                                 True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x35100000, "LOOP wrong command word")
+        self.assertEqual(command, 0x35100000)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "LOOP wrong start word")
+        self.assertEqual(data, 0x00000001)  # LOOP wrong start word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000002, "LOOP wrong end word")
+        self.assertEqual(data, 0x00000002)  # LOOP wrong end word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "LOOP wrong increment word")
+        self.assertEqual(data, 0x00000001)  # LOOP wrong increment word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x35100002, "LOOP wrong command word")
+        self.assertEqual(command, 0x35100002)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x02345678, "LOOP wrong start word")
+        self.assertEqual(data, 0x02345678)  # LOOP wrong start word
         data = self.get_next_word()
-        self.assertEquals(data, 0x0ABBCCDD, "LOOP wrong end word")
+        self.assertEqual(data, 0x0ABBCCDD)  # LOOP wrong end word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "LOOP wrong increment word")
+        self.assertEqual(data, 0x00000001)  # LOOP wrong increment word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x35100000, "LOOP wrong command word")
+        self.assertEqual(command, 0x35100000)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "LOOP wrong start word")
+        self.assertEqual(data, 0x00000001)  # LOOP wrong start word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000002, "LOOP wrong end word")
+        self.assertEqual(data, 0x00000002)  # LOOP wrong end word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000005, "LOOP wrong increment word")
+        self.assertEqual(data, 0x00000005)  # LOOP wrong increment word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x35100001, "LOOP wrong command word")
+        self.assertEqual(command, 0x35100001)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x02345678, "LOOP wrong start word")
+        self.assertEqual(data, 0x02345678)  # LOOP wrong start word
         data = self.get_next_word()
-        self.assertEquals(data, 0x0ABBCCDD, "LOOP wrong end word")
+        self.assertEqual(data, 0x0ABBCCDD)  # LOOP wrong end word
         data = self.get_next_word()
-        self.assertEquals(data, 0x01111111, "LOOP wrong increment word")
+        self.assertEqual(data, 0x01111111)  # LOOP wrong increment word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x35100000, "LOOP wrong command word")
+        self.assertEqual(command, 0x35100000)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x0000000A, "LOOP wrong start word")
+        self.assertEqual(data, 0x0000000A)  # LOOP wrong start word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000002, "LOOP wrong end word")
+        self.assertEqual(data, 0x00000002)  # LOOP wrong end word
         data = self.get_next_word()
-        self.assertEquals(data, 0xFFFFFFFF, "LOOP wrong increment word")
+        self.assertEqual(data, 0xFFFFFFFF)  # LOOP wrong increment word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x25142001, "LOOP wrong command word")
+        self.assertEqual(command, 0x25142001)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000003, "LOOP wrong end word")
+        self.assertEqual(data, 0x00000003)  # LOOP wrong end word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000004, "LOOP wrong increment word")
+        self.assertEqual(data, 0x00000004)  # LOOP wrong increment word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x25120301, "LOOP wrong command word")
+        self.assertEqual(command, 0x25120301)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000005, "LOOP wrong start word")
+        self.assertEqual(data, 0x00000005)  # LOOP wrong start word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000004, "LOOP wrong increment word")
+        self.assertEqual(data, 0x00000004)  # LOOP wrong increment word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x25110052, "LOOP wrong command word")
+        self.assertEqual(command, 0x25110052)  # LOOP wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000002, "LOOP wrong start word")
+        self.assertEqual(data, 0x00000002)  # LOOP wrong start word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000003, "LOOP wrong end word")
+        self.assertEqual(data, 0x00000003)  # LOOP wrong end word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x05172341, "LOOP wrong command word")
+        self.assertEqual(command, 0x05172341)  # LOOP wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x35100005, "LOOP wrong command word")
+        self.assertEqual(command, 0x35100005)  # LOOP wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x00000001, "LOOP wrong command word")
+        self.assertEqual(command, 0x00000001)  # LOOP wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x00000001, "LOOP wrong command word")
+        self.assertEqual(command, 0x00000001)  # LOOP wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x00000001, "LOOP wrong command word")
+        self.assertEqual(command, 0x00000001)  # LOOP wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x05171111, "LOOP wrong command word")
+        self.assertEqual(command, 0x05171111)  # LOOP wrong command word
 
     def test_end_loop(self):
         self.dsg.end_loop()
         command = self.get_next_word()
-        self.assertEquals(command, 0x05300000, "END_LOOP wrong command word")
+        self.assertEqual(command, 0x05300000)  # END_LOOP wrong command word
 
     def test_start_conditional(self):
         self.dsg.start_conditional(0, Condition.EQUAL, 0, False)
@@ -1184,48 +1093,48 @@ class TestDataSpecGeneration(unittest.TestCase):
                                        constants.MAX_REGISTERS, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x15520000, "IF wrong command word")
+        self.assertEqual(command, 0x15520000)  # IF wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "IF wrong data word")
+        self.assertEqual(data, 0x00000000)  # IF wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x15520200, "IF wrong command word")
+        self.assertEqual(command, 0x15520200)  # IF wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "IF wrong data word")
+        self.assertEqual(data, 0x00000001)  # IF wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x15520301, "IF wrong command word")
+        self.assertEqual(command, 0x15520301)  # IF wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "IF wrong data word")
+        self.assertEqual(data, 0x00000001)  # IF wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x15520402, "IF wrong command word")
+        self.assertEqual(command, 0x15520402)  # IF wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000003, "IF wrong data word")
+        self.assertEqual(data, 0x00000003)  # IF wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x15520403, "IF wrong command word")
+        self.assertEqual(command, 0x15520403)  # IF wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000003, "IF wrong data word")
+        self.assertEqual(data, 0x00000003)  # IF wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x15520404, "IF wrong command word")
+        self.assertEqual(command, 0x15520404)  # IF wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000005, "IF wrong data word")
+        self.assertEqual(data, 0x00000005)  # IF wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x15520205, "IF wrong command word")
+        self.assertEqual(command, 0x15520205)  # IF wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000005, "IF wrong data word")
+        self.assertEqual(data, 0x00000005)  # IF wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x05530010, "IF wrong command word")
+        self.assertEqual(command, 0x05530010)  # IF wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x05530433, "IF wrong command word")
+        self.assertEqual(command, 0x05530433)  # IF wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x05530255, "IF wrong command word")
+        self.assertEqual(command, 0x05530255)  # IF wrong command word
 
     def test_else_conditional(self):
         with self.assertRaises(DataSpecificationInvalidCommandException):
@@ -1245,11 +1154,11 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(1)
         command = self.get_next_word()
-        self.assertEquals(command, 0x05600000, "ELSE wrong command word")
+        self.assertEqual(command, 0x05600000)  # ELSE wrong command word
 
         self.skip_words(2)
         command = self.get_next_word()
-        self.assertEquals(command, 0x05600000, "ELSE wrong command word")
+        self.assertEqual(command, 0x05600000)  # ELSE wrong command word
 
     def test_end_conditional(self):
         with self.assertRaises(DataSpecificationInvalidCommandException):
@@ -1270,11 +1179,11 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(1)
         command = self.get_next_word()
-        self.assertEquals(command, 0x05700000, "END_IF wrong command word")
+        self.assertEqual(command, 0x05700000)  # END_IF wrong command word
 
         self.skip_words(3)
         command = self.get_next_word()
-        self.assertEquals(command, 0x05700000, "END_IF wrong command word")
+        self.assertEqual(command, 0x05700000)  # END_IF wrong command word
 
     def test_switch_write_focus(self):
         self.dsg.reserve_memory_region(0, 100)
@@ -1296,12 +1205,10 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(6)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x05000000,
-                          "SWITCH_FOCUS wrong command word")
+        self.assertEqual(command, 0x05000000)  # SWITCH_FOCUS wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x05000200,
-                          "SWITCH_FOCUS wrong command word")
+        self.assertEqual(command, 0x05000200)  # SWITCH_FOCUS wrong command word
 
     def test_save_write_pointer(self):
         with self.assertRaises(DataSpecificationNoRegionSelectedException):
@@ -1324,10 +1231,10 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(3)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06340000, "GET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x06340000)  # GET_WR_PTR wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06345000, "GET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x06345000)  # GET_WR_PTR wrong command word
 
     def test_print_struct(self):
 
@@ -1355,20 +1262,16 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(11)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08200000,
-                          "PRINT_STRUCT wrong command word")
+        self.assertEqual(command, 0x08200000)  # PRINT_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08200001,
-                          "PRINT_STRUCT wrong command word")
+        self.assertEqual(command, 0x08200001)  # PRINT_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08220200,
-                          "PRINT_STRUCT wrong command word")
+        self.assertEqual(command, 0x08220200)  # PRINT_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08220300,
-                          "PRINT_STRUCT wrong command word")
+        self.assertEqual(command, 0x08220300)  # PRINT_STRUCT wrong command word
 
     def test_print_text(self):
         self.dsg.print_text("t")
@@ -1381,35 +1284,35 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.print_text("test123456789")
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x18100000, "PRINT_TEXT wrong command word")
+        self.assertEqual(command, 0x18100000)  # PRINT_TEXT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000074, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x00000074)  # PRINT_TEXT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x18100001, "PRINT_TEXT wrong command word")
+        self.assertEqual(command, 0x18100001)  # PRINT_TEXT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00006574, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x00006574)  # PRINT_TEXT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x18100003, "PRINT_TEXT wrong command word")
+        self.assertEqual(command, 0x18100003)  # PRINT_TEXT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x74736574, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x74736574)  # PRINT_TEXT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x28100007, "PRINT_TEXT wrong command word")
+        self.assertEqual(command, 0x28100007)  # PRINT_TEXT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x74736574, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x74736574)  # PRINT_TEXT wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x34333231, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x34333231)  # PRINT_TEXT wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x3810000B, "PRINT_TEXT wrong command word")
+        self.assertEqual(command, 0x3810000B)  # PRINT_TEXT wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x74736574, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x74736574)  # PRINT_TEXT wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x34333231, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x34333231)  # PRINT_TEXT wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x38373635, "PRINT_TEXT wrong data word")
+        self.assertEqual(data, 0x38373635)  # PRINT_TEXT wrong data word
 
     def test_print_value(self):
         self.dsg.print_value(0x78, False, DataType.UINT8)
@@ -1431,33 +1334,33 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.print_value(0x12345678, False, DataType.INT16)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x18000000, "PRINT_VAL wrong command word")
+        self.assertEqual(command, 0x18000000)  # PRINT_VAL wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000078, "PRINT_VAL wrong data word")
+        self.assertEqual(data, 0x00000078)  # PRINT_VAL wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x18000002, "PRINT_VAL wrong command word")
+        self.assertEqual(command, 0x18000002)  # PRINT_VAL wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "PRINT_VAL wrong data word")
+        self.assertEqual(data, 0x12345678)  # PRINT_VAL wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08020002, "PRINT_VAL wrong command word")
+        self.assertEqual(command, 0x08020002)  # PRINT_VAL wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08020202, "PRINT_VAL wrong command word")
+        self.assertEqual(command, 0x08020202)  # PRINT_VAL wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08020206, "PRINT_VAL wrong command word")
+        self.assertEqual(command, 0x08020206)  # PRINT_VAL wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x08020207, "PRINT_VAL wrong command word")
+        self.assertEqual(command, 0x08020207)  # PRINT_VAL wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x28000003, "PRINT_VAL wrong command word")
+        self.assertEqual(command, 0x28000003)  # PRINT_VAL wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x89ABCDEF, "PRINT_VAL wrong data word")
+        self.assertEqual(data, 0x89ABCDEF)  # PRINT_VAL wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x01234567, "PRINT_VAL wrong data word")
+        self.assertEqual(data, 0x01234567)  # PRINT_VAL wrong data word
 
     def test_set_register_value(self):
         self.dsg.set_register_value(0, 0, False, DataType.UINT32)
@@ -1482,37 +1385,37 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.set_register_value(0, 0, True)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16040000, "MV wrong command word")
+        self.assertEqual(command, 0x16040000)  # MV wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "MV wrong data word")
+        self.assertEqual(data, 0x00000000)  # MV wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16041000, "MV wrong command word")
+        self.assertEqual(command, 0x16041000)  # MV wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "MV wrong data word")
+        self.assertEqual(data, 0x12345678)  # MV wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x26042000, "MV wrong command word")
+        self.assertEqual(command, 0x26042000)  # MV wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x89ABCDEF, "MV wrong data word")
+        self.assertEqual(data, 0x89ABCDEF)  # MV wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x01234567, "MV wrong data word")
+        self.assertEqual(data, 0x01234567)  # MV wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16042000, "MV wrong command word")
+        self.assertEqual(command, 0x16042000)  # MV wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x01234567, "MV wrong data word")
+        self.assertEqual(data, 0x01234567)  # MV wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16043000, "MV wrong command word")
+        self.assertEqual(command, 0x16043000)  # MV wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000067, "MV wrong data word")
+        self.assertEqual(data, 0x00000067)  # MV wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06063200, "MV wrong command word")
+        self.assertEqual(command, 0x06063200)  # MV wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06063200, "MV wrong command word")
+        self.assertEqual(command, 0x06063200)  # MV wrong command word
 
     def test_set_write_pointer(self):
         with self.assertRaises(DataSpecificationNoRegionSelectedException):
@@ -1539,30 +1442,30 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(3)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16400000, "SET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x16400000)  # SET_WR_PTR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "SET_WR_PTR wrong data word")
+        self.assertEqual(data, 0x12345678)  # SET_WR_PTR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16400000, "SET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x16400000)  # SET_WR_PTR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000078, "SET_WR_PTR wrong data word")
+        self.assertEqual(data, 0x00000078)  # SET_WR_PTR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16400001, "SET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x16400001)  # SET_WR_PTR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "SET_WR_PTR wrong data word")
+        self.assertEqual(data, 0x00000012)  # SET_WR_PTR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x16400001, "SET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x16400001)  # SET_WR_PTR wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0xFFFFFFF4, "SET_WR_PTR wrong data word")
+        self.assertEqual(data, 0xFFFFFFF4)  # SET_WR_PTR wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06420101, "SET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x06420101)  # SET_WR_PTR wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x06420300, "SET_WR_PTR wrong command word")
+        self.assertEqual(command, 0x06420300)  # SET_WR_PTR wrong command word
 
     def test_write_value(self):
         with self.assertRaises(DataSpecificationNoRegionSelectedException):
@@ -1596,60 +1499,60 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(3)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14202001, "WRITE wrong command word")
+        self.assertEqual(command, 0x14202001)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "WRITE wrong data word")
+        self.assertEqual(data, 0x00000000)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14202001, "WRITE wrong command word")
+        self.assertEqual(command, 0x14202001)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+        self.assertEqual(data, 0x00000012)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14202001, "WRITE wrong command word")
+        self.assertEqual(command, 0x14202001)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "WRITE wrong data word")
+        self.assertEqual(data, 0x12345678)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14202002, "WRITE wrong command word")
+        self.assertEqual(command, 0x14202002)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "WRITE wrong data word")
+        self.assertEqual(data, 0x12345678)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x1420200C, "WRITE wrong command word")
+        self.assertEqual(command, 0x1420200C)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+        self.assertEqual(data, 0x00000012)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x142000FF, "WRITE wrong command word")
+        self.assertEqual(command, 0x142000FF)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+        self.assertEqual(data, 0x00000012)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14201005, "WRITE wrong command word")
+        self.assertEqual(command, 0x14201005)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "WRITE wrong data word")
+        self.assertEqual(data, 0x00000012)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x24203005, "WRITE wrong command word")
+        self.assertEqual(command, 0x24203005)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x89ABCDEF, "WRITE wrong data word")
+        self.assertEqual(data, 0x89ABCDEF)  # WRITE wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x01234567, "WRITE wrong data word")
+        self.assertEqual(data, 0x01234567)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x24213050, "WRITE wrong command word")
+        self.assertEqual(command, 0x24213050)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x89ABCDEF, "WRITE wrong data word")
+        self.assertEqual(data, 0x89ABCDEF)  # WRITE wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x01234567, "WRITE wrong data word")
+        self.assertEqual(data, 0x01234567)  # WRITE wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x24213020, "WRITE wrong command word")
+        self.assertEqual(command, 0x24213020)  # WRITE wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000123, "WRITE wrong data word")
+        self.assertEqual(data, 0x00000123)  # WRITE wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "WRITE wrong data word")
+        self.assertEqual(data, 0x00000000)  # WRITE wrong data word
 
     def test_write_structure(self):
         with self.assertRaises(DataSpecificationNotAllocatedException):
@@ -1684,28 +1587,22 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(15)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04400100,
-                          "WRITE_STRUCT wrong command word")
+        self.assertEqual(command, 0x04400100)  # WRITE_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04400200,
-                          "WRITE_STRUCT wrong command word")
+        self.assertEqual(command, 0x04400200)  # WRITE_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04420500,
-                          "WRITE_STRUCT wrong command word")
+        self.assertEqual(command, 0x04420500)  # WRITE_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04420501,
-                          "WRITE_STRUCT wrong command word")
+        self.assertEqual(command, 0x04420501)  # WRITE_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04400F0A,
-                          "WRITE_STRUCT wrong command word")
+        self.assertEqual(command, 0x04400F0A)  # WRITE_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04420F0A,
-                          "WRITE_STRUCT wrong command word")
+        self.assertEqual(command, 0x04420F0A)  # WRITE_STRUCT wrong command word
 
     def test_write_array(self):
         with self.assertRaises(DataSpecificationNoRegionSelectedException):
@@ -1724,64 +1621,58 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(3)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14300001,
-                          "WRITE_ARRAY wrong command word")
+        self.assertEqual(command, 0x14300001)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "WRITE_ARRAY wrong command word")
+        self.assertEqual(data, 0x00000000)  # WRITE_ARRAY wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14300001,
-                          "WRITE_ARRAY wrong command word")
+        self.assertEqual(command, 0x14300001)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong command word")
+        self.assertEqual(data, 0x00000004)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x03020100, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x03020100)  # WRITE_ARRAY wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14300002,
-                          "WRITE_ARRAY wrong command word")
+        self.assertEqual(command, 0x14300002)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong command word")
+        self.assertEqual(data, 0x00000004)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00010000, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00010000)  # WRITE_ARRAY wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00030002, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00030002)  # WRITE_ARRAY wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14300004,
-                          "WRITE_ARRAY wrong command word")
+        self.assertEqual(command, 0x14300004)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong command word")
+        self.assertEqual(data, 0x00000004)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000000, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00000000)  # WRITE_ARRAY wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000001, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00000001)  # WRITE_ARRAY wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000002, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00000002)  # WRITE_ARRAY wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000003, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00000003)  # WRITE_ARRAY wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14300002,
-                          "WRITE_ARRAY wrong command word")
+        self.assertEqual(command, 0x14300002)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000005, "WRITE_ARRAY wrong command word")
+        self.assertEqual(data, 0x00000005)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00010000, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00010000)  # WRITE_ARRAY wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00030002, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00030002)  # WRITE_ARRAY wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00000004)  # WRITE_ARRAY wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x14300001,
-                          "WRITE_ARRAY wrong command word")
+        self.assertEqual(command, 0x14300001)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000005, "WRITE_ARRAY wrong command word")
+        self.assertEqual(data, 0x00000005)  # WRITE_ARRAY wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x03020100, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x03020100)  # WRITE_ARRAY wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000004, "WRITE_ARRAY wrong data word")
+        self.assertEqual(data, 0x00000004)  # WRITE_ARRAY wrong data word
 
     def test_set_structure_value(self):
         with self.assertRaises(DataSpecificationNotAllocatedException):
@@ -1824,48 +1715,41 @@ class TestDataSpecGeneration(unittest.TestCase):
                                          DataType.UINT32)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17200000,
-                          "WRITE_PARAM wrong command word")
+        self.assertEqual(command, 0x17200000)  # WRITE_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "WRITE_PARAM wrong data word")
+        self.assertEqual(data, 0x00000012)  # WRITE_PARAM wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17201002,
-                          "WRITE_PARAM wrong command word")
+        self.assertEqual(command, 0x17201002)  # WRITE_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00001234, "WRITE_PARAM wrong data word")
+        self.assertEqual(data, 0x00001234)  # WRITE_PARAM wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x17201001,
-                          "WRITE_PARAM wrong command word")
+        self.assertEqual(command, 0x17201001)  # WRITE_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "WRITE_PARAM wrong data word")
+        self.assertEqual(data, 0x12345678)  # WRITE_PARAM wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x2720A001,
-                          "WRITE_PARAM wrong command word")
+        self.assertEqual(command, 0x2720A001)  # WRITE_PARAM wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x89ABCDEF, "WRITE_PARAM wrong data word")
+        self.assertEqual(data, 0x89ABCDEF)  # WRITE_PARAM wrong data word
         data = self.get_next_word()
-        self.assertEquals(data, 0x01234567, "WRITE_PARAM wrong data word")
+        self.assertEqual(data, 0x01234567)  # WRITE_PARAM wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07221200,
-                          "WRITE_PARAM wrong command word")
+        self.assertEqual(command, 0x07221200)  # WRITE_PARAM wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07221301,
-                          "WRITE_PARAM wrong command word")
+        self.assertEqual(command, 0x07221301)  # WRITE_PARAM wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x0722A501,
-                          "WRITE_PARAM wrong command word")
+        self.assertEqual(command, 0x0722A501)  # WRITE_PARAM wrong command word
 
     def test_end_specification(self):
         self.dsg.end_specification(False)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x0FF00000, "END_SPEC wrong command word")
+        self.assertEqual(command, 0x0FF00000)  # END_SPEC wrong command word
 
         self.dsg.end_specification()
         with self.assertRaises(ValueError):
@@ -1895,16 +1779,14 @@ class TestDataSpecGeneration(unittest.TestCase):
                 2, RandomNumberGenerator.MERSENNE_TWISTER, -1)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x10500000,
-                          "DECLARE_RNG wrong command word")
+        self.assertEqual(command, 0x10500000)  # DECLARE_RNG wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "DECLARE_RNG wrong data word")
+        self.assertEqual(data, 0x12345678)  # DECLARE_RNG wrong data word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x10503000,
-                          "DECLARE_RNG wrong command word")
+        self.assertEqual(command, 0x10503000)  # DECLARE_RNG wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x00000012, "DECLARE_RNG wrong data word")
+        self.assertEqual(data, 0x00000012)  # DECLARE_RNG wrong data word
 
     def test_declare_uniform_random_distribution(self):
         self.dsg.declare_random_number_generator(
@@ -1941,74 +1823,69 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.declare_uniform_random_distribution(0, 1, 3, 100, 200)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x10503000,
-                          "DECLARE_RNG wrong command word")
+        self.assertEqual(command, 0x10503000)  # DECLARE_RNG wrong command word
         data = self.get_next_word()
-        self.assertEquals(data, 0x12345678, "DECLARE_RNG wrong data word")
+        self.assertEqual(data, 0x12345678)  # DECLARE_RNG wrong data word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01000000,
-                         "START_STRUCT wrong command word")
+        self.assertEqual(command, 0x01000000)  # START_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x11100002)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x00000000, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x00000000)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x11100002)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x00000003, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x00000003)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x1110000C)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x00050000, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x00050000)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x1110000C)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x00320000, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x00320000)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01200000, "END_STRUCT wrong command word")
-
-
-        command = self.get_next_word()
-        self.assertEquals(command, 0x00600000,
-                          "DECLARE_RANDOM_DIST wrong command word")
+        self.assertEqual(command, 0x01200000)  # END_STRUCT wrong command word
 
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01000004,
-                         "START_STRUCT wrong command word")
+        self.assertEqual(command, 0x00600000)  # DECLARE_RANDOM_DIST wrong command word
+
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
-        command = self.get_next_word()
-        self.assertEqual(command, 0x00000000, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x01000004)  # START_STRUCT wrong command word
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x11100002, "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x11100002)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x00000003, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x00000000)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x11100002)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x00190000, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x00000003)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x1110000C, "STRUCT_ELEM wrong command word")
+        self.assertEqual(command, 0x1110000C)  # STRUCT_ELEM wrong command word
         command = self.get_next_word()
-        self.assertEqual(command, 0x00640000, "STRUCT_ELEM value wrong")
+        self.assertEqual(command, 0x00190000)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEqual(command, 0x01200000, "END_STRUCT wrong command word")
+        self.assertEqual(command, 0x1110000C)  # STRUCT_ELEM wrong command word
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00640000)  # STRUCT_ELEM value wrong
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x00600204,
-                          "DECLARE_RANDOM_DIST wrong command word")
+        self.assertEqual(command, 0x01200000)  # END_STRUCT wrong command word
+
+        command = self.get_next_word()
+        self.assertEqual(command, 0x00600204)  # DECLARE_RANDOM_DIST wrong command word
 
     def test_call_random_distribution(self):
         self.dsg.declare_random_number_generator(
@@ -2033,11 +1910,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(13)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x00741003,
-                          "GET_RANDOM_NUMBER wrong command word")
+        self.assertEqual(command, 0x00741003)  # GET_RANDOM_NUMBER wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x00745003,
-                          "GET_RANDOM_NUMBER wrong command word")
+        self.assertEqual(command, 0x00745003)  # GET_RANDOM_NUMBER wrong command word
 
     def test_get_structure_value(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -2082,20 +1957,20 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(14)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07340000, "READ_PARAM wrong command word")
+        self.assertEqual(command, 0x07340000)  # READ_PARAM wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x07343000, "READ_PARAM wrong command word")
+        self.assertEqual(command, 0x07343000)  # READ_PARAM wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x07342011, "READ_PARAM wrong command word")
+        self.assertEqual(command, 0x07342011)  # READ_PARAM wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x07343031, "READ_PARAM wrong command word")
+        self.assertEqual(command, 0x07343031)  # READ_PARAM wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x07363301, "READ_PARAM wrong command word")
+        self.assertEqual(command, 0x07363301)  # READ_PARAM wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x07363000, "READ_PARAM wrong command word")
+        self.assertEqual(command, 0x07363000)  # READ_PARAM wrong command word
         command = self.get_next_word()
-        self.assertEquals(command, 0x07363500, "READ_PARAM wrong command word")
+        self.assertEqual(command, 0x07363500)  # READ_PARAM wrong command word
 
     def test_read_value(self):
         self.dsg.read_value(0, DataType.UINT32)
@@ -2112,25 +1987,25 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.read_value(constants.MAX_REGISTERS, DataType.UINT32)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04140004, "READ wrong command word")
+        self.assertEqual(command, 0x04140004)  # READ wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04141008, "READ wrong command word")
+        self.assertEqual(command, 0x04141008)  # READ wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04142004, "READ wrong command word")
+        self.assertEqual(command, 0x04142004)  # READ wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04143008, "READ wrong command word")
+        self.assertEqual(command, 0x04143008)  # READ wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04144001, "READ wrong command word")
+        self.assertEqual(command, 0x04144001)  # READ wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04145001, "READ wrong command word")
+        self.assertEqual(command, 0x04145001)  # READ wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04146002, "READ wrong command word")
+        self.assertEqual(command, 0x04146002)  # READ wrong command word
 
     def test_write_value_from_register(self):
         with self.assertRaises(DataSpecificationNoRegionSelectedException):
@@ -2167,34 +2042,34 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(3)
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04222001, "WRITE wrong command word")
+        self.assertEqual(command, 0x04222001)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04222301, "WRITE wrong command word")
+        self.assertEqual(command, 0x04222301)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04222302, "WRITE wrong command word")
+        self.assertEqual(command, 0x04222302)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x0422030A, "WRITE wrong command word")
+        self.assertEqual(command, 0x0422030A)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x042223FF, "WRITE wrong command word")
+        self.assertEqual(command, 0x042223FF)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04232000, "WRITE wrong command word")
+        self.assertEqual(command, 0x04232000)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x042322A0, "WRITE wrong command word")
+        self.assertEqual(command, 0x042322A0)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04232530, "WRITE wrong command word")
+        self.assertEqual(command, 0x04232530)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04230530, "WRITE wrong command word")
+        self.assertEqual(command, 0x04230530)  # WRITE wrong command word
 
         command = self.get_next_word()
-        self.assertEquals(command, 0x04231530, "WRITE wrong command word")
+        self.assertEqual(command, 0x04231530)  # WRITE wrong command word
 
 
 if __name__ == '__main__':

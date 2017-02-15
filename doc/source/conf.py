@@ -35,6 +35,14 @@ extensions = [
     'sphinx.ext.autosummary',
 ]
 
+intersphinx_mapping = {'spinn_machine':
+                       ('http://spinnmachine.readthedocs.org/en/latest/',
+                           None),
+                       'spinn_storage_handlers':
+                           ('http://spinnmachine.readthedocs.io/en/latest/',
+                            None)
+                       }
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 

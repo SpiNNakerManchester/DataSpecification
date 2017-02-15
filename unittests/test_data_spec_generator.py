@@ -60,16 +60,16 @@ class TestDataSpecGeneration(unittest.TestCase):
         # DSG spec writer not initialized correctly
         # DSG report writer not initialized correctly
         self.assertEqual(self.dsg.spec_writer, self.spec_writer)
-      
+
         # DSG instruction counter not initialized correctly
         self.assertEqual(self.dsg.report_writer, self.report_writer)
-      
+
         # DSG memory slots not initialized correctly
         self.assertEqual(self.dsg.instruction_counter, 0)
-      
+
         # DSG constructor slots not initialized correctly
         self.assertEqual(self.dsg.mem_slot, constants.MAX_MEM_REGIONS * [0])
-      
+
         # BREAK wrong command word
         self.assertEqual(self.dsg.function, constants.MAX_CONSTRUCTORS * [0])
 
@@ -78,14 +78,11 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         command = self.get_next_word()
 
-      
-
         # BREAK added more words
-
         self.assertEqual(command, 0x00000000)
 
         command = self.spec_writer.read(1)
-      
+
         # NOP wrong command word
         self.assertEqual(command, "")
 
@@ -93,12 +90,12 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.no_operation()
 
         command = self.get_next_word()
-      
+
         # NOP added more words
         self.assertEqual(command, 0x00100000)
 
         command = self.spec_writer.read(1)
-      
+
         # RESERVE wrong command word for memory region 1
         self.assertEqual(command, "")
 
@@ -115,51 +112,28 @@ class TestDataSpecGeneration(unittest.TestCase):
         with self.assertRaises(DataSpecificationRegionInUseException):
             self.dsg.reserve_memory_region(1, 0x100)
 
-        command = self.get_next_word()
-      
         # RESERVE size word wrong for memory region 1
-        self.assertEqual(command, 0x10200041)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x10200041)
         # RESERVE wrong command word for memory region 2
-        self.assertEqual(command, 0x111)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x111)
         # RESERVE size word wrong for memory region 2
-        self.assertEqual(command, 0x10200042)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x10200042)
         # RESERVE wrong command word for memory region 3
-        self.assertEqual(command, 0x1122)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x1122)
         # RESERVE size word wrong for memory region 3
-        self.assertEqual(command, 0x102000C3)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x102000C3)
         # RESERVE wrong command word for memory region 4
-        self.assertEqual(command, 0x1122)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x1122)
         # RESERVE size word wrong for memory region 4
-        self.assertEqual(command, 0x10200044)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x10200044)
         # Memory region 0 DSG data wrong
-        self.assertEqual(command, 0x3344)
-
-      
-
+        self.assertEqual(self.get_next_word(), 0x3344)
         # Memory region 1 DSG data wrong
-
         self.assertEqual(self.dsg.mem_slot[1], [0x111, None, False])
-      
         # Memory region 2 DSG data wrong
         self.assertEqual(self.dsg.mem_slot[2], [0x1122, None, False])
-      
         # Memory region 3 DSG data wrong
         self.assertEqual(self.dsg.mem_slot[3], [0x1122, None, True])
-      
         # FREE wrong command word
         self.assertEqual(self.dsg.mem_slot[4], [0x3344, "test", False])
 
@@ -170,7 +144,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(2)
 
         command = self.get_next_word()
-      
+
         # FREE not cleared mem slot entry
         self.assertEqual(command, 0x00300001)
 
@@ -182,7 +156,7 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.free_memory_region(2)
         with self.assertRaises(DataSpecificationNotAllocatedException):
             self.dsg.free_memory_region(1)
-      
+
         # START_STRUCT wrong command word
         self.assertEqual(self.dsg.mem_slot[1], 0)
 
@@ -203,73 +177,37 @@ class TestDataSpecGeneration(unittest.TestCase):
         with self.assertRaises(DataSpecificationStructureInUseException):
             self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
 
-        command = self.get_next_word()
-      
         # STRUCT_ELEM wrong command word
-        self.assertEqual(command, 0x01000000)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x01000000)
         # STRUCT_ELEM value wrong
-        self.assertEqual(command, 0x11100000)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x11100000)
         # END_STRUCT wrong command word
-        self.assertEqual(command, 0x000000AB)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x000000AB)
         # START_STRUCT wrong command word
-        self.assertEqual(command, 0x01200000)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x01200000)
         # STRUCT_ELEM wrong command word
-        self.assertEqual(command, 0x01000001)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x01000001)
         # STRUCT_ELEM value wrong
-        self.assertEqual(command, 0x11100000)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x11100000)
         # STRUCT_ELEM wrong command word
-        self.assertEqual(command, 0x000000AB)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x000000AB)
         # STRUCT_ELEM value wrong
-        self.assertEqual(command, 0x11100002)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x11100002)
         # STRUCT_ELEM wrong command word
-        self.assertEqual(command, 0x12345679)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x12345679)
         # STRUCT_ELEM wrong command word
-        self.assertEqual(command, 0x01100005)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x01100005)
         # STRUCT_ELEM value wrong
-        self.assertEqual(command, 0x21100003)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x21100003)
         # STRUCT_ELEM value wrong
-        self.assertEqual(command, 0x89ABCDEF)
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x89ABCDEF)
         # END_STRUCT wrong command word
-        self.assertEqual(command, 0x01234567)
-
-        command = self.get_next_word()
-      
+        self.assertEqual(self.get_next_word(), 0x01234567)
         # Call addition signed and unsigned
-        self.assertEqual(command, 0x01200000)
+        self.assertEqual(self.get_next_word(), 0x01200000)
 
     def test_call_arithmetic_operation(self):
-      
+
         self.dsg.call_arithmetic_operation(2, 0x12, ArithmeticOperation.ADD,
                                            0x34, False, False, False)
         self.dsg.call_arithmetic_operation(2, 0x1234, ArithmeticOperation.ADD,
@@ -351,87 +289,84 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(command, 0x26742000)
 
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(data, 0x12)
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong command word
         self.assertEqual(data, 0x34)
 
         command = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(command, 0x267C2000)
 
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(data, 0x1234)
         data = self.get_next_word()
-      
+
         # Test subtraction signed and unsigned
         self.assertEqual(data, 0x5678)
 
-      
         command = self.get_next_word()
         # ARITH_OP wrong command word
         # ARITH_OP wrong data word
         self.assertEqual(command, 0x26743001)
 
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(data, 0x1234)
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong command word
         self.assertEqual(data, 0x3456)
 
         command = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(command, 0x267C3001)
 
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(data, 0x1234)
         data = self.get_next_word()
-      
+
         # Test multiplication signed and unsigned
         self.assertEqual(data, 0x3456)
 
-      
         command = self.get_next_word()
         # ARITH_OP wrong command word
         # ARITH_OP wrong data word
         self.assertEqual(command, 0x26743002)
 
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(data, 0x12345678)
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong command word
         self.assertEqual(data, 0x3456)
 
         command = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(command, 0x267C3002)
 
         data = self.get_next_word()
-      
+
         # ARITH_OP wrong data word
         self.assertEqual(data, 0x1234)
         data = self.get_next_word()
-      
+
         # Test register arguments
         self.assertEqual(data, 0x3456ABCD)
 
-      
         command = self.get_next_word()
         # ARITH_OP wrong command word
         # ARITH_OP wrong data word

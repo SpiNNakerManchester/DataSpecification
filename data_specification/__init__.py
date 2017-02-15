@@ -39,12 +39,14 @@ Use Cases
 
 There are a number of use-cases of this library:
 
-  * :py:class:`~data_specification.data_specification_generator.DataSpecificationGenerator`
+  * :py:class:`~data_specification.data_specification_generator.\
+      DataSpecificationGenerator`
     is used to create a compressed memory image which can be expanded later,
     to reduce the amount of data that needs to be transferred over a slow
     connection.
 
-  * :py:class:`~data_specification.data_specification_executor.DataSpecificationExecutor`
+  * :py:class:`~data_specification.data_specification_executor.\
+      DataSpecificationExecutor`
     is used to execute a previously generated specification at the receiving
     end of a slow connection.
 """

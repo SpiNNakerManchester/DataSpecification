@@ -28,7 +28,7 @@ class MyTestCase(unittest.TestCase):
             self.assertEqual(file_handle.read(1), '')
         self.reader = FileDataReader(myfile)
         stream = self.reader.read(1)
-        self.assertEqual(stream[0], 1)
+        self.assertEqual(stream[0], '\x01')
 
     def test_readinto_one_byte(self):
         myfile = self._file('txt_one_byte')
@@ -59,11 +59,11 @@ class MyTestCase(unittest.TestCase):
         self.reader = FileDataReader(myfile)
         stream = self.reader.read(5)
         self.assertEqual(len(stream), 5)
-        self.assertEqual(stream[0], 1)
-        self.assertEqual(stream[1], 2)
-        self.assertEqual(stream[2], 3)
-        self.assertEqual(stream[3], 4)
-        self.assertEqual(stream[4], 5)
+        self.assertEqual(stream[0], '\x01')
+        self.assertEqual(stream[1], '\x02')
+        self.assertEqual(stream[2], '\x03')
+        self.assertEqual(stream[3], '\x04')
+        self.assertEqual(stream[4], '\x05')
 
     def test_read_from_empty_file(self):
         myfile = self._file('txt_empty')
@@ -90,8 +90,8 @@ class MyTestCase(unittest.TestCase):
         self.reader = FileDataReader(myfile)
         stream = self.reader.read(2)
         self.assertEqual(len(stream), 2)
-        self.assertEqual(stream[0], 240)
-        self.assertEqual(stream[1], 164)
+        self.assertEqual(stream[0], '\xf0')
+        self.assertEqual(stream[1], '\xA4')
 
 
 if __name__ == '__main__':

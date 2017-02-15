@@ -1031,7 +1031,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, -1, 1, 0, False)
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
-            self.dsg.copy_structure_parameter(0,constants.MAX_STRUCT_ELEMENTS,
+            self.dsg.copy_structure_parameter(0, constants.MAX_STRUCT_ELEMENTS,
                                               1, 0, False)
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, 1, -1, False)
@@ -2238,11 +2238,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         # END_STRUCT wrong command word
         self.assertEqual(command, 0x01200000)
 
-
         command = self.get_next_word()
         # DECLARE_RANDOM_DIST wrong command word
         self.assertEqual(command, 0x00600000)
-
 
         command = self.get_next_word()
         # START_STRUCT wrong command word

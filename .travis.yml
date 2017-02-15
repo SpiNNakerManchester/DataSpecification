@@ -8,7 +8,7 @@ virtualenv:
   system_site_packages: true
 
 install:
-  - curl --silent --location https://raw.github.com/clear-code/cutter/master/data/travis/setup.sh | sh
+  ###- curl --silent --location https://raw.github.com/clear-code/cutter/master/data/travis/setup.sh | sh
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
   - pip install -r requirements-test.txt
   - python ./setup.py install
@@ -16,7 +16,7 @@ install:
 script: 
   - py.test unittests
   - py.test integration_tests
-  - make -C c_data_specification all check
+  ###- make -C c_data_specification all check
   # Code quality check
   - flake8 data_specification
   - flake8 unittests integration_tests

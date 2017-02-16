@@ -7,7 +7,6 @@ from data_specification.data_spec_sender.commands import Commands
 class DataSpecificationSenderFunctions(object):
 
     __slots__ = [
-        
         # the reader for the spec file
         "spec_reader",
 

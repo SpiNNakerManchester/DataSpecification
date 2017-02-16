@@ -14,7 +14,6 @@ class SpecSender(object):
     """
 
     __slots__ = [
-        
         # The transceiver used to communicate with the board.
         "transceiver",
 

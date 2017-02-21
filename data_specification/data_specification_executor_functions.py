@@ -74,9 +74,9 @@ class DataSpecificationExecutorFunctions(object):
         :type mem_writer:\
             :py:class:`data_specification.abstract_data_writer.\
             AbstractDataWriter`
-        :param space_available: Memory space available for the data to be\
+        :param memory_space: Memory space available for the data to be\
             generated
-        :type space_available: int
+        :type memory_space: int
         """
         self.spec_reader = spec_reader
         self.mem_writer = mem_writer
@@ -529,7 +529,7 @@ class DataSpecificationExecutorFunctions(object):
             The selected memory region needs to be already allocated
 
         :param data: the value to be written in the data memory region
-        :type value: str
+        :type data: str
         :param command: the command which is being executed
         :type command: str
         :return: No value returned

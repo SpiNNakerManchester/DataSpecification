@@ -243,8 +243,8 @@ class DataSpecificationRandomNumberDistributionInUseException(
 
     def __init__(self, rng_id):
         """
-        :param id: The id of the random number distribution
-        :type id: int
+        :param rng_id: The id of the random number distribution
+        :type rng_id: int
         """
         Exception.__init__(
             self,

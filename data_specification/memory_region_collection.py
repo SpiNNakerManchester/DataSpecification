@@ -76,4 +76,3 @@ class MemoryRegionCollection(object):
                         not self._regions[region].unfilled):
                     needs_writing = True
         return needs_writing
-

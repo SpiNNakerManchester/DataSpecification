@@ -1,7 +1,9 @@
 """
-This file is no longer actively used.
-
-It has been kept purely as it is used for its relative path.
-Easiest way to find sibling file data_specification_executor.aplx
+    Empty file to help FrontEndCommonMachineExecuteDataSpecification find
+    data_specification/data_spec_sender/data_specification_executor.aplx
 
 """
+
+
+def location():
+    return __file__

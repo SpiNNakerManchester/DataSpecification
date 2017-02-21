@@ -54,4 +54,6 @@ enabled, run:
 
 Documentation
 =============
-[Python code documentation](http://dataspecification.readthedocs.io)
+[DataSpecification python documentation](http://dataspecification.readthedocs.io)
+
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)

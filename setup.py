@@ -13,6 +13,6 @@ setup(
               'data_specification.data_spec_sender',
               'data_specification.enums'],
     package_data={'data_specification.data_spec_sender': ['*.aplx']},
-    install_requires=['SpiNNStorageHandlers >= 3.0.0, < 4.0.0',
+    install_requires=['SpiNNMachine >= 3.0.0, < 4.0.0',
                       'six', 'enum34']
 )

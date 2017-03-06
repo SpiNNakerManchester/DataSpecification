@@ -16,8 +16,8 @@ _lock_condition = threading.Condition()
 
 
 def get_region_base_address_offset(app_data_base_address, region):
-    """
-    helper method which finds the address of the of a given region for the dsg
+    """ Find the address of the of a given region for the dsg
+
     :param app_data_base_address: base address for the core
     :param region: the region id we're looking for
     :return:
@@ -30,29 +30,26 @@ def get_data_spec_and_file_writer_filename(
         processor_chip_x, processor_chip_y, processor_id,
         hostname, report_directory, write_text_specs,
         application_run_time_report_folder):
-    """ encapsulates the creation of the dsg writer and the file paths
+    """ Encapsulates the creation of the dsg writer and the file paths
 
-    :param processor_chip_x: the chip coord for x axis to which this dsg is
-    being written for
+    :param processor_chip_x: x-coordinate of the chip
     :type processor_chip_x: int
-    :param processor_chip_y: the chip coord for y axis to which the dsg is
-     being written for
-     :type processor_chip_y: int
-    :param processor_id: the processor id for which this dsg is being written
-    for
-    :type processor_id: int (0, 16)
+    :param processor_chip_y: y-coordinate of the chip
+    :type processor_chip_y: int
+    :param processor_id: The processor ID
+    :type processor_id: int
     :param hostname: The hostname of the spinnaker machine
     :type hostname: str
     :param report_directory: the directory for the reports folder
     :type report_directory: file path
-    :param write_text_specs: bool that dicates if the text version of the dsg
-    should be generated
+    :param write_text_specs:\
+        True if a textual version of the specification should be written
     :type write_text_specs: bool
-    :param application_run_time_report_folder: the folder where to store the
-    dsg data
-    :type application_run_time_report_folder: file path
+    :param application_run_time_report_folder:\
+        The folder to contain the resulting specification files
+    :type application_run_time_report_folder: str
     :return: the filename of the data writer and the data specification object
-    :rtype file_path, DataSpecificationGenerator
+    :rtype str, DataSpecificationGenerator
     """
 
     binary_file_path = get_data_spec_file_path(
@@ -64,8 +61,8 @@ def get_data_spec_and_file_writer_filename(
     # writer to send down to dsg
     report_writer = None
     if write_text_specs:
-        new_report_directory = os.path.join(report_directory,
-                                            "data_spec_text_files")
+        new_report_directory = os.path.join(
+            report_directory, "data_spec_text_files")
 
         # uses locks to stop multiple instances of this writing the same
         # folder at the same time (os breaks down and throws exception
@@ -90,20 +87,18 @@ def get_data_spec_and_file_writer_filename(
 def get_data_spec_file_path(processor_chip_x, processor_chip_y,
                             processor_id, hostname,
                             application_run_time_folder):
-    """ gets the filepath for storing the dsg data
-    :param processor_chip_x: the chip coord for x axis to which this dsg is
-    being written for
+    """ Gets the file path for storing the dsg data
+
+    :param processor_chip_x: The x-coordinate of a chip
     :type processor_chip_x: int
-    :param processor_chip_y: the chip coord for y axis to which the dsg is
-     being written for
+    :param processor_chip_y: The y-coordinate of a chip
      :type processor_chip_y: int
-    :param processor_id: the processor id for which this dsg is being written
-    for
-    :type processor_id: int (0, 16)
+    :param processor_id: The processor ID
+    :type processor_id: int
     :param hostname: The hostname of the spinnaker machine
     :type hostname: str
     :return: the filename of the data writer and the data specification object
-    :rtype file_path, DataSpecificationGenerator
+    :rtype str, DataSpecificationGenerator
     """
 
     if application_run_time_folder == "TEMP":

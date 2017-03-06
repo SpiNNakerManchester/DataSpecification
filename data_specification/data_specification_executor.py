@@ -139,6 +139,23 @@ class DataSpecificationExecutor(object):
                 else:
                     self.space_written -= memory_region.allocated_size
 
+    def write_dse_region_output_file(self, region_to_write):
+        """ supports writing a specific region instead of the entire DSE file
+
+        :param region_to_write: the dsg region to write
+        :return: None
+        """
+        memory_region = self.dsef.mem_regions[region_to_write]
+        if memory_region is not None:
+            if ((memory_region.unfilled and
+                    self.dsef.mem_regions.needs_to_write_region(
+                        region_to_write)) or
+                    not memory_region.unfilled):
+                self.mem_writer.write(memory_region.region_data[
+                                      :memory_region.max_write_pointer])
+            else:
+                self.space_written -= memory_region.allocated_size
+
     def write_header(self):
         """ writes the DSE header which resides at the top of any cores\
             memory region when used with a DSE.
@@ -157,8 +174,7 @@ class DataSpecificationExecutor(object):
                     self.mem_writer.tell(), constants.APPDATA_MAGIC_NUM))
         self.mem_writer.write(magic_number_encoded)
 
-        version_encoded = bytearray(
-            struct.pack("<I", constants.DSE_VERSION))
+        version_encoded = bytearray(struct.pack("<I", constants.DSE_VERSION))
         if self.report_writer is not None:
             self.report_writer.write(
                 "{} File structure version: {} \n".format(

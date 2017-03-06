@@ -143,7 +143,7 @@ class DataSpecificationExecutor(object):
         """ supports writing a specific region instead of the entire DSE file
 
         :param region_to_write: the dsg region to write
-        :return: None
+        :rtype: None
         """
         memory_region = self.dsef.mem_regions[region_to_write]
         if memory_region is not None:

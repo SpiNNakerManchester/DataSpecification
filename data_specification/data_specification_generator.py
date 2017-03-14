@@ -3118,12 +3118,6 @@ class DataSpecificationGenerator(object):
             structure_id_is_register is False and structure_id is the id of a \
             structure that has not been allocated
         """
-
-#        :raise data_specification.exceptions.DataUndefinedWriterException:
-#            If the binary specification file writer has not been\
-#            initialised
-#        :raise spinn_storage_handlers.exceptions.DataWriteException:
-#            If a write to external storage fails
         struct_register = 0
         bit_field = 0
         cmd_string = "PRINT_STRUCT"

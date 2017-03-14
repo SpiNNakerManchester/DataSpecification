@@ -161,7 +161,6 @@ class DataSpecificationExecutor(object):
             memory region when used with a DSE.
 
         :rtype: None
-        :raise None: this method does not raise any known exceptions
         """
         if self.report_writer is not None:
             self.report_writer.write("header structure \n")
@@ -191,7 +190,6 @@ class DataSpecificationExecutor(object):
                     this application data file is going to be stored
         :type start_address: unsigned int
         :rtype: None
-        :raise None: this method does not raise any known exceptions
         """
         if self.report_writer is not None:
             self.report_writer.write("Pointer table \n")

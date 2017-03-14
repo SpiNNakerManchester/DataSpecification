@@ -109,7 +109,6 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None:
         """
         self._cmd_size = (cmd >> 28) & 0x3
         self.opcode = (cmd >> 20) & 0xFF
@@ -144,7 +143,6 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None:
         """
         pass
 
@@ -275,7 +273,6 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None:
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", str(length_encoded))[0]
@@ -439,7 +436,7 @@ class DataSpecificationExecutorFunctions(object):
 
         :param cmd: the command which triggered the function call
         :type cmd: int
-        :return: constants. END_SPEC_EXECUTOR
+        :return: constants.END_SPEC_EXECUTOR
         :rtype: int
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If command END_SPEC != -1

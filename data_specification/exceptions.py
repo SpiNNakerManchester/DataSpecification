@@ -479,7 +479,7 @@ class DataSpecificationTablePointerOutOfMemory(DataSpecificationException):
 
         :param memory_available: on-chip memory available
         :type memory_available: int
-        :param memory_required: on-chip memory required to complete the
+        :param memory_required: on-chip memory required to complete the\
             execution of the specification file
         :type memory_required: int
         """

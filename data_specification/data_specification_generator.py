@@ -1207,7 +1207,7 @@ class DataSpecificationGenerator(object):
         """ Insert command to write a value one or more times to the current\
             write pointer, causing the write pointer to move on by the number\
             of bytes required to represent the data type. The data is passed\
-            as a parameter to this function\
+            as a parameter to this function
 
         :param data: the data to write as a float.
         :type data: float
@@ -1215,7 +1215,7 @@ class DataSpecificationGenerator(object):
             * If repeats_is_register is False, this parameter identifies the\
               number of times to repeat the data, between 1 and 255\
               (default 1)
-            * If repeats_is_register is True, this parameter identifies the
+            * If repeats_is_register is True, this parameter identifies the\
               register that contains the number of repeats.
         :type repeats: int
         :param repeats_is_register: Indicates if the parameter repeats\
@@ -2368,7 +2368,8 @@ class DataSpecificationGenerator(object):
     def logical_and(self, register_id, operand_1, operand_2,
                     operand_1_is_register=False, operand_2_is_register=False):
         """ Insert command to perform a logical AND operation, using the\
-            _call_logic_operation.
+             _call_logic_operation.
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:
@@ -2404,6 +2405,7 @@ class DataSpecificationGenerator(object):
                    operand_1_is_register=False, operand_2_is_register=False):
         """ Insert command to perform a logical OR operation, using the\
             _call_logic_operation.
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:
@@ -2440,6 +2442,7 @@ class DataSpecificationGenerator(object):
                            operand_2_is_register=False):
         """ Insert command to perform a logical left shift operation, using\
             the _call_logic_operation.
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:
@@ -2477,6 +2480,7 @@ class DataSpecificationGenerator(object):
                             operand_2_is_register=False):
         """ Insert command to perform a logical right shift operation, using\
             the _call_logic_operation.
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:
@@ -2513,6 +2517,7 @@ class DataSpecificationGenerator(object):
                     operand_1_is_register=False, operand_2_is_register=False):
         """ Insert command to perform a logical xor operation, using
             the _call_logic_operation.
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand_1:
@@ -2548,6 +2553,7 @@ class DataSpecificationGenerator(object):
     def logical_not(self, register_id, operand, operand_is_register=False):
         """ Insert command to perform a logical xor operation, using
             the _call_logic_operation.
+
         :param register_id: The id of the register to store the result in
         :type register_id: int
         :param operand:
@@ -3101,15 +3107,13 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been\
             initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
-            If a write to external storage fails
         :raise data_specification.exceptions.\
             DataSpecificationParameterOutOfBoundsException:\
             * If structure_id_is_register is True and structure_id is\
               not a valid register id
             * If structure_id_is_register is False and structure_id is\
               not a valid structure id
-        :raise data_specification.exceptions.
+        :raise data_specification.exceptions.\
             DataSpecificationNotAllocatedException: If \
             structure_id_is_register is False and structure_id is the id of a \
             structure that has not been allocated
@@ -3195,7 +3199,7 @@ class DataSpecificationGenerator(object):
             the text version to the text file.\
             Setting the optional parameter 'indent' to True causes subsequent\
             commands to be indented by two spaces relative to this one.\
-            Similarly, setting 'outdent' to True, reverses this spacing.\
+            Similarly, setting 'outdent' to True, reverses this spacing.
 
         :param cmd_word_list: list of binary words to be added to the binary\
             data specification file

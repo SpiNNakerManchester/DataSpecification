@@ -29,7 +29,6 @@ class MemoryRegion(object):
 
         :param memory_pointer: the write pointer position
         :param unfilled: if the region needs to be filled when written
-        :return: None
         :rtype: None
         :raise None: this method does not raise any known exception
         """

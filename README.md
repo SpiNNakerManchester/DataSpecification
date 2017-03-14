@@ -51,3 +51,9 @@ To install as a development version in a `virtualenv`, with the `virutalenv`
 enabled, run:
 
     python setup.py develop
+
+Documentation
+=============
+[DataSpecification python documentation](http://dataspecification.readthedocs.io)
+
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)

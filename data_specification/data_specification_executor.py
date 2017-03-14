@@ -116,7 +116,7 @@ class DataSpecificationExecutor(object):
         :param start_address: starting address of the region of memory where\
                     this application data file is going to be stored
         :type start_address: unsigned int
-        :return:
+        :rtype: None:
         """
         # write the data file header
         self.write_header()
@@ -143,7 +143,7 @@ class DataSpecificationExecutor(object):
         """ supports writing a specific region instead of the entire DSE file
 
         :param region_to_write: the dsg region to write
-        :return: None
+        :rtype: None
         """
         memory_region = self.dsef.mem_regions[region_to_write]
         if memory_region is not None:
@@ -160,8 +160,7 @@ class DataSpecificationExecutor(object):
         """ writes the DSE header which resides at the top of any cores\
             memory region when used with a DSE.
 
-        :return: None
-        :raise None: this method does not raise any known exceptions
+        :rtype: None
         """
         if self.report_writer is not None:
             self.report_writer.write("header structure \n")
@@ -190,8 +189,7 @@ class DataSpecificationExecutor(object):
         :param start_address: starting address of the region of memory where\
                     this application data file is going to be stored
         :type start_address: unsigned int
-        :return: None
-        :raise None: this method does not raise any known exceptions
+        :rtype: None
         """
         if self.report_writer is not None:
             self.report_writer.write("Pointer table \n")

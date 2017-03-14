@@ -214,7 +214,7 @@ class DataSpecificationFunctionInUse(DataSpecificationException):
     def __init__(self, function_id):
         """
         :param function_id: The id of the function
-        :type function_id:int
+        :type function_id: int
         """
         Exception.__init__(
             self, "Function {0:d} is already defined".format(function_id))
@@ -228,7 +228,7 @@ class DataSpecificationRNGInUseException(DataSpecificationException):
     def __init__(self, rng_id):
         """
         :param rng_id: The id of the rng
-        :type rng_id:int
+        :type rng_id: int
         """
         Exception.__init__(
             self,
@@ -243,8 +243,8 @@ class DataSpecificationRandomNumberDistributionInUseException(
 
     def __init__(self, rng_id):
         """
-        :param id: The id of the random number distribution
-        :type id: int
+        :param rng_id: The id of the random number distribution
+        :type rng_id: int
         """
         Exception.__init__(
             self,
@@ -479,8 +479,8 @@ class DataSpecificationTablePointerOutOfMemory(DataSpecificationException):
 
         :param memory_available: on-chip memory available
         :type memory_available: int
-        :param memory_required: on-chip memory required to complete the
-        execution of the specification file
+        :param memory_required: on-chip memory required to complete the\
+            execution of the specification file
         :type memory_required: int
         """
         Exception.__init__(

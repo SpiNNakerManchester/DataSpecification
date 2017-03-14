@@ -20,7 +20,6 @@ def get_region_base_address_offset(app_data_base_address, region):
 
     :param app_data_base_address: base address for the core
     :param region: the region id we're looking for
-    :return:
     """
     return (app_data_base_address +
             constants.APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
@@ -49,7 +48,7 @@ def get_data_spec_and_file_writer_filename(
         The folder to contain the resulting specification files
     :type application_run_time_report_folder: str
     :return: the filename of the data writer and the data specification object
-    :rtype str, DataSpecificationGenerator
+    :rtype: str, DataSpecificationGenerator
     """
 
     binary_file_path = get_data_spec_file_path(
@@ -98,7 +97,7 @@ def get_data_spec_file_path(processor_chip_x, processor_chip_y,
     :param hostname: The hostname of the spinnaker machine
     :type hostname: str
     :return: the filename of the data writer and the data specification object
-    :rtype str, DataSpecificationGenerator
+    :rtype: str, DataSpecificationGenerator
     """
 
     if application_run_time_folder == "TEMP":

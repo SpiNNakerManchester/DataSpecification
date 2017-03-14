@@ -74,9 +74,9 @@ class DataSpecificationExecutorFunctions(object):
         :type mem_writer:\
             :py:class:`data_specification.abstract_data_writer.\
             AbstractDataWriter`
-        :param space_available: Memory space available for the data to be\
+        :param memory_space: Memory space available for the data to be\
             generated
-        :type space_available: int
+        :type memory_space: int
         """
         self.spec_reader = spec_reader
         self.mem_writer = mem_writer
@@ -109,7 +109,6 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None
         """
         self._cmd_size = (cmd >> 28) & 0x3
         self.opcode = (cmd >> 20) & 0xFF
@@ -144,7 +143,6 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None
         """
         pass
 
@@ -159,7 +157,7 @@ class DataSpecificationExecutorFunctions(object):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If there is an error in the command syntax
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\ If the requested \
+            DataSpecificationParameterOutOfBoundsException: If the requested \
             size of the region is beyond the available memory space
         """
         self.__unpack_cmd__(cmd)
@@ -275,7 +273,6 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise None
         """
         length_encoded = self.spec_reader.read(4)
         length = struct.unpack("<I", str(length_encoded))[0]
@@ -441,7 +438,8 @@ class DataSpecificationExecutorFunctions(object):
         :type cmd: int
         :return: constants.END_SPEC_EXECUTOR
         :rtype: int
-        :raise None
+        :raise data_specification.exceptions.DataSpecificationSyntaxError:\
+            If command END_SPEC != -1
         """
         read_data = self.spec_reader.read(4)
         value = struct.unpack("<i", str(read_data))[0]
@@ -528,7 +526,7 @@ class DataSpecificationExecutorFunctions(object):
             The selected memory region needs to be already allocated
 
         :param data: the value to be written in the data memory region
-        :type value: bytestring
+        :type data: str
         :param command: the command which is being executed
         :type command: str
         :return: No value returned

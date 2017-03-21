@@ -7,12 +7,19 @@ matrix:
 virtualenv:
   system_site_packages: true
 
+cache: pip
+
+before_install:
+  - pip install --upgrade pip setuptools wheel
+  # SpiNNakerManchester internal dependencies; development mode
+  - pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install -q --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+
 install:
   ###- curl --silent --location https://raw.github.com/clear-code/cutter/master/data/travis/setup.sh | sh
-  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
   - pip install -r requirements-test.txt
   - pip install -r doc/doc_requirements.txt
   - python ./setup.py install
+
 script:
   - py.test unittests
   - py.test integration_tests

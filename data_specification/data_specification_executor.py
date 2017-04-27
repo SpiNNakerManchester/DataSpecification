@@ -134,10 +134,12 @@ class DataSpecificationExecutor(object):
                 if ((memory_region.unfilled and
                     self.dsef.mem_regions.needs_to_write_region(i)) or
                         not memory_region.unfilled):
+                    max_pointer = memory_region.max_write_pointer
+                    if not memory_region.shrink:
+                        max_pointer = memory_region.allocated_size
                     self.mem_writer.write(memory_region.region_data[
-                        :memory_region.max_write_pointer])
-                else:
-                    self.space_written -= memory_region.allocated_size
+                        :max_pointer])
+                self.space_written -= memory_region.allocated_size
 
     def write_dse_region_output_file(self, region_to_write):
         """ supports writing a specific region instead of the entire DSE file
@@ -151,10 +153,12 @@ class DataSpecificationExecutor(object):
                     self.dsef.mem_regions.needs_to_write_region(
                         region_to_write)) or
                     not memory_region.unfilled):
-                self.mem_writer.write(memory_region.region_data[
-                                      :memory_region.max_write_pointer])
-            else:
-                self.space_written -= memory_region.allocated_size
+                max_pointer = memory_region.max_write_pointer
+                if not memory_region.shrink:
+                    max_pointer = memory_region.allocated_size
+                self.mem_writer.write(memory_region.region_data[:max_pointer])
+
+            self.space_written -= memory_region.allocated_size
 
     def write_header(self):
         """ writes the DSE header which resides at the top of any cores\

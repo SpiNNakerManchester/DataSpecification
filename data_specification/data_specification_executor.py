@@ -135,7 +135,7 @@ class DataSpecificationExecutor(object):
                     self.dsef.mem_regions.needs_to_write_region(i)) or
                         not memory_region.unfilled):
                     max_pointer = memory_region.max_write_pointer
-                    if not memory_region.shrink:
+                    if not memory_region.shrink or memory_region.unfilled:
                         max_pointer = memory_region.allocated_size
                     self.mem_writer.write(memory_region.region_data[
                         :max_pointer])
@@ -154,7 +154,7 @@ class DataSpecificationExecutor(object):
                         region_to_write)) or
                     not memory_region.unfilled):
                 max_pointer = memory_region.max_write_pointer
-                if not memory_region.shrink:
+                if not memory_region.shrink or memory_region.unfilled:
                     max_pointer = memory_region.allocated_size
                 self.mem_writer.write(memory_region.region_data[:max_pointer])
 

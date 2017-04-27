@@ -211,15 +211,10 @@ class DataSpecificationExecutor(object):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
                 pointer_table[i] = next_free_offset + start_address
-                if memory_region.unfilled or not memory_region.shrink:
-                    region_size = memory_region.allocated_size
-                else:
-                    region_size = memory_region.max_write_pointer
+                self.space_used += memory_region.allocated_size
+                next_free_offset += memory_region.allocated_size
             else:
                 pointer_table[i] = 0
-                region_size = 0
-            self.space_used += region_size
-            next_free_offset += region_size
 
         index = 0
         for i in pointer_table:

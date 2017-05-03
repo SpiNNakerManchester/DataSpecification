@@ -6,7 +6,7 @@ from collections import defaultdict
 import os
 
 __version__ = None
-exec(open("spinnman/_version.py").read())
+exec(open("data_specification/_version.py").read())
 assert __version__
 
 # Build a list of all project modules, as well as supplementary files

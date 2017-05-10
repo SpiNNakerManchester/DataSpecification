@@ -14,6 +14,7 @@ before_install:
   # SpiNNakerManchester internal dependencies; development mode
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNUtils.git@master
   - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNMachine.git@master
+  - pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@$TRAVIS_BRANCH || pip install --upgrade git+git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git@master
 
 install:
   ###- curl --silent --location https://raw.github.com/clear-code/cutter/master/data/travis/setup.sh | sh

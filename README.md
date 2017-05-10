@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/SpiNNakerManchester/DataSpecification.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/DataSpecification)
+
 This package provides utilities for specifying binary data algorithmically,
 and executing the specifications to produce the data.
 
@@ -56,4 +58,6 @@ Documentation
 =============
 [DataSpecification python documentation](http://dataspecification.readthedocs.io)
 
-[Combined python documentation](http://spinnakermanchester.readthedocs.io)
+[Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
+
+[Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)

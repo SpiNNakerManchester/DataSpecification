@@ -50,3 +50,7 @@ There are a number of use-cases of this library:
     is used to execute a previously generated specification at the receiving
     end of a slow connection.
 """
+from data_specification._version import __version__  # NOQA
+from data_specification._version import __version_name__  # NOQA
+from data_specification._version import __version_month__  # NOQA
+from data_specification._version import __version_year__  # NOQA

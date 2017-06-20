@@ -5,6 +5,10 @@ except ImportError:
 from collections import defaultdict
 import os
 
+__version__ = None
+exec(open("data_specification/_version.py").read())
+assert __version__
+
 # Build a list of all project modules, as well as supplementary files
 main_package = "data_specification"
 data_extensions = {".aplx", ".xml"}
@@ -27,13 +31,13 @@ for dirname, dirnames, filenames in os.walk(main_package_dir):
 
 setup(
     name="SpiNNaker_DataSpecification",
-    version="3.0.0",
+    version=__version__,
     description="Specification of Memory Images",
     url="https://github.com/SpiNNakerManchester/DataSpecification",
     license="GNU GPLv3.0",
     packages=packages,
     package_data=package_data,
-    install_requires=['SpiNNUtilities >= 3.0.0, < 4.0.0',
-                      'SpiNNMachine >= 3.0.0, < 4.0.0',
+    install_requires=['SpiNNStorageHandlers >= 1!4.0.0a5, < 1!5.0.0',
+                      'SpiNNMachine >= 1!4.0.0a5, < 1!5.0.0',
                       'six', 'enum34']
 )

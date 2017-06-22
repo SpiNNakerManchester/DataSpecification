@@ -54,3 +54,14 @@ from data_specification._version import __version__  # NOQA
 from data_specification._version import __version_name__  # NOQA
 from data_specification._version import __version_month__  # NOQA
 from data_specification._version import __version_year__  # NOQA
+
+from .data_specification_executor import DataSpecificationExecutor
+from .data_specification_executor_functions \
+    import DataSpecificationExecutorFunctions
+from .data_specification_generator import DataSpecificationGenerator
+from .memory_region import MemoryRegion
+from .memory_region_collection import MemoryRegionCollection
+
+__all__ = ["DataSpecificationExecutor", "DataSpecificationExecutorFunctions",
+           "DataSpecificationGenerator", "MemoryRegion",
+           "MemoryRegionCollection"]

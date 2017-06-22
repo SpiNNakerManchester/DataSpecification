@@ -20,14 +20,9 @@ from data_specification.exceptions \
     DataSpecificationRandomNumberDistributionInUseException,\
     DataSpecificationRNGInUseException
 
-from data_specification.enums.data_type import DataType
-from data_specification.enums.condition import Condition
-from data_specification.enums.random_number_generator \
-    import RandomNumberGenerator
-from data_specification.enums.arithemetic_operation import ArithmeticOperation
-from data_specification.enums.logic_operation import LogicOperation
-from data_specification.data_specification_generator \
-    import DataSpecificationGenerator
+from data_specification.enums import DataType, Condition, RandomNumberGenerator
+from data_specification.enums import ArithmeticOperation, LogicOperation
+from data_specification import DataSpecificationGenerator
 
 
 class TestDataSpecGeneration(unittest.TestCase):

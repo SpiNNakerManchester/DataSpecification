@@ -47,7 +47,7 @@ def get_data_spec_and_file_writer_filename(
         The folder to contain the resulting specification files
     :type application_run_time_report_folder: str
     :return: the filename of the data writer and the data specification object
-    :rtype: str, DataSpecificationGenerator
+    :rtype: str, data_specification.DataSpecificationGenerator
     """
 
     binary_file_path = get_data_spec_file_path(

@@ -3,9 +3,8 @@ utility calls for interpreting bits of the dsg
 """
 
 from data_specification import constants
-from data_specification.data_specification_generator import \
-    DataSpecificationGenerator
-from spinn_storage_handlers.file_data_writer import FileDataWriter
+from .data_specification_generator import DataSpecificationGenerator
+from spinn_storage_handlers import FileDataWriter
 
 import tempfile
 import os

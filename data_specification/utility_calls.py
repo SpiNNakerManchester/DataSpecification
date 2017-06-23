@@ -2,7 +2,7 @@
 utility calls for interpreting bits of the dsg
 """
 
-from data_specification import constants
+from .constants import APP_PTR_TABLE_HEADER_BYTE_SIZE
 from .data_specification_generator import DataSpecificationGenerator
 from spinn_storage_handlers import FileDataWriter
 
@@ -21,7 +21,7 @@ def get_region_base_address_offset(app_data_base_address, region):
     :param region: the region id we're looking for
     """
     return (app_data_base_address +
-            constants.APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
+            APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
 
 
 def get_data_spec_and_file_writer_filename(
@@ -96,7 +96,7 @@ def get_data_spec_file_path(processor_chip_x, processor_chip_y,
     :param hostname: The hostname of the spinnaker machine
     :type hostname: str
     :return: the filename of the data writer and the data specification object
-    :rtype: str, DataSpecificationGenerator
+    :rtype: str, data_specification.DataSpecificationGenerator
     """
 
     if application_run_time_folder == "TEMP":

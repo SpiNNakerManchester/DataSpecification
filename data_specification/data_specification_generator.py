@@ -193,23 +193,19 @@ class DataSpecificationGenerator(object):
                 sdram.SDRAM.DEFAULT_SDRAM_BYTES,
                 Commands.RESERVE.name)  # @UndefinedVariable
 
-        unfilled = False
-        if empty:
-            unfilled = True
-
-        self.mem_slot[region] = [size, label, unfilled]
+        self.mem_slot[region] = [size, label, empty]
 
         cmd_word = ((constants.LEN2 << 28) |
                     (Commands.RESERVE.value << 20) |  # @UndefinedVariable
                     (constants.NO_REGS << 16) |
-                    (unfilled << 7) |
-                    (shrink << 6) |
+                    (int(bool(empty)) << 7) |
+                    (int(bool(shrink)) << 6) |
                     region)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_size = bytearray(struct.pack("<I", size))
         cmd_word_list = encoded_cmd_word + encoded_size
 
-        if unfilled:
+        if empty:
             unfilled_string = "UNFILLED"
         else:
             unfilled_string = ""

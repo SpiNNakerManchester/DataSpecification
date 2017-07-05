@@ -2,7 +2,7 @@ import unittest
 import inspect
 import os.path
 
-from spinn_storage_handlers.file_data_writer import FileDataWriter
+from spinn_storage_handlers import FileDataWriter
 
 
 class TestFileDataWriter(unittest.TestCase):

@@ -1,5 +1,5 @@
 import unittest
-from data_specification.memory_region_collection import MemoryRegionCollection
+from data_specification import MemoryRegionCollection
 
 
 class MyTestCase(unittest.TestCase):

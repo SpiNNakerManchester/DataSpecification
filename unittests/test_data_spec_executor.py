@@ -1,6 +1,5 @@
 import unittest
-from data_specification.data_specification_executor \
-    import DataSpecificationExecutor
+from data_specification import DataSpecificationExecutor
 
 
 class MyTestCase(unittest.TestCase):

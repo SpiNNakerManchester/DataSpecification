@@ -1,12 +1,11 @@
 import unittest
 import decimal
-from data_specification.enums.arithemetic_operation import ArithmeticOperation
-from data_specification.enums.commands import Commands
-from data_specification.enums.condition import Condition
-from data_specification.enums.data_type import DataType
-from data_specification.enums.logic_operation import LogicOperation
-from data_specification.enums.random_number_generator \
-    import RandomNumberGenerator
+from data_specification.enums import ArithmeticOperation
+from data_specification.enums import Commands
+from data_specification.enums import Condition
+from data_specification.enums import DataType
+from data_specification.enums import LogicOperation
+from data_specification.enums import RandomNumberGenerator
 
 
 class TestingEnums(unittest.TestCase):

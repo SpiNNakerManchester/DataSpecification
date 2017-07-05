@@ -3,13 +3,9 @@ import struct
 import decimal
 
 from data_specification import constants, exceptions
-from data_specification.enums.data_type import DataType
-from data_specification.enums.random_number_generator\
-    import RandomNumberGenerator
-from data_specification.enums.commands import Commands
-from data_specification.enums.condition import Condition
-from data_specification.enums.logic_operation import LogicOperation
-from data_specification.enums.arithemetic_operation import ArithmeticOperation
+from data_specification.enums import \
+    DataType, RandomNumberGenerator, Commands, Condition, LogicOperation, \
+    ArithmeticOperation
 from spinn_machine import sdram
 import numpy
 
@@ -1440,7 +1436,7 @@ class DataSpecificationGenerator(object):
         :param array_values: An array of words to be written
         :type array_values: list of unsigned int
         :param data_type: Type of data contained in the array
-        :type data_type: data_specification.enums.data_type.DataType
+        :type data_type: data_specification.enums.DataType
         :return: The position of the write pointer within the current region,\
             in bytes from the start of the region
         :rtype: int

@@ -3,7 +3,7 @@ import struct
 from data_specification.data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as Dsef
 from data_specification import exceptions, constants
-from data_specification.enums import commands
+from data_specification.enums import Commands
 
 import traceback
 
@@ -92,8 +92,7 @@ class DataSpecificationExecutor(object):
 
             try:
                 # noinspection PyArgumentList
-                return_value = \
-                    commands.Commands(opcode).exec_function(self.dsef, cmd)
+                return_value = Commands(opcode).exec_function(self.dsef, cmd)
             except ValueError:
                 traceback.print_exc()
                 raise exceptions.DataSpecificationException(

@@ -1,5 +1,3 @@
-__author__ = 'stokesa6'
-
 from .arithemetic_operation import ArithmeticOperation
 from .commands import Commands
 from .condition import Condition

@@ -139,8 +139,7 @@ class DataSpecificationGenerator(object):
         self.write_command_to_files(cmd_word_list, cmd_string)
         return
 
-    def reserve_memory_region(
-            self, region, size, label=None, empty=False, shrink=True):
+    def reserve_memory_region(self, region, size, label=None, empty=False):
         """ Insert command to reserve a memory region
 
         :param region: The number of the region to reserve, from 0 to 15
@@ -151,8 +150,6 @@ class DataSpecificationGenerator(object):
         :type label: str
         :param empty: Specifies if the region will be left empty
         :type empty: bool
-        :param shrink: Specifies if the region will be compressed
-        :type shrink: bool
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException:\
@@ -189,19 +186,23 @@ class DataSpecificationGenerator(object):
                 sdram.SDRAM.DEFAULT_SDRAM_BYTES,
                 Commands.RESERVE.name)  # @UndefinedVariable
 
-        self.mem_slot[region] = [size, label, empty]
+        unfilled = False
+        if empty:
+            unfilled = True
+
+        self.mem_slot[region] = [size, label, unfilled]
 
         cmd_word = ((constants.LEN2 << 28) |
                     (Commands.RESERVE.value << 20) |  # @UndefinedVariable
                     (constants.NO_REGS << 16) |
-                    (int(bool(empty)) << 7) |
-                    (int(bool(shrink)) << 6) |
+                    (unfilled << 7) |
+                    (1 << 6) |
                     region)
         encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
         encoded_size = bytearray(struct.pack("<I", size))
         cmd_word_list = encoded_cmd_word + encoded_size
 
-        if empty:
+        if unfilled:
             unfilled_string = "UNFILLED"
         else:
             unfilled_string = ""

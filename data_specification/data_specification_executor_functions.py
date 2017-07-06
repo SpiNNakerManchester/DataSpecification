@@ -171,6 +171,7 @@ class DataSpecificationExecutorFunctions(object):
                     "RESERVE", cmd, self._cmd_size))
 
         unfilled = (cmd >> 7) & 0x1 == 0x1
+        shrink = (cmd >> 6) & 0x1 == 0x1
 
         if not self.mem_regions.is_empty(region):
             raise exceptions.DataSpecificationRegionInUseException(region)
@@ -185,7 +186,7 @@ class DataSpecificationExecutorFunctions(object):
                 "region size", size, 1, self.memory_space, "RESERVE")
 
         self.mem_regions[region] = MemoryRegion(
-            memory_pointer=0, unfilled=unfilled, size=size)
+            memory_pointer=0, unfilled=unfilled, size=size, shrink=shrink)
         self.space_allocated += size
 
     def execute_free(self, cmd):

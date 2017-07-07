@@ -195,7 +195,8 @@ class DataSpecificationExecutor(object):
         :param start_address: starting address of the region of memory where\
                     this application data file is going to be stored
         :type start_address: unsigned int
-        :rtype: None
+        :return: The pointer table as an array of integers
+        :rtype: list of int
         """
         if self.report_writer is not None:
             self.report_writer.write("Pointer table \n")
@@ -230,6 +231,8 @@ class DataSpecificationExecutor(object):
 
         if self.report_writer is not None:
             self.report_writer.write("End of pointer table \n")
+
+        return pointer_table
 
     def get_constructed_data_size(self):
         """ Return the size of the data that will be written to memory

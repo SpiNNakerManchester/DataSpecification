@@ -62,7 +62,7 @@ class DataSpecificationExecutorFunctions(object):
         "data_len"
     ]
 
-    def __init__(self, spec_reader, mem_writer, memory_space):
+    def __init__(self, spec_reader, memory_space):
         """
 
         :param spec_reader: The object to read the specification language file\
@@ -70,16 +70,11 @@ class DataSpecificationExecutorFunctions(object):
         :type spec_reader:\
             :py:class:`data_specification.abstract_data_reader.\
             AbstractDataReader`
-        :param mem_writer: The object to write the memory image to
-        :type mem_writer:\
-            :py:class:`data_specification.abstract_data_writer.\
-            AbstractDataWriter`
         :param memory_space: Memory space available for the data to be\
             generated
         :type memory_space: int
         """
         self.spec_reader = spec_reader
-        self.mem_writer = mem_writer
         self.memory_space = memory_space
 
         self.space_allocated = 0
@@ -171,7 +166,6 @@ class DataSpecificationExecutorFunctions(object):
                     "RESERVE", cmd, self._cmd_size))
 
         unfilled = (cmd >> 7) & 0x1 == 0x1
-        shrink = (cmd >> 6) & 0x1 == 0x1
 
         if not self.mem_regions.is_empty(region):
             raise exceptions.DataSpecificationRegionInUseException(region)
@@ -186,7 +180,7 @@ class DataSpecificationExecutorFunctions(object):
                 "region size", size, 1, self.memory_space, "RESERVE")
 
         self.mem_regions[region] = MemoryRegion(
-            memory_pointer=0, unfilled=unfilled, size=size, shrink=shrink)
+            memory_pointer=0, unfilled=unfilled, size=size)
         self.space_allocated += size
 
     def execute_free(self, cmd):

@@ -21,13 +21,10 @@ class MemoryRegion(object):
         "_write_pointer",
 
         # the max point where if written over, it will cause an error
-        "_max_write_pointer",
-
-        # Whether to shrink the region or not
-        "_shrink"
+        "_max_write_pointer"
     ]
 
-    def __init__(self, memory_pointer, unfilled, size, shrink):
+    def __init__(self, memory_pointer, unfilled, size):
         """
 
         :param memory_pointer: the write pointer position
@@ -41,7 +38,6 @@ class MemoryRegion(object):
         self._region_data = bytearray(size)
         self._write_pointer = 0
         self._max_write_pointer = 0
-        self._shrink = shrink
 
     @property
     def memory_pointer(self):
@@ -101,7 +97,3 @@ class MemoryRegion(object):
         self._write_pointer += n_bytes
         self._max_write_pointer = max((
             self._write_pointer, self._max_write_pointer))
-
-    @property
-    def shrink(self):
-        return self._shrink

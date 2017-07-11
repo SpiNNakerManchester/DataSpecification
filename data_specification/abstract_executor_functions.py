@@ -2,8 +2,9 @@ from .exceptions import UnimplementedDSECommand
 
 
 class AbstractExecutorFunctions(object):
-    """ This class includes the function related to each of the commands\
-        of the data specification file.
+    """This class defines a function related to each of the commands of the\
+        data specification file. Subclasses need to provide implementations\
+        that work for the operations they wish to support.
     """
 
     __slots__ = []

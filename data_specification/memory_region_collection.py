@@ -1,4 +1,5 @@
-from data_specification import exceptions
+from .exceptions import DataSpecificationRegionInUseException, \
+    DataSpecificationNoRegionSelectedException
 
 
 class MemoryRegionCollection(object):
@@ -28,7 +29,7 @@ class MemoryRegionCollection(object):
 
     def __setitem__(self, key, value):
         if self._regions[key] is not None:
-            raise exceptions.DataSpecificationRegionInUseException(key)
+            raise DataSpecificationRegionInUseException(key)
         self._regions[key] = value
 
     def __iter__(self):
@@ -64,15 +65,13 @@ class MemoryRegionCollection(object):
         beyond the expected region range
         """
         if region_id > self._n_regions:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise DataSpecificationNoRegionSelectedException(
                 "the region id requested is beyond the supported number of"
                 "available region ids")
         if not self._regions[region_id].unfilled:
             return True
-        else:
-            needs_writing = False
-            for region in range(region_id, self._n_regions):
-                if (self._regions[region] is not None and
-                        not self._regions[region].unfilled):
-                    needs_writing = True
-        return needs_writing
+        for region in range(region_id, self._n_regions):
+            if (self._regions[region] is not None and
+                    not self._regions[region].unfilled):
+                return True
+        return False

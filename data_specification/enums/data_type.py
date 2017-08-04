@@ -100,8 +100,8 @@ class DataType(Enum):
            "8.7 signed fixed point number")
     S1615 = (12,
              4,
-             decimal.Decimal("-32768"),
-             decimal.Decimal("32767.9999847"),
+             decimal.Decimal("-65536"),
+             decimal.Decimal("65535.999969482421875"),
              decimal.Decimal("32768"),
              "i",
              "16.15 signed fixed point number")

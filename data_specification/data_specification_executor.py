@@ -2,10 +2,12 @@ import struct
 import traceback
 import numpy
 
-from data_specification.data_specification_executor_functions \
+from .constants import DSE_VERSION, END_SPEC_EXECUTOR, MAX_MEM_REGIONS, \
+    APPDATA_MAGIC_NUM, APP_PTR_TABLE_HEADER_BYTE_SIZE, APP_PTR_TABLE_BYTE_SIZE
+from .data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as Dsef
-from data_specification import exceptions, constants
-from data_specification.enums import Commands
+from .enums import Commands
+from .exceptions import DataSpecificationException
 
 
 class DataSpecificationExecutor(object):
@@ -24,17 +26,16 @@ class DataSpecificationExecutor(object):
 
     def __init__(self, spec_reader, memory_space):
         """
-        :param spec_reader: The object to read the specification language file\
-                    from
+        :param spec_reader: \
+            The object to read the specification language file from
         :type spec_reader:\
-                    :py:class:`data_specification.abstract_data_reader.\
-                    AbstractDataReader`
+            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
         :param memory_space: memory available on the destination architecture
         :type memory_space: int
         :raise spinn_storage_handlers.exceptions.DataReadException:\
-                    If a read from external storage fails
+            If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
-                    If a write to external storage fails
+            If a write to external storage fails
         """
         self.spec_reader = spec_reader
         self.dsef = Dsef(self.spec_reader, memory_space)
@@ -42,19 +43,18 @@ class DataSpecificationExecutor(object):
     def execute(self):
         """ Executes the specification
 
-        :return: The number of bytes used by the image and \
-                the number of bytes written by the image
+        :return: The number of bytes used by the image and the number of \
+            bytes written by the image
         :rtype: int
         :raise spinn_storage_handlers.exceptions.DataReadException:\
-                    If a read from external storage fails
+            If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
-                    If a write to external storage fails
+            If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationException:\
-                    If there is an error when executing the specification
-        :raise data_specification.exceptions.\
-                    DataSpecificationTablePointerOutOfMemory:\
-                    If the table pointer generated as data header exceeds the \
-                    size of the available memory
+            If there is an error when executing the specification
+        :raise data_specification.exceptions.DataSpecificationTablePointerOutOfMemory:\
+            If the table pointer generated as data header exceeds the size \
+            of the available memory
         """
         instruction_spec = self.spec_reader.read(4)
         while len(instruction_spec) != 0:
@@ -68,16 +68,16 @@ class DataSpecificationExecutor(object):
                 return_value = Commands(opcode).exec_function(self.dsef, cmd)
             except ValueError:
                 traceback.print_exc()
-                raise exceptions.DataSpecificationException(
+                raise DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(
                         cmd, self.spec_reader.filename))
             except TypeError:
                 traceback.print_exc()
-                raise exceptions.DataSpecificationException(
+                raise DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(
                         cmd, self.spec_reader.filename))
 
-            if return_value == constants.END_SPEC_EXECUTOR:
+            if return_value == END_SPEC_EXECUTOR:
                 break
             instruction_spec = self.spec_reader.read(4)
 
@@ -93,20 +93,18 @@ class DataSpecificationExecutor(object):
     def get_header(self):
         """ Get the header of the data as a numpy array
         """
-        return numpy.array(
-            [constants.APPDATA_MAGIC_NUM, constants.DSE_VERSION], dtype="<u4")
+        return numpy.array([APPDATA_MAGIC_NUM, DSE_VERSION], dtype="<u4")
 
     def get_pointer_table(self, start_address):
         """ Get the pointer table as a numpy array
 
         :param start_address: The base address of the data to be written
         """
-        pointer_table = numpy.zeros(constants.MAX_MEM_REGIONS, dtype="<u4")
-        pointer_table_size = constants.MAX_MEM_REGIONS * 4
-        next_free_offset = \
-            pointer_table_size + constants.APP_PTR_TABLE_HEADER_BYTE_SIZE
+        pointer_table = numpy.zeros(MAX_MEM_REGIONS, dtype="<u4")
+        pointer_table_size = MAX_MEM_REGIONS * 4
+        next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
-        for i in xrange(constants.MAX_MEM_REGIONS):
+        for i in xrange(MAX_MEM_REGIONS):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
                 pointer_table[i] = next_free_offset + start_address
@@ -122,8 +120,8 @@ class DataSpecificationExecutor(object):
         :return: size of the data that will be written to memory
         :rtype: unsigned int
         """
-        size = constants.APP_PTR_TABLE_BYTE_SIZE
-        for i in xrange(constants.MAX_MEM_REGIONS):
+        size = APP_PTR_TABLE_BYTE_SIZE
+        for i in xrange(MAX_MEM_REGIONS):
             memory_region = self.dsef.mem_regions[i]
             if memory_region is not None:
                 size += memory_region.allocated_size

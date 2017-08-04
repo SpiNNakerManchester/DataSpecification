@@ -1,7 +1,17 @@
-from data_specification import constants, exceptions, memory_region_collection
+from data_specification import memory_region_collection
 import struct
 from data_specification.memory_region import MemoryRegion
 from .abstract_executor_functions import AbstractExecutorFunctions
+from .constants import MAX_REGISTERS, MAX_MEM_REGIONS, MAX_STRUCT_SLOTS, \
+    LEN2, LEN3, END_SPEC_EXECUTOR
+from .exceptions \
+    import ExecuteBreakInstruction, DataSpecificationSyntaxError, \
+    DataSpecificationNoMoreException, DataSpecificationRegionNotAllocated, \
+    DataSpecificationNoRegionSelectedException, \
+    DataSpecificationUnknownTypeLengthException, \
+    DataSpecificationRegionUnfilledException, \
+    DataSpecificationParameterOutOfBoundsException, \
+    DataSpecificationRegionInUseException
 
 
 class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
@@ -81,10 +91,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.space_allocated = 0
         self.current_region = None
 
-        self.registers = [0] * constants.MAX_REGISTERS
+        self.registers = [0] * MAX_REGISTERS
         self.mem_regions = memory_region_collection.MemoryRegionCollection(
-            constants.MAX_MEM_REGIONS)
-        self.struct_slots = [0] * constants.MAX_STRUCT_SLOTS
+            MAX_MEM_REGIONS)
+        self.struct_slots = [0] * MAX_STRUCT_SLOTS
 
         # storage objects
         self._cmd_size = None
@@ -128,7 +138,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise data_specification.exceptions.ExecuteBreakInstruction:\
             Raises the exception to break the execution of the DSE
         """
-        raise exceptions.ExecuteBreakInstruction(
+        raise ExecuteBreakInstruction(
             self.spec_reader.tell(), self.spec_reader.filename)
 
     def execute_nop(self, cmd):
@@ -159,8 +169,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__unpack_cmd__(cmd)
         region = cmd & 0x1F  # cmd[4:0]
 
-        if self._cmd_size != constants.LEN2:
-            raise exceptions.DataSpecificationSyntaxError(
+        if self._cmd_size != LEN2:
+            raise DataSpecificationSyntaxError(
                 "Command {0:s} requires one word as argument (total 2 words), "
                 "but the current encoding ({1:X}) is specified to be {2:d} "
                 "words long".format(
@@ -169,7 +179,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         unfilled = (cmd >> 7) & 0x1 == 0x1
 
         if not self.mem_regions.is_empty(region):
-            raise exceptions.DataSpecificationRegionInUseException(region)
+            raise DataSpecificationRegionInUseException(region)
 
         size_encoded = self.spec_reader.read(4)
         size = struct.unpack("<I", str(size_encoded))[0]
@@ -177,7 +187,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             size = (size + 4) - (size & 0x3)
 
         if (size <= 0) or (size > self.memory_space):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise DataSpecificationParameterOutOfBoundsException(
                 "region size", size, 1, self.memory_space, "RESERVE")
 
         self.mem_regions[region] = MemoryRegion(
@@ -209,25 +219,22 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
+        elif self._cmd_size == LEN2 and data_len != 8:
+            read_data = self.spec_reader.read(4)
+            value = struct.unpack("<I", str(read_data))[0]
+        elif self._cmd_size == LEN3 and data_len == 8:
+            read_data = self.spec_reader.read(8)
+            value = struct.unpack("<Q", str(read_data))[0]
         else:
-            if self._cmd_size == constants.LEN2 and data_len != 8:
-                read_data = self.spec_reader.read(4)
-                value = struct.unpack("<I", str(read_data))[0]
-            elif self._cmd_size == constants.LEN3 and data_len == 8:
-                read_data = self.spec_reader.read(8)
-                value = struct.unpack("<Q", str(read_data))[0]
-            else:
-                raise exceptions.DataSpecificationSyntaxError(
-                    "Command {0:s} requires a value as an argument, but the "
-                    "current encoding ({1:X}) is specified to be {2:d} words "
-                    "long and the data length command argument is specified "
-                    "to be {3:d} bytes long".format(
-                        "WRITE", cmd, self._cmd_size,
-                        data_len))
+            raise DataSpecificationSyntaxError(
+                "Command {0:s} requires a value as an argument, but the "
+                "current encoding ({1:X}) is specified to be {2:d} words "
+                "long and the data length command argument is specified "
+                "to be {3:d} bytes long".format(
+                    "WRITE", cmd, self._cmd_size, data_len))
 
         # Perform the writes
-        self._write_to_mem(
-            value, data_len, n_repeats, "WRITE")
+        self._write_to_mem(value, data_len, n_repeats, "WRITE")
 
     def execute_write_array(self, cmd):
         """ This command writes an array of values in the specified region
@@ -263,10 +270,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             region = self.registers[self.src1_reg]
 
         if self.mem_regions.is_empty(region):
-            raise exceptions.DataSpecificationRegionUnfilledException(
+            raise DataSpecificationRegionUnfilledException(
                 region, "SWITCH_FOCUS")
-        else:
-            self.current_region = region
+        self.current_region = region
 
     def execute_mv(self, cmd):
         """ This command moves an immediate value to a register or copies the \
@@ -284,7 +290,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__unpack_cmd__(cmd)
 
         if not self.use_dest_reg:
-            raise exceptions.DataSpecificationSyntaxError(
+            raise DataSpecificationSyntaxError(
                 "Destination register not correctly specified")
 
         if self.use_src1_reg:
@@ -309,19 +315,16 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         # check that the address is relative or absolute
         if cmd & 0x1 == 1:
-
             # relative to its current write pointer
             if self.mem_regions[self.current_region] is None:
-
-                raise exceptions.DataSpecificationNoRegionSelectedException(
+                raise DataSpecificationNoRegionSelectedException(
                     "the write pointer for this region is currently undefined")
-            else:
 
-                # relative to the base address of the region (obsolete)
-                # noinspection PyTypeChecker
-                address = (
-                    self.mem_regions[self.current_region].write_pointer +
-                    future_address)
+            # relative to the base address of the region (obsolete)
+            # noinspection PyTypeChecker
+            address = (
+                self.mem_regions[self.current_region].write_pointer +
+                future_address)
         else:
             address = future_address
 
@@ -341,10 +344,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         read_data = self.spec_reader.read(4)
         value = struct.unpack("<i", str(read_data))[0]
         if value != -1:
-            raise exceptions.DataSpecificationSyntaxError(
+            raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
                 "current argument value is {0:d}".format(value))
-        return constants.END_SPEC_EXECUTOR
+        return END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):
         """ Write the specified value to data memory the specified amount of\
@@ -377,11 +380,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         """
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise DataSpecificationNoRegionSelectedException(
                 command)
 
         if self.mem_regions.is_empty(self.current_region) is None:
-            raise exceptions.DataSpecificationRegionNotAllocated(
+            raise DataSpecificationRegionNotAllocated(
                 self.current_region, command)
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
@@ -392,7 +395,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         space_required = n_bytes * repeat
 
         if space_available < space_required:
-            raise exceptions.DataSpecificationNoMoreException(
+            raise DataSpecificationNoMoreException(
                 space_available, space_required, self.current_region)
 
         if n_bytes == 1:
@@ -404,7 +407,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         elif n_bytes == 8:
             encoded_value = struct.pack("<Q", value)
         else:
-            raise exceptions.DataSpecificationUnknownTypeLengthException(
+            raise DataSpecificationUnknownTypeLengthException(
                 n_bytes, command)
 
         encoded_array = encoded_value * repeat
@@ -441,11 +444,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         data_length = len(data)
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                command)
+            raise DataSpecificationNoRegionSelectedException(command)
 
         if self.mem_regions.is_empty(self.current_region) is None:
-            raise exceptions.DataSpecificationRegionNotAllocated(
+            raise DataSpecificationRegionNotAllocated(
                 self.current_region, command)
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
@@ -456,7 +458,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         space_required = data_length
 
         if space_available < space_required:
-            raise exceptions.DataSpecificationNoMoreException(
+            raise DataSpecificationNoMoreException(
                 space_available, space_required, self.current_region)
 
         current_write_ptr = self.mem_regions[self.current_region].write_pointer

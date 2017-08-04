@@ -73,7 +73,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "data_len"
     ]
 
-    def __init__(self, spec_reader, mem_writer, memory_space):
+    def __init__(self, spec_reader, memory_space):
         """
 
         :param spec_reader: The object to read the specification language file\
@@ -81,16 +81,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type spec_reader:\
             :py:class:`data_specification.abstract_data_reader.\
             AbstractDataReader`
-        :param mem_writer: The object to write the memory image to
-        :type mem_writer:\
-            :py:class:`data_specification.abstract_data_writer.\
-            AbstractDataWriter`
         :param memory_space: Memory space available for the data to be\
             generated
         :type memory_space: int
         """
         self.spec_reader = spec_reader
-        self.mem_writer = mem_writer
         self.memory_space = memory_space
 
         self.space_allocated = 0

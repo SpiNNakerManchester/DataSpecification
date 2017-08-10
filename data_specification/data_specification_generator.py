@@ -204,7 +204,7 @@ class DataSpecificationGenerator(object):
         self._clamp(Commands.RESERVE, "memory region identifier",
                     region, 0, MAX_MEM_REGIONS)
         self._clamp(Commands.RESERVE, "memory size",
-                    region, 1, sdram.SDRAM.DEFAULT_SDRAM_BYTES + 1)
+                    size, 1, sdram.SDRAM.DEFAULT_SDRAM_BYTES + 1)
 
         if self.mem_slot[region] != 0:
             error_string = "Error: Requested memory region ({0:d}) ".format(

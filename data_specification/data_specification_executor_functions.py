@@ -14,6 +14,12 @@ from .exceptions \
     DataSpecificationParameterOutOfBoundsException, \
     DataSpecificationRegionInUseException
 
+_ONE_BYTE = struct.Struct("<B")
+_ONE_SHORT = struct.Struct("<H")
+_ONE_WORD = struct.Struct("<I")
+_ONE_SINT = struct.Struct("<i")
+_ONE_LONG = struct.Struct("<Q")
+
 
 class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     """ This class includes the function related to each of the commands\
@@ -169,8 +175,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if not self.mem_regions.is_empty(region):
             raise DataSpecificationRegionInUseException(region)
 
-        size_encoded = self.spec_reader.read(4)
-        size = struct.unpack("<I", str(size_encoded))[0]
+        size = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
@@ -208,9 +213,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
         elif self._cmd_size == LEN2 and data_len != 8:
-            value = struct.unpack("<I", str(self.spec_reader.read(4)))[0]
+            value = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
         elif self._cmd_size == LEN3 and data_len == 8:
-            value = struct.unpack("<Q", str(self.spec_reader.read(8)))[0]
+            value = _ONE_LONG.unpack(self.spec_reader.read(8))[0]
         else:
             raise DataSpecificationSyntaxError(
                 "Command {0:s} requires a value as an argument, but the "
@@ -230,8 +235,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :return: No value returned
         :rtype: None
         """
-        length_encoded = self.spec_reader.read(4)
-        length = struct.unpack("<I", str(length_encoded))[0]
+        length = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
         value_encoded = self.spec_reader.read(4 * length)
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
@@ -282,8 +286,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.use_src1_reg:
             self.registers[self.dest_reg] = self.registers[self.src1_reg]
         else:
-            data_encoded = self.spec_reader.read(4)
-            data = struct.unpack("<I", str(data_encoded))[0]
+            data = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
             self.registers[self.dest_reg] = data
 
     def execute_set_wr_ptr(self, cmd):
@@ -296,8 +299,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         else:
 
             # the data is a raw address
-            data_encoded = self.spec_reader.read(4)
-            future_address = struct.unpack("<I", str(data_encoded))[0]
+            future_address = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
 
         # check that the address is relative or absolute
         if cmd & 0x1 == 1:
@@ -327,7 +329,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If command END_SPEC != -1
         """
-        value = struct.unpack("<i", str(self.spec_reader.read(4)))[0]
+        value = _ONE_SINT.unpack(self.spec_reader.read(4))[0]
         if value != -1:
             raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
@@ -382,13 +384,13 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
                 space_available, space_required, self.current_region)
 
         if n_bytes == 1:
-            encoded_value = struct.pack("<B", value)
+            encoded_value = _ONE_BYTE.pack(value)
         elif n_bytes == 2:
-            encoded_value = struct.pack("<H", value)
+            encoded_value = _ONE_SHORT.pack(value)
         elif n_bytes == 4:
-            encoded_value = struct.pack("<I", value)
+            encoded_value = _ONE_WORD.pack(value)
         elif n_bytes == 8:
-            encoded_value = struct.pack("<Q", value)
+            encoded_value = _ONE_LONG.pack(value)
         else:
             raise DataSpecificationUnknownTypeLengthException(
                 n_bytes, command)

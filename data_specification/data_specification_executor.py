@@ -10,6 +10,7 @@ from .enums import Commands
 from .exceptions import DataSpecificationException
 
 logger = logging.getLogger(__name__)
+_ONE_WORD = struct.Struct("<I")
 
 
 class DataSpecificationExecutor(object):
@@ -59,10 +60,10 @@ class DataSpecificationExecutor(object):
         return_value = END_SPEC_EXECUTOR + 1
         while return_value != END_SPEC_EXECUTOR:
             instruction_spec = self.spec_reader.read(4)
-            if len(instruction_spec) > 0:
+            if len(instruction_spec) == 0:
                 break
             # process the received command
-            cmd = struct.unpack("<I", str(instruction_spec))[0]
+            cmd = _ONE_WORD.unpack(instruction_spec)[0]
 
             opcode = (cmd >> 20) & 0xFF
 
@@ -117,7 +118,8 @@ class DataSpecificationExecutor(object):
         :rtype: unsigned int
         """
         size = APP_PTR_TABLE_BYTE_SIZE
-        for region in self.dsef.mem_regions:
+        for i in xrange(MAX_MEM_REGIONS):
+            region = self.dsef.mem_regions[i]
             if region is not None:
                 size += region.allocated_size
         return size

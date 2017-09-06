@@ -457,7 +457,7 @@ class DataSpecificationGenerator(object):
         _bounds(Commands.START_STRUCT, "structure id",
                 structure_id, 0, MAX_STRUCT_SLOTS)
         _bounds(Commands.WRITE_PARAM, "structure elements",
-                len(parameters), 0, MAX_STRUCT_ELEMENTS)
+                len(parameters), 1, MAX_STRUCT_ELEMENTS)
         if self.struct_slot[structure_id] != 0:
             raise DataSpecificationStructureInUseException(structure_id)
 
@@ -1076,7 +1076,7 @@ class DataSpecificationGenerator(object):
             cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
             reg_usage = SRC1_ONLY
-            parameters |= repeats & 0xFF
+            parameters = repeats & 0xFF
             cmd_string += ", repeats={0:d}".format(repeats)
 
         cmd_word = _binencode(LEN1, Commands.WRITE, [
@@ -1142,7 +1142,7 @@ class DataSpecificationGenerator(object):
         _bounds(Commands.SWITCH_FOCUS, "region", region, 0, MAX_MEM_REGIONS)
         if self.mem_slot[region] == 0:
             raise DataSpecificationNotAllocatedException(
-                "region", region, Commands.SWITCH_FOCUS) 
+                "region", region, Commands.SWITCH_FOCUS)
         if self.mem_slot[region][2]:
             raise DataSpecificationRegionUnfilledException(
                 region, Commands.SWITCH_FOCUS)
@@ -1297,8 +1297,8 @@ class DataSpecificationGenerator(object):
             DataSpecificationInvalidCommandException: If there is no loop in \
             operation at this point
         """
-        if self.ongoing_loop is not True:
-            raise DataSpecificationInvalidCommandException(Commands.END_LOOP)
+        # if self.ongoing_loop is not True:
+        #     raise DataSpecificationInvalidCommandException(Commands.END_LOOP)
 
         cmd_word = _binencode(LEN1, Commands.END_LOOP)
         cmd_string = "END_LOOP"

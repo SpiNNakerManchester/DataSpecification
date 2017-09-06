@@ -51,7 +51,7 @@ def _typebounds(cmd, name, value, valuetype):  # @ReservedAssignment
 
 def _binencode(length, command, arguments=[]):
     if len(arguments) & 1 == 1:
-        raise KeyError()
+        arguments.append(0)
     cmd_word = (length << 28) | (command.value << 20)
     i = 0
     while i < len(arguments):

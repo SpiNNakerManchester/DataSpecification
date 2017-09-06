@@ -1179,7 +1179,7 @@ class DataSpecificationGenerator(object):
 
         if repeats_is_register is False:
             self._clamp(Commands.WRITE, "repeats",
-                        repeats, 0, 256)
+                        repeats, 1, 256)
         else:
             self._clamp(Commands.WRITE, "repeats",
                         repeats, 0, MAX_REGISTERS)
@@ -1190,7 +1190,7 @@ class DataSpecificationGenerator(object):
         if self.report_writer is not None:
             cmd_string = "WRITE data=0x%8.8X" % data
 
-        if repeats_is_register is not False:
+        if repeats_is_register:
             repeat_reg_usage = 1
             parameters |= (repeats << 4)
             if self.report_writer is not None:
@@ -1198,7 +1198,7 @@ class DataSpecificationGenerator(object):
                     cmd_string, repeats)
         else:
             repeat_reg_usage = NO_REGS
-            parameters |= repeats
+            parameters |= repeats & 0xFF
             if self.report_writer is not None:
                 cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
@@ -1286,7 +1286,7 @@ class DataSpecificationGenerator(object):
 
         if repeats_is_register is False:
             self._clamp(Commands.WRITE, "repeats",
-                        repeats, 0, 256)
+                        repeats, 1, 256)
         else:
             self._clamp(Commands.WRITE, "repeats",
                         repeats, 0, MAX_REGISTERS)
@@ -1304,7 +1304,7 @@ class DataSpecificationGenerator(object):
                 cmd_string, repeats)
         else:
             reg_usage = SRC1_ONLY
-            parameters |= repeats
+            parameters |= repeats & 0xFF
             cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
 
         cmd_word = (

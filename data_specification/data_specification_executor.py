@@ -10,6 +10,7 @@ from .enums import Commands
 from .exceptions import DataSpecificationException
 
 logger = logging.getLogger(__name__)
+_ONE_WORD = struct.Struct("<I")
 
 
 class DataSpecificationExecutor(object):
@@ -64,7 +65,7 @@ class DataSpecificationExecutor(object):
         instruction_spec = self.spec_reader.read(4)
         while len(instruction_spec) != 0:
             # process the received command
-            cmd = struct.unpack("<I", str(instruction_spec))[0]
+            cmd = _ONE_WORD.unpack(str(instruction_spec))[0]
 
             opcode = (cmd >> 20) & 0xFF
 

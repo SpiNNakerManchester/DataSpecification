@@ -1,13 +1,15 @@
-import struct
-import traceback
+import logging
 import numpy
+import struct
 
-from .constants import DSE_VERSION, END_SPEC_EXECUTOR, MAX_MEM_REGIONS, \
-    APPDATA_MAGIC_NUM, APP_PTR_TABLE_HEADER_BYTE_SIZE, APP_PTR_TABLE_BYTE_SIZE
 from .data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as Dsef
+from .constants import APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR, \
+    MAX_MEM_REGIONS, APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE
 from .enums import Commands
 from .exceptions import DataSpecificationException
+
+logger = logging.getLogger(__name__)
 
 
 class DataSpecificationExecutor(object):
@@ -56,6 +58,7 @@ class DataSpecificationExecutor(object):
             If the table pointer generated as data header exceeds the size \
             of the available memory
         """
+        index = 0
         instruction_spec = self.spec_reader.read(4)
         while len(instruction_spec) != 0:
             # process the received command
@@ -66,13 +69,9 @@ class DataSpecificationExecutor(object):
             try:
                 # noinspection PyArgumentList
                 return_value = Commands(opcode).exec_function(self.dsef, cmd)
-            except ValueError:
-                traceback.print_exc()
-                raise DataSpecificationException(
-                    "Invalid command 0x{0:X} while reading file {1:s}".format(
-                        cmd, self.spec_reader.filename))
-            except TypeError:
-                traceback.print_exc()
+            except (ValueError, TypeError):
+                logger.debug("problem decoding opcode %d at index %d",
+                             cmd, index, exc_info=True)
                 raise DataSpecificationException(
                     "Invalid command 0x{0:X} while reading file {1:s}".format(
                         cmd, self.spec_reader.filename))
@@ -80,6 +79,7 @@ class DataSpecificationExecutor(object):
             if return_value == END_SPEC_EXECUTOR:
                 break
             instruction_spec = self.spec_reader.read(4)
+            index += 4
 
     def get_region(self, region_id):
         """ Get a region with a given id

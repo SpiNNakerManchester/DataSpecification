@@ -976,7 +976,7 @@ class DataSpecificationGenerator(object):
             raise DataSpecificationInvalidSizeException(
                 data_type.name, data_size, Commands.WRITE)
         if repeats_is_register is False:
-            _bounds(Commands.WRITE, "repeats", repeats, 0, 256)
+            _bounds(Commands.WRITE, "repeats", repeats, 1, 256)
         else:
             _bounds(Commands.WRITE, "repeats", repeats, 0, MAX_REGISTERS)
         _typebounds(Commands.WRITE, "data", data, data_type)
@@ -984,13 +984,13 @@ class DataSpecificationGenerator(object):
         parameters = 0
         cmd_string = "WRITE data=0x%8.8X" % data
 
-        if repeats_is_register is not False:
+        if repeats_is_register:
             repeat_reg_usage = 1
             parameters |= (repeats << 4)
             cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
             repeat_reg_usage = NO_REGS
-            parameters |= repeats
+            parameters |= repeats & 0xFF
             cmd_string += ", repeats={0:d}".format(repeats)
 
         cmd_word = _binencode(cmd_data_len, Commands.WRITE, [
@@ -1063,7 +1063,7 @@ class DataSpecificationGenerator(object):
             raise DataSpecificationInvalidSizeException(
                 data_type.name, data_size, Commands.WRITE)
         if repeats_is_register is False:
-            _bounds(Commands.WRITE, "repeats", repeats, 0, 256)
+            _bounds(Commands.WRITE, "repeats", repeats, 1, 256)
         else:
             _bounds(Commands.WRITE, "repeats", repeats, 0, MAX_REGISTERS)
         _bounds(Commands.WRITE, "data_register",
@@ -1076,7 +1076,7 @@ class DataSpecificationGenerator(object):
             cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
             reg_usage = SRC1_ONLY
-            parameters = repeats
+            parameters |= repeats & 0xFF
             cmd_string += ", repeats={0:d}".format(repeats)
 
         cmd_word = _binencode(LEN1, Commands.WRITE, [

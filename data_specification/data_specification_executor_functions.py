@@ -1,18 +1,18 @@
 import struct
 
-from .abstract_executor_functions import AbstractExecutorFunctions
-from .constants import \
-    MAX_REGISTERS, MAX_MEM_REGIONS, MAX_STRUCT_SLOTS, END_SPEC_EXECUTOR, \
-    LEN2, LEN3
-from .exceptions import \
-    DataSpecificationSyntaxError, DataSpecificationNoRegionSelectedException,\
-    DataSpecificationNoMoreException, DataSpecificationRegionNotAllocated, \
-    DataSpecificationRegionInUseException, UnimplementedDSECommand, \
-    DataSpecificationRegionUnfilledException, ExecuteBreakInstruction, \
-    DataSpecificationParameterOutOfBoundsException, \
-    DataSpecificationUnknownTypeLengthException
-from .memory_region_collection import MemoryRegionCollection
 from .memory_region import MemoryRegion
+from .memory_region_collection import MemoryRegionCollection
+from .abstract_executor_functions import AbstractExecutorFunctions
+from .constants import MAX_REGISTERS, MAX_MEM_REGIONS, MAX_STRUCT_SLOTS, \
+    LEN2, LEN3, END_SPEC_EXECUTOR
+from .exceptions \
+    import ExecuteBreakInstruction, DataSpecificationSyntaxError, \
+    DataSpecificationNoMoreException, DataSpecificationRegionNotAllocated, \
+    DataSpecificationNoRegionSelectedException, \
+    DataSpecificationUnknownTypeLengthException, \
+    DataSpecificationRegionUnfilledException, \
+    DataSpecificationParameterOutOfBoundsException, \
+    DataSpecificationRegionInUseException
 
 
 class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
@@ -301,7 +301,6 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         # check that the address is relative or absolute
         if cmd & 0x1 == 1:
-
             # relative to its current write pointer
             if self.mem_regions[self.current_region] is None:
                 raise DataSpecificationNoRegionSelectedException(
@@ -309,8 +308,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
             # relative to the base address of the region (obsolete)
             # noinspection PyTypeChecker
-            address = (self.mem_regions[self.current_region].write_pointer +
-                       future_address)
+            address = (
+                self.mem_regions[self.current_region].write_pointer +
+                future_address)
         else:
             address = future_address
 

@@ -435,7 +435,9 @@ void execute_loop(Command cmd) {
     // END_LOOP. Otherwise, start iterating.
     if (loop_start >= loop_end) {
         Command command;
-        while((command = get_next_command()).opCode != END_LOOP);
+        do {
+            command = get_next_command();
+        } while (command.opCode != END_LOOP);
     } else {
 
         // Push the return value of the command pointer on the stack.
@@ -790,7 +792,9 @@ void execute_start_constructor(Command cmd) {
 
     // Skip all instructions up to END_CONSTRUCTOR.
     Command constructorEntry;
-    while ((constructorEntry = get_next_command()).opCode != END_CONSTRUCTOR);
+    do {
+	constructorEntry = get_next_command();
+    } while (constructorEntry.opCode != END_CONSTRUCTOR);
 }
 
 
@@ -962,7 +966,9 @@ void execute_else(Command cmd) {
 
     // Skip all instructions up to END_IF.
     Command command;
-    while ((command = get_next_command()).opCode != END_IF);
+    do {
+	command = get_next_command();
+    } while (command.opCode != END_IF);
 }
 
 //! \brief Execute a PRINT_VAL command.
@@ -1273,4 +1279,3 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
         }
     }
 }
-

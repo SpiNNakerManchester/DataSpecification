@@ -82,4 +82,3 @@ extern uint32_t future_sark_xalloc_flags;
 void data_specification_executor(address_t, uint32_t);
 
 #endif
-

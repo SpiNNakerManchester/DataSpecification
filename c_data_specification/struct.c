@@ -55,4 +55,3 @@ Struct *struct_create_copy(Struct *source) {
     }
     return new_struct;
 }
-

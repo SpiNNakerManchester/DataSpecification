@@ -29,7 +29,7 @@ script:
   # Tests
   - py.test unittests
   - py.test integration_tests
-  - make -C c_data_specification all check
+  - make -C c_data_specification -f test.mk check
   # Code quality check
   - flake8 data_specification
   - flake8 unittests integration_tests

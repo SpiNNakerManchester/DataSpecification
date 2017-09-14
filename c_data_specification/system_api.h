@@ -8,6 +8,23 @@
 
 typedef uint32_t* address_t;
 
+#ifdef DEBUG_ENABLED
+#define log_debug(message, ...) \
+    printf("[DEBUG] " message "\n", ##__VA_ARGS__)
+#else
+#define log_debug(message, ...) \
+    do {} while (0)
+#endif // DEBUG_ENABLED
+
+#define log_info(message, ...) \
+    printf("[INFO] " message "\n", ##__VA_ARGS__)
+
+#define log_warning(message, ...) \
+    printf("[WARNING] " message "\n", ##__VA_ARGS__)
+
+#define log_error(message, ...) \
+    fprintf(stderr, "[ERROR] " message "\n", ##__VA_ARGS__)
+
 #define spin1_exit(code) \
     return (code);
 #define spin1_memcpy(destination, source, size) \
@@ -15,14 +32,6 @@ typedef uint32_t* address_t;
 #define rt_error(error_code) \
     exit((error_code))
 #define RTE_ABORT	-1
-#define log_info(message, ...) \
-    printf("[INFO] " message "\n", ##__VA_ARGS__)
-#define log_warning(message, ...) \
-    printf("[WARNING] " message "\n", ##__VA_ARGS__)
-#define log_error(message, ...) \
-    printf("[ERROR] " message "\n", ##__VA_ARGS__)
-#define log_debug(message, ...) \
-    printf("[DEBUG] " message "\n", ##__VA_ARGS__)
 #define sark_xalloc(heap, size, tag, flag) \
     malloc((size))
 #define sark_alloc(count, size) \

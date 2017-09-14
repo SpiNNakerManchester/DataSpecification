@@ -3,7 +3,7 @@
 #include "struct.h"
 
 uint8_t command_get_length(uint32_t command);
-enum OpCode command_get_opcode(uint32_t command);
+OpCode command_get_opcode(uint32_t command);
 uint8_t command_get_fieldUsage(uint32_t command);
 uint8_t command_get_destReg(uint32_t command);
 uint8_t command_get_src1Reg(uint32_t command);
@@ -11,39 +11,39 @@ uint8_t command_get_src2Reg(uint32_t command);
 int command_dest_in_use(uint32_t command);
 int command_src1_in_use(uint32_t command);
 int command_src2_in_use(uint32_t command);
-struct Command get_next_command();
+Command get_next_command();
 
 extern address_t command_pointer;
-extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
+extern MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 extern int current_region;
 extern uint64_t registers[MAX_REGISTERS];
-extern struct Struct *structs[MAX_STRUCTS];
+extern Struct *structs[MAX_STRUCTS];
 
-void execute_reserve(struct Command cmd);
-void execute_free(struct Command cmd);
-void execute_switch_focus(struct Command cmd);
-void execute_write(struct Command cmd);
-void execute_write_array(struct Command cmd);
-void execute_get_wr_ptr(struct Command cmd);
-void execute_set_wr_ptr(struct Command cmd);
-void execute_read(struct Command cmd);
-void execute_reset_wr_ptr(struct Command cmd);
-void execute_logic_op(struct Command cmd);
-void execute_start_struct(struct Command cmd);
-void execute_mv(struct Command cmd);
-void execute_arith_op(struct Command cmd);
-void execute_if(struct Command cmd);
-void execute_copy_param(struct Command cmd);
-void execute_print_text(struct Command cmd);
-void execute_print_val(struct Command cmd);
-void execute_read_param(struct Command cmd);
-void execute_write_param(struct Command cmd);
-void execute_loop(struct Command cmd);
-void execute_write_struct(struct Command cmd);
-void execute_print_struct(struct Command cmd);
-void execute_copy_struct(struct Command cmd);
-void execute_align_wr_ptr(struct Command cmd);
-void execute_block_copy(struct Command cmd);
+void execute_reserve(Command cmd);
+void execute_free(Command cmd);
+void execute_switch_focus(Command cmd);
+void execute_write(Command cmd);
+void execute_write_array(Command cmd);
+void execute_get_wr_ptr(Command cmd);
+void execute_set_wr_ptr(Command cmd);
+void execute_read(Command cmd);
+void execute_reset_wr_ptr(Command cmd);
+void execute_logic_op(Command cmd);
+void execute_start_struct(Command cmd);
+void execute_mv(Command cmd);
+void execute_arith_op(Command cmd);
+void execute_if(Command cmd);
+void execute_copy_param(Command cmd);
+void execute_print_text(Command cmd);
+void execute_print_val(Command cmd);
+void execute_read_param(Command cmd);
+void execute_write_param(Command cmd);
+void execute_loop(Command cmd);
+void execute_write_struct(Command cmd);
+void execute_print_struct(Command cmd);
+void execute_copy_struct(Command cmd);
+void execute_align_wr_ptr(Command cmd);
+void execute_block_copy(Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -190,7 +190,7 @@ void test_get_next_command() {
 
     command_pointer = commands;
 
-    struct Command cmd;
+    Command cmd;
 
     cmd = get_next_command();
     cut_assert_equal_int(0x01, cmd.dataLength);

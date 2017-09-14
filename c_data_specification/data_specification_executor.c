@@ -36,7 +36,7 @@ uint8_t command_get_length(uint32_t command) {
 //! \brief Find the operation code of a command (bits 27:20).
 //! \param[in] The command word (the first word of a command).
 //! \return The command's opcode.
-enum OpCode command_get_opcode(uint32_t command) {
+OpCode command_get_opcode(uint32_t command) {
     return (command & 0x0FF00000) >> 20;
 }
 
@@ -94,8 +94,8 @@ int command_src2_in_use(uint32_t command) {
 }
 
 uint32_t available_region_space(uint8_t region) {
-    return (uint32_t) memory_regions[region]->size -
-        (uint32_t) (memory_regions[region]->start_address -
+    return (uint32_t) memory_regions[region]->size - (uint32_t) (
+	    memory_regions[region]->start_address -
             memory_regions[region]->write_pointer);
 }
 
@@ -103,7 +103,6 @@ uint32_t available_region_space(uint8_t region) {
 //!        accordingly.
 //! \return A Command object storing the command.
 Command get_next_command() {
-
     // The command object.
     Command cmd;
 
@@ -128,7 +127,6 @@ Command get_next_command() {
 //!        a given size on SDRAM.
 //! \param[in] The command to be executed.
 void execute_reserve(Command cmd) {
-
     // Check if the instruction format is correct.
     if (cmd.dataLength != 1) {
         log_error("Data specification RESERVE requires one word as argument");
@@ -155,9 +153,8 @@ void execute_reserve(Command cmd) {
         sv->sdram_heap, mem_region_size, TAG, future_sark_xalloc_flags);
 
     if (mem_region_start == NULL) {
-        log_error(
-            "RESERVE unable to allocate %d bytes of SDRAM memory.",
-            mem_region_size);
+        log_error("RESERVE unable to allocate %d bytes of SDRAM memory",
+        	mem_region_size);
         rt_error(RTE_ABORT);
     }
 
@@ -170,21 +167,18 @@ void execute_reserve(Command cmd) {
 
     uint8_t read_only = (cmd.cmdWord >> 7) & 0x1;
 
-    log_debug(
-        "RESERVE %smemory region %d of %d bytes",
-        read_only ? "read-only " : "", region_id, mem_region_size);
+    log_debug("RESERVE %smemory region %d of %d bytes",
+	    read_only ? "read-only " : "", region_id, mem_region_size);
 
     memory_regions[region_id]->size = mem_region_size;
     memory_regions[region_id]->start_address = mem_region_start;
     memory_regions[region_id]->write_pointer = mem_region_start;
     memory_regions[region_id]->unfilled = read_only;
 
-    log_debug(
-        "region start pointer: 0x%08x",
-        memory_regions[region_id]->start_address);
-    log_debug(
-        "region write pointer: 0x%08x",
-        memory_regions[region_id]->write_pointer);
+    log_debug("region start pointer: 0x%08x",
+	    memory_regions[region_id]->start_address);
+    log_debug("region write pointer: 0x%08x",
+	    memory_regions[region_id]->write_pointer);
     log_debug("region size: %d", memory_regions[region_id]->size);
 
     if (memory_regions[region_id]->unfilled) {
@@ -197,18 +191,17 @@ void execute_reserve(Command cmd) {
 //! \brief Execute a FREE command.
 //! \param[in] cmd The command to be executed.
 void execute_free(Command cmd) {
-
     uint8_t region_id = cmd.cmdWord & 0x0F;
 
     if (memory_regions[region_id] == NULL) {
-        log_error("FREE region %d not allocated.", region_id);
+        log_error("FREE region %d not allocated", region_id);
         rt_error(RTE_ABORT);
     }
 
-    log_debug("FREE memory region %d.", region_id);
+    log_debug("FREE memory region %d", region_id);
 
     sark_xfree(
-        sv->sdram_heap, memory_regions[region_id]->start_address, ALLOC_LOCK);
+	    sv->sdram_heap, memory_regions[region_id]->start_address, ALLOC_LOCK);
 
     sark_free(memory_regions[region_id]);
 
@@ -222,44 +215,41 @@ void execute_free(Command cmd) {
 //! \param[in] size The size in bytes of the data to be written.
 //                  The supported sizes are 1, 2, 4 and 8 bytes.
 void write_value(void *value, int size) {
-
-    log_debug("wp: 0x%08x\n", memory_regions[current_region]->write_pointer);
-    log_debug("size of the data to be written: %d", size);
+    log_debug("writing %d bytes at pointer 0x%08x", size,
+	    memory_regions[current_region]->write_pointer);
 
     switch (size) {
-        case 1:
-            *(memory_regions[current_region]->write_pointer) =
-                *((uint8_t*) value);
-            break;
-        case 2:
-            *((uint16_t*)memory_regions[current_region]->write_pointer) =
+    case 1:
+	*(memory_regions[current_region]->write_pointer) =
+		*((uint8_t*) value);
+	break;
+    case 2:
+	*((uint16_t*)memory_regions[current_region]->write_pointer) =
                 *((uint16_t*) value);
-            break;
-        case 4:
-            *((uint32_t*)memory_regions[current_region]->write_pointer) =
+	break;
+    case 4:
+	*((uint32_t*)memory_regions[current_region]->write_pointer) =
                 *((uint32_t*) value);
-            break;
-        case 8:
-            *((uint64_t*)memory_regions[current_region]->write_pointer) =
+	break;
+    case 8:
+	*((uint64_t*)memory_regions[current_region]->write_pointer) =
                 *((uint64_t*) value);
-            break;
-        default:
-            log_error("write value unknown size");
-            rt_error(RTE_ABORT);
+	break;
+    default:
+	log_error("write value unknown size");
+	rt_error(RTE_ABORT);
     }
 
-    ((memory_regions[current_region]->write_pointer)) += size;
+    memory_regions[current_region]->write_pointer += size;
 
-    log_debug(
-        "final write pointer: 0x%08x",
-        memory_regions[current_region]->write_pointer);
+    log_debug("final write pointer: 0x%08x",
+	    memory_regions[current_region]->write_pointer);
 }
 
 //! \brief Execute a WRITE command, which writes 1, 2, 4 or 8 bytes of data from
 //!        a parameter to memory, with the possibility of data to be repeated.
 //! \param[in] cmd The command to be executed.
 void execute_write(Command cmd) {
-
     // The number of repetitions.
     int n_repeats;
 
@@ -267,11 +257,9 @@ void execute_write(Command cmd) {
     // repetitions.
     // Otherwise, the number of repetitions is stored into the last significant
     // byte.
-    if (command_src2_in_use(cmd.cmdWord))
-    {
+    if (command_src2_in_use(cmd.cmdWord)) {
         n_repeats = registers[command_get_src2Reg(cmd.cmdWord)];
-    }
-    else {
+    } else {
         n_repeats = cmd.cmdWord & 0xFF;
     }
 
@@ -287,9 +275,8 @@ void execute_write(Command cmd) {
     } else if (cmd.dataLength == 2 && data_len == 8) {
         data_val = ((uint64_t)cmd.dataWords[0] << 32) | cmd.dataWords[1];
     } else {
-        log_error(
-            "WRITE format error. DataLength %d data_len %d src1 in use %d",
-            cmd.dataLength, data_len, command_src1_in_use(cmd.cmdWord));
+        log_error("WRITE format error. DataLength %d data_len %d src1 in use %d",
+        	cmd.dataLength, data_len, command_src1_in_use(cmd.cmdWord));
         rt_error(RTE_ABORT);
     }
 
@@ -305,21 +292,21 @@ void execute_write(Command cmd) {
         log_error("WRITE the current memory region is full");
         log_error("current region: %d", current_region);
         log_error("start region address: 0x%08x",
-            memory_regions[current_region]->start_address);
+        	memory_regions[current_region]->start_address);
         log_error("current write pointer: 0x%08x",
-            memory_regions[current_region]->write_pointer);
+        	memory_regions[current_region]->write_pointer);
         log_error("size of the data to be written: %d", data_len);
         log_error("available space: %d",
-            available_region_space(current_region));
+        	available_region_space(current_region));
         log_error("address of the data specification file: 0x%08x",
-            dsf_pointer);
+        	dsf_pointer);
         log_error("address of the instruction executed: 0x%08x",
-            command_pointer);
+        	command_pointer);
         rt_error(RTE_ABORT);
-    } else {
-        for (int count = 0; count < n_repeats; count++) {
-            write_value(&data_val, data_len);
-        }
+    }
+
+    for (int count = 0; count < n_repeats; count++) {
+	write_value(&data_val, data_len);
     }
 }
 
@@ -327,7 +314,6 @@ void execute_write(Command cmd) {
 //!        to memory.
 //! \param[in] cmd The command to be executed.
 void execute_write_array(Command cmd) {
-
     // The length of the array is specified in the second word of the command.
     int length        = cmd.dataWords[0];
     uint8_t data_size = cmd.cmdWord & 0x0F;
@@ -335,47 +321,43 @@ void execute_write_array(Command cmd) {
     // Perform some checks and, if everything is fine, write the array to
     // memory.
     if (current_region == -1) {
-        log_error(
-            "WRITE_ARRAY the current memory region has not been selected");
+        log_error("WRITE_ARRAY the current memory region has not been selected");
         rt_error(RTE_ABORT);
     } else if (memory_regions[current_region] == NULL) {
-        log_error(
-            "WRITE_ARRAY the current memory region has not been allocated");
+        log_error("WRITE_ARRAY the current memory region has not been allocated");
         rt_error(RTE_ABORT);
     } else if (available_region_space(current_region) < length * data_size) {
         log_error("WRITE_ARRAY the current memory region is full");
         log_error("current region: %d", current_region);
         log_error("start region address: 0x%08x",
-            memory_regions[current_region]->start_address);
+        	memory_regions[current_region]->start_address);
         log_error("current write pointer: 0x%08x",
-            memory_regions[current_region]->write_pointer);
+        	memory_regions[current_region]->write_pointer);
         log_error("size of the data to be written: %d", length * data_size);
         log_error("available space: %d",
-            available_region_space(current_region));
+        	available_region_space(current_region));
         log_error("address of the data specification file: 0x%08x",
-            dsf_pointer);
+        	dsf_pointer);
         log_error("address of the instruction executed: 0x%08x",
-            command_pointer);
+        	command_pointer);
         rt_error(RTE_ABORT);
-    } else {
-
-        uint8_t *array_writer = (uint8_t*)command_pointer;
-        for (int count = 0; count < length; count++) {
-            write_value(array_writer, data_size);
-            array_writer += data_size;
-        }
-
-        command_pointer = ((long)array_writer & 0x03)?
-            (address_t)((((long)array_writer >> 2) + 1) << 2) :
-            (address_t)array_writer;
     }
+
+    uint8_t *array_writer = (uint8_t*)command_pointer;
+    for (int count = 0; count < length; count++) {
+	write_value(array_writer, data_size);
+	array_writer += data_size;
+    }
+
+    command_pointer = ((long)array_writer & 0x03)?
+	    (address_t)((((long)array_writer >> 2) + 1) << 2) :
+            (address_t)array_writer;
 }
 
 //! \brief Execute a SWITCH_FOCUS command, which changes the selected memory
 //!        region.
 //! \param[in] cmd The command to be executed.
 void execute_switch_focus(Command cmd) {
-
     // The region to be selected.
     int region;
 
@@ -391,9 +373,9 @@ void execute_switch_focus(Command cmd) {
     if (memory_regions[region] == NULL) {
         log_error("SWITCH_FOCUS unallocated memory region");
         rt_error(RTE_ABORT);
-    } else {
-        current_region = region;
     }
+
+    current_region = region;
 }
 
 extern int stack_size;
@@ -401,7 +383,6 @@ extern int stack_size;
 //! \brief Execute a LOOP command.
 //! \param[in] cmd The command to be executed.
 void execute_loop(Command cmd) {
-
     int used_data_words = 0;
 
     // The start value of the loop counter.
@@ -439,7 +420,6 @@ void execute_loop(Command cmd) {
             command = get_next_command();
         } while (command.opCode != END_LOOP);
     } else {
-
         // Push the return value of the command pointer on the stack.
         stack_push(command_pointer);
 
@@ -458,7 +438,6 @@ void execute_loop(Command cmd) {
 //!        Reads the entire structure definition, up to the END_STRUCT command.
 //! \param[in] cmd The command to be executed.
 void execute_start_struct(Command cmd) {
-
     // The id of the new struct.
     int struct_id = cmd.cmdWord & 0x1F;
 
@@ -511,7 +490,6 @@ void execute_start_struct(Command cmd) {
 //!        memory region.
 //! \param[in] cmd The command to be executed.
 void execute_write_struct(Command cmd) {
-
     // The number of repetitions of the same struct.
     uint8_t n_repeats;
     if (command_src1_in_use(cmd.cmdWord)) {
@@ -528,14 +506,14 @@ void execute_write_struct(Command cmd) {
         rt_error(RTE_ABORT);
     }
 
-
     // Iterate over all elements of the struct n times and print all the
     // defined elements.
     for (int count = 0; count < n_repeats; count++) {
         for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++) {
             write_value(
-                &(structs[struct_id]->elements[elem_id].data),
-                data_type_get_size(structs[struct_id]->elements[elem_id].type));
+        	    &(structs[struct_id]->elements[elem_id].data),
+		    data_type_get_size(
+			    structs[struct_id]->elements[elem_id].type));
         }
     }
 }
@@ -543,7 +521,6 @@ void execute_write_struct(Command cmd) {
 //! \brief Execute a MV instruction.
 //! \param[in] cmd The command to be executed.
 void execute_mv(Command cmd) {
-
     // The id of the destination register.
     uint8_t dest_id = command_get_destReg(cmd.cmdWord);
 
@@ -564,7 +541,6 @@ void execute_mv(Command cmd) {
 //! \brief Execute a LOGIC_OP instruction.
 //! \param[in] cmd The command to be executed.
 void execute_logic_op(Command cmd) {
-
     // The operation to be performed.
     uint8_t operation = cmd.cmdWord & 0xF;
 
@@ -592,27 +568,27 @@ void execute_logic_op(Command cmd) {
     uint8_t dest_id = command_get_destReg(cmd.cmdWord);
 
     switch (operation) {
-        case 0x0:
-            registers[dest_id] = source1 << source2;
-            break;
-        case 0x1:
-            registers[dest_id] = source1 >> source2;
-            break;
-        case 0x2:
-            registers[dest_id] = source1 |  source2;
-            break;
-        case 0x3:
-            registers[dest_id] = source1 &  source2;
-            break;
-        case 0x4:
-            registers[dest_id] = source1 ^  source2;
-            break;
-        case 0x5:
-            registers[dest_id] =~source1;
-            break;
-        default:
-            log_error("Undefined logic operation %d", operation);
-            rt_error(RTE_ABORT);
+    case 0x0:
+	registers[dest_id] = source1 << source2;
+	break;
+    case 0x1:
+	registers[dest_id] = source1 >> source2;
+	break;
+    case 0x2:
+	registers[dest_id] = source1 |  source2;
+	break;
+    case 0x3:
+	registers[dest_id] = source1 &  source2;
+	break;
+    case 0x4:
+	registers[dest_id] = source1 ^  source2;
+	break;
+    case 0x5:
+	registers[dest_id] =~source1;
+	break;
+    default:
+	log_error("Undefined logic operation %d", operation);
+	rt_error(RTE_ABORT);
     }
 }
 
@@ -620,7 +596,6 @@ void execute_logic_op(Command cmd) {
 //! \brief Execute a WRITE_PARAM instruction.
 //! \param[in] cmd The command to be executed.
 void execute_write_param(Command cmd) {
-
     // The value to be written.
     uint64_t value;
     if (command_src1_in_use(cmd.cmdWord)) {
@@ -639,9 +614,8 @@ void execute_write_param(Command cmd) {
         rt_error(RTE_ABORT);
     }
     if (structs[struct_id]->size <= elem_id) {
-        log_error(
-            "WRITE_PARAM %d is not a valid element id in structure %d",
-            struct_id, elem_id);
+        log_error("WRITE_PARAM %d is not a valid element id in structure %d",
+        	struct_id, elem_id);
         rt_error(RTE_ABORT);
     }
 
@@ -666,7 +640,6 @@ void execute_read_param(Command cmd) {
 //! \brief Execute a COPY_PARAM instruction.
 //! \param[in] cmd The command to be executed.
 void execute_copy_param(Command cmd) {
-
     uint8_t dest_id = (cmd.cmdWord & 0xF000) >> 12;
     uint8_t src_struct_id  = (cmd.cmdWord & 0x0F00) >> 8;
 
@@ -674,40 +647,37 @@ void execute_copy_param(Command cmd) {
     uint8_t src_elem_id   = (cmd.dataWords[0] & 0x00FF);
 
     if (structs[src_struct_id] == NULL) {
-        log_error("COPY_PARAM source structure %d not defined.", src_struct_id);
+        log_error("COPY_PARAM source structure %d not defined", src_struct_id);
         rt_error(RTE_ABORT);
     }
     if (structs[src_struct_id]->size <= src_elem_id) {
-        log_error(
-            "COPY_PARAM source element %d of structure %d not defined.",
-            dest_elem_id, dest_id);
+        log_error("COPY_PARAM source element %d of structure %d not defined",
+        	dest_elem_id, dest_id);
         rt_error(RTE_ABORT);
     }
 
     if (command_dest_in_use(cmd.cmdWord)) {
         registers[dest_id] = structs[src_struct_id]->elements[src_elem_id].data;
     } else {
-
         if (structs[src_struct_id] == NULL) {
-            log_error(
-                "COPY_PARAM destination structure %d not defined.", dest_id);
+            log_error("COPY_PARAM destination structure %d not defined",
+        	    dest_id);
             rt_error(RTE_ABORT);
         }
         if (structs[src_struct_id]->size <= dest_elem_id) {
-            log_error("COPY_PARAM destination element %d of structure %d "
-                      "not defined.", dest_elem_id, dest_id);
+            log_error("COPY_PARAM destination element %d of structure %d not defined",
+		      dest_elem_id, dest_id);
             rt_error(RTE_ABORT);
         }
 
         structs[dest_id]->elements[dest_elem_id].data =
-            structs[src_struct_id]->elements[src_elem_id].data;
+        	structs[src_struct_id]->elements[src_elem_id].data;
     }
 }
 
 //! \brief Execute a PRINT_TEXT command.
 //! \param[in] cmd The command to be executed.
 void execute_print_text(Command cmd) {
-
     // The number of characters to be printed.
     uint8_t n_characters = cmd.cmdWord & 0xFF;
 
@@ -733,7 +703,6 @@ void execute_print_text(Command cmd) {
 //! \brief Execute a PRINT_STRUCT command.
 //! \param[in] cmd The command to be executed.
 void execute_print_struct(Command cmd) {
-
     uint8_t struct_id;
     if (command_src1_in_use(cmd.cmdWord)) {
         struct_id = registers[command_get_src1Reg(cmd.cmdWord)];
@@ -748,11 +717,10 @@ void execute_print_struct(Command cmd) {
 
     log_info("Printing structure %d", struct_id);
     for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++) {
-        log_info(
-            "\t%08X%08X",
-            (structs[struct_id]->elements[elem_id].data &
-                 0xFFFFFFFF00000000LL) >> 32,
-            structs[struct_id]->elements[elem_id].data & 0xFFFFFFFF);
+        log_info("\t%08X%08X",
+        	(structs[struct_id]->elements[elem_id].data &
+        		0xFFFFFFFF00000000LL) >> 32,
+		structs[struct_id]->elements[elem_id].data & 0xFFFFFFFF);
     }
 }
 
@@ -781,7 +749,6 @@ int get_nth_struct_arg(Command cmd, int param_n) {
 //! \brief Execute a START_CONSTRUCTOR command.
 //! \param[in] cmd The command to be executed.
 void execute_start_constructor(Command cmd) {
-
     int constructor_id = (cmd.cmdWord & 0xF800) >> 11;
     int arg_count      = (cmd.cmdWord & 0x0700) >> 8;
     int read_only_mask = (cmd.cmdWord & 0x001F);
@@ -801,7 +768,6 @@ void execute_start_constructor(Command cmd) {
 //! \brief Execute a CONSTRUCT command.
 //! \param[in] cmd The command to be executed.
 void execute_construct(Command cmd) {
-
     int constructor_id = (cmd.cmdWord & 0x1F00) >> 8;
 
     // Space to temporarily save the read only structs.
@@ -852,25 +818,25 @@ void execute_read(Command cmd) {
     int data_len = cmd.cmdWord & 0xF;
 
     switch (data_len) {
-        case 1:
-            registers[dest_id] =
+    case 1:
+	registers[dest_id] =
                 *((uint8_t*)memory_regions[current_region]->write_pointer);
-            break;
-        case 2:
-            registers[dest_id] =
+	break;
+    case 2:
+	registers[dest_id] =
                 *((uint16_t*)memory_regions[current_region]->write_pointer);
-            break;
-        case 4:
-            registers[dest_id] =
+	break;
+    case 4:
+	registers[dest_id] =
                 *((uint32_t*)memory_regions[current_region]->write_pointer);
-            break;
-        case 8:
-            registers[dest_id] =
+	break;
+    case 8:
+	registers[dest_id] =
                 *((uint64_t*)memory_regions[current_region]->write_pointer);
-            break;
-        default:
-            log_error("READ unsupported size %d", data_len);
-            rt_error(RTE_ABORT);
+	break;
+    default:
+	log_error("READ unsupported size %d", data_len);
+	rt_error(RTE_ABORT);
     }
 
     memory_regions[current_region]->write_pointer += data_len;
@@ -880,9 +846,9 @@ void execute_read(Command cmd) {
 //! \param[in] cmd The command to be executed.
 void execute_get_wr_ptr(Command cmd) {
     int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
-    registers[dest_reg] =
-        (long) (memory_regions[current_region]->write_pointer -
-        memory_regions[current_region]->start_address);
+    registers[dest_reg] = (long) (
+	    memory_regions[current_region]->write_pointer -
+	    memory_regions[current_region]->start_address);
 }
 
 //! \brief Execute a SET_WR_PTR command.
@@ -901,8 +867,8 @@ void execute_set_wr_ptr(Command cmd) {
     if (relative_addressing) {
         memory_regions[current_region]->write_pointer += source;
     } else {
-        memory_regions[current_region]->write_pointer =
-            (uint8_t*) (memory_regions[current_region]->start_address + source);
+        memory_regions[current_region]->write_pointer = (uint8_t*) (
+        	memory_regions[current_region]->start_address + source);
     }
 }
 
@@ -924,34 +890,33 @@ void execute_if(Command cmd) {
     }
 
     switch (operation) {
-        case 0x00:
-            op_result = source1 == source2;
-            break;
-        case 0x01:
-            op_result = source1 != source2;
-            break;
-        case 0x02:
-            op_result = source1 <= source2;
-            break;
-        case 0x03:
-            op_result = source1 <  source2;
-            break;
-        case 0x04:
-            op_result = source1 >= source2;
-            break;
-        case 0x05:
-            op_result = source1 >  source2;
-            break;
-        case 0x06:
-            op_result = source1 == 0;
-            break;
-        case 0x07:
-            op_result = source1 != 0;
-            break;
+    case 0x00:
+	op_result = source1 == source2;
+	break;
+    case 0x01:
+	op_result = source1 != source2;
+	break;
+    case 0x02:
+	op_result = source1 <= source2;
+	break;
+    case 0x03:
+	op_result = source1 <  source2;
+	break;
+    case 0x04:
+	op_result = source1 >= source2;
+	break;
+    case 0x05:
+	op_result = source1 >  source2;
+	break;
+    case 0x06:
+	op_result = source1 == 0;
+	break;
+    case 0x07:
+	op_result = source1 != 0;
+	break;
     }
 
     if (op_result == 0) {
-
         // Skip all instructions up to ELSE or END_IF.
         Command command = get_next_command();
         while (command.opCode != ELSE && command.opCode != END_IF) {
@@ -963,7 +928,6 @@ void execute_if(Command cmd) {
 //! \brief Execute an ELSE command.
 //! \param[in] cmd The command to be executed.
 void execute_else(Command cmd) {
-
     // Skip all instructions up to END_IF.
     Command command;
     do {
@@ -976,11 +940,10 @@ void execute_else(Command cmd) {
 void execute_print_val(Command cmd) {
     if (command_src1_in_use(cmd.cmdWord)) {
         uint64_t data = registers[command_get_src1Reg(cmd.cmdWord)];
-        log_info(
-            "Register %d has value %08X%08X",
-            command_get_src1Reg(cmd.cmdWord),
-            (uint32_t) ((data % 0xFFFFFFFF00000000LL) >> 32),
-            (uint32_t) (data & 0xFFFFFFFFF));
+        log_info("Register %d has value %08X%08X",
+        	command_get_src1Reg(cmd.cmdWord),
+		(uint32_t) ((data % 0xFFFFFFFF00000000LL) >> 32),
+		(uint32_t) (data & 0xFFFFFFFFF));
     } else if (cmd.dataLength == 1) {
         log_info("Value %08X", cmd.dataWords[0]);
     } else {
@@ -1018,33 +981,33 @@ void execute_arith_op(Command cmd) {
     uint64_t result = 0;
     if (sgn) {
         switch (operation) {
-            case 0:
-                result = (int64_t)source1 + (int64_t)source2;
-                break;
-            case 1:
-                result = (int64_t)source1 - (int64_t)source2;
-                break;
-            case 2:
-                result = (int64_t)source1 * (int64_t)source2;
-                break;
-            default:
-                log_error("Unknown arithmetic operation");
-                rt_error(RTE_ABORT);
+        case 0:
+            result = (int64_t)source1 + (int64_t)source2;
+            break;
+        case 1:
+            result = (int64_t)source1 - (int64_t)source2;
+            break;
+        case 2:
+            result = (int64_t)source1 * (int64_t)source2;
+            break;
+        default:
+            log_error("Unknown arithmetic operation");
+            rt_error(RTE_ABORT);
         }
     } else {
         switch (operation) {
-            case 0:
-                result = source1 + source2;
-                break;
-            case 1:
-                result = source1 - source2;
-                break;
-            case 2:
-                result = source1 * source2;
-                break;
-            default:
-                log_error("Unknown arithmetic operation");
-                rt_error(RTE_ABORT);
+        case 0:
+            result = source1 + source2;
+            break;
+        case 1:
+            result = source1 - source2;
+            break;
+        case 2:
+            result = source1 * source2;
+            break;
+        default:
+            log_error("Unknown arithmetic operation");
+            rt_error(RTE_ABORT);
         }
     }
     registers[dest_reg] = result;
@@ -1074,7 +1037,6 @@ void execute_copy_struct(Command cmd) {
 //! \brief Execute a ALIGN_WR_PTR command.
 //! \param[in] cmd The command to be executed.
 void execute_align_wr_ptr(Command cmd) {
-
     uint8_t padding_value = 0;
 
     int block_size = cmd.cmdWord & 0x1F;
@@ -1088,8 +1050,8 @@ void execute_align_wr_ptr(Command cmd) {
     }
 
     if (command_dest_in_use(cmd.cmdWord)) {
-        registers[command_get_destReg(cmd.cmdWord)] =
-            (long) memory_regions[current_region]->write_pointer;
+        registers[command_get_destReg(cmd.cmdWord)] = (long)
+        	memory_regions[current_region]->write_pointer;
     }
 
 }
@@ -1097,11 +1059,10 @@ void execute_align_wr_ptr(Command cmd) {
 //! \brief Execute a BLOCK_COPY command.
 //! \param[in] cmd The command to be executed.
 void execute_block_copy(Command cmd) {
-
-    address_t source =
-        (address_t) (uint32_t) registers[command_get_src2Reg(cmd.cmdWord)];
-    address_t destination =
-        (address_t) (uint32_t) registers[command_get_destReg(cmd.cmdWord)];
+    address_t source = (address_t)
+	    (uint32_t) registers[command_get_src2Reg(cmd.cmdWord)];
+    address_t destination = (address_t)
+	    (uint32_t) registers[command_get_destReg(cmd.cmdWord)];
 
     uint32_t size = command_get_src1Reg(cmd.cmdWord);
     if (command_src1_in_use(cmd.cmdWord)) {
@@ -1119,7 +1080,6 @@ void execute_block_copy(Command cmd) {
 //!                     If ds_size is 0, DSE will run until a stopping command
 //!                     is reached.
 void data_specification_executor(address_t ds_start, uint32_t ds_size) {
-
     // Pointer to the next command to be executed.
     dsf_pointer = ds_start;
     command_pointer = ds_start;
@@ -1134,148 +1094,147 @@ void data_specification_executor(address_t ds_start, uint32_t ds_size) {
     while (ds_size != 0 ? command_pointer < ds_end : 1) {
         cmd = get_next_command();
         switch (cmd.opCode) {
-            case BREAK:
-
-                // This command stops the execution of the data spec and
-                // outputs an error in the log.
-                log_error("BREAK encountered");
-                rt_error(RTE_ABORT);
-                return;
-            case NOP:
-                // This command executes no operation.
-                break;
-            case RESERVE:
-                execute_reserve(cmd);
-                break;
-            case FREE:
-                execute_free(cmd);
-                break;
-            case DECLARE_RNG:
-                log_error("Unimplemented DSE command DECLARE_RNG");
-                rt_error(RTE_ABORT);
-                break;
-            case DECLARE_RANDOM_DIST:
-                log_error("Unimplemented DSE command DECLARE_RANDOM_DIST");
-                rt_error(RTE_ABORT);
-                break;
-            case GET_RANDOM_NUMBER:
-                log_error("Unimplemented DSE command GET_RANDOM_NUMBER");
-                rt_error(RTE_ABORT);
-                break;
-            case START_STRUCT:
-                execute_start_struct(cmd);
-                break;
-            case STRUCT_ELEM:
-                break;
-            case END_STRUCT:
-                break;
-            case START_PACKSPEC:
-                log_error("Unimplemented DSE command START_PACKSPEC");
-                rt_error(RTE_ABORT);
-                break;
-            case PACK_PARAM:
-                log_error("Unimplemented DSE command PACK_PARAM");
-                rt_error(RTE_ABORT);
-                break;
-            case END_PACKSPEC:
-                log_error("Unimplemented DSE command END_PACKSPEC");
-                rt_error(RTE_ABORT);
-                break;
-            case START_CONSTRUCTOR:
-                execute_start_constructor(cmd);
-                break;
-            case END_CONSTRUCTOR:
-                log_debug("Constructor ended");
-                return;
-            case CONSTRUCT:
-                execute_construct(cmd);
-                break;
-            case READ:
-                execute_read(cmd);
-                break;
-            case WRITE:
-                execute_write(cmd);
-                break;
-            case WRITE_ARRAY:
-                execute_write_array(cmd);
-                break;
-            case WRITE_STRUCT:
-                execute_write_struct(cmd);
-                break;
-            case BLOCK_COPY:
-                execute_block_copy(cmd);
-                break;
-            case SWITCH_FOCUS:
-                execute_switch_focus(cmd);
-                break;
-            case LOOP:
-                execute_loop(cmd);
-                break;
-            case BREAK_LOOP:
-                return;
-            case END_LOOP:
-                return;
-            case IF:
-                execute_if(cmd);
-                break;
-            case ELSE:
-                execute_else(cmd);
-                break;
-            case END_IF:
-                break;
-            case MV:
-                execute_mv(cmd);
-                break;
-            case GET_WR_PTR:
-                execute_get_wr_ptr(cmd);
-                break;
-            case SET_WR_PTR:
-                execute_set_wr_ptr(cmd);
-                break;
-            case ALIGN_WR_PTR:
-                execute_align_wr_ptr(cmd);
-                break;
-            case ARITH_OP:
-                execute_arith_op(cmd);
-                break;
-            case LOGIC_OP:
-                execute_logic_op(cmd);
-                break;
-            case REFORMAT:
-                log_error("Unimplemented DSE command REFORMAT");
-                rt_error(RTE_ABORT);
-                break;
-            case COPY_STRUCT:
-                execute_copy_struct(cmd);
-                break;
-            case COPY_PARAM:
-                execute_copy_param(cmd);
-                break;
-            case WRITE_PARAM:
-                execute_write_param(cmd);
-                break;
-            case READ_PARAM:
-                execute_read_param(cmd);
-                break;
-            case WRITE_PARAM_COMPONENT:
-                log_error("Unimplemented DSE command WRITE_PARAM_COMPONENT");
-                rt_error(RTE_ABORT);
-                break;
-            case PRINT_VAL:
-                execute_print_val(cmd);
-                break;
-            case PRINT_TXT:
-                execute_print_text(cmd);
-                break;
-            case PRINT_STRUCT:
-                execute_print_struct(cmd);
-                break;
-            case END_SPEC:
-                log_info("End of spec has been reached");
-                return;
-            default:
-                log_error("Not a DSE command: %x", cmd.opCode);
-                rt_error(RTE_ABORT);
+        case BREAK:
+            // This command stops the execution of the data spec and
+            // outputs an error in the log.
+            log_error("BREAK encountered");
+            rt_error(RTE_ABORT);
+            return;
+        case NOP:
+            // This command executes no operation.
+            break;
+        case RESERVE:
+            execute_reserve(cmd);
+            break;
+        case FREE:
+            execute_free(cmd);
+            break;
+        case DECLARE_RNG:
+            log_error("Unimplemented DSE command DECLARE_RNG");
+            rt_error(RTE_ABORT);
+            break;
+        case DECLARE_RANDOM_DIST:
+            log_error("Unimplemented DSE command DECLARE_RANDOM_DIST");
+            rt_error(RTE_ABORT);
+            break;
+        case GET_RANDOM_NUMBER:
+            log_error("Unimplemented DSE command GET_RANDOM_NUMBER");
+            rt_error(RTE_ABORT);
+            break;
+        case START_STRUCT:
+            execute_start_struct(cmd);
+            break;
+        case STRUCT_ELEM:
+            break;
+        case END_STRUCT:
+            break;
+        case START_PACKSPEC:
+            log_error("Unimplemented DSE command START_PACKSPEC");
+            rt_error(RTE_ABORT);
+            break;
+        case PACK_PARAM:
+            log_error("Unimplemented DSE command PACK_PARAM");
+            rt_error(RTE_ABORT);
+            break;
+        case END_PACKSPEC:
+            log_error("Unimplemented DSE command END_PACKSPEC");
+            rt_error(RTE_ABORT);
+            break;
+        case START_CONSTRUCTOR:
+            execute_start_constructor(cmd);
+            break;
+        case END_CONSTRUCTOR:
+            log_debug("Constructor ended");
+            return;
+        case CONSTRUCT:
+            execute_construct(cmd);
+            break;
+        case READ:
+            execute_read(cmd);
+            break;
+        case WRITE:
+            execute_write(cmd);
+            break;
+        case WRITE_ARRAY:
+            execute_write_array(cmd);
+            break;
+        case WRITE_STRUCT:
+            execute_write_struct(cmd);
+            break;
+        case BLOCK_COPY:
+            execute_block_copy(cmd);
+            break;
+        case SWITCH_FOCUS:
+            execute_switch_focus(cmd);
+            break;
+        case LOOP:
+            execute_loop(cmd);
+            break;
+        case BREAK_LOOP:
+            return;
+        case END_LOOP:
+            return;
+        case IF:
+            execute_if(cmd);
+            break;
+        case ELSE:
+            execute_else(cmd);
+            break;
+        case END_IF:
+            break;
+        case MV:
+            execute_mv(cmd);
+            break;
+        case GET_WR_PTR:
+            execute_get_wr_ptr(cmd);
+            break;
+        case SET_WR_PTR:
+            execute_set_wr_ptr(cmd);
+            break;
+        case ALIGN_WR_PTR:
+            execute_align_wr_ptr(cmd);
+            break;
+        case ARITH_OP:
+            execute_arith_op(cmd);
+            break;
+        case LOGIC_OP:
+            execute_logic_op(cmd);
+            break;
+        case REFORMAT:
+            log_error("Unimplemented DSE command REFORMAT");
+            rt_error(RTE_ABORT);
+            break;
+        case COPY_STRUCT:
+            execute_copy_struct(cmd);
+            break;
+        case COPY_PARAM:
+            execute_copy_param(cmd);
+            break;
+        case WRITE_PARAM:
+            execute_write_param(cmd);
+            break;
+        case READ_PARAM:
+            execute_read_param(cmd);
+            break;
+        case WRITE_PARAM_COMPONENT:
+            log_error("Unimplemented DSE command WRITE_PARAM_COMPONENT");
+            rt_error(RTE_ABORT);
+            break;
+        case PRINT_VAL:
+            execute_print_val(cmd);
+            break;
+        case PRINT_TXT:
+            execute_print_text(cmd);
+            break;
+        case PRINT_STRUCT:
+            execute_print_struct(cmd);
+            break;
+        case END_SPEC:
+            log_debug("End of spec has been reached");
+            return;
+        default:
+            log_error("Not a DSE command: %x", cmd.opCode);
+            rt_error(RTE_ABORT);
         }
     }
 }

@@ -23,6 +23,8 @@ before_install:
 install:
   - pip install -r requirements-test.txt
   - python ./setup.py install
+  # C build checks
+  - make -C c_data_specification -f test.mk build-test
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
 
 script:

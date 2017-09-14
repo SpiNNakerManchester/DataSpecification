@@ -21,6 +21,7 @@ TEST_OBJS=$(BUILD_TEST_DIR)/test_data_specification_executor.o
 CUTTER_FLAGS=${shell pkg-config --cflags cutter}
 CUTTER_LIBS =${shell pkg-config --libs   cutter}
 
+build-test: $(TEST_TARGET)
 check: $(TEST_TARGET)
 	cutter $(BUILD_TEST_DIR)
 
@@ -37,3 +38,5 @@ $(BUILD_TEST_DIR)/%.o: %.c $(TEST_SRCS) $(HEADERS)
 $(TEST_OBJS): $(TEST_SRCS) $(HEADERS)
 	test -d $(BUILD_TEST_DIR) || mkdir -p $(BUILD_TEST_DIR)
 	$(CC) $(CFLAGS) -c $< -I$(SRC_DIR) -o $@
+
+.PHONY: build-test check

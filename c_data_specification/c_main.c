@@ -14,27 +14,6 @@
 //! Initialised with 0 (NULL) by default.
 MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
-//! \brief Get the value of user2 register.
-//!
-//! \return The value of user2.
-uint32_t get_user2_value() {
-    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user2;
-}
-
-//! \brief Get the value of user1 register.
-//!
-//! \return The value of user1.
-uint32_t get_user1_value() {
-    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user1;
-}
-
-//! \brief Get the value of user0 register.
-//!
-//! \return The value of user0.
-uint32_t get_user0_value() {
-    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user0;
-}
-
 //! \brief Pointer to a memory region that contains the currently executing
 //!        data spec.
 address_t execRegion = NULL;
@@ -67,6 +46,31 @@ uint8_t generate_report;
 //! \brief memory are to store info related to the regions, to be used for
 //         memory map report
 MemoryRegion *report_header_start = NULL;
+
+// -------------------------------------------------------------------------
+
+#ifndef EMULATE
+
+//! \brief Get the value of user2 register.
+//!
+//! \return The value of user2.
+uint32_t get_user2_value() {
+    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user2;
+}
+
+//! \brief Get the value of user1 register.
+//!
+//! \return The value of user1.
+uint32_t get_user1_value() {
+    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user1;
+}
+
+//! \brief Get the value of user0 register.
+//!
+//! \return The value of user0.
+uint32_t get_user0_value() {
+    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user0;
+}
 
 //! \brief Allocate memory for the header and the pointer table.
 void pointer_table_header_alloc() {
@@ -109,8 +113,7 @@ void pointer_table_header_alloc() {
 void write_pointer_table() {
 
     // Pointer to write the pointer table.
-    address_t base_ptr = (address_t)(
-        ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user0);
+    address_t base_ptr = (address_t) get_user0_value();
     address_t pt_writer = base_ptr + HEADER_SIZE;
 
     // Iterate over the memory regions and write their start address in the
@@ -204,3 +207,5 @@ void c_main(void) {
     // would get rid of the data in DTCM
     free_mem_region_info();
 }
+
+#endif // !EMULATE

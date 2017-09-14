@@ -36,7 +36,7 @@ uint8_t command_get_length(uint32_t command) {
 //! \brief Find the operation code of a command (bits 27:20).
 //! \param[in] The command word (the first word of a command).
 //! \return The command's opcode.
-enum OpCode command_get_opcode(uint32_t command) {
+OpCode command_get_opcode(uint32_t command) {
     return (command & 0x0FF00000) >> 20;
 }
 
@@ -223,7 +223,7 @@ void execute_free(Command cmd) {
 //                  The supported sizes are 1, 2, 4 and 8 bytes.
 void write_value(void *value, int size) {
 
-    log_debug("wp: 0x%08x\n", memory_regions[current_region]->write_pointer);
+    log_debug("wp: 0x%08x", memory_regions[current_region]->write_pointer);
     log_debug("size of the data to be written: %d", size);
 
     switch (size) {

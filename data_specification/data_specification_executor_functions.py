@@ -2,6 +2,12 @@ from data_specification import constants, exceptions, memory_region_collection
 import struct
 from data_specification.memory_region import MemoryRegion
 
+_ONE_BYTE = struct.Struct("<B")
+_ONE_SHORT = struct.Struct("<H")
+_ONE_WORD = struct.Struct("<I")
+_ONE_LONG = struct.Struct("<Q")
+_ONE_SIGNED_INT = struct.Struct("<i")
+
 
 class DataSpecificationExecutorFunctions(object):
     """ This class includes the function related to each of the commands\
@@ -171,7 +177,7 @@ class DataSpecificationExecutorFunctions(object):
             raise exceptions.DataSpecificationRegionInUseException(region)
 
         size_encoded = self.spec_reader.read(4)
-        size = struct.unpack("<I", str(size_encoded))[0]
+        size = _ONE_WORD.unpack(str(size_encoded))[0]
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
@@ -244,10 +250,10 @@ class DataSpecificationExecutorFunctions(object):
         else:
             if self._cmd_size == constants.LEN2 and data_len != 8:
                 read_data = self.spec_reader.read(4)
-                value = struct.unpack("<I", str(read_data))[0]
+                value = _ONE_WORD.unpack(str(read_data))[0]
             elif self._cmd_size == constants.LEN3 and data_len == 8:
                 read_data = self.spec_reader.read(8)
-                value = struct.unpack("<Q", str(read_data))[0]
+                value = _ONE_LONG.unpack(str(read_data))[0]
             else:
                 raise exceptions.DataSpecificationSyntaxError(
                     "Command {0:s} requires a value as an argument, but the "
@@ -270,7 +276,7 @@ class DataSpecificationExecutorFunctions(object):
         :rtype: None
         """
         length_encoded = self.spec_reader.read(4)
-        length = struct.unpack("<I", str(length_encoded))[0]
+        length = _ONE_WORD.unpack(str(length_encoded))[0]
         value_encoded = self.spec_reader.read(4 * length)
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
@@ -347,7 +353,7 @@ class DataSpecificationExecutorFunctions(object):
             self.registers[self.dest_reg] = self.registers[self.src1_reg]
         else:
             data_encoded = self.spec_reader.read(4)
-            data = struct.unpack("<I", str(data_encoded))[0]
+            data = _ONE_WORD.unpack(str(data_encoded))[0]
             self.registers[self.dest_reg] = data
 
     def execute_get_wr_ptr(self, cmd):
@@ -364,7 +370,7 @@ class DataSpecificationExecutorFunctions(object):
 
             # the data is a raw address
             data_encoded = self.spec_reader.read(4)
-            future_address = struct.unpack("<I", str(data_encoded))[0]
+            future_address = _ONE_WORD.unpack(str(data_encoded))[0]
 
         # check that the address is relative or absolute
         if cmd & 0x1 == 1:
@@ -437,7 +443,7 @@ class DataSpecificationExecutorFunctions(object):
             If command END_SPEC != -1
         """
         read_data = self.spec_reader.read(4)
-        value = struct.unpack("<i", str(read_data))[0]
+        value = _ONE_SIGNED_INT.unpack(str(read_data))[0]
         if value != -1:
             raise exceptions.DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
@@ -494,13 +500,13 @@ class DataSpecificationExecutorFunctions(object):
                 space_available, space_required, self.current_region)
 
         if n_bytes == 1:
-            encoded_value = struct.pack("<B", value)
+            encoded_value = _ONE_BYTE.pack(value)
         elif n_bytes == 2:
-            encoded_value = struct.pack("<H", value)
+            encoded_value = _ONE_SHORT.pack(value)
         elif n_bytes == 4:
-            encoded_value = struct.pack("<I", value)
+            encoded_value = _ONE_WORD.pack(value)
         elif n_bytes == 8:
-            encoded_value = struct.pack("<Q", value)
+            encoded_value = _ONE_LONG.pack(value)
         else:
             raise exceptions.DataSpecificationUnknownTypeLengthException(
                 n_bytes, command)

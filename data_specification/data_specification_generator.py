@@ -10,6 +10,10 @@ from spinn_machine import sdram
 import numpy
 
 logger = logging.getLogger(__name__)
+_ONE_SBYTE = struct.Struct("<b")
+_ONE_WORD = struct.Struct("<I")
+_ONE_SINT = struct.Struct("<i")
+_TWO_WORDS = struct.Struct("<II")
 
 
 class DataSpecificationGenerator(object):
@@ -115,7 +119,7 @@ class DataSpecificationGenerator(object):
         cmd_word = (
             (constants.LEN1 << 28) |
             (Commands.BREAK.value << 20))  # @UndefinedVariable
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "BREAK"
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -133,7 +137,7 @@ class DataSpecificationGenerator(object):
         cmd_word = (
             (constants.LEN1 << 28) |
             (Commands.NOP.value << 20))  # @UndefinedVariable
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "NOP"
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -197,9 +201,7 @@ class DataSpecificationGenerator(object):
                     (int(bool(empty)) << 7) |
                     (int(bool(shrink)) << 6) |
                     region)
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
-        encoded_size = bytearray(struct.pack("<I", size))
-        cmd_word_list = encoded_cmd_word + encoded_size
+        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, size))
 
         if empty:
             unfilled_string = "UNFILLED"
@@ -252,7 +254,7 @@ class DataSpecificationGenerator(object):
             region)
         cmd_string = "FREE memRegion={0:d}".format(region)
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         self.write_command_to_files(encoded_cmd_word, cmd_string)
 
     def declare_random_number_generator(self, rng_id, rng_type, seed):
@@ -315,8 +317,8 @@ class DataSpecificationGenerator(object):
             (rng_id << 12) |
             (rng_type.value << 8))
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
-        encoded_seed = bytearray(struct.pack("<i", seed))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
+        encoded_seed = bytearray(_ONE_SINT.pack(seed))
         cmd_word_list = encoded_cmd_word + encoded_seed
 
         cmd_string = "DECLARE_RNG id={0:d}, source={1:d}, seed={2:d}".format(
@@ -420,7 +422,7 @@ class DataSpecificationGenerator(object):
         cmd_string = "DECLARE_RANDOM_DIST distribution_id={0:d} " \
                      "structure_id={1:d}".format(distribution_id, structure_id)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -476,7 +478,7 @@ class DataSpecificationGenerator(object):
             (bit_field << 16) |
             (register_id << 12) |
             distribution_id)
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -538,7 +540,7 @@ class DataSpecificationGenerator(object):
             (Commands.START_STRUCT.value << 20) |  # @UndefinedVariable
             structure_id)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
         cmd_string = "START_STRUCT id={0:d}".format(structure_id)
 
@@ -582,7 +584,7 @@ class DataSpecificationGenerator(object):
                         data_type.name, data_type.size,
                         Commands.STRUCT_ELEM.name)  # @UndefinedVariable
 
-                cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+                cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
 
                 data_format = "<{}".format(data_type.struct_encoding)
                 text_value = "{}".format(value)
@@ -619,7 +621,7 @@ class DataSpecificationGenerator(object):
                     (Commands.STRUCT_ELEM.value << 20) |   # @UndefinedVariable
                     data_type.value)
 
-                cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+                cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
                 cmd_word_list = cmd_word_encoded
 
                 if len(label) == 0:
@@ -639,7 +641,7 @@ class DataSpecificationGenerator(object):
         cmd_word = (
             (constants.LEN1 << 28) |
             (Commands.END_STRUCT.value << 20))  # @UndefinedVariable
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         cmd_string = "END_STRUCT id={0:d}".format(structure_id)
@@ -740,7 +742,7 @@ class DataSpecificationGenerator(object):
                          "destination_register={2:d}".\
                 format(structure_id, parameter_index, destination_id)
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         self.write_command_to_files(encoded_cmd_word, cmd_string)
 
     def set_structure_value(self, structure_id, parameter_index, value,
@@ -871,7 +873,7 @@ class DataSpecificationGenerator(object):
                          "value={2:d}".format(structure_id,
                                               parameter_index, value)
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word + value_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -940,7 +942,7 @@ class DataSpecificationGenerator(object):
                 (repeats << 8) |
                 structure_id)
 
-            cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+            cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
             cmd_string = "WRITE_STRUCT structure_id={0:d}, " \
                          "repeats=reg[{1:d}]".format(structure_id, repeats)
             cmd_word_list = cmd_word_encoded
@@ -960,7 +962,7 @@ class DataSpecificationGenerator(object):
                 (repeats << 8) |
                 structure_id)
 
-            cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+            cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
             cmd_string = "WRITE_STRUCT structure_id={0:d}, " \
                          "repeats={1:d}".format(structure_id, repeats)
             cmd_word_list = cmd_word_encoded
@@ -1036,7 +1038,7 @@ class DataSpecificationGenerator(object):
             (len(argument_by_value) << 8) |
             read_only_flags)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string, indent=True)
@@ -1060,7 +1062,7 @@ class DataSpecificationGenerator(object):
         cmd_word = (
             (constants.LEN1 << 28) |
             (Commands.END_CONSTRUCTOR.value << 20))  # @UndefinedVariable
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         cmd_string = "END_CONSTRUCT"
@@ -1145,13 +1147,13 @@ class DataSpecificationGenerator(object):
             cmd_word_length = constants.LEN1
         else:
             cmd_word_length = constants.LEN2
-            param_word_encoded = bytearray(struct.pack("<I", param_word))
+            param_word_encoded = bytearray(_ONE_WORD.pack(param_word))
 
         cmd_word = (
             (cmd_word_length << 28) |
             (Commands.CONSTRUCT.value << 20) |  # @UndefinedVariable
             (function_id << 8))
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded + param_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -1189,7 +1191,7 @@ class DataSpecificationGenerator(object):
             (dest_id << 12) |
             data_type.size)
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
 
         cmd_string = "READ {0:d} bytes in register {0:d}" \
             .format(data_type.size, dest_id)
@@ -1424,7 +1426,7 @@ class DataSpecificationGenerator(object):
             (cmd_data_len << 12) |
             (data_register << 8) | parameters)
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -1463,7 +1465,7 @@ class DataSpecificationGenerator(object):
 
         cmd_string = "WRITE_ARRAY, %d elements\n" % (data.size)
 
-        cmd_word_list = bytearray(struct.pack("<II", cmd_word, data.size))
+        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, data.size))
         self.write_command_to_files(cmd_word_list, cmd_string)
         self.spec_writer.write(data.tostring())
 
@@ -1515,7 +1517,7 @@ class DataSpecificationGenerator(object):
             (reg_usage << 16) |
             (parameters << 8))
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
 
         cmd_word_string = encoded_cmd_word
         self.write_command_to_files(cmd_word_string, cmd_string)
@@ -1613,7 +1615,7 @@ class DataSpecificationGenerator(object):
                         DataType.INT32.max,  # @UndefinedVariable
                         Commands.LOOP.name)  # @UndefinedVariable
             length += 1
-            encoded_start = bytearray(struct.pack("<i", start))
+            encoded_start = bytearray(_ONE_SINT.pack(start))
             encoded_values += encoded_start
             cmd_string = "{0:s} start={1:d},".format(cmd_string, start)
 
@@ -1636,7 +1638,7 @@ class DataSpecificationGenerator(object):
                         DataType.INT32.max,  # @UndefinedVariable
                         Commands.LOOP.name)  # @UndefinedVariable
             length += 1
-            encoded_end = bytearray(struct.pack("<i", end))
+            encoded_end = bytearray(_ONE_SINT.pack(end))
             encoded_values += encoded_end
             cmd_string = "{0:s} end={1:d},".format(cmd_string, end)
 
@@ -1660,7 +1662,7 @@ class DataSpecificationGenerator(object):
                         DataType.INT32.max,  # @UndefinedVariable
                         Commands.LOOP.name)  # @UndefinedVariable
             length += 1
-            encoded_increment = bytearray(struct.pack("<i", increment))
+            encoded_increment = bytearray(_ONE_SINT.pack(increment))
             encoded_values += encoded_increment
             cmd_string = "{0:s} increment={1:d},".format(cmd_string, increment)
 
@@ -1669,7 +1671,7 @@ class DataSpecificationGenerator(object):
         cmd_word |= (length << 28)
         cmd_word |= (bit_field << 16)
 
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word + encoded_values
         self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -1694,7 +1696,7 @@ class DataSpecificationGenerator(object):
             (constants.LEN1 << 28) |
             (Commands.BREAK_LOOP.value << 20))  # @UndefinedVariable
         cmd_string = "BREAK_LOOP"
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -1718,7 +1720,7 @@ class DataSpecificationGenerator(object):
             (constants.LEN1 << 28) |
             (Commands.END_LOOP.value << 20))  # @UndefinedVariable
         cmd_string = "END_LOOP"
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -1806,13 +1808,13 @@ class DataSpecificationGenerator(object):
                 (bit_field << 16) |
                 (register_id << 8) |
                 condition.value)
-            data_encoded = bytearray(struct.pack("<i", value))
+            data_encoded = bytearray(_ONE_SINT.pack(value))
             cmd_string = "IF reg[{0:d}] {1:s} {2:d}".format(
                 register_id, condition.operator, value)
 
         self.conditionals.append(False)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded + data_encoded
         self.write_command_to_files(cmd_word_list, cmd_string, indent=True)
 
@@ -1843,7 +1845,7 @@ class DataSpecificationGenerator(object):
         cmd_word = (
             (constants.LEN1 << 28) |
             (Commands.ELSE.value << 20))  # @UndefinedVariable
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
         cmd_string = "ELSE"
 
@@ -1872,7 +1874,7 @@ class DataSpecificationGenerator(object):
         cmd_word = (
             (constants.LEN1 << 28) |
             (Commands.END_IF.value << 20))  # @UndefinedVariable
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
         cmd_string = "END_IF"
 
@@ -1939,7 +1941,7 @@ class DataSpecificationGenerator(object):
                 (constants.DEST_AND_SRC1 << 16) |
                 (dest_reg << 12) |
                 (src_reg << 8))
-            encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+            encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
             cmd_word_list = encoded_cmd_word
             cmd_string = "reg[{0:d}] = reg[{1:d}]".format(dest_reg, src_reg)
         else:
@@ -1968,9 +1970,9 @@ class DataSpecificationGenerator(object):
             encoding_string = "<{0:s}".format(data_type.struct_encoding)
             encoded_data = bytearray(struct.pack(encoding_string, scaled_data))
             while len(encoded_data) % 4:
-                encoded_data += bytearray(struct.pack("<b", 0))
+                encoded_data += bytearray(_ONE_SBYTE.pack(0))
 
-            encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+            encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
 
             cmd_word_list = encoded_cmd_word + encoded_data
             cmd_string = "reg[{0:d}] = {1:d} (0x{2:X})".format(
@@ -2010,7 +2012,7 @@ class DataSpecificationGenerator(object):
             (bit_field << 16) |
             (register_id << 12))
         cmd_string = "GET_WR_PTR reg[{0:d}]".format(register_id)
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -2081,7 +2083,7 @@ class DataSpecificationGenerator(object):
                             DataType.UINT32.max,  # @UndefinedVariable
                             Commands.SET_WR_PTR.name)  # @UndefinedVariable
                 else:
-                    data_encoded = bytearray(struct.pack("<I", address))
+                    data_encoded = bytearray(_ONE_WORD.pack(address))
             else:
                 if (address < DataType.INT32.min or  # @UndefinedVariable
                         address > DataType.INT32.max):  # @UndefinedVariable
@@ -2092,7 +2094,7 @@ class DataSpecificationGenerator(object):
                             DataType.INT32.max,  # @UndefinedVariable
                             Commands.SET_WR_PTR.name)  # @UndefinedVariable
                 else:
-                    data_encoded = bytearray(struct.pack("<i", address))
+                    data_encoded = bytearray(_ONE_SINT.pack(address))
 
             cmd_word = (
                 (constants.LEN2 << 28) |
@@ -2102,7 +2104,7 @@ class DataSpecificationGenerator(object):
             cmd_string = "SET_WR_PTR {0:d} {1:s}".format(
                 address, relative_string)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded + data_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -2200,7 +2202,7 @@ class DataSpecificationGenerator(object):
             (return_register_value << 12) |
             (block_size_reg << 8) |
             imm_value)
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -2289,7 +2291,7 @@ class DataSpecificationGenerator(object):
                             DataType.INT32.min,  # @UndefinedVariable
                             DataType.INT32.max,  # @UndefinedVariable
                             Commands.ARITH_OP.name)  # @UndefinedVariable
-                operand_1_encoded = bytearray(struct.pack("<i", operand_1))
+                operand_1_encoded = bytearray(_ONE_SINT.pack(operand_1))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_1)
             else:
                 if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
@@ -2300,7 +2302,7 @@ class DataSpecificationGenerator(object):
                             DataType.UINT32.min,  # @UndefinedVariable
                             DataType.UINT32.max,  # @UndefinedVariable
                             Commands.ARITH_OP.name)  # @UndefinedVariable
-                operand_1_encoded = bytearray(struct.pack("<I", operand_1))
+                operand_1_encoded = bytearray(_ONE_WORD.pack(operand_1))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_1)
 
         if operation not in ArithmeticOperation:
@@ -2330,7 +2332,7 @@ class DataSpecificationGenerator(object):
                             DataType.INT32.min,  # @UndefinedVariable
                             DataType.INT32.max,  # @UndefinedVariable
                             Commands.ARITH_OP.name)  # @UndefinedVariable
-                operand_2_encoded = bytearray(struct.pack("<i", operand_2))
+                operand_2_encoded = bytearray(_ONE_SINT.pack(operand_2))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_2)
             else:
                 if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
@@ -2341,7 +2343,7 @@ class DataSpecificationGenerator(object):
                             DataType.UINT32.min,  # @UndefinedVariable
                             DataType.UINT32.max,  # @UndefinedVariable
                             Commands.ARITH_OP.name)  # @UndefinedVariable
-                operand_2_encoded = bytearray(struct.pack("<I", operand_2))
+                operand_2_encoded = bytearray(_ONE_WORD.pack(operand_2))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_2)
 
         cmd_word = (
@@ -2354,7 +2356,7 @@ class DataSpecificationGenerator(object):
             (register_op_2 << 4) |
             operation.value)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = (
             cmd_word_encoded + operand_1_encoded + operand_2_encoded)
 
@@ -2650,7 +2652,7 @@ class DataSpecificationGenerator(object):
                         DataType.UINT32.min,  # @UndefinedVariable
                         DataType.UINT32.max,  # @UndefinedVariable
                         Commands.LOGIC_OP.name)  # @UndefinedVariable
-            operand_1_encoded = bytearray(struct.pack("<I", operand_1))
+            operand_1_encoded = bytearray(_ONE_WORD.pack(operand_1))
             cmd_string = "{0:s} {1:d}".format(cmd_string, operand_1)
 
         if operation.value != LogicOperation.NOT.value:  # @UndefinedVariable
@@ -2677,7 +2679,7 @@ class DataSpecificationGenerator(object):
                             DataType.UINT32.min,  # @UndefinedVariable
                             DataType.UINT32.max,  # @UndefinedVariable
                             Commands.LOGIC_OP.name)  # @UndefinedVariable
-                operand_2_encoded = bytearray(struct.pack("<I", operand_2))
+                operand_2_encoded = bytearray(_ONE_WORD.pack(operand_2))
                 cmd_string = "{0:s} {1:d}".format(cmd_string, operand_2)
 
         cmd_word = (
@@ -2689,7 +2691,7 @@ class DataSpecificationGenerator(object):
             (register_op_2 << 4) |
             operation.value)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = (
             cmd_word_encoded + operand_1_encoded + operand_2_encoded)
 
@@ -2804,7 +2806,7 @@ class DataSpecificationGenerator(object):
             (destination_structure_id << 12) |
             (source_structure_id << 8))
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
         self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -2962,8 +2964,8 @@ class DataSpecificationGenerator(object):
                 .format(source_structure_id,
                         source_parameter_index, destination_id)
 
-        cmd_word_1_encoded = bytearray(struct.pack("<I", cmd_word_1))
-        cmd_word_2_encoded = bytearray(struct.pack("<I", cmd_word_2))
+        cmd_word_1_encoded = bytearray(_ONE_WORD.pack(cmd_word_1))
+        cmd_word_2_encoded = bytearray(_ONE_WORD.pack(cmd_word_2))
 
         cmd_word_list = cmd_word_1_encoded + cmd_word_2_encoded
 
@@ -3028,7 +3030,7 @@ class DataSpecificationGenerator(object):
             data_encoding_string = "<{0:s}".format(data_type.struct_encoding)
             data_encoded = bytearray(struct.pack(data_encoding_string, value))
             while len(data_encoded) % 4:
-                data_encoded += bytearray(struct.pack("<b", 0))
+                data_encoded += bytearray(_ONE_SBYTE.pack(0))
             cmd_string = "PRINT_VAL {0:d}".format(value)
 
         cmd_word = (
@@ -3037,7 +3039,7 @@ class DataSpecificationGenerator(object):
             (bit_field << 16) |
             (source_register_id << 8) |
             data_type.value)
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
 
         cmd_word_list = cmd_word_encoded + data_encoded
 
@@ -3079,7 +3081,7 @@ class DataSpecificationGenerator(object):
             (cmd_word_len << 28) |
             (Commands.PRINT_TXT.value << 20) |  # @UndefinedVariable
             (text_len - 1))
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded + text_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -3151,7 +3153,7 @@ class DataSpecificationGenerator(object):
             (struct_register << 8) |
             structure_id)
 
-        cmd_word_encoded = bytearray(struct.pack("<I", cmd_word))
+        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -3175,9 +3177,9 @@ class DataSpecificationGenerator(object):
         cmd_word = (
             (constants.LEN1 << 28) |
             (Commands.END_SPEC.value << 20))  # @UndefinedVariable
-        encoded_cmd_word = bytearray(struct.pack("<I", cmd_word))
+        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         parameter = -1
-        encoded_parameter = struct.pack("<i", parameter)
+        encoded_parameter = _ONE_SINT.pack(parameter)
         cmd_word_list = encoded_cmd_word + encoded_parameter
         cmd_string = "END_SPEC"
         self.write_command_to_files(cmd_word_list, cmd_string)

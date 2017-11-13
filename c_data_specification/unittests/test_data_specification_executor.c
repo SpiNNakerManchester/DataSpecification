@@ -3,7 +3,7 @@
 #include "struct.h"
 
 uint8_t command_get_length(uint32_t command);
-enum OpCode command_get_opcode(uint32_t command);
+OpCode command_get_opcode(uint32_t command);
 uint8_t command_get_fieldUsage(uint32_t command);
 uint8_t command_get_destReg(uint32_t command);
 uint8_t command_get_src1Reg(uint32_t command);
@@ -11,39 +11,39 @@ uint8_t command_get_src2Reg(uint32_t command);
 int command_dest_in_use(uint32_t command);
 int command_src1_in_use(uint32_t command);
 int command_src2_in_use(uint32_t command);
-struct Command get_next_command();
+Command get_next_command();
 
 extern address_t command_pointer;
-extern struct MemoryRegion *memory_regions[MAX_MEM_REGIONS];
+extern MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 extern int current_region;
 extern uint64_t registers[MAX_REGISTERS];
-extern struct Struct *structs[MAX_STRUCTS];
+extern Struct *structs[MAX_STRUCTS];
 
-void execute_reserve(struct Command cmd);
-void execute_free(struct Command cmd);
-void execute_switch_focus(struct Command cmd);
-void execute_write(struct Command cmd);
-void execute_write_array(struct Command cmd);
-void execute_get_wr_ptr(struct Command cmd);
-void execute_set_wr_ptr(struct Command cmd);
-void execute_read(struct Command cmd);
-void execute_reset_wr_ptr(struct Command cmd);
-void execute_logic_op(struct Command cmd);
-void execute_start_struct(struct Command cmd);
-void execute_mv(struct Command cmd);
-void execute_arith_op(struct Command cmd);
-void execute_if(struct Command cmd);
-void execute_copy_param(struct Command cmd);
-void execute_print_text(struct Command cmd);
-void execute_print_val(struct Command cmd);
-void execute_read_param(struct Command cmd);
-void execute_write_param(struct Command cmd);
-void execute_loop(struct Command cmd);
-void execute_write_struct(struct Command cmd);
-void execute_print_struct(struct Command cmd);
-void execute_copy_struct(struct Command cmd);
-void execute_align_wr_ptr(struct Command cmd);
-void execute_block_copy(struct Command cmd);
+void execute_reserve(Command cmd);
+void execute_free(Command cmd);
+void execute_switch_focus(Command cmd);
+void execute_write(Command cmd);
+void execute_write_array(Command cmd);
+void execute_get_wr_ptr(Command cmd);
+void execute_set_wr_ptr(Command cmd);
+void execute_read(Command cmd);
+void execute_reset_wr_ptr(Command cmd);
+void execute_logic_op(Command cmd);
+void execute_start_struct(Command cmd);
+void execute_mv(Command cmd);
+void execute_arith_op(Command cmd);
+void execute_if(Command cmd);
+void execute_copy_param(Command cmd);
+void execute_print_text(Command cmd);
+void execute_print_val(Command cmd);
+void execute_read_param(Command cmd);
+void execute_write_param(Command cmd);
+void execute_loop(Command cmd);
+void execute_write_struct(Command cmd);
+void execute_print_struct(Command cmd);
+void execute_copy_struct(Command cmd);
+void execute_align_wr_ptr(Command cmd);
+void execute_block_copy(Command cmd);
 
 void cut_teardown() {
     for (int i = 0; i < MAX_MEM_REGIONS; i++) {
@@ -180,16 +180,17 @@ void test_command_src2_in_use() {
 }
 
 void test_get_next_command() {
-    uint32_t commands[] = {0x9DB703A7, 0x2B52EA07,
-                           0xA6AA233C, 0x343A207B, 0x6BD67CE5,
-                           0x58FE1B19, 0x263CBFCD,
-                           0x920A1C38, 0x6BC65B04,
-                           0x5C84BE6A, 0x05E2FC3B,
-                           0xF7CD26BE, 0xC5C94996, 0x21ABFBBC, 0x000000F0};
+    static uint32_t commands[] = {
+	    0x9DB703A7, 0x2B52EA07,
+	    0xA6AA233C, 0x343A207B, 0x6BD67CE5,
+	    0x58FE1B19, 0x263CBFCD,
+	    0x920A1C38, 0x6BC65B04,
+	    0x5C84BE6A, 0x05E2FC3B,
+	    0xF7CD26BE, 0xC5C94996, 0x21ABFBBC, 0x000000F0};
 
     command_pointer = commands;
 
-    struct Command cmd;
+    Command cmd;
 
     cmd = get_next_command();
     cut_assert_equal_int(0x01, cmd.dataLength);
@@ -231,23 +232,26 @@ void test_get_next_command() {
 }
 
 void test_execute_reserve() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x10200001, 0x00000200,
-                           0x10200082, 0x00000201,
-                           0x10200083, 0x00000022,
-                           0x10200084, 0x00000000,
-                           0x1020000F, 0x00000011};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x10200001, 0x00000200,
+	    0x10200082, 0x00000201,
+	    0x10200083, 0x00000022,
+	    0x10200084, 0x00000000,
+	    0x1020000F, 0x00000011};
 
     command_pointer = commands;
 
-    for (int i = 0; i < sizeof(commands) / 8; i++)
+    for (int i = 0; i < sizeof(commands) / 8; i++) {
         execute_reserve(get_next_command());
-
-    for (int i = 0; i < MAX_MEM_REGIONS; i++)
-        if (i > 4 && i != 0xF)
+    }
+    for (int i = 0; i < MAX_MEM_REGIONS; i++) {
+        if (i > 4 && i != 0xF) {
             cut_assert_null(memory_regions[i]);
-        else
+        } else {
             cut_assert_not_null(memory_regions[i]);
+        }
+    }
 
     cut_assert_equal_int(memory_regions[0]->size, 0x100);
     cut_assert_equal_int(memory_regions[1]->size, 0x200);
@@ -278,60 +282,67 @@ void test_execute_reserve() {
 }
 
 void test_execute_free() {
-    uint32_t reserve_memory_commands[] = {0x10200000, 0x00000100,
-                                          0x10200001, 0x00000200,
-                                          0x10200082, 0x00000201,
-                                          0x10200083, 0x00000022,
-                                          0x10200084, 0x00000004,
-                                          0x1020000F, 0x00000011};
+    static uint32_t reserve_memory_commands[] = {
+	    0x10200000, 0x00000100,
+	    0x10200001, 0x00000200,
+	    0x10200082, 0x00000201,
+	    0x10200083, 0x00000022,
+	    0x10200084, 0x00000004,
+	    0x1020000F, 0x00000011};
 
     command_pointer = reserve_memory_commands;
 
-    for (int i = 0; i < sizeof(reserve_memory_commands) / 8; i++)
+    for (int i = 0; i < sizeof(reserve_memory_commands) / 8; i++) {
         execute_reserve(get_next_command());
+    }
 
-    uint32_t free_memory_commands[] = {0x03000000,
-                                       0x03000001,
-                                       0x03000002,
-                                       0x03000003,
-                                       0x03000004,
-                                       0x0300000F};
+    static uint32_t free_memory_commands[] = {
+	    0x03000000,
+	    0x03000001,
+	    0x03000002,
+	    0x03000003,
+	    0x03000004,
+	    0x0300000F};
 
     command_pointer = free_memory_commands;
 
-    for (int i = 0; i < sizeof(free_memory_commands) / 4; i++)
+    for (int i = 0; i < sizeof(free_memory_commands) / 4; i++) {
         execute_free(get_next_command());
-
-    for (int i = 0; i < MAX_MEM_REGIONS; i++)
+    }
+    for (int i = 0; i < MAX_MEM_REGIONS; i++) {
         cut_assert_null(memory_regions[i]);
+    }
 }
 
 void test_execute_switch_focus() {
-    uint32_t reserve_memory_commands[] = {0x10200000, 0x00000100,
-                                          0x10200001, 0x00000200,
-                                          0x10200082, 0x00000201,
-                                          0x10200083, 0x00000022,
-                                          0x10200084, 0x00000004,
-                                          0x1020000F, 0x00000011};
+    static uint32_t reserve_memory_commands[] = {
+	    0x10200000, 0x00000100,
+	    0x10200001, 0x00000200,
+	    0x10200082, 0x00000201,
+	    0x10200083, 0x00000022,
+	    0x10200084, 0x00000004,
+	    0x1020000F, 0x00000011};
 
     command_pointer = reserve_memory_commands;
 
-    for (int i = 0; i < sizeof(reserve_memory_commands) / 8; i++)
+    for (int i = 0; i < sizeof(reserve_memory_commands) / 8; i++) {
         execute_reserve(get_next_command());
+    }
 
-    uint32_t switch_focus_commands[] = {0x05000000,
-                                        0x05000100,
-                                        0x05000200,
-                                        0x05000300,
-                                        0x05000400,
-                                        0x05000F00};
+    static uint32_t switch_focus_commands[] = {
+	    0x05000000,
+	    0x05000100,
+	    0x05000200,
+	    0x05000300,
+	    0x05000400,
+	    0x05000F00};
 
     command_pointer = switch_focus_commands;
 
     for (int i = 0; i < sizeof(switch_focus_commands) / 4; i++) {
         execute_switch_focus(get_next_command());
         cut_assert_equal_int((switch_focus_commands[i] & 0xF00) >> 8,
-                             current_region);
+        	current_region);
     }
 
     registers[5] = 0;
@@ -341,12 +352,13 @@ void test_execute_switch_focus() {
     registers[9] = 4;
     registers[10] = 0xF;
 
-    uint32_t switch_focus_register_commands[] = {0x05020500,
-                                                 0x05020600,
-                                                 0x05020700,
-                                                 0x05020800,
-                                                 0x05020900,
-                                                 0x05020A00};
+    static uint32_t switch_focus_register_commands[] = {
+	    0x05020500,
+	    0x05020600,
+	    0x05020700,
+	    0x05020800,
+	    0x05020900,
+	    0x05020A00};
 
     command_pointer = switch_focus_register_commands;
 
@@ -357,16 +369,17 @@ void test_execute_switch_focus() {
 }
 
 void test_execute_write() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
-                           0x14202001, 0x12345678,
-                           0x14201002, 0xABCD,
-                           0x14200004, 0xAB,
-                           0x24203002, 0x12345678, 0x9ABCDEF0,
-                           0x04222102,
-                           0x04221102,
-                           0x04230230,
-                           0x04230230};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
+	    0x14202001, 0x12345678,
+	    0x14201002, 0xABCD,
+	    0x14200004, 0xAB,
+	    0x24203002, 0x12345678, 0x9ABCDEF0,
+	    0x04222102,
+	    0x04221102,
+	    0x04230230,
+	    0x04230230};
 
     command_pointer = commands;
 
@@ -376,21 +389,22 @@ void test_execute_write() {
 
     execute_reserve(get_next_command());
     execute_switch_focus(get_next_command());
-
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; i++) {
         execute_write(get_next_command());
+    }
 
     const char *memory =
-                    cut_take_memory((void*)(memory_regions[0]->start_address));
+	    cut_take_memory((void*)(memory_regions[0]->start_address));
 
-    uint32_t out[] = {0x12345678,
-                      0xABCDABCD,
-                      0xABABABAB,
-                      0x9ABCDEF0, 0x12345678,
-                      0x9ABCDEF0, 0x12345678,
-                      0x12345678, 0x12345678,
-                      0x56785678,
-                      0xABABABAB};
+    static uint32_t out[] = {
+	    0x12345678,
+	    0xABCDABCD,
+	    0xABABABAB,
+	    0x9ABCDEF0, 0x12345678,
+	    0x9ABCDEF0, 0x12345678,
+	    0x12345678, 0x12345678,
+	    0x56785678,
+	    0xABABABAB};
 
     uint32_t *reader = (uint32_t*)memory;
 
@@ -402,32 +416,35 @@ void test_execute_write() {
 }
 
 void test_execute_write_array() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
-                           0x14300004, 0x00000004,
-                               0x01234567, 0x9ABCDEF0,
-                               0xAABBCCDD, 0x11223344,
-                           0x14300002, 0x00000004,
-                               0x1234ABCD,
-                               0xAABB1234};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
+	    0x14300004, 0x00000004,
+	    0x01234567, 0x9ABCDEF0,
+	    0xAABBCCDD, 0x11223344,
+	    0x14300002, 0x00000004,
+	    0x1234ABCD,
+	    0xAABB1234};
 
     command_pointer = commands;
 
     execute_reserve(get_next_command());
     execute_switch_focus(get_next_command());
 
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 2; i++) {
         execute_write_array(get_next_command());
+    }
 
     const char *memory =
-                    cut_take_memory((void*)(memory_regions[0]->start_address));
+	    cut_take_memory((void*)(memory_regions[0]->start_address));
 
-    uint32_t out[] = {0x01234567,
-                      0x9ABCDEF0,
-                      0xAABBCCDD,
-                      0x11223344,
-                      0x1234ABCD,
-                      0xAABB1234};
+    static uint32_t out[] = {
+	    0x01234567,
+	    0x9ABCDEF0,
+	    0xAABBCCDD,
+	    0x11223344,
+	    0x1234ABCD,
+	    0xAABB1234};
 
     uint32_t *reader = (uint32_t*)memory;
 
@@ -436,27 +453,27 @@ void test_execute_write_array() {
     }
 
     memory_regions[0] = NULL;
-
 }
 
 void test_execute_get_wr_ptr() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
-                           0x14202004, 0x12345678,
-                           0x06340000,
-                           0x14201004, 0xABCD,
-                           0x06341000,
-                           0x14200004, 0xAB,
-                           0x06342000,
-                           0x24203004, 0x12345678, 0x9ABCDEF0,
-                           0x06343000};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
+	    0x14202004, 0x12345678,
+	    0x06340000,
+	    0x14201004, 0xABCD,
+	    0x06341000,
+	    0x14200004, 0xAB,
+	    0x06342000,
+	    0x24203004, 0x12345678, 0x9ABCDEF0,
+	    0x06343000};
 
     command_pointer = commands;
 
     execute_reserve(get_next_command());
     execute_switch_focus(get_next_command());
 
-    int out[] = {16, 24, 28, 60};
+    static int out[] = {16, 24, 28, 60};
 
     for (int i = 0; i < 4; i++) {
         execute_write(get_next_command());
@@ -466,13 +483,14 @@ void test_execute_get_wr_ptr() {
 }
 
 void test_execute_set_wr_ptr() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
-                           0x16400000, 5,
-                           0x16400000, 99,
-                           0x16400001, -99,
-                           0x06420300,
-                           0x06420401};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
+	    0x16400000, 5,
+	    0x16400000, 99,
+	    0x16400001, -99,
+	    0x06420300,
+	    0x06420401};
 
     registers[3] = 10;
     registers[4] = -10;
@@ -482,7 +500,7 @@ void test_execute_set_wr_ptr() {
     execute_reserve(get_next_command());
     execute_switch_focus(get_next_command());
 
-    int out[] = {5, 99, 0, 10, 0};
+    static int out[] = {5, 99, 0, 10, 0};
 
     for (int i = 0; i < 5; i++) {
         execute_set_wr_ptr(get_next_command());
@@ -493,18 +511,19 @@ void test_execute_set_wr_ptr() {
 }
 
 void test_execute_read() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
-                           0x14202003, 0x12345678,
-                           0x14201002, 0xABCD,
-                           0x14200004, 0xAB,
-                           0x16400000, 0,
-                           0x04140008,
-                           0x04141004,
-                           0x04142002,
-                           0x04143001,
-                           0x04144001,
-                           0x04145004};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
+	    0x14202003, 0x12345678,
+	    0x14201002, 0xABCD,
+	    0x14200004, 0xAB,
+	    0x16400000, 0,
+	    0x04140008,
+	    0x04141004,
+	    0x04142002,
+	    0x04143001,
+	    0x04144001,
+	    0x04145004};
 
     command_pointer = commands;
 
@@ -515,8 +534,9 @@ void test_execute_read() {
     execute_write(get_next_command());
     execute_set_wr_ptr(get_next_command());
 
-    long long out[] = {0x1234567812345678LL, 0x12345678, 0xABCD, 0xCD, 0xAB,
-                       0xABABABAB};
+    static long long out[] = {
+	    0x1234567812345678LL, 0x12345678, 0xABCD, 0xCD, 0xAB,
+	    0xABABABAB};
 
     for (int i = 0; i < 6; i++) {
         execute_read(get_next_command());
@@ -525,31 +545,32 @@ void test_execute_read() {
 }
 
 void test_execute_logic_op() {
-    uint32_t commands[] = {0x2684F000, 0xFF, 4,
-                           0x2684F001, 0xFF, 4,
-                           0x2684F002, 0xF0, 4,
-                           0x2684F003, 0xFE, 5,
-                           0x2684F004, 0xFE, 5,
-                           0x1684F005, 0xFF,
+    static uint32_t commands[] = {
+	    0x2684F000, 0xFF, 4,
+	    0x2684F001, 0xFF, 4,
+	    0x2684F002, 0xF0, 4,
+	    0x2684F003, 0xFE, 5,
+	    0x2684F004, 0xFE, 5,
+	    0x1684F005, 0xFF,
 
-                           0x1686F100, 4,
-                           0x1686F101, 4,
-                           0x1686F002, 0xFF,
-                           0x1686F003, 0xFF,
-                           0x1686F004, 0xFF,
-                           0x0686F005,
+	    0x1686F100, 4,
+	    0x1686F101, 4,
+	    0x1686F002, 0xFF,
+	    0x1686F003, 0xFF,
+	    0x1686F004, 0xFF,
+	    0x0686F005,
 
-                           0x1685F030, 0xFF,
-                           0x1685F031, 0xFF,
-                           0x1685F032, 0xF0,
-                           0x1685F043, 0xFE,
-                           0x1685F044, 0xFE,
+	    0x1685F030, 0xFF,
+	    0x1685F031, 0xFF,
+	    0x1685F032, 0xF0,
+	    0x1685F043, 0xFE,
+	    0x1685F044, 0xFE,
 
-                           0x0687F131,
-                           0x0687F132,
-                           0x0687F052,
-                           0x0687F053,
-                           0x0687F054};
+	    0x0687F131,
+	    0x0687F132,
+	    0x0687F052,
+	    0x0687F053,
+	    0x0687F054};
 
     registers[0] = 0x12345678;
     registers[1] = 0xFFFFFFFF;
@@ -560,10 +581,11 @@ void test_execute_logic_op() {
 
     command_pointer = commands;
 
-    long long int out[] = {0xFF0, 0xF, 0xF4, 0x4, 0xFB, ~0xFF,
-                           0xFFFFFFFF0, 0x0FFFFFFF, 0x123456FF, 0x78, 0x12345687,
-                           0xFF0, 0xF, 0xF4, 0x5, 0x1, ~0xFF,
-                           0xFFFFFFF0, 0x0FFFFFFF, 0x123456FF, 0x78, 0x12345687};
+    static long long int out[] = {
+	    0xFF0, 0xF, 0xF4, 0x4, 0xFB, ~0xFF,
+	    0xFFFFFFFF0, 0x0FFFFFFF, 0x123456FF, 0x78, 0x12345687,
+	    0xFF0, 0xF, 0xF4, 0x5, 0x1, ~0xFF,
+	    0xFFFFFFF0, 0x0FFFFFFF, 0x123456FF, 0x78, 0x12345687};
 
     for (int i = 0; i < 7; i++) {
         execute_logic_op(get_next_command());
@@ -572,22 +594,23 @@ void test_execute_logic_op() {
 }
 
 void test_execute_start_struct() {
-    uint32_t commands[] = {0x01000004,
-                           0x01200000,
-                           0x01000008,
-                           0x11100000, 0x12,
-                           0x11100001, 0x1234,
-                           0x11100002, 0x12345678,
-                           0x21100003, 0x12345678, 0x90ABCDEF,
-                           0x11100004, -1,
-                           0x11100005, -1,
-                           0x11100006, -1,
-                           0x01100007,
-                           0x01100008,
-                           0x01100009,
-                           0x0110000A,
-                           0x0110000B,
-                           0x01200000};
+    static uint32_t commands[] = {
+	    0x01000004,
+	    0x01200000,
+	    0x01000008,
+	    0x11100000, 0x12,
+	    0x11100001, 0x1234,
+	    0x11100002, 0x12345678,
+	    0x21100003, 0x12345678, 0x90ABCDEF,
+	    0x11100004, -1,
+	    0x11100005, -1,
+	    0x11100006, -1,
+	    0x01100007,
+	    0x01100008,
+	    0x01100009,
+	    0x0110000A,
+	    0x0110000B,
+	    0x01200000};
 
     command_pointer = commands;
 
@@ -597,8 +620,9 @@ void test_execute_start_struct() {
     cut_assert_equal_int(0, structs[4]->size);
     cut_assert_equal_int(12, structs[8]->size);
 
-    for (int i = 0; i < 12; i++)
+    for (int i = 0; i < 12; i++) {
         cut_assert_equal_int(i, structs[8]->elements[i].type);
+    }
 
     cut_assert_equal_int(0x12, structs[8]->elements[0].data);
     cut_assert_equal_int(0x1234, structs[8]->elements[1].data);
@@ -611,21 +635,22 @@ void test_execute_start_struct() {
     cut_assert_equal_int(0, structs[8]->elements[8].data);
     cut_assert_equal_int(0, structs[8]->elements[9].data);
     cut_assert_equal_int(0, structs[8]->elements[10].data);
-
 }
 
 void test_execute_mv() {
-    uint32_t commands[] = {0x26040000, 0xABCDEF12, 0x12345678,
-                           0x16048000, 0x11223344,
-                           0x16045000, 0x12,
-                           0x06062000,
-                           0x06063800,
-                           0x06064500};
+    static uint32_t commands[] = {
+	    0x26040000, 0xABCDEF12, 0x12345678,
+	    0x16048000, 0x11223344,
+	    0x16045000, 0x12,
+	    0x06062000,
+	    0x06063800,
+	    0x06064500};
 
     command_pointer = commands;
 
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 6; i++) {
         execute_mv(get_next_command());
+    }
 
     cut_assert_equal_int(0xABCDEF1212345678LL, registers[0]);
     cut_assert_equal_int(0xABCDEF1212345678LL, registers[2]);
@@ -638,33 +663,34 @@ void test_execute_mv() {
 }
 
 void test_execute_arith_op() {
-    uint32_t commands[] = {0x2674F000, 0xFF, 4,
-                           0x2674F001, 0xFF, 4,
-                           0x2674F002, 0xF0, 4,
-                           0x267CF000, 0xFE, -1,
-                           0x267CF001, 0xFE, -1,
-                           0x267CF002, 0xFF, -1,
+    static uint32_t commands[] = {
+	    0x2674F000, 0xFF, 4,
+	    0x2674F001, 0xFF, 4,
+	    0x2674F002, 0xF0, 4,
+	    0x267CF000, 0xFE, -1,
+	    0x267CF001, 0xFE, -1,
+	    0x267CF002, 0xFF, -1,
 
-                           0x1676F100, 4,       //6
-                           0x1676F101, -1,
-                           0x1676F002, 0xFF,
-                           0x167EF000, -1,
-                           0x167EF001, 1,
-                           0x167EF002, 0,
+	    0x1676F100, 4,       //6
+	    0x1676F101, -1,
+	    0x1676F002, 0xFF,
+	    0x167EF000, -1,
+	    0x167EF001, 1,
+	    0x167EF002, 0,
 
-                           0x1675F030, 0xFF,    //12
-                           0x1675F031, 0xFF,
-                           0x1675F032, 0xF0,
-                           0x167DF040, 1,
-                           0x167DF041, -3,
-                           0x167DF042, -10,
+	    0x1675F030, 0xFF,    //12
+	    0x1675F031, 0xFF,
+	    0x1675F032, 0xF0,
+	    0x167DF040, 1,
+	    0x167DF041, -3,
+	    0x167DF042, -10,
 
-                           0x0677F130,          //18
-                           0x0677F131,
-                           0x0677F132,
-                           0x0677F050,
-                           0x067FF051,
-                           0x067FF052};
+	    0x0677F130,          //18
+	    0x0677F131,
+	    0x0677F132,
+	    0x0677F050,
+	    0x067FF051,
+	    0x067FF052};
 
     command_pointer = commands;
 
@@ -675,169 +701,169 @@ void test_execute_arith_op() {
     registers[4] = 0x100;
     registers[5] = -5;
 
-    long long int out[] = {0xFF + 4,
-                           0xFF - 4,
-                           0xF0 * 4,
-                           0xFD,
-                           0xFF,
-                           (uint64_t)((int64_t)0xFF * -1LL),
-                           5,
-                           2,
-                           0xFF * 0xFF,
-                           (uint64_t)((int64_t)0xFF + -1LL),
-                           0xFE,
-                           0,
-                           0x24 + 0xFF,
-                           0xFF - 0x24,
-                           0x24 * 0xF0,
-                           0x101,
-                           -0x103,
-                           0x100LL * (-10LL),
-                           0x25,
-                           (uint64_t)1 - (uint64_t)0x24,
-                           0x24,
-                           0xFF + (-5),
-                           0xFF - (-5),
-                           0xFF * (-5)
-                          };
+    static long long int out[] = {
+	    0xFF + 4,
+	    0xFF - 4,
+	    0xF0 * 4,
+	    0xFD,
+	    0xFF,
+	    (uint64_t)((int64_t)0xFF * -1LL),
+	    5,
+	    2,
+	    0xFF * 0xFF,
+	    (uint64_t)((int64_t)0xFF + -1LL),
+	    0xFE,
+	    0,
+	    0x24 + 0xFF,
+	    0xFF - 0x24,
+	    0x24 * 0xF0,
+	    0x101,
+	    -0x103,
+	    0x100LL * (-10LL),
+	    0x25,
+	    (uint64_t)1 - (uint64_t)0x24,
+	    0x24,
+	    0xFF + (-5),
+	    0xFF - (-5),
+	    0xFF * (-5)};
 
     for (int i = 0; i < 24; i++) {
         execute_arith_op(get_next_command());
         cut_assert_equal_int(out[i], registers[15]);
     }
-
 }
 
 void test_execute_if() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
 
-                           0x15520000, 0x12345678,
-                           0x14200001, 0x1,
-                           0x05700000,
-                           0x15520001, 0x12345678,
-                           0x14200001, 0x2,
-                           0x05700000,
-                           0x15520002, 0x12345678,
-                           0x14200001, 0x3,
-                           0x05700000,
-                           0x15520003, 0x12345678,
-                           0x14200001, 0x4,
-                           0x05700000,
-                           0x15520004, 0x12345678,
-                           0x14200001, 0x5,
-                           0x05700000,
-                           0x15520005, 0x12345678,
-                           0x14200001, 0x6,
-                           0x05700000,
+	    0x15520000, 0x12345678,
+	    0x14200001, 0x1,
+	    0x05700000,
+	    0x15520001, 0x12345678,
+	    0x14200001, 0x2,
+	    0x05700000,
+	    0x15520002, 0x12345678,
+	    0x14200001, 0x3,
+	    0x05700000,
+	    0x15520003, 0x12345678,
+	    0x14200001, 0x4,
+	    0x05700000,
+	    0x15520004, 0x12345678,
+	    0x14200001, 0x5,
+	    0x05700000,
+	    0x15520005, 0x12345678,
+	    0x14200001, 0x6,
+	    0x05700000,
 
-                           0x15520100, 0x12345678,
-                           0x14200001, 0x7,
-                           0x05700000,
-                           0x15520101, 0x12345678,
-                           0x14200001, 0x8,
-                           0x05700000,
-                           0x15520102, 0x12345678,
-                           0x14200001, 0x9,
-                           0x05700000,
-                           0x15520103, 0x12345678,
-                           0x14200001, 0xA,
-                           0x05700000,
-                           0x15520104, 0x12345678,
-                           0x14200001, 0xB,
-                           0x05700000,
-                           0x15520105, 0x12345678,
-                           0x14200001, 0xC,
-                           0x05700000,
+	    0x15520100, 0x12345678,
+	    0x14200001, 0x7,
+	    0x05700000,
+	    0x15520101, 0x12345678,
+	    0x14200001, 0x8,
+	    0x05700000,
+	    0x15520102, 0x12345678,
+	    0x14200001, 0x9,
+	    0x05700000,
+	    0x15520103, 0x12345678,
+	    0x14200001, 0xA,
+	    0x05700000,
+	    0x15520104, 0x12345678,
+	    0x14200001, 0xB,
+	    0x05700000,
+	    0x15520105, 0x12345678,
+	    0x14200001, 0xC,
+	    0x05700000,
 
-                           0x15520200, 0x12345678,
-                           0x14200001, 0x7,
-                           0x05700000,
-                           0x15520201, 0x12345678,
-                           0x14200001, 0x8,
-                           0x05700000,
-                           0x15520202, 0x12345678,
-                           0x14200001, 0x9,
-                           0x05700000,
-                           0x15520203, 0x12345678,
-                           0x14200001, 0xA,
-                           0x05700000,
-                           0x15520204, 0x12345678,
-                           0x14200001, 0xB,
-                           0x05700000,
-                           0x15522005, 0x12345678,
-                           0x14200001, 0xC,
-                           0x05700000,
+	    0x15520200, 0x12345678,
+	    0x14200001, 0x7,
+	    0x05700000,
+	    0x15520201, 0x12345678,
+	    0x14200001, 0x8,
+	    0x05700000,
+	    0x15520202, 0x12345678,
+	    0x14200001, 0x9,
+	    0x05700000,
+	    0x15520203, 0x12345678,
+	    0x14200001, 0xA,
+	    0x05700000,
+	    0x15520204, 0x12345678,
+	    0x14200001, 0xB,
+	    0x05700000,
+	    0x15522005, 0x12345678,
+	    0x14200001, 0xC,
+	    0x05700000,
 
-                           0x15520101, 0x12345678,
-                           0x14200001, 0xF,
-                           0x05600000,
-                           0x14200001, 0x10,
-                           0x05700000,
+	    0x15520101, 0x12345678,
+	    0x14200001, 0xF,
+	    0x05600000,
+	    0x14200001, 0x10,
+	    0x05700000,
 
-                           0x15520102, 0x12345678,
-                           0x14200001, 0x11,
-                           0x05600000,
-                           0x14200001, 0x12,
-                           0x05700000,
+	    0x15520102, 0x12345678,
+	    0x14200001, 0x11,
+	    0x05600000,
+	    0x14200001, 0x12,
+	    0x05700000,
 
-                           0x15520103, 0x12345678,
-                           0x14200001, 0x13,
-                           0x05600000,
-                           0x14200001, 0x14,
-                           0x05700000,
+	    0x15520103, 0x12345678,
+	    0x14200001, 0x13,
+	    0x05600000,
+	    0x14200001, 0x14,
+	    0x05700000,
 
-                           0x15520104, 0x12345678,
-                           0x14200001, 0x15,
-                           0x05600000,
-                           0x14200001, 0x16,
-                           0x05700000,
+	    0x15520104, 0x12345678,
+	    0x14200001, 0x15,
+	    0x05600000,
+	    0x14200001, 0x16,
+	    0x05700000,
 
-                           0x15520105, 0x12345678,
-                           0x14200001, 0x18,
-                           0x05600000,
-                           0x14200001, 0x19,
-                           0x05700000,
+	    0x15520105, 0x12345678,
+	    0x14200001, 0x18,
+	    0x05600000,
+	    0x14200001, 0x19,
+	    0x05700000,
 
-                           0x15520200, 0x12345678,
-                           0x15520200, 0x12345678,
-                           0x14200001, 0x20,
-                           0x05700000,
-                           0x05700000,
+	    0x15520200, 0x12345678,
+	    0x15520200, 0x12345678,
+	    0x14200001, 0x20,
+	    0x05700000,
+	    0x05700000,
 
-                           0x05520006,
-                           0x14200001, 0x21,
-                           0x05700000,
-                           0x05520106,
-                           0x14200001, 0x22,
-                           0x05700000,
-                           0x05520007,
-                           0x14200001, 0x23,
-                           0x05700000,
-                           0x05520107,
-                           0x14200001, 0x24,
-                           0x05700000,
+	    0x05520006,
+	    0x14200001, 0x21,
+	    0x05700000,
+	    0x05520106,
+	    0x14200001, 0x22,
+	    0x05700000,
+	    0x05520007,
+	    0x14200001, 0x23,
+	    0x05700000,
+	    0x05520107,
+	    0x14200001, 0x24,
+	    0x05700000,
 
-                           0x05530120,
-                           0x14200001, 0x1,
-                           0x05700000,
-                           0x05530121,
-                           0x14200001, 0x2,
-                           0x05700000,
-                           0x05530122,
-                           0x14200001, 0x3,
-                           0x05700000,
-                           0x05530123,
-                           0x14200001, 0x4,
-                           0x05700000,
-                           0x05530124,
-                           0x14200001, 0x5,
-                           0x05700000,
-                           0x05530125,
-                           0x14200001, 0x6,
-                           0x05700000,
+	    0x05530120,
+	    0x14200001, 0x1,
+	    0x05700000,
+	    0x05530121,
+	    0x14200001, 0x2,
+	    0x05700000,
+	    0x05530122,
+	    0x14200001, 0x3,
+	    0x05700000,
+	    0x05530123,
+	    0x14200001, 0x4,
+	    0x05700000,
+	    0x05530124,
+	    0x14200001, 0x5,
+	    0x05700000,
+	    0x05530125,
+	    0x14200001, 0x6,
+	    0x05700000,
 
-                           0x0FF00000};
+	    0x0FF00000};
 
     registers[0] = 0;
     registers[1] = 0xFFFFFFFF;
@@ -845,64 +871,67 @@ void test_execute_if() {
 
     data_specification_executor(commands, 0);
 
-    uint8_t out[] = {0x2, 0x3, 0x4,
-                     0x8, 0xB, 0xC,
-                     0x7, 0x9, 0xB,
-                     0xF, 0x12, 0x14, 0x15, 0x18, 0x20, 0x21, 0x24,
-                     0x2, 0x5, 0x6};
+    static uint8_t out[] = {
+	    0x2, 0x3, 0x4,
+	    0x8, 0xB, 0xC,
+	    0x7, 0x9, 0xB,
+	    0xF, 0x12, 0x14, 0x15, 0x18, 0x20, 0x21, 0x24,
+	    0x2, 0x5, 0x6};
 
     uint8_t *reader = memory_regions[0]->start_address;
-    for (int i = 0; i < sizeof(out); i++)
+    for (int i = 0; i < sizeof(out); i++) {
         cut_assert_equal_int(out[i], *(reader++));
+    }
 }
 
 void test_execute_copy_param() {
-    uint32_t commands[] = {0x01000004,
-                           0x21100003, 0x12345678, 0x90ABCDEF,
-                           0x11100002, 0x12345678,
-                           0x11100001, 0x1234,
-                           0x11100000, 0x12,
-                           0x11100004, -1,
-                           0x11100005, -1,
-                           0x11100006, -1,
-                           0x01200000,
+    static uint32_t commands[] = {
+	    0x01000004,
+	    0x21100003, 0x12345678, 0x90ABCDEF,
+	    0x11100002, 0x12345678,
+	    0x11100001, 0x1234,
+	    0x11100000, 0x12,
+	    0x11100004, -1,
+	    0x11100005, -1,
+	    0x11100006, -1,
+	    0x01200000,
 
-                           0x01000008,
-                           0x01100006,
-                           0x01100005,
-                           0x01100004,
-                           0x01100000,
-                           0x01100001,
-                           0x01100002,
-                           0x01100003,
-                           0x01200000,
+	    0x01000008,
+	    0x01100006,
+	    0x01100005,
+	    0x01100004,
+	    0x01100000,
+	    0x01100001,
+	    0x01100002,
+	    0x01100003,
+	    0x01200000,
 
-                           0x17108400, 0x00000600,
-                           0x17108400, 0x00000501,
-                           0x17108400, 0x00000402,
-                           0x17108400, 0x00000303,
-                           0x17108400, 0x00000204,
-                           0x17108400, 0x00000105,
-                           0x17108400, 0x00000006,
-    };
+	    0x17108400, 0x00000600,
+	    0x17108400, 0x00000501,
+	    0x17108400, 0x00000402,
+	    0x17108400, 0x00000303,
+	    0x17108400, 0x00000204,
+	    0x17108400, 0x00000105,
+	    0x17108400, 0x00000006};
 
     command_pointer = commands;
 
     execute_start_struct(get_next_command());
     execute_start_struct(get_next_command());
-
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < 7; i++) {
         execute_copy_param(get_next_command());
+    }
 
     for (int i = 0; i < 7; i++) {
         cut_assert_equal_int(structs[4]->elements[i].data,
-                             structs[8]->elements[6-i].data);
+        	structs[8]->elements[6-i].data);
     }
 }
 
 void test_execute_print_text() {
-    uint32_t commands[] = {0x17300003, 0x54455354,
-                           0x3730000B, 0x44434241, 0x48474645, 0x4C4B4A49};
+    static uint32_t commands[] = {
+	    0x17300003, 0x54455354,
+	    0x3730000B, 0x44434241, 0x48474645, 0x4C4B4A49};
 
     command_pointer = commands;
 
@@ -919,9 +948,10 @@ void test_execute_print_text() {
 }
 
 void test_execute_print_val() {
-    uint32_t commands[] = {0x18000000, 0x12345678,
-                           0x28000000, 0x87654321, 0x90ABCDEF,
-                           0x08020300};
+    static uint32_t commands[] = {
+	    0x18000000, 0x12345678,
+	    0x28000000, 0x87654321, 0x90ABCDEF,
+	    0x08020300};
 
     command_pointer = commands;
     registers[3] = 0xF0F0F0F0;
@@ -941,13 +971,14 @@ void test_execute_print_val() {
 }
 
 void test_execute_print_struct() {
-    uint32_t commands[] = {0x01000004,
-                           0x21100003, 0x12345678, 0x90ABCDEF,
-                           0x11100002, 0x87654321,
-                           0x11100001, 0x8A7B,
-                           0x11100000, 0xFF,
-                           0x01200000,
-                           0x08200004};
+    static uint32_t commands[] = {
+	    0x01000004,
+	    0x21100003, 0x12345678, 0x90ABCDEF,
+	    0x11100002, 0x87654321,
+	    0x11100001, 0x8A7B,
+	    0x11100000, 0xFF,
+	    0x01200000,
+	    0x08200004};
 
     command_pointer = commands;
 
@@ -967,19 +998,19 @@ void test_execute_print_struct() {
 }
 
 void test_execute_read_param() {
-    uint32_t commands[] = {0x01000004,
-                           0x21100003, 0x12345678, 0x90ABCDEF,
-                           0x11100002, 0x87654321,
-                           0x11100001, 0x8A7B,
-                           0x11100000, 0xFF,
-                           0x01200000,
-                           0x07340034,
-                           0x07341024,
-                           0x07342014,
-                           0x07343004,
-                           0x07364F04,
-                           0x07365E04,
-    };
+    static uint32_t commands[] = {
+	    0x01000004,
+	    0x21100003, 0x12345678, 0x90ABCDEF,
+	    0x11100002, 0x87654321,
+	    0x11100001, 0x8A7B,
+	    0x11100000, 0xFF,
+	    0x01200000,
+	    0x07340034,
+	    0x07341024,
+	    0x07342014,
+	    0x07343004,
+	    0x07364F04,
+	    0x07365E04};
 
     registers[0xE] = 0;
     registers[0xF] = 2;
@@ -987,32 +1018,34 @@ void test_execute_read_param() {
     command_pointer = commands;
 
     execute_start_struct(get_next_command());
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 6; i++) {
         execute_read_param(get_next_command());
+    }
 
-   cut_assert_equal_int(0x1234567890ABCDEFLL,   registers[3]);
-   cut_assert_equal_int(0x87654321,             registers[2]);
-   cut_assert_equal_int(0x8A7B,                 registers[1]);
-   cut_assert_equal_int(0xFF,                   registers[0]);
-   cut_assert_equal_int(0x1234567890ABCDEFLL,   registers[5]);
-   cut_assert_equal_int(0x8A7B,                 registers[4]);
+    cut_assert_equal_int(0x1234567890ABCDEFLL,   registers[3]);
+    cut_assert_equal_int(0x87654321,             registers[2]);
+    cut_assert_equal_int(0x8A7B,                 registers[1]);
+    cut_assert_equal_int(0xFF,                   registers[0]);
+    cut_assert_equal_int(0x1234567890ABCDEFLL,   registers[5]);
+    cut_assert_equal_int(0x8A7B,                 registers[4]);
 }
 
 void test_execute_write_param() {
-    uint32_t commands[] = {0x01000004,
-                           0x21100003, 0x12345678, 0x90ABCDEF,
-                           0x11100002, 0x87654321,
-                           0x11100001, 0x8A7B,
-                           0x11100000, 0xFF,
-                           0x01200000,
-                           0x27204000, 0xFBFBFBFB, 0xFBFBFBFB,
-                           0x17204001, 0x12121212,
-                           0x17204002, 0x3434,
-                           0x17204003, 0x56,
-                           0x07224F00,
-                           0x07224E01,
-                           0x07224D02,
-                           0x07224C03};
+    static uint32_t commands[] = {
+	    0x01000004,
+	    0x21100003, 0x12345678, 0x90ABCDEF,
+	    0x11100002, 0x87654321,
+	    0x11100001, 0x8A7B,
+	    0x11100000, 0xFF,
+	    0x01200000,
+	    0x27204000, 0xFBFBFBFB, 0xFBFBFBFB,
+	    0x17204001, 0x12121212,
+	    0x17204002, 0x3434,
+	    0x17204003, 0x56,
+	    0x07224F00,
+	    0x07224E01,
+	    0x07224D02,
+	    0x07224C03};
 
     registers[0xC] = 0xDB;
     registers[0xD] = 0xEFFE;
@@ -1022,16 +1055,18 @@ void test_execute_write_param() {
     command_pointer = commands;
 
     execute_start_struct(get_next_command());
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) {
         execute_write_param(get_next_command());
+    }
 
     cut_assert_equal_int(0xFBFBFBFBFBFBFBFBLL, structs[4]->elements[0].data);
     cut_assert_equal_int(0x12121212,           structs[4]->elements[1].data);
     cut_assert_equal_int(0x3434,               structs[4]->elements[2].data);
     cut_assert_equal_int(0x56,                 structs[4]->elements[3].data);
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; i++) {
         execute_write_param(get_next_command());
+    }
 
     cut_assert_equal_int(0x1234567812345678LL, structs[4]->elements[0].data);
     cut_assert_equal_int(0xABCDEFFF,           structs[4]->elements[1].data);
@@ -1040,27 +1075,26 @@ void test_execute_write_param() {
 }
 
 void test_execute_loop() {
-    uint32_t commands[] = {0x35100001, 0x00000004, 0x00000008, 2,
-                           0x08020100,
-                           0x05300000,
+    static uint32_t commands[] = {
+	    0x35100001, 0x00000004, 0x00000008, 2,
+	    0x08020100,
+	    0x05300000,
 
-                           0x25143002, 0x00000004, 0x00000001,
-                           0x08020200,
-                           0x05300000,
+	    0x25143002, 0x00000004, 0x00000001,
+	    0x08020200,
+	    0x05300000,
 
-                           0x15165604, 0x00000001,
-                           0x08020400,
-                           0x05300000,
+	    0x15165604, 0x00000001,
+	    0x08020400,
+	    0x05300000,
 
-                           0x051798AB,
-                           0x08020B00,
-                           0x05300000,
+	    0x051798AB,
+	    0x08020B00,
+	    0x05300000,
 
-                           0x051789A7,
-                           0x08020700,
-                           0x05300000,
-
-    };
+	    0x051789A7,
+	    0x08020700,
+	    0x05300000};
 
     registers[3] = 0x1;
 
@@ -1075,8 +1109,9 @@ void test_execute_loop() {
 
     int pid = cut_fork();
     if (pid==0) {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 5; i++) {
             execute_loop(get_next_command());
+        }
         exit(EXIT_SUCCESS);
     }
 
@@ -1120,23 +1155,23 @@ void test_execute_loop() {
 
     cut_assert_not_null(strstr(str, "000000000000001B"));
     str = strstr(str, "000000000000001B");
-
 }
 
 void test_execute_write_struct() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
-                           0x01000004,
-                           0x21100003, 0x12345678, 0x90ABCDEF,
-                           0x11100002, 0x12345678,
-                           0x11100001, 0x1234,
-                           0x11100000, 0x12,
-                           0x11100004, -1,
-                           0x11100005, -1,
-                           0x11100006, -1,
-                           0x01200000,
-                           0x04300204,
-                           0x04320304};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
+	    0x01000004,
+	    0x21100003, 0x12345678, 0x90ABCDEF,
+	    0x11100002, 0x12345678,
+	    0x11100001, 0x1234,
+	    0x11100000, 0x12,
+	    0x11100004, -1,
+	    0x11100005, -1,
+	    0x11100006, -1,
+	    0x01200000,
+	    0x04300204,
+	    0x04320304};
 
     registers[3] = 1;
 
@@ -1183,39 +1218,41 @@ void test_execute_write_struct() {
 }
 
 void test_constructor() {
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
 
-                           0x01000004,
-                           0x11100002, 0xABABABAB,
-                           0x01200000,
+	    0x01000004,
+	    0x11100002, 0xABABABAB,
+	    0x01200000,
 
-                           0x01000002,
-                           0x11100002, 0x12345678,
-                           0x01200000,
+	    0x01000002,
+	    0x11100002, 0x12345678,
+	    0x01200000,
 
-                           0x02001A01,
+	    0x02001A01,
 
-                           0x04400100,
-                           0x04400101,
+	    0x04400100,
+	    0x04400101,
 
-                           0x17200000, 0x11111111,
-                           0x17201000, 0x12121212,
+	    0x17200000, 0x11111111,
+	    0x17201000, 0x12121212,
 
-                           0x04400100,
-                           0x04400101,
+	    0x04400100,
+	    0x04400101,
 
-                           0x02500000,
+	    0x02500000,
 
-                           0x14000300, 0x00000084,
+	    0x14000300, 0x00000084,
 
-                           0x04400104,
-                           0x04400102,
-                           0x0FF00000};
+	    0x04400104,
+	    0x04400102,
+	    0x0FF00000};
 
     data_specification_executor(commands, 0);
 
-    uint32_t *reader = (uint32_t*)memory_regions[current_region]->start_address;
+    uint32_t *reader = (uint32_t*)
+	    memory_regions[current_region]->start_address;
 
     cut_assert_equal_int(0xABABABAB, *(reader++));
     cut_assert_equal_int(0x12345678, *(reader++));
@@ -1223,29 +1260,28 @@ void test_constructor() {
     cut_assert_equal_int(0x12121212, *(reader++));
     cut_assert_equal_int(0xABABABAB, *(reader++));
     cut_assert_equal_int(0x12121212, *(reader++));
-
 }
 
 void test_execute_copy_struct() {
+    static uint32_t commands[] = {
+	    0x10200000, 0x00000100,
+	    0x05000000,
 
-    uint32_t commands[] = {0x10200000, 0x00000100,
-                           0x05000000,
+	    0x01000004,
+	    0x11100002, 0xABABABAB,
+	    0x01200000,
 
-                           0x01000004,
-                           0x11100002, 0xABABABAB,
-                           0x01200000,
+	    0x07001400,
+	    0x07041400,
+	    0x07023200,
+	    0x07063200,
 
-                           0x07001400,
-                           0x07041400,
-                           0x07023200,
-                           0x07063200,
-
-                           0x04400101,
-                           0x04400102,
-                           0x04400103,
-                           0x04400104,
-                           0x04400105,
-                           0x0FF00000};
+	    0x04400101,
+	    0x04400102,
+	    0x04400103,
+	    0x04400104,
+	    0x04400105,
+	    0x0FF00000};
 
     registers[1] = 2;
     registers[2] = 4;
@@ -1253,26 +1289,27 @@ void test_execute_copy_struct() {
 
     data_specification_executor(commands, 0);
 
-    uint32_t *reader = (uint32_t*)memory_regions[current_region]->start_address;
+    uint32_t *reader = (uint32_t*)
+	    memory_regions[current_region]->start_address;
 
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++) {
         cut_assert_equal_int(0xABABABAB, *(reader++));
-
+    }
 }
 
 void test_execute_align_wr_ptr() {
+    static uint32_t commands[] = {
+	    0x10200000, 0x00004000,
+	    0x05000000,
 
-    uint32_t commands[] = {0x10200000, 0x00004000,
-                           0x05000000,
+	    0x16400000, 1,
+	    0x06500002,
 
-                           0x16400000, 1,
-                           0x06500002,
+	    0x16400000, 1,
+	    0x06543002,
 
-                           0x16400000, 1,
-                           0x06543002,
-
-                           0x16400000, 1,
-                           0x06564100};
+	    0x16400000, 1,
+	    0x06564100};
 
     registers[1] = 1;
 
@@ -1284,33 +1321,32 @@ void test_execute_align_wr_ptr() {
     execute_set_wr_ptr(get_next_command());
     execute_align_wr_ptr(get_next_command());
     cut_assert_equal_int(0,
-                 (uint64_t)memory_regions[current_region]->write_pointer & 0x3);
+	    (uint64_t) memory_regions[current_region]->write_pointer & 0x3);
 
     execute_set_wr_ptr(get_next_command());
     execute_align_wr_ptr(get_next_command());
     cut_assert_equal_int(0,
-                 (uint64_t)memory_regions[current_region]->write_pointer & 0x3);
+	    (uint64_t) memory_regions[current_region]->write_pointer & 0x3);
     cut_assert_equal_int(registers[3],
-                       (uint64_t)memory_regions[current_region]->write_pointer);
+	    (uint64_t) memory_regions[current_region]->write_pointer);
 
     execute_set_wr_ptr(get_next_command());
     execute_align_wr_ptr(get_next_command());
     cut_assert_equal_int(0,
-                 (uint64_t)memory_regions[current_region]->write_pointer & 0x1);
+	    (uint64_t) memory_regions[current_region]->write_pointer & 0x1);
     cut_assert_equal_int(registers[4],
-                       (uint64_t)memory_regions[current_region]->write_pointer);
-
+	    (uint64_t) memory_regions[current_region]->write_pointer);
 }
 
 void test_execute_block_copy() {
-
-    uint32_t commands[] = {0x10200000, 0x00004000,
-                           0x05000000,
-                           0x14202001, 0x12345678,
-                           0x14201002, 0xABCD,
-                           0x14200004, 0xAB,
-                           0x04451C20,
-                           0x04473450};
+    static uint32_t commands[] = {
+	    0x10200000, 0x00004000,
+	    0x05000000,
+	    0x14202001, 0x12345678,
+	    0x14201002, 0xABCD,
+	    0x14200004, 0xAB,
+	    0x04451C20,
+	    0x04473450};
 
     command_pointer = commands;
 
@@ -1342,6 +1378,3 @@ void test_execute_block_copy() {
         cut_assert_equal_int(0xABABABAB, *(reader++));
     }
 }
-
-
-

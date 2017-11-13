@@ -4,12 +4,12 @@
 void *stack[MAX_STACK_SIZE];
 int stack_size = 0;
 
-void stack_push(void *new) {
+void stack_push(void *new_item) {
     if (stack_size + 1 > MAX_STACK_SIZE) {
         log_error("DSE stack is full.");
         rt_error(RTE_ABORT);
     }
-    stack[stack_size++] = new;
+    stack[stack_size++] = new_item;
 }
 
 void *stack_pop() {
@@ -27,4 +27,3 @@ void *stack_top() {
     }
     return stack[stack_size - 1];
 }
-

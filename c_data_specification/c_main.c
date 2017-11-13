@@ -14,27 +14,6 @@
 //! Initialised with 0 (NULL) by default.
 MemoryRegion *memory_regions[MAX_MEM_REGIONS];
 
-//! \brief Get the value of user2 register.
-//!
-//! \return The value of user2.
-uint32_t get_user2_value() {
-    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user2;
-}
-
-//! \brief Get the value of user1 register.
-//!
-//! \return The value of user1.
-uint32_t get_user1_value() {
-    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user1;
-}
-
-//! \brief Get the value of user0 register.
-//!
-//! \return The value of user0.
-uint32_t get_user0_value() {
-    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user0;
-}
-
 //! \brief Pointer to a memory region that contains the currently executing
 //!        data spec.
 address_t execRegion = NULL;
@@ -68,12 +47,37 @@ uint8_t generate_report;
 //         memory map report
 MemoryRegion *report_header_start = NULL;
 
+// -------------------------------------------------------------------------
+
+#ifndef EMULATE
+
+//! \brief Get the value of user2 register.
+//!
+//! \return The value of user2.
+uint32_t get_user2_value() {
+    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user2;
+}
+
+//! \brief Get the value of user1 register.
+//!
+//! \return The value of user1.
+uint32_t get_user1_value() {
+    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user1;
+}
+
+//! \brief Get the value of user0 register.
+//!
+//! \return The value of user0.
+uint32_t get_user0_value() {
+    return ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user0;
+}
+
 //! \brief Allocate memory for the header and the pointer table.
 void pointer_table_header_alloc() {
     log_info("Allocating memory for pointer table");
     address_t header_start = sark_xalloc(sv->sdram_heap,
-            HEADER_SIZE_BYTES + POINTER_TABLE_SIZE_BYTES,
-            TAG, future_sark_xalloc_flags);
+        HEADER_SIZE_BYTES + POINTER_TABLE_SIZE_BYTES,
+        TAG, future_sark_xalloc_flags);
 
     if (header_start == NULL) {
         log_error("Could not allocate memory for the header and pointer table");
@@ -88,8 +92,8 @@ void pointer_table_header_alloc() {
     log_info("Header address 0x%08x", header_start);
 
     if (generate_report) {
-        report_header_start = sark_xalloc(
-            sv->sdram_heap, sizeof(MemoryRegion) * MAX_MEM_REGIONS, TAG,
+        report_header_start = sark_xalloc(sv->sdram_heap,
+            sizeof(MemoryRegion) * MAX_MEM_REGIONS, TAG,
             future_sark_xalloc_flags);
 
         if (report_header_start == NULL) {
@@ -98,7 +102,7 @@ void pointer_table_header_alloc() {
             spin1_exit(-1);
         }
         ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user1 =
-            (uint) report_header_start;
+                (uint) report_header_start;
         log_info("Report address 0x%08x", report_header_start);
     }
 }
@@ -109,8 +113,7 @@ void pointer_table_header_alloc() {
 void write_pointer_table() {
 
     // Pointer to write the pointer table.
-    address_t base_ptr = (address_t)(
-        ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user0);
+    address_t base_ptr = (address_t) get_user0_value();
     address_t pt_writer = base_ptr + HEADER_SIZE;
 
     // Iterate over the memory regions and write their start address in the
@@ -120,8 +123,7 @@ void write_pointer_table() {
         if (memory_regions[i] != NULL) {
             *pt_writer = (uint32_t) memory_regions[i]->start_address;
 
-            log_info(
-                "Region %d address 0x%08x size %d bytes, %s", i,
+            log_info("Region %d address 0x%08x size %d bytes, %s", i,
                 *pt_writer, memory_regions[i]->size,
                 memory_regions[i]->unfilled ? "unfilled" : "filled");
         } else {
@@ -204,3 +206,5 @@ void c_main(void) {
     // would get rid of the data in DTCM
     free_mem_region_info();
 }
+
+#endif // !EMULATE

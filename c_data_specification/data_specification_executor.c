@@ -94,8 +94,8 @@ int command_src2_in_use(uint32_t command) {
 }
 
 uint32_t available_region_space(uint8_t region) {
-    return (uint32_t) memory_regions[region]->size - (uint32_t) (
-	    memory_regions[region]->start_address -
+    return (uint32_t) memory_regions[region]->size -
+        (uint32_t) (memory_regions[region]->start_address -
             memory_regions[region]->write_pointer);
 }
 
@@ -145,16 +145,16 @@ void execute_reserve(Command cmd) {
     }
 
     // Allocate the required memory
-    uint32_t mem_region_size = ((cmd.dataWords[0] & 0x03) > 0) ?
-        (((cmd.dataWords[0] >> 2) + 1) << 2) :
-        cmd.dataWords[0];
+    uint32_t mem_region_size =
+        ((cmd.dataWords[0] & 0x03) > 0) ?
+            (((cmd.dataWords[0] >> 2) + 1) << 2) : cmd.dataWords[0];
 
-    void *mem_region_start = sark_xalloc(
-        sv->sdram_heap, mem_region_size, TAG, future_sark_xalloc_flags);
+    void *mem_region_start = sark_xalloc(sv->sdram_heap, mem_region_size, TAG,
+        future_sark_xalloc_flags);
 
     if (mem_region_start == NULL) {
         log_error("RESERVE unable to allocate %d bytes of SDRAM memory",
-        	mem_region_size);
+            mem_region_size);
         rt_error(RTE_ABORT);
     }
 
@@ -168,7 +168,7 @@ void execute_reserve(Command cmd) {
     uint8_t read_only = (cmd.cmdWord >> 7) & 0x1;
 
     log_debug("RESERVE %smemory region %d of %d bytes",
-	    read_only ? "read-only " : "", region_id, mem_region_size);
+        read_only ? "read-only " : "", region_id, mem_region_size);
 
     memory_regions[region_id]->size = mem_region_size;
     memory_regions[region_id]->start_address = mem_region_start;
@@ -176,9 +176,9 @@ void execute_reserve(Command cmd) {
     memory_regions[region_id]->unfilled = read_only;
 
     log_debug("region start pointer: 0x%08x",
-	    memory_regions[region_id]->start_address);
+        memory_regions[region_id]->start_address);
     log_debug("region write pointer: 0x%08x",
-	    memory_regions[region_id]->write_pointer);
+        memory_regions[region_id]->write_pointer);
     log_debug("region size: %d", memory_regions[region_id]->size);
 
     if (memory_regions[region_id]->unfilled) {
@@ -200,8 +200,8 @@ void execute_free(Command cmd) {
 
     log_debug("FREE memory region %d", region_id);
 
-    sark_xfree(
-	    sv->sdram_heap, memory_regions[region_id]->start_address, ALLOC_LOCK);
+    sark_xfree(sv->sdram_heap, memory_regions[region_id]->start_address,
+        ALLOC_LOCK);
 
     sark_free(memory_regions[region_id]);
 
@@ -216,34 +216,37 @@ void execute_free(Command cmd) {
 //                  The supported sizes are 1, 2, 4 and 8 bytes.
 void write_value(void *value, int size) {
     log_debug("writing %d bytes at pointer 0x%08x", size,
-	    memory_regions[current_region]->write_pointer);
+        memory_regions[current_region]->write_pointer);
 
     switch (size) {
     case 1:
-	*(memory_regions[current_region]->write_pointer) =
-		*((uint8_t*) value);
-	break;
+        *(memory_regions[current_region]->write_pointer) = *((uint8_t*) value);
+        break;
+
     case 2:
-	*((uint16_t*)memory_regions[current_region]->write_pointer) =
-                *((uint16_t*) value);
-	break;
+        *((uint16_t*) memory_regions[current_region]->write_pointer) =
+            *((uint16_t*) value);
+        break;
+
     case 4:
-	*((uint32_t*)memory_regions[current_region]->write_pointer) =
-                *((uint32_t*) value);
-	break;
+        *((uint32_t*) memory_regions[current_region]->write_pointer) =
+            *((uint32_t*) value);
+        break;
+
     case 8:
-	*((uint64_t*)memory_regions[current_region]->write_pointer) =
-                *((uint64_t*) value);
-	break;
+        *((uint64_t*) memory_regions[current_region]->write_pointer) =
+            *((uint64_t*) value);
+        break;
+
     default:
-	log_error("write value unknown size");
-	rt_error(RTE_ABORT);
+        log_error("write value unknown size");
+        rt_error(RTE_ABORT);
     }
 
     memory_regions[current_region]->write_pointer += size;
 
     log_debug("final write pointer: 0x%08x",
-	    memory_regions[current_region]->write_pointer);
+        memory_regions[current_region]->write_pointer);
 }
 
 //! \brief Execute a WRITE command, which writes 1, 2, 4 or 8 bytes of data from
@@ -273,10 +276,11 @@ void execute_write(Command cmd) {
     } else if (cmd.dataLength == 1 && data_len != 8) {
         data_val = cmd.dataWords[0];
     } else if (cmd.dataLength == 2 && data_len == 8) {
-        data_val = ((uint64_t)cmd.dataWords[0] << 32) | cmd.dataWords[1];
+        data_val = ((uint64_t) cmd.dataWords[0] << 32) | cmd.dataWords[1];
     } else {
-        log_error("WRITE format error. DataLength %d data_len %d src1 in use %d",
-        	cmd.dataLength, data_len, command_src1_in_use(cmd.cmdWord));
+        log_error(
+            "WRITE format error. DataLength %d data_len %d src1 in use %d",
+            cmd.dataLength, data_len, command_src1_in_use(cmd.cmdWord));
         rt_error(RTE_ABORT);
     }
 
@@ -292,21 +296,21 @@ void execute_write(Command cmd) {
         log_error("WRITE the current memory region is full");
         log_error("current region: %d", current_region);
         log_error("start region address: 0x%08x",
-        	memory_regions[current_region]->start_address);
+            memory_regions[current_region]->start_address);
         log_error("current write pointer: 0x%08x",
-        	memory_regions[current_region]->write_pointer);
+            memory_regions[current_region]->write_pointer);
         log_error("size of the data to be written: %d", data_len);
         log_error("available space: %d",
-        	available_region_space(current_region));
+            available_region_space(current_region));
         log_error("address of the data specification file: 0x%08x",
-        	dsf_pointer);
+            dsf_pointer);
         log_error("address of the instruction executed: 0x%08x",
-        	command_pointer);
+            command_pointer);
         rt_error(RTE_ABORT);
     }
 
     for (int count = 0; count < n_repeats; count++) {
-	write_value(&data_val, data_len);
+        write_value(&data_val, data_len);
     }
 }
 
@@ -315,43 +319,46 @@ void execute_write(Command cmd) {
 //! \param[in] cmd The command to be executed.
 void execute_write_array(Command cmd) {
     // The length of the array is specified in the second word of the command.
-    int length        = cmd.dataWords[0];
+    int length = cmd.dataWords[0];
     uint8_t data_size = cmd.cmdWord & 0x0F;
 
     // Perform some checks and, if everything is fine, write the array to
     // memory.
     if (current_region == -1) {
-        log_error("WRITE_ARRAY the current memory region has not been selected");
+        log_error(
+            "WRITE_ARRAY the current memory region has not been selected");
         rt_error(RTE_ABORT);
     } else if (memory_regions[current_region] == NULL) {
-        log_error("WRITE_ARRAY the current memory region has not been allocated");
+        log_error(
+            "WRITE_ARRAY the current memory region has not been allocated");
         rt_error(RTE_ABORT);
     } else if (available_region_space(current_region) < length * data_size) {
         log_error("WRITE_ARRAY the current memory region is full");
         log_error("current region: %d", current_region);
         log_error("start region address: 0x%08x",
-        	memory_regions[current_region]->start_address);
+            memory_regions[current_region]->start_address);
         log_error("current write pointer: 0x%08x",
-        	memory_regions[current_region]->write_pointer);
+            memory_regions[current_region]->write_pointer);
         log_error("size of the data to be written: %d", length * data_size);
         log_error("available space: %d",
-        	available_region_space(current_region));
+            available_region_space(current_region));
         log_error("address of the data specification file: 0x%08x",
-        	dsf_pointer);
+            dsf_pointer);
         log_error("address of the instruction executed: 0x%08x",
-        	command_pointer);
+            command_pointer);
         rt_error(RTE_ABORT);
     }
 
-    uint8_t *array_writer = (uint8_t*)command_pointer;
+    uint8_t *array_writer = (uint8_t*) command_pointer;
     for (int count = 0; count < length; count++) {
-	write_value(array_writer, data_size);
-	array_writer += data_size;
+        write_value(array_writer, data_size);
+        array_writer += data_size;
     }
 
-    command_pointer = ((long)array_writer & 0x03)?
-	    (address_t)((((long)array_writer >> 2) + 1) << 2) :
-            (address_t)array_writer;
+    command_pointer =
+        ((long) array_writer & 0x03) ?
+            (address_t)((((long) array_writer >> 2) + 1) << 2) :
+            (address_t) array_writer;
 }
 
 //! \brief Execute a SWITCH_FOCUS command, which changes the selected memory
@@ -423,8 +430,7 @@ void execute_loop(Command cmd) {
         // Push the return value of the command pointer on the stack.
         stack_push(command_pointer);
 
-        for (registers[count_reg] = loop_start;
-                registers[count_reg] < loop_end;
+        for (registers[count_reg] = loop_start; registers[count_reg] < loop_end;
                 registers[count_reg] += increment) {
             data_specification_executor(stack_top(), 0);
         }
@@ -472,8 +478,8 @@ void execute_start_struct(Command cmd) {
         if (structEntry.dataLength == 1) {
             value = structEntry.dataWords[0];
         } else if (structEntry.dataLength == 2) {
-            value = ((uint64_t)structEntry.dataWords[0] << 32) |
-                structEntry.dataWords[1];
+            value = ((uint64_t) structEntry.dataWords[0] << 32)
+                | structEntry.dataWords[1];
         }
 
         struct_set_element_type(str, current_element_id, elem_type);
@@ -510,10 +516,8 @@ void execute_write_struct(Command cmd) {
     // defined elements.
     for (int count = 0; count < n_repeats; count++) {
         for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++) {
-            write_value(
-        	    &(structs[struct_id]->elements[elem_id].data),
-		    data_type_get_size(
-			    structs[struct_id]->elements[elem_id].type));
+            write_value(&(structs[struct_id]->elements[elem_id].data),
+                data_type_get_size(structs[struct_id]->elements[elem_id].type));
         }
     }
 }
@@ -531,7 +535,7 @@ void execute_mv(Command cmd) {
     } else if (cmd.dataLength == 1) {
         data = cmd.dataWords[0];
     } else {
-        data = ((uint64_t)cmd.dataWords[0] << 32) | cmd.dataWords[1];
+        data = ((uint64_t) cmd.dataWords[0] << 32) | cmd.dataWords[1];
     }
 
     // Perform the actual data move.
@@ -569,29 +573,28 @@ void execute_logic_op(Command cmd) {
 
     switch (operation) {
     case 0x0:
-	registers[dest_id] = source1 << source2;
-	break;
+        registers[dest_id] = source1 << source2;
+        break;
     case 0x1:
-	registers[dest_id] = source1 >> source2;
-	break;
+        registers[dest_id] = source1 >> source2;
+        break;
     case 0x2:
-	registers[dest_id] = source1 |  source2;
-	break;
+        registers[dest_id] = source1 | source2;
+        break;
     case 0x3:
-	registers[dest_id] = source1 &  source2;
-	break;
+        registers[dest_id] = source1 & source2;
+        break;
     case 0x4:
-	registers[dest_id] = source1 ^  source2;
-	break;
+        registers[dest_id] = source1 ^ source2;
+        break;
     case 0x5:
-	registers[dest_id] =~source1;
-	break;
+        registers[dest_id] = ~source1;
+        break;
     default:
-	log_error("Undefined logic operation %d", operation);
-	rt_error(RTE_ABORT);
+        log_error("Undefined logic operation %d", operation);
+        rt_error(RTE_ABORT);
     }
 }
-
 
 //! \brief Execute a WRITE_PARAM instruction.
 //! \param[in] cmd The command to be executed.
@@ -603,11 +606,11 @@ void execute_write_param(Command cmd) {
     } else if (cmd.dataLength == 1) {
         value = cmd.dataWords[0];
     } else {
-        value = (uint64_t)cmd.dataWords[0] << 32 | cmd.dataWords[1];
+        value = (uint64_t) cmd.dataWords[0] << 32 | cmd.dataWords[1];
     }
 
     uint8_t struct_id = (cmd.cmdWord & 0xF000) >> 12;
-    uint8_t elem_id   = cmd.cmdWord & 0xFF;
+    uint8_t elem_id = cmd.cmdWord & 0xFF;
 
     if (structs[struct_id] == NULL) {
         log_error("WRITE_PARAM structure %d has not been defined", struct_id);
@@ -615,7 +618,7 @@ void execute_write_param(Command cmd) {
     }
     if (structs[struct_id]->size <= elem_id) {
         log_error("WRITE_PARAM %d is not a valid element id in structure %d",
-        	struct_id, elem_id);
+            struct_id, elem_id);
         rt_error(RTE_ABORT);
     }
 
@@ -641,10 +644,10 @@ void execute_read_param(Command cmd) {
 //! \param[in] cmd The command to be executed.
 void execute_copy_param(Command cmd) {
     uint8_t dest_id = (cmd.cmdWord & 0xF000) >> 12;
-    uint8_t src_struct_id  = (cmd.cmdWord & 0x0F00) >> 8;
+    uint8_t src_struct_id = (cmd.cmdWord & 0x0F00) >> 8;
 
-    uint8_t dest_elem_id  = (cmd.dataWords[0] & 0xFF00) >> 8;
-    uint8_t src_elem_id   = (cmd.dataWords[0] & 0x00FF);
+    uint8_t dest_elem_id = (cmd.dataWords[0] & 0xFF00) >> 8;
+    uint8_t src_elem_id = (cmd.dataWords[0] & 0x00FF);
 
     if (structs[src_struct_id] == NULL) {
         log_error("COPY_PARAM source structure %d not defined", src_struct_id);
@@ -652,7 +655,7 @@ void execute_copy_param(Command cmd) {
     }
     if (structs[src_struct_id]->size <= src_elem_id) {
         log_error("COPY_PARAM source element %d of structure %d not defined",
-        	dest_elem_id, dest_id);
+            dest_elem_id, dest_id);
         rt_error(RTE_ABORT);
     }
 
@@ -661,17 +664,18 @@ void execute_copy_param(Command cmd) {
     } else {
         if (structs[src_struct_id] == NULL) {
             log_error("COPY_PARAM destination structure %d not defined",
-        	    dest_id);
+                dest_id);
             rt_error(RTE_ABORT);
         }
         if (structs[src_struct_id]->size <= dest_elem_id) {
-            log_error("COPY_PARAM destination element %d of structure %d not defined",
-		      dest_elem_id, dest_id);
+            log_error(
+                "COPY_PARAM destination element %d of structure %d not defined",
+                dest_elem_id, dest_id);
             rt_error(RTE_ABORT);
         }
 
-        structs[dest_id]->elements[dest_elem_id].data =
-        	structs[src_struct_id]->elements[src_elem_id].data;
+        structs[dest_id]->elements[dest_elem_id].data = structs[src_struct_id]
+            ->elements[src_elem_id].data;
     }
 }
 
@@ -718,9 +722,8 @@ void execute_print_struct(Command cmd) {
     log_info("Printing structure %d", struct_id);
     for (int elem_id = 0; elem_id < structs[struct_id]->size; elem_id++) {
         log_info("\t%08X%08X",
-        	(structs[struct_id]->elements[elem_id].data &
-        		0xFFFFFFFF00000000LL) >> 32,
-		structs[struct_id]->elements[elem_id].data & 0xFFFFFFFF);
+            (structs[struct_id]->elements[elem_id].data & 0xFFFFFFFF00000000LL)
+                >> 32, structs[struct_id]->elements[elem_id].data & 0xFFFFFFFF);
     }
 }
 
@@ -750,20 +753,19 @@ int get_nth_struct_arg(Command cmd, int param_n) {
 //! \param[in] cmd The command to be executed.
 void execute_start_constructor(Command cmd) {
     int constructor_id = (cmd.cmdWord & 0xF800) >> 11;
-    int arg_count      = (cmd.cmdWord & 0x0700) >> 8;
+    int arg_count = (cmd.cmdWord & 0x0700) >> 8;
     int read_only_mask = (cmd.cmdWord & 0x001F);
 
-    constructors[constructor_id].start_address  = command_pointer;
-    constructors[constructor_id].arg_count     = arg_count;
+    constructors[constructor_id].start_address = command_pointer;
+    constructors[constructor_id].arg_count = arg_count;
     constructors[constructor_id].arg_read_only = read_only_mask;
 
     // Skip all instructions up to END_CONSTRUCTOR.
     Command constructorEntry;
     do {
-	constructorEntry = get_next_command();
+        constructorEntry = get_next_command();
     } while (constructorEntry.opCode != END_CONSTRUCTOR);
 }
-
 
 //! \brief Execute a CONSTRUCT command.
 //! \param[in] cmd The command to be executed.
@@ -819,24 +821,24 @@ void execute_read(Command cmd) {
 
     switch (data_len) {
     case 1:
-	registers[dest_id] =
-                *((uint8_t*)memory_regions[current_region]->write_pointer);
-	break;
+        registers[dest_id] = *((uint8_t*) memory_regions[current_region]
+            ->write_pointer);
+        break;
     case 2:
-	registers[dest_id] =
-                *((uint16_t*)memory_regions[current_region]->write_pointer);
-	break;
+        registers[dest_id] = *((uint16_t*) memory_regions[current_region]
+            ->write_pointer);
+        break;
     case 4:
-	registers[dest_id] =
-                *((uint32_t*)memory_regions[current_region]->write_pointer);
-	break;
+        registers[dest_id] = *((uint32_t*) memory_regions[current_region]
+            ->write_pointer);
+        break;
     case 8:
-	registers[dest_id] =
-                *((uint64_t*)memory_regions[current_region]->write_pointer);
-	break;
+        registers[dest_id] = *((uint64_t*) memory_regions[current_region]
+            ->write_pointer);
+        break;
     default:
-	log_error("READ unsupported size %d", data_len);
-	rt_error(RTE_ABORT);
+        log_error("READ unsupported size %d", data_len);
+        rt_error(RTE_ABORT);
     }
 
     memory_regions[current_region]->write_pointer += data_len;
@@ -846,9 +848,8 @@ void execute_read(Command cmd) {
 //! \param[in] cmd The command to be executed.
 void execute_get_wr_ptr(Command cmd) {
     int dest_reg = (cmd.cmdWord & 0xF000) >> 12;
-    registers[dest_reg] = (long) (
-	    memory_regions[current_region]->write_pointer -
-	    memory_regions[current_region]->start_address);
+    registers[dest_reg] = (long) (memory_regions[current_region]->write_pointer
+        - memory_regions[current_region]->start_address);
 }
 
 //! \brief Execute a SET_WR_PTR command.
@@ -867,11 +868,10 @@ void execute_set_wr_ptr(Command cmd) {
     if (relative_addressing) {
         memory_regions[current_region]->write_pointer += source;
     } else {
-        memory_regions[current_region]->write_pointer = (uint8_t*) (
-        	memory_regions[current_region]->start_address + source);
+        memory_regions[current_region]->write_pointer =
+            (uint8_t*) (memory_regions[current_region]->start_address + source);
     }
 }
-
 
 //! \brief Execute an IF command.
 //! \param[in] cmd The command to be executed.
@@ -891,36 +891,36 @@ void execute_if(Command cmd) {
 
     switch (operation) {
     case 0x00:
-	op_result = source1 == source2;
-	break;
+        op_result = source1 == source2;
+        break;
     case 0x01:
-	op_result = source1 != source2;
-	break;
+        op_result = source1 != source2;
+        break;
     case 0x02:
-	op_result = source1 <= source2;
-	break;
+        op_result = source1 <= source2;
+        break;
     case 0x03:
-	op_result = source1 <  source2;
-	break;
+        op_result = source1 < source2;
+        break;
     case 0x04:
-	op_result = source1 >= source2;
-	break;
+        op_result = source1 >= source2;
+        break;
     case 0x05:
-	op_result = source1 >  source2;
-	break;
+        op_result = source1 > source2;
+        break;
     case 0x06:
-	op_result = source1 == 0;
-	break;
+        op_result = source1 == 0;
+        break;
     case 0x07:
-	op_result = source1 != 0;
-	break;
+        op_result = source1 != 0;
+        break;
     }
 
     if (op_result == 0) {
         // Skip all instructions up to ELSE or END_IF.
         Command command = get_next_command();
         while (command.opCode != ELSE && command.opCode != END_IF) {
-             command = get_next_command();
+            command = get_next_command();
         }
     }
 }
@@ -931,7 +931,7 @@ void execute_else(Command cmd) {
     // Skip all instructions up to END_IF.
     Command command;
     do {
-	command = get_next_command();
+        command = get_next_command();
     } while (command.opCode != END_IF);
 }
 
@@ -941,9 +941,9 @@ void execute_print_val(Command cmd) {
     if (command_src1_in_use(cmd.cmdWord)) {
         uint64_t data = registers[command_get_src1Reg(cmd.cmdWord)];
         log_info("Register %d has value %08X%08X",
-        	command_get_src1Reg(cmd.cmdWord),
-		(uint32_t) ((data % 0xFFFFFFFF00000000LL) >> 32),
-		(uint32_t) (data & 0xFFFFFFFFF));
+            command_get_src1Reg(cmd.cmdWord),
+            (uint32_t) ((data % 0xFFFFFFFF00000000LL) >> 32),
+            (uint32_t) (data & 0xFFFFFFFFF));
     } else if (cmd.dataLength == 1) {
         log_info("Value %08X", cmd.dataWords[0]);
     } else {
@@ -982,13 +982,13 @@ void execute_arith_op(Command cmd) {
     if (sgn) {
         switch (operation) {
         case 0:
-            result = (int64_t)source1 + (int64_t)source2;
+            result = (int64_t) source1 + (int64_t) source2;
             break;
         case 1:
-            result = (int64_t)source1 - (int64_t)source2;
+            result = (int64_t) source1 - (int64_t) source2;
             break;
         case 2:
-            result = (int64_t)source1 * (int64_t)source2;
+            result = (int64_t) source1 * (int64_t) source2;
             break;
         default:
             log_error("Unknown arithmetic operation");
@@ -1050,8 +1050,8 @@ void execute_align_wr_ptr(Command cmd) {
     }
 
     if (command_dest_in_use(cmd.cmdWord)) {
-        registers[command_get_destReg(cmd.cmdWord)] = (long)
-        	memory_regions[current_region]->write_pointer;
+        registers[command_get_destReg(cmd.cmdWord)] =
+            (long) memory_regions[current_region]->write_pointer;
     }
 
 }
@@ -1059,10 +1059,10 @@ void execute_align_wr_ptr(Command cmd) {
 //! \brief Execute a BLOCK_COPY command.
 //! \param[in] cmd The command to be executed.
 void execute_block_copy(Command cmd) {
-    address_t source = (address_t)
-	    (uint32_t) registers[command_get_src2Reg(cmd.cmdWord)];
-    address_t destination = (address_t)
-	    (uint32_t) registers[command_get_destReg(cmd.cmdWord)];
+    address_t source = (address_t) (uint32_t) registers[command_get_src2Reg(
+        cmd.cmdWord)];
+    address_t destination =
+        (address_t) (uint32_t) registers[command_get_destReg(cmd.cmdWord)];
 
     uint32_t size = command_get_src1Reg(cmd.cmdWord);
     if (command_src1_in_use(cmd.cmdWord)) {

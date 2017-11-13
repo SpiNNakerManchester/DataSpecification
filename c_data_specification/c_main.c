@@ -76,8 +76,8 @@ uint32_t get_user0_value() {
 void pointer_table_header_alloc() {
     log_info("Allocating memory for pointer table");
     address_t header_start = sark_xalloc(sv->sdram_heap,
-            HEADER_SIZE_BYTES + POINTER_TABLE_SIZE_BYTES,
-            TAG, future_sark_xalloc_flags);
+        HEADER_SIZE_BYTES + POINTER_TABLE_SIZE_BYTES,
+        TAG, future_sark_xalloc_flags);
 
     if (header_start == NULL) {
         log_error("Could not allocate memory for the header and pointer table");
@@ -92,8 +92,8 @@ void pointer_table_header_alloc() {
     log_info("Header address 0x%08x", header_start);
 
     if (generate_report) {
-        report_header_start = sark_xalloc(
-            sv->sdram_heap, sizeof(MemoryRegion) * MAX_MEM_REGIONS, TAG,
+        report_header_start = sark_xalloc(sv->sdram_heap,
+            sizeof(MemoryRegion) * MAX_MEM_REGIONS, TAG,
             future_sark_xalloc_flags);
 
         if (report_header_start == NULL) {
@@ -102,7 +102,7 @@ void pointer_table_header_alloc() {
             spin1_exit(-1);
         }
         ((vcpu_t*) SV_VCPU)[spin1_get_core_id()].user1 =
-            (uint) report_header_start;
+                (uint) report_header_start;
         log_info("Report address 0x%08x", report_header_start);
     }
 }
@@ -123,8 +123,7 @@ void write_pointer_table() {
         if (memory_regions[i] != NULL) {
             *pt_writer = (uint32_t) memory_regions[i]->start_address;
 
-            log_info(
-                "Region %d address 0x%08x size %d bytes, %s", i,
+            log_info("Region %d address 0x%08x size %d bytes, %s", i,
                 *pt_writer, memory_regions[i]->size,
                 memory_regions[i]->unfilled ? "unfilled" : "filled");
         } else {

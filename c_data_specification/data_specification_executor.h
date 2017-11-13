@@ -42,10 +42,10 @@ typedef struct dse_data {
     uint32_t generate_report;
 } dse_data;
 
-extern uint8_t	current_app_id;
-extern uint8_t	future_app_id;
-extern uint32_t	current_sark_xalloc_flags;
-extern uint32_t	future_sark_xalloc_flags;
+extern uint8_t current_app_id;
+extern uint8_t future_app_id;
+extern uint32_t current_sark_xalloc_flags;
+extern uint32_t future_sark_xalloc_flags;
 
 // The tag to give to memory regions reserved
 #define TAG 0x00

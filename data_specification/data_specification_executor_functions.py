@@ -17,8 +17,8 @@ from .exceptions \
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")
 _ONE_WORD = struct.Struct("<I")
-_ONE_SINT = struct.Struct("<i")
 _ONE_LONG = struct.Struct("<Q")
+_ONE_SIGNED_INT = struct.Struct("<i")
 
 
 class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
@@ -27,55 +27,52 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     """
 
     __slots__ = [
-        # ????????????
+        # The object to read the specification language file from
         "spec_reader",
 
-        # ????????????
-        "mem_writer",
-
-        # ????????????
+        # How much space do we have available?
         "memory_space",
 
-        # ????????????
+        # How much space is allocated
         "space_allocated",
 
-        # ????????????
+        # What memory region are we writing to?
         "current_region",
 
-        # ????????????
+        # List of register values
         "registers",
 
-        # ????????????
+        # Collection of memory regions
         "mem_regions",
 
-        # ????????????
+        # List of slots for structure definitions
         "struct_slots",
 
-        # ????????????
+        # The size of the current command
         "_cmd_size",
 
-        # ????????????
+        # The current command operation code
         "opcode",
 
-        # ????????????
+        # Is the destination a register? Not meaningful for all opcodes
         "use_dest_reg",
 
-        # ????????????
+        # Is the first source a register? Not meaningful for all opcodes
         "use_src1_reg",
 
-        # ????????????
+        # Is the second source a register? Not meaningful for all opcodes
         "use_src2_reg",
 
-        # ????????????
+        # The destination register. Not meaningful for all opcodes
         "dest_reg",
 
-        # ????????????
+        # The first source register. Not meaningful for all opcodes
         "src1_reg",
 
-        # ????????????
+        # The second source register. Not meaningful for all opcodes
         "src2_reg",
 
-        # ????????????
+        # The length of the associated data.
         "data_len"
     ]
 
@@ -179,7 +176,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
-        if (size <= 0) or (size > self.memory_space):
+        if not (0 < size <= self.memory_space):
             raise DataSpecificationParameterOutOfBoundsException(
                 "region size", size, 1, self.memory_space, "RESERVE")
 
@@ -286,18 +283,16 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.use_src1_reg:
             self.registers[self.dest_reg] = self.registers[self.src1_reg]
         else:
-            data = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
-            self.registers[self.dest_reg] = data
+            self.registers[self.dest_reg] = \
+                _ONE_WORD.unpack(self.spec_reader.read(4))[0]
 
     def execute_set_wr_ptr(self, cmd):
         address = None
         self.__unpack_cmd__(cmd)
-        if self.use_src1_reg == 1:
-
+        if self.use_src1_reg:
             # the data is a register
             future_address = self.registers[self.dest_reg]
         else:
-
             # the data is a raw address
             future_address = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
 
@@ -329,7 +324,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If command END_SPEC != -1
         """
-        value = _ONE_SINT.unpack(self.spec_reader.read(4))[0]
+        value = _ONE_SIGNED_INT.unpack(self.spec_reader.read(4))[0]
         if value != -1:
             raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "

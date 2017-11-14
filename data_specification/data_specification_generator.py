@@ -33,8 +33,10 @@ from .exceptions import \
     DataUndefinedWriterException
 
 logger = logging.getLogger(__name__)
+_ONE_SBYTE = struct.Struct("<b")
 _ONE_WORD = struct.Struct("<I")
-_ONE_SINT = struct.Struct("<i")
+_ONE_SIGNED_INT = struct.Struct("<i")
+_TWO_WORDS = struct.Struct("<II")
 
 
 def _bounds(cmd, name, value, low, high):
@@ -304,7 +306,7 @@ class DataSpecificationGenerator(object):
         cmd_word = _binencode(LEN2, Commands.DECLARE_RNG, [
             rng_id, 12,
             rng_type, 8])
-        encoded_seed = _ONE_SINT.pack(seed)
+        encoded_seed = _ONE_SIGNED_INT.pack(seed)
 
         cmd_string = "DECLARE_RNG id={0:d}, source={1:d}, seed={2:d}".format(
             rng_id, rng_type.value, seed)
@@ -468,8 +470,7 @@ class DataSpecificationGenerator(object):
         self.write_command_to_files(cmd_word, cmd_string)
 
         # elements of the struct
-        elem_index = 0
-        for i in parameters:
+        for elem_index, i in enumerate(parameters):
             label = i[0]
             data_type = i[1]
             value = i[2]
@@ -506,7 +507,6 @@ class DataSpecificationGenerator(object):
                 if len(label):
                     cmd_string += ", label={0:s}".format(label)
                 self.write_command_to_files(cmd_word, cmd_string)
-            elem_index += 1
 
         # end of struct
         cmd_word = _binencode(LEN1, Commands.END_STRUCT)
@@ -1229,7 +1229,7 @@ class DataSpecificationGenerator(object):
         else:
             _typebounds(Commands.LOOP, "start", start, DataType.INT32)
             length += 1
-            encoded_values += _ONE_SINT.pack(start)
+            encoded_values += _ONE_SIGNED_INT.pack(start)
             cmd_string += " start={0:d},".format(start)
 
         if end_is_register:
@@ -1240,7 +1240,7 @@ class DataSpecificationGenerator(object):
         else:
             _typebounds(Commands.LOOP, "end", end, DataType.INT32)
             length += 1
-            encoded_values += _ONE_SINT.pack(end)
+            encoded_values += _ONE_SIGNED_INT.pack(end)
             cmd_string += " end={0:d},".format(end)
 
         if increment_is_register:
@@ -1251,7 +1251,7 @@ class DataSpecificationGenerator(object):
         else:
             _typebounds(Commands.LOOP, "increment", increment, DataType.INT32)
             length += 1
-            encoded_values += _ONE_SINT.pack(increment)
+            encoded_values += _ONE_SIGNED_INT.pack(increment)
             cmd_string += " increment={0:d},".format(increment)
 
         self.ongoing_loop = True
@@ -1363,7 +1363,7 @@ class DataSpecificationGenerator(object):
                 bit_field, 16,
                 register_id, 8,
                 condition])
-            data_encoded += _ONE_SINT.pack(value)
+            data_encoded += _ONE_SIGNED_INT.pack(value)
             cmd_string = "IF reg[{0:d}] {1:s} {2:d}".format(
                 register_id, condition.operator, value)
 
@@ -1576,7 +1576,7 @@ class DataSpecificationGenerator(object):
             else:
                 _typebounds(Commands.SET_WR_PTR, "address",
                             address, DataType.INT32)
-                data_encoded += _ONE_SINT.pack(address)
+                data_encoded += _ONE_SIGNED_INT.pack(address)
 
             cmd_word = _binencode(LEN2, Commands.SET_WR_PTR, [
                 NO_REGS, 16,
@@ -1737,7 +1737,7 @@ class DataSpecificationGenerator(object):
             _typebounds(Commands.ARITH_OP, "operand_1",
                         operand_1, DataType.INT32)
             cmd_length += 1
-            encoded_operands += _ONE_SINT.pack(operand_1)
+            encoded_operands += _ONE_SIGNED_INT.pack(operand_1)
             cmd_string += " {0:d}".format(operand_1)
         else:
             _typebounds(Commands.ARITH_OP, "operand_1",
@@ -1758,7 +1758,7 @@ class DataSpecificationGenerator(object):
             _typebounds(Commands.ARITH_OP, "operand_2",
                         operand_2, DataType.INT32)
             cmd_length += 1
-            encoded_operands += _ONE_SINT.pack(operand_2)
+            encoded_operands += _ONE_SIGNED_INT.pack(operand_2)
             cmd_string += " {0:d}".format(operand_2)
         else:
             _typebounds(Commands.ARITH_OP, "operand_2",
@@ -2272,7 +2272,7 @@ class DataSpecificationGenerator(object):
                 destination_id, 12,
                 source_structure_id, 8])
             param_word = source_parameter_index
-            cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
+            cmd_string = "COPY_PARAM source_structure_id = {0:d}, " \
                          "source_parameter_id = {1:d}, " \
                          "destination_register_id = {2:d}".format(
                              source_structure_id, source_parameter_index,
@@ -2439,7 +2439,7 @@ class DataSpecificationGenerator(object):
         self.comment("\nEnd of specification:")
 
         cmd_word = _binencode(LEN1, Commands.END_SPEC)
-        encoded_parameter = _ONE_SINT.pack(-1)
+        encoded_parameter = _ONE_SIGNED_INT.pack(-1)
         cmd_string = "END_SPEC"
         self.write_command_to_files(cmd_word + encoded_parameter, cmd_string)
 

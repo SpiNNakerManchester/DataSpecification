@@ -12,59 +12,30 @@
 #include "constants.h"
 #include "commands.h"
 #include <stdint.h>
-
-#ifdef EMULATE
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-typedef uint32_t* address_t;
-#define spin1_exit(code) return (code);
-#define spin1_memcpy(destination, source, size)\
-    memcpy((destination), (source), (size))
-#define rt_error(error_code) exit((error_code))
-#define RTE_ABORT -1
-#define log_info(message, ...) printf("[INFO] " message "\n", ##__VA_ARGS__)
-#define log_warning(message, ...) \
-    printf("[WARNING] " message "\n", ##__VA_ARGS__)
-#define log_error(message, ...) printf("[ERROR] " message "\n", ##__VA_ARGS__)
-#define log_debug(message, ...) printf("[DEBUG] " message "\n", ##__VA_ARGS__)
-#define sark_xalloc(heap, size, tag, flag) malloc((size))
-#define sark_alloc(count, size) malloc((count) * (size))
-#define sark_xfree(heap, ptr, flag) free((ptr))
-#define sark_free(ptr) free((ptr))
-#endif
-
-
-#ifndef EMULATE
-#include <spin1_api.h>
-#include <debug.h>
-#include <spinnaker.h>
-#include <data_specification.h>
-#endif
+#include "system_api.h"
 
 // Stores the details of a command.
-typedef struct {
-    enum OpCode opCode;
+typedef struct Command {
+    OpCode opCode;
     uint8_t dataLength;
     uint32_t cmdWord;
     uint32_t dataWords[3];
 } Command;
 
-typedef struct {
+typedef struct MemoryRegion {
     uint8_t* start_address;
     uint32_t size;
     uint32_t unfilled;
     uint8_t* write_pointer;
 } MemoryRegion;
 
-
-typedef struct {
+typedef struct Constructor {
     address_t start_address;
     int arg_count;
     uint8_t arg_read_only;
 } Constructor;
 
-typedef struct {
+typedef struct dse_data {
     address_t execRegion;
     uint32_t currentBlock_size;
     uint32_t future_app_id;
@@ -82,4 +53,3 @@ extern uint32_t future_sark_xalloc_flags;
 void data_specification_executor(address_t, uint32_t);
 
 #endif
-

@@ -6,7 +6,7 @@
 #define _DATA_SPECIFICATION_COMMANDS
 
 //! The op-codes of the supported commands.
-enum OpCode {
+typedef enum OpCode {
     BREAK                 = 0x00,
     NOP                   = 0x01,
     RESERVE               = 0x02,
@@ -51,6 +51,6 @@ enum OpCode {
     PRINT_TXT             = 0x81,
     PRINT_STRUCT          = 0x82,
     END_SPEC              = 0xFF
-};
+} OpCode;
 
 #endif

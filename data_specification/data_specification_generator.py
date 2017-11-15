@@ -1262,7 +1262,6 @@ class DataSpecificationGenerator(object):
             cmd_string = "WRITE data=0x%8.8X" % data
 
         repeat_reg_usage = constants.NO_REGS
-        parameters = 1
         if self.report_writer is not None:
             cmd_string = "{0:s}".format(cmd_string)
 

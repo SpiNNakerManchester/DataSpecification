@@ -1198,7 +1198,161 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(encoded_cmd_word, cmd_string)
 
+    def create_cmd(self, data, data_type=DataType.UINT32):
+        """ Creates command to write a value one or more times to the current\
+            write pointer, causing the write pointer to move on by the number\
+            of bytes required to represent the data type. The data is passed\
+            as a parameter to this function
+
+
+        :param data: the data to write as a float.
+        :type data: float
+        :param data_type: the type to convert data to
+        :type data_type: :py:class:`DataType`
+        :return:  cmd_word_list; list of binary words to be added to the
+            binary data specification file and
+            cmd_string; string describing the command to be added to the\
+            report for the data specification file
+        :rtype: (bytearray, str)
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialised
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If repeats_register is None, and repeats is out of range
+            * If repeats_register is not a valid register id
+            * If data_type is an integer type, and data has a fractional part
+            * If data would overflow the data type
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If the data type is not\
+            known
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidSizeException: If the data size is invalid
+        """
+        if data_type not in DataType:
+            raise exceptions.DataSpecificationUnknownTypeException(
+                data_type.value, Commands.WRITE.name)  # @UndefinedVariable
+
+        data_size = data_type.size
+        if data_size == 1:
+            cmd_data_len = constants.LEN2
+            data_len = 0
+        elif data_size == 2:
+            cmd_data_len = constants.LEN2
+            data_len = 1
+        elif data_size == 4:
+            cmd_data_len = constants.LEN2
+            data_len = 2
+        elif data_size == 8:
+            cmd_data_len = constants.LEN3
+            data_len = 3
+        else:
+            raise exceptions.DataSpecificationInvalidSizeException(
+                data_type.name, data_size,
+                Commands.WRITE.name)  # @UndefinedVariable
+
+        if (data_type.min > data) or (data_type.max < data):
+            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "data", data, data_type.min, data_type.max,
+                Commands.WRITE.name)  # @UndefinedVariable
+
+        cmd_string = None
+        if self.report_writer is not None:
+            cmd_string = "WRITE data=0x%8.8X" % data
+
+        repeat_reg_usage = constants.NO_REGS
+        parameters = 1
+        if self.report_writer is not None:
+            cmd_string = "{0:s}".format(cmd_string)
+
+        cmd_word = (
+            (cmd_data_len << 28) |
+            (Commands.WRITE.value << 20) |  # @UndefinedVariable
+            (repeat_reg_usage << 16) | (data_len << 12) | 1)
+        # 1 is based on parameters = 0, repeats = 1 and parameters |= repeats
+
+        data_value = decimal.Decimal("{}".format(data)) * data_type.scale
+        padding = 4 - data_type.size if data_type.size < 4 else 0
+
+        cmd_word_list = struct.pack(
+            "<I{}{}x".format(data_type.struct_encoding, padding),
+            cmd_word, data_value)
+        if self.report_writer is not None:
+            cmd_string = "{0:s}, dataType={1:s}".format(
+                cmd_string, data_type.name)
+        return (cmd_word_list, cmd_string)
+
     def write_value(
+            self, data, data_type=DataType.UINT32):
+        """ Insert command to write a value one or more times to the current\
+            write pointer, causing the write pointer to move on by the number\
+            of bytes required to represent the data type. The data is passed\
+            as a parameter to this function
+
+        Note: This method used to have two extra parameters repeats and
+        repeats_is_register. They have been removed here. If you need then use
+        write_repeated_value
+
+        :param data: the data to write as a float.
+        :type data: float
+        :param data_type: the type to convert data to
+        :type data_type: :py:class:`DataType`
+        :return: Nothing is returned
+        :rtype: None
+        :raise data_specification.exceptions.DataUndefinedWriterException:\
+            If the binary specification file writer has not been initialised
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationParameterOutOfBoundsException:\
+            * If repeats_register is None, and repeats is out of range
+            * If repeats_register is not a valid register id
+            * If data_type is an integer type, and data has a fractional part
+            * If data would overflow the data type
+        :raise data_specification.exceptions.\
+            DataSpecificationUnknownTypeException: If the data type is not\
+            known
+        :raise data_specification.exceptions.\
+            DataSpecificationInvalidSizeException: If the data size is invalid
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected to write to
+        """
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                "WRITE")
+
+        (cmd_word_list, cmd_string) = self.create_cmd(data, data_type)
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
+    def write_cmd(self, cmd_word_list, cmd_string):
+        """ Writes cmd values created previously created and cacheed
+
+        see: create_cmd which is the ONLY way the parameters should have
+        been created.
+
+        :param cmd_word_list: list of binary words to be added to the binary\
+            data specification file
+        :type cmd_word_list: bytearray
+        :param cmd_string: string describing the command to be added to the\
+            report for the data specification file
+        :type cmd_string: str
+        :return: Nothing is returned
+        :rtype: None
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+            If a write to external storage fails
+        :raise data_specification.exceptions.\
+            DataSpecificationNoRegionSelectedException: If no region has been \
+            selected to write to
+        """
+        if self.current_region is None:
+            raise exceptions.DataSpecificationNoRegionSelectedException(
+                "WRITE")
+
+        self.write_command_to_files(cmd_word_list, cmd_string)
+
+    def write_repeated_value(
             self, data, repeats=1, repeats_is_register=False,
             data_type=DataType.UINT32):
         """ Insert command to write a value one or more times to the current\

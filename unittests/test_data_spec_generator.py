@@ -1036,24 +1036,26 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.write_value(0x0)
         self.dsg.write_value(0x12)
         self.dsg.write_value(0x12345678)
-        self.dsg.write_value(0x12345678, 2)
-        self.dsg.write_value(0x12, 12)
-        self.dsg.write_value(0x12, 0xFF, False, DataType.UINT8)
-        self.dsg.write_value(0x12, 5, False, DataType.UINT16)
-        self.dsg.write_value(0x123456789ABCDEFL, 5, False, DataType.UINT64)
-        self.dsg.write_value(0x123456789ABCDEFL, 5, True, DataType.UINT64)
-        self.dsg.write_value(0x123, 2, True, DataType.UINT64)
+        self.dsg.write_repeated_value(0x12345678, 2)
+        self.dsg.write_repeated_value(0x12, 12)
+        self.dsg.write_repeated_value(0x12, 0xFF, False, DataType.UINT8)
+        self.dsg.write_repeated_value(0x12, 5, False, DataType.UINT16)
+        self.dsg.write_repeated_value(0x123456789ABCDEFL, 5, False,
+                                      DataType.UINT64)
+        self.dsg.write_repeated_value(0x123456789ABCDEFL, 5, True,
+                                      DataType.UINT64)
+        self.dsg.write_repeated_value(0x123, 2, True, DataType.UINT64)
 
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
-            self.dsg.write_value(0, -1, True)
+            self.dsg.write_repeated_value(0, -1, True)
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
-            self.dsg.write_value(0, 0, False)
+            self.dsg.write_repeated_value(0, 0, False)
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
-            self.dsg.write_value(0, constants.MAX_REGISTERS, True)
+            self.dsg.write_repeated_value(0, constants.MAX_REGISTERS, True)
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
-            self.dsg.write_value(0, -1, False)
+            self.dsg.write_repeated_value(0, -1, False)
         with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
-            self.dsg.write_value(0, 256, False)
+            self.dsg.write_repeated_value(0, 256, False)
 
         self.skip_words(3)
         # WRITE

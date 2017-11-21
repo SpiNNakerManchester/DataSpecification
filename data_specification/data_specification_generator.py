@@ -982,9 +982,9 @@ class DataSpecificationGenerator(object):
         data_value = decimal.Decimal("{}".format(data)) * data_type.scale
         padding = 4 - data_type.size if data_type.size < 4 else 0
 
-        cmd_word_list = struct.pack(
-            "<I{}{}x".format(data_type.struct_encoding, padding),
-            cmd_word, data_value)
+        cmd_word_list = cmd_word + struct.pack(
+            "<{}{}x".format(data_type.struct_encoding, padding),
+            data_value)
         if self.report_writer is not None:
             cmd_string += ", dataType={0:s}".format(data_type.name)
         return (cmd_word_list, cmd_string)

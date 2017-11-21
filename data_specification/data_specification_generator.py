@@ -1,3 +1,4 @@
+import decimal
 from enum import Enum
 import logging
 import numpy
@@ -916,7 +917,6 @@ class DataSpecificationGenerator(object):
             of bytes required to represent the data type. The data is passed\
             as a parameter to this function
 
-
         :param data: the data to write as a float.
         :type data: float
         :param data_type: the type to convert data to
@@ -943,44 +943,40 @@ class DataSpecificationGenerator(object):
             DataSpecificationInvalidSizeException: If the data size is invalid
         """
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                data_type.value, Commands.WRITE.name)  # @UndefinedVariable
+            raise DataSpecificationUnknownTypeException(
+                data_type.value, Commands.WRITE)
 
         data_size = data_type.size
         if data_size == 1:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 0
         elif data_size == 2:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 1
         elif data_size == 4:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 2
         elif data_size == 8:
-            cmd_data_len = constants.LEN3
+            cmd_data_len = LEN3
             data_len = 3
         else:
-            raise exceptions.DataSpecificationInvalidSizeException(
-                data_type.name, data_size,
-                Commands.WRITE.name)  # @UndefinedVariable
+            raise DataSpecificationInvalidSizeException(
+                data_type.name, data_size, Commands.WRITE)
 
-        if (data_type.min > data) or (data_type.max < data):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "data", data, data_type.min, data_type.max,
-                Commands.WRITE.name)  # @UndefinedVariable
+        _typebounds(Commands.WRITE, "data", data, data_type)
 
         cmd_string = None
         if self.report_writer is not None:
             cmd_string = "WRITE data=0x%8.8X" % data
 
-        repeat_reg_usage = constants.NO_REGS
+        repeat_reg_usage = NO_REGS
         if self.report_writer is not None:
             cmd_string = "{0:s}".format(cmd_string)
 
-        cmd_word = (
-            (cmd_data_len << 28) |
-            (Commands.WRITE.value << 20) |  # @UndefinedVariable
-            (repeat_reg_usage << 16) | (data_len << 12) | 1)
+        cmd_word = _binencode(cmd_data_len, Commands.WRITE, [
+            repeat_reg_usage, 16,
+            data_len, 12,
+            1])
         # 1 is based on parameters = 0, repeats = 1 and parameters |= repeats
 
         data_value = decimal.Decimal("{}".format(data)) * data_type.scale
@@ -990,8 +986,7 @@ class DataSpecificationGenerator(object):
             "<I{}{}x".format(data_type.struct_encoding, padding),
             cmd_word, data_value)
         if self.report_writer is not None:
-            cmd_string = "{0:s}, dataType={1:s}".format(
-                cmd_string, data_type.name)
+            cmd_string += ", dataType={0:s}".format(data_type.name)
         return (cmd_word_list, cmd_string)
 
     def write_value(
@@ -1031,10 +1026,9 @@ class DataSpecificationGenerator(object):
             selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                "WRITE")
+            raise DataSpecificationNoRegionSelectedException(Commands.WRITE)
 
-        (cmd_word_list, cmd_string) = self.create_cmd(data, data_type)
+        cmd_word_list, cmd_string = self.create_cmd(data, data_type)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_cmd(self, cmd_word_list, cmd_string):
@@ -1058,8 +1052,7 @@ class DataSpecificationGenerator(object):
             selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                "WRITE")
+            raise DataSpecificationNoRegionSelectedException(Commands.WRITE)
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 

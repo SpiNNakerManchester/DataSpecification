@@ -2508,7 +2508,4 @@ class DataSpecificationGenerator(object):
         """ A list of sizes of each region that has been reserved.  Note that\
             the list will include 0s for each non-reserved region.
         """
-        return [
-            self.mem_slot[i] if self.mem_slot[i] == 0 else self.mem_slot[i][0]
-            for i in xrange(len(self.mem_slot))
-        ]
+        return [slot if slot == 0 else slot[0] for slot in self.mem_slot]

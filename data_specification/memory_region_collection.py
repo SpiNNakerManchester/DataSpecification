@@ -7,10 +7,8 @@ class MemoryRegionCollection(object):
     """
 
     __slots__ = [
-
         # the max number of regions available
         "_n_regions",
-
         # map of region id to region data
         "_regions"
     ]
@@ -47,11 +45,7 @@ class MemoryRegionCollection(object):
         return self._regions[region].unfilled
 
     def count_used_regions(self):
-        count = 0
-        for i in self._regions:
-            if i is not None:
-                count += 1
-        return count
+        return sum(region is not None for region in self._regions)
 
     def needs_to_write_region(self, region_id):
         """
@@ -70,8 +64,5 @@ class MemoryRegionCollection(object):
                 "available region ids")
         if not self._regions[region_id].unfilled:
             return True
-        for region in range(region_id, self._n_regions):
-            if (self._regions[region] is not None and
-                    not self._regions[region].unfilled):
-                return True
-        return False
+        return any(region is not None and not region.unfilled
+                   for region in self._regions[region_id:])

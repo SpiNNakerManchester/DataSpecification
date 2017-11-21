@@ -101,8 +101,7 @@ class DataSpecificationExecutor(object):
         pointer_table_size = MAX_MEM_REGIONS * 4
         next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
-        for i in xrange(MAX_MEM_REGIONS):
-            region = self.dsef.mem_regions[i]
+        for i, region in enumerate(self.dsef.mem_regions):
             if region is not None:
                 pointer_table[i] = next_free_offset + start_address
                 next_free_offset += region.allocated_size
@@ -117,9 +116,6 @@ class DataSpecificationExecutor(object):
         :return: size of the data that will be written to memory
         :rtype: unsigned int
         """
-        size = APP_PTR_TABLE_BYTE_SIZE
-        for i in xrange(MAX_MEM_REGIONS):
-            region = self.dsef.mem_regions[i]
-            if region is not None:
-                size += region.allocated_size
-        return size
+        return APP_PTR_TABLE_BYTE_SIZE + sum(
+            region.allocated_size
+            for region in self.dsef.mem_regions if region is not None)

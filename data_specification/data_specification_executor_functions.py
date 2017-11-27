@@ -1,6 +1,7 @@
 from data_specification import constants, exceptions, memory_region_collection
 import struct
 from data_specification.memory_region import MemoryRegion
+from .abstract_executor_functions import AbstractExecutorFunctions
 
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")
@@ -9,61 +10,40 @@ _ONE_LONG = struct.Struct("<Q")
 _ONE_SIGNED_INT = struct.Struct("<i")
 
 
-class DataSpecificationExecutorFunctions(object):
+class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     """ This class includes the function related to each of the commands\
         of the data specification file.
     """
 
     __slots__ = [
-
-        # ????????????
+        # Where we are reading the data spec from
         "spec_reader",
-
-        # ????????????
-        "mem_writer",
-
         # ????????????
         "memory_space",
-
-        # ????????????
+        # How much space has been allocated
         "space_allocated",
-
-        # ????????????
+        # What is the current region that we're writing to
         "current_region",
-
-        # ????????????
+        # The model registers, a list of 16 ints
         "registers",
-
-        # ????????????
+        # The collection of memory regions that can be written to
         "mem_regions",
-
-        # ????????????
-        "struct_slots",
-
         # ????????????
         "_cmd_size",
-
         # ????????????
         "opcode",
-
         # ????????????
         "use_dest_reg",
-
         # ????????????
         "use_src1_reg",
-
         # ????????????
         "use_src2_reg",
-
         # ????????????
         "dest_reg",
-
         # ????????????
         "src1_reg",
-
         # ????????????
         "src2_reg",
-
         # ????????????
         "data_len"
     ]
@@ -89,7 +69,6 @@ class DataSpecificationExecutorFunctions(object):
         self.registers = [0] * constants.MAX_REGISTERS
         self.mem_regions = memory_region_collection.MemoryRegionCollection(
             constants.MAX_MEM_REGIONS)
-        self.struct_slots = [0] * constants.MAX_STRUCT_SLOTS
 
         # storage objects
         self._cmd_size = None
@@ -136,17 +115,6 @@ class DataSpecificationExecutorFunctions(object):
         raise exceptions.ExecuteBreakInstruction(
             self.spec_reader.tell(), self.spec_reader.filename)
 
-    def execute_nop(self, cmd):
-        """
-        This command executes no operation
-
-        :param cmd: the command which triggered the function call
-        :type cmd: int
-        :return: No value returned
-        :rtype: None
-        """
-        pass
-
     def execute_reserve(self, cmd):
         """
         This command reserves a region and assigns some memory space to it
@@ -188,39 +156,6 @@ class DataSpecificationExecutorFunctions(object):
         self.mem_regions[region] = MemoryRegion(
             memory_pointer=0, unfilled=unfilled, size=size)
         self.space_allocated += size
-
-    def execute_free(self, cmd):
-        raise exceptions.UnimplementedDSECommand("FREE")
-
-    def execute_declare_rng(self, cmd):
-        raise exceptions.UnimplementedDSECommand("DECLARE_RNG")
-
-    def execute_random_dist(self, cmd):
-        raise exceptions.UnimplementedDSECommand("DECLARE_RANDOM_DIST")
-
-    def execute_get_random_rumber(self, cmd):
-        raise exceptions.UnimplementedDSECommand("GET_RANDOM_NUMBER")
-
-    def execute_start_struct(self, cmd):
-        raise exceptions.UnimplementedDSECommand("START_STRUCT")
-
-    def execute_struct_elem(self, cmd):
-        raise exceptions.UnimplementedDSECommand("STRUCT_ELEM")
-
-    def execute_end_struct(self, cmd):
-        raise exceptions.UnimplementedDSECommand("END_STRUCT")
-
-    def execute_start_constructor(self, cmd):
-        raise exceptions.UnimplementedDSECommand("START_CONSTRUCTOR")
-
-    def execute_end_constructor(self, cmd):
-        raise exceptions.UnimplementedDSECommand("END_CONSTRUCTOR")
-
-    def execute_construct(self, cmd):
-        raise exceptions.UnimplementedDSECommand("CONSTRUCT")
-
-    def execute_read(self, cmd):
-        raise exceptions.UnimplementedDSECommand("READ")
 
     def execute_write(self, cmd):
         """
@@ -280,12 +215,6 @@ class DataSpecificationExecutorFunctions(object):
         value_encoded = self.spec_reader.read(4 * length)
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
-    def execute_write_struct(self, cmd):
-        raise exceptions.UnimplementedDSECommand("WRITE_STRUCT")
-
-    def execute_block_copy(self, cmd):
-        raise exceptions.UnimplementedDSECommand("BLOCK_COPY")
-
     def execute_switch_focus(self, cmd):
         """ This command switches the focus to the desired, already allocated,\
             memory region
@@ -312,24 +241,6 @@ class DataSpecificationExecutorFunctions(object):
         else:
             self.current_region = region
 
-    def execute_loop(self, cmd):
-        raise exceptions.UnimplementedDSECommand("LOOP")
-
-    def execute_break_loop(self, cmd):
-        raise exceptions.UnimplementedDSECommand("BREAK_LOOP")
-
-    def execute_end_loop(self, cmd):
-        raise exceptions.UnimplementedDSECommand("END_LOOP")
-
-    def execute_if(self, cmd):
-        raise exceptions.UnimplementedDSECommand("IF")
-
-    def execute_else(self, cmd):
-        raise exceptions.UnimplementedDSECommand("ELSE")
-
-    def execute_end_if(self, cmd):
-        raise exceptions.UnimplementedDSECommand("ENDIF")
-
     def execute_mv(self, cmd):
         """ This command moves an immediate value to a register or copies the \
             value of a register to another register
@@ -355,9 +266,6 @@ class DataSpecificationExecutorFunctions(object):
             data_encoded = self.spec_reader.read(4)
             data = _ONE_WORD.unpack(str(data_encoded))[0]
             self.registers[self.dest_reg] = data
-
-    def execute_get_wr_ptr(self, cmd):
-        raise exceptions.UnimplementedDSECommand("GET_WR_PTR")
 
     def execute_set_wr_ptr(self, cmd):
         address = None
@@ -392,45 +300,6 @@ class DataSpecificationExecutorFunctions(object):
 
         # update write pointer
         self.mem_regions[self.current_region].write_pointer = address
-
-    def execute_reset_wr_ptr(self, cmd):
-        raise exceptions.UnimplementedDSECommand("RESET_RW_PTR")
-
-    def execute_align_wr_ptr(self, cmd):
-        raise exceptions.UnimplementedDSECommand("ALIGN_WR_PTR")
-
-    def execute_arith_op(self, cmd):
-        raise exceptions.UnimplementedDSECommand("ARITH_OP")
-
-    def execute_logic_op(self, cmd):
-        raise exceptions.UnimplementedDSECommand("LOGIC_OP")
-
-    def execute_reformat(self, cmd):
-        raise exceptions.UnimplementedDSECommand("REFORMAT")
-
-    def execute_copy_struct(self, cmd):
-        raise exceptions.UnimplementedDSECommand("COPY_STRUCT")
-
-    def execute_copy_param(self, cmd):
-        raise exceptions.UnimplementedDSECommand("COPY_PARAM")
-
-    def execute_write_param(self, cmd):
-        raise exceptions.UnimplementedDSECommand("WRITE_PARAM")
-
-    def execute_write_param_component(self, cmd):
-        raise exceptions.UnimplementedDSECommand("WRITE_PARAM_COMPONENT")
-
-    def execute_print_val(self, cmd):
-        raise exceptions.UnimplementedDSECommand("PRINT_VAL")
-
-    def execute_print_txt(self, cmd):
-        raise exceptions.UnimplementedDSECommand("PRINT_TXT")
-
-    def execute_print_struct(self, cmd):
-        raise exceptions.UnimplementedDSECommand("PRINT_STRUCT")
-
-    def execute_read_param(self, cmd):
-        raise exceptions.UnimplementedDSECommand("READ_PARAM")
 
     def execute_end_spec(self, cmd):
         """ Return the value which terminates the data spec executor

@@ -3,6 +3,7 @@ import decimal
 import numpy as np
 
 
+# Note that the datatype names 
 class DataType(Enum):
     """ Supported data types
         The first value is an identifier for the enum class;
@@ -24,6 +25,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "B",
              np.uint8,
+             "uint8_t",
              "8-bit unsigned integer")
     UINT16 = (1,
               2,
@@ -32,6 +34,7 @@ class DataType(Enum):
               decimal.Decimal("1"),
               "H",
               np.uint16,
+              "uint16_t",
               "16-bit unsigned integer")
     UINT32 = (2,
               4,
@@ -40,6 +43,7 @@ class DataType(Enum):
               decimal.Decimal("1"),
               "I",
               np.uint32,
+              "uint32_t",
               "32-bit unsigned integer")
     UINT64 = (3,
               8,
@@ -48,6 +52,7 @@ class DataType(Enum):
               decimal.Decimal("1"),
               "Q",
               np.uint64,
+              "uint64_t",
               "64-bit unsigned integer")
     INT8 = (4,
             1,
@@ -56,6 +61,7 @@ class DataType(Enum):
             decimal.Decimal("1"),
             "b",
             np.int8,
+            "int8_t",
             "8-bit signed integer")
     INT16 = (5,
              2,
@@ -64,6 +70,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "h",
              np.int16,
+             "int16_t",
              "16-bit signed integer")
     INT32 = (6,
              4,
@@ -72,6 +79,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "i",
              np.int32,
+             "int32_t",
              "32-bit signed integer")
     INT64 = (7,
              8,
@@ -80,6 +88,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "q",
              np.int64,
+             "uint64_t",
              "64-bit signed integer")
     U88 = (8,
            2,
@@ -88,6 +97,7 @@ class DataType(Enum):
            decimal.Decimal("256"),
            "H",
            None,
+           "unsigned short accum",
            "8.8 unsigned fixed point number")
     U1616 = (9,
              4,
@@ -96,6 +106,7 @@ class DataType(Enum):
              decimal.Decimal("65536"),
              "I",
              None,
+             "unsigned accum",
              "16.16 unsigned fixed point number")
     U3232 = (10,
              8,
@@ -104,6 +115,7 @@ class DataType(Enum):
              decimal.Decimal("4294967296"),
              "Q",
              None,
+             "unsigned long accum",
              "32.32 unsigned fixed point number")  # rounding problem for max
     S87 = (11,
            2,
@@ -112,6 +124,7 @@ class DataType(Enum):
            decimal.Decimal("128"),
            "h",
            None,
+           "short accum",
            "8.7 signed fixed point number")
     S1615 = (12,
              4,
@@ -120,6 +133,7 @@ class DataType(Enum):
              decimal.Decimal("32768"),
              "i",
              None,
+             "accum",
              "16.15 signed fixed point number")
     S3231 = (13,
              8,
@@ -128,6 +142,7 @@ class DataType(Enum):
              decimal.Decimal("2147483648"),
              "q",
              None,
+             "long accum",
              "32.31 signed fixed point number")  # rounding problem for max
     FLOAT_32 = (14,
                 4,
@@ -136,6 +151,7 @@ class DataType(Enum):
                 decimal.Decimal("1"),
                 "f",
                 np.float32,
+                "float",
                 "32-bit floating point number")
     FLOAT_64 = (15,
                 8,
@@ -144,6 +160,7 @@ class DataType(Enum):
                 decimal.Decimal("1"),
                 "d",
                 np.float64,
+                "double",
                 "64-bit floating point number")
     U08 = (16,
            1,
@@ -152,6 +169,7 @@ class DataType(Enum):
            decimal.Decimal("256"),
            "B",
            None,
+           "unsigned short fract",
            "0.8 unsigned fixed point number")
     U016 = (17,
             2,
@@ -160,6 +178,7 @@ class DataType(Enum):
             decimal.Decimal("65536"),
             "H",
             None,
+            "unsigned fract",
             "0.16 unsigned fixed point number")
     U032 = (18,
             4,
@@ -168,6 +187,7 @@ class DataType(Enum):
             decimal.Decimal("4294967296"),
             "I",
             None,
+            "unsigned long fract",
             "0.32 unsigned fixed point number")
     U064 = (19,
             8,
@@ -177,6 +197,7 @@ class DataType(Enum):
             decimal.Decimal("18446744073709551616"),
             "Q",
             None,
+            "unsigned long long fract",
             "0.64 unsigned fixed point number")  # rounding problem for max
     S07 = (20,
            1,
@@ -185,6 +206,7 @@ class DataType(Enum):
            decimal.Decimal("128"),
            "b",
            None,
+           "short fract",
            "0.7 signed fixed point number")
     S015 = (21,
             2,
@@ -193,6 +215,7 @@ class DataType(Enum):
             decimal.Decimal("32768"),
             "h",
             None,
+            "fract",
             "0.15 signed fixed point number")
     S031 = (22,
             4,
@@ -201,6 +224,7 @@ class DataType(Enum):
             decimal.Decimal("2147483648"),
             "i",
             None,
+            "long fract",
             "0.32 signed fixed point number")
     S063 = (23,
             8,
@@ -210,10 +234,11 @@ class DataType(Enum):
             decimal.Decimal("9223372036854775808"),
             "q",
             None,
+            "long long fract",
             "0.63 signed fixed point number")  # rounding problem for max
 
     def __new__(cls, value, size, min_val, max_val, scale, struct_encoding,
-                numpy_typename, doc=""):
+                numpy_typename, c_type, doc=""):
         # pylint: disable=protected-access, too-many-arguments
         obj = object.__new__(cls)
         obj._value_ = value
@@ -224,10 +249,11 @@ class DataType(Enum):
         obj.scale = scale
         obj.struct_encoding = struct_encoding
         obj.numpy_typename = numpy_typename
+        obj.c_type = c_type
         return obj
 
     def __init__(self, value, size, min_val, max_val, scale, struct_encoding,
-                 numpy_typename, doc=""):
+                 numpy_typename, c_type, doc=""):
         # pylint: disable=too-many-arguments
         self._value_ = value
         self.__doc__ = doc
@@ -237,3 +263,4 @@ class DataType(Enum):
         self.scale = scale
         self.struct_encoding = struct_encoding
         self.numpy_typename = numpy_typename
+        self.c_type = c_type

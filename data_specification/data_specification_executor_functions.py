@@ -3,8 +3,8 @@ import struct
 from .memory_region import MemoryRegion
 from .memory_region_collection import MemoryRegionCollection
 from .abstract_executor_functions import AbstractExecutorFunctions
-from .constants import MAX_REGISTERS, MAX_MEM_REGIONS, MAX_STRUCT_SLOTS, \
-    LEN2, LEN3, END_SPEC_EXECUTOR
+from .constants \
+    import MAX_REGISTERS, MAX_MEM_REGIONS, LEN2, LEN3, END_SPEC_EXECUTOR
 from .exceptions \
     import ExecuteBreakInstruction, DataSpecificationSyntaxError, \
     DataSpecificationNoMoreException, DataSpecificationRegionNotAllocated, \
@@ -27,51 +27,34 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     """
 
     __slots__ = [
-        # The object to read the specification language file from
+        # Where we are reading the data spec from
         "spec_reader",
-
         # How much space do we have available?
         "memory_space",
-
-        # How much space is allocated
+        # How much space has been allocated
         "space_allocated",
-
-        # What memory region are we writing to?
+        # What is the current region that we're writing to
         "current_region",
-
-        # List of register values
+        # The model registers, a list of 16 ints
         "registers",
-
-        # Collection of memory regions
+        # The collection of memory regions that can be written to
         "mem_regions",
-
-        # List of slots for structure definitions
-        "struct_slots",
-
         # The size of the current command
         "_cmd_size",
-
         # The current command operation code
         "opcode",
-
         # Is the destination a register? Not meaningful for all opcodes
         "use_dest_reg",
-
         # Is the first source a register? Not meaningful for all opcodes
         "use_src1_reg",
-
         # Is the second source a register? Not meaningful for all opcodes
         "use_src2_reg",
-
         # The destination register. Not meaningful for all opcodes
         "dest_reg",
-
         # The first source register. Not meaningful for all opcodes
         "src1_reg",
-
         # The second source register. Not meaningful for all opcodes
         "src2_reg",
-
         # The length of the associated data.
         "data_len"
     ]
@@ -96,7 +79,6 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         self.registers = [0] * MAX_REGISTERS
         self.mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
-        self.struct_slots = [0] * MAX_STRUCT_SLOTS
 
         # storage objects
         self._cmd_size = None

@@ -41,7 +41,7 @@ class MemoryRegion(object):
 
     @property
     def memory_pointer(self):
-        """ property method to retrieve memory write pointer
+        """ The memory write pointer
 
         :return: the memory pointer of the region
         :rtype: int
@@ -51,7 +51,7 @@ class MemoryRegion(object):
 
     @property
     def allocated_size(self):
-        """ property method for the size of the region
+        """ The size of the region
 
         :return: the size of the region
         :rtype: int
@@ -60,8 +60,19 @@ class MemoryRegion(object):
         return self._allocated_size
 
     @property
+    def available_space(self):
+        """ The maximum number of bytes that can be added to the region \
+        starting at the current write location
+
+        :return: the maximum size of write at the current write pointer
+        :rtype: int
+        :raise None: this method does not raise any known exception
+        """
+        return self._allocated_size - self._write_pointer
+
+    @property
     def unfilled(self):
-        """ property method to retrieve if the region is filled
+        """ Whether the region is unfilled
 
         :return: the the
         :rtype: None
@@ -71,7 +82,7 @@ class MemoryRegion(object):
 
     @property
     def region_data(self):
-        """ the container which holds the data written in this region
+        """ The container which holds the data written in this region
 
         :return: the region data container
         :rtype: bytearray

@@ -2388,7 +2388,7 @@ class DataSpecificationGenerator(object):
                         DataType.INT32.max,  # @UndefinedVariable
                         Commands.ARITH_OP.name)  # @UndefinedVariable
             payload += bytearray(_ONE_SINT.pack(operand_1))
-            cmd_string += " " + operand_1
+            cmd_string += " " + str(operand_1)
         else:
             if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_1 > DataType.UINT32.max):  # @UndefinedVariable
@@ -2399,7 +2399,7 @@ class DataSpecificationGenerator(object):
                         DataType.UINT32.max,  # @UndefinedVariable
                         Commands.ARITH_OP.name)  # @UndefinedVariable
             payload += bytearray(_ONE_WORD.pack(operand_1))
-            cmd_string += " " + operand_1
+            cmd_string += " " + str(operand_1)
 
         if operation not in ArithmeticOperation:
             raise exceptions.DataSpecificationInvalidOperationException(
@@ -2427,7 +2427,7 @@ class DataSpecificationGenerator(object):
                         DataType.INT32.max,  # @UndefinedVariable
                         Commands.ARITH_OP.name)  # @UndefinedVariable
             payload += bytearray(_ONE_SINT.pack(operand_2))
-            cmd_string += " " + operand_2
+            cmd_string += " " + str(operand_2)
         else:
             if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_2 > DataType.UINT32.max):  # @UndefinedVariable
@@ -2438,10 +2438,10 @@ class DataSpecificationGenerator(object):
                         DataType.UINT32.max,  # @UndefinedVariable
                         Commands.ARITH_OP.name)  # @UndefinedVariable
             payload += bytearray(_ONE_WORD.pack(operand_2))
-            cmd_string += " " + operand_2
+            cmd_string += " " + str(operand_2)
 
         cmd_word = (
-            (len(payload) << 28) |
+            (len(payload) << 26) |
             (Commands.ARITH_OP.value << 20) |  # @UndefinedVariable
             (int(signed) << 19) |
             (bit_field << 16) |
@@ -2702,20 +2702,17 @@ class DataSpecificationGenerator(object):
             DataSpecificationInvalidOperationException: If operation is not a\
             known operation
         """
-        cmd_length = 0
         bit_field = 0x4
         register_op_1 = 0
         register_op_2 = 0
-        operand_1_encoded = bytearray()
-        operand_2_encoded = bytearray()
-        cmd_string = "LOGIC_OP"
+        payload = bytearray()
 
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.LOGIC_OP.name)  # @UndefinedVariable
 
-        cmd_string = "{0:s} reg[{1:d}] =".format(cmd_string, register_id)
+        cmd_string = "LOGIC_OP reg[{0:d}] =".format(register_id)
 
         if operation not in LogicOperation:
             raise exceptions.DataSpecificationInvalidOperationException(
@@ -2723,7 +2720,7 @@ class DataSpecificationGenerator(object):
                 Commands.LOGIC_OP.name)  # @UndefinedVariable
 
         if operation.value == LogicOperation.NOT.value:  # @UndefinedVariable
-            cmd_string = "{0:s} {1:s}".format(cmd_string, operation.operator)
+            cmd_string += " " + operation.operator
 
         if operand_1_is_register:
             if operand_1 < 0 or operand_1 >= constants.MAX_REGISTERS:
@@ -2733,9 +2730,8 @@ class DataSpecificationGenerator(object):
                         Commands.LOGIC_OP.name)  # @UndefinedVariable
             bit_field |= 2
             register_op_1 = operand_1
-            cmd_string = "{0:s} reg[{1:d}]".format(cmd_string, register_op_1)
+            cmd_string += " reg[{0:d}]".format(register_op_1)
         else:
-            cmd_length += 1
             if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_1 > DataType.UINT32.max):  # @UndefinedVariable
                 raise exceptions.\
@@ -2744,11 +2740,11 @@ class DataSpecificationGenerator(object):
                         DataType.UINT32.min,  # @UndefinedVariable
                         DataType.UINT32.max,  # @UndefinedVariable
                         Commands.LOGIC_OP.name)  # @UndefinedVariable
-            operand_1_encoded = bytearray(_ONE_WORD.pack(operand_1))
-            cmd_string = "{0:s} {1:d}".format(cmd_string, operand_1)
+            payload += bytearray(_ONE_WORD.pack(operand_1))
+            cmd_string += " " + str(operand_1)
 
         if operation.value != LogicOperation.NOT.value:  # @UndefinedVariable
-            cmd_string = "{0:s} {1:s}".format(cmd_string, operation.operator)
+            cmd_string += " " + operation.operator
 
             if operand_2_is_register:
                 if operand_2 < 0 or operand_2 >= constants.MAX_REGISTERS:
@@ -2759,10 +2755,8 @@ class DataSpecificationGenerator(object):
                             Commands.LOGIC_OP.name)  # @UndefinedVariable
                 bit_field |= 1
                 register_op_2 = operand_2
-                cmd_string = "{0:s} reg[{1:d}]".format(
-                    cmd_string, register_op_2)
+                cmd_string += " reg[{0:d}]".format(register_op_2)
             else:
-                cmd_length += 1
                 if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
                         operand_2 > DataType.UINT32.max):  # @UndefinedVariable
                     raise exceptions.\
@@ -2771,11 +2765,11 @@ class DataSpecificationGenerator(object):
                             DataType.UINT32.min,  # @UndefinedVariable
                             DataType.UINT32.max,  # @UndefinedVariable
                             Commands.LOGIC_OP.name)  # @UndefinedVariable
-                operand_2_encoded = bytearray(_ONE_WORD.pack(operand_2))
-                cmd_string = "{0:s} {1:d}".format(cmd_string, operand_2)
+                payload += bytearray(_ONE_WORD.pack(operand_2))
+                cmd_string += " " + str(operand_2)
 
         cmd_word = (
-            (cmd_length << 28) |
+            (len(payload) << 26) |
             (Commands.LOGIC_OP.value << 20) |  # @UndefinedVariable
             (bit_field << 16) |
             (register_id << 12) |
@@ -2783,9 +2777,8 @@ class DataSpecificationGenerator(object):
             (register_op_2 << 4) |
             operation.value)
 
-        self.write_command_to_files(bytearray(_ONE_WORD.pack(cmd_word)) +
-                                    operand_1_encoded + operand_2_encoded,
-                                    cmd_string)
+        self.write_command_to_files(
+            bytearray(_ONE_WORD.pack(cmd_word)) + payload, cmd_string)
 
     def copy_structure(self, source_structure_id, destination_structure_id,
                        source_id_is_register=False,

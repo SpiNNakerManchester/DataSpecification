@@ -63,7 +63,7 @@ class DataSpecificationExecutor(object):
         """
         index = 0
         instruction_spec = self.spec_reader.read(4)
-        while len(instruction_spec) != 0:
+        while instruction_spec:
             # process the received command
             cmd = _ONE_WORD.unpack(str(instruction_spec))[0]
 
@@ -71,6 +71,7 @@ class DataSpecificationExecutor(object):
 
             try:
                 # noinspection PyArgumentList
+                # pylint: disable=no-value-for-parameter
                 return_value = Commands(opcode).exec_function(self.dsef, cmd)
             except (ValueError, TypeError):
                 logger.debug("problem decoding opcode %d at index %d",

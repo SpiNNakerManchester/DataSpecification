@@ -147,7 +147,6 @@ class DataSpecificationParameterOutOfBoundsException(
 
     def __init__(self, parameter, value, range_min, range_max, command):
         """
-
         :param parameter: The parameter that is out of bounds
         :type parameter: str
         :param value: The value specified
@@ -159,6 +158,7 @@ class DataSpecificationParameterOutOfBoundsException(
         :param command: The command being executed
         :type command: str
         """
+        # pylint: disable=too-many-arguments
         DataSpecificationException.__init__(
             self,
             "Requesting value {} for parameter {} whose allowed range "

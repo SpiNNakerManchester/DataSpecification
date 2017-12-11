@@ -49,7 +49,7 @@ def get_data_spec_and_file_writer_filename(
     :return: the filename of the data writer and the data specification object
     :rtype: str, data_specification.DataSpecificationGenerator
     """
-
+    # pylint: disable=too-many-arguments
     binary_file_path = get_data_spec_file_path(
         processor_chip_x, processor_chip_y, processor_id, hostname,
         application_run_time_report_folder)

@@ -20,6 +20,7 @@ class DataSpecificationGenerator(object):
     """ Used to generate a data specification language file that can be\
         executed to produce a memory image
     """
+    # pylint: disable=too-many-arguments
 
     __slots__ = [
         # The object to write the specification to
@@ -523,7 +524,7 @@ class DataSpecificationGenerator(object):
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.START_STRUCT.name)  # @UndefinedVariable
 
-        if len(parameters) == 0 or \
+        if not parameters or \
                 len(parameters) > constants.MAX_STRUCT_ELEMENTS:
             raise exceptions.DataSpecificationParameterOutOfBoundsException(
                 "structure elements", len(parameters), 0,
@@ -600,7 +601,7 @@ class DataSpecificationGenerator(object):
 
                 cmd_word_list = cmd_word_encoded + value_encoded + padding
 
-                if len(label) == 0:
+                if label == "":
                     cmd_string = "STRUCT_ELEM element_id={0:d}, element_type="\
                                  "{1:s}, value = {2:d}".format(
                                      elem_index, data_type.name, value)
@@ -624,7 +625,7 @@ class DataSpecificationGenerator(object):
                 cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
                 cmd_word_list = cmd_word_encoded
 
-                if len(label) == 0:
+                if label == "":
                     cmd_string = "STRUCT_ELEM element_id={0:d}, element_type="\
                                  "{1:s}".format(elem_index, data_type.name)
                 else:
@@ -1121,7 +1122,7 @@ class DataSpecificationGenerator(object):
         cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
 
         param_word = None
-        if len(structure_ids) > 0:
+        if structure_ids:
             param_word = 0
             for i in xrange(len(structure_ids)):
                 if structure_ids[i] < 0 \
@@ -1989,7 +1990,7 @@ class DataSpecificationGenerator(object):
             conditional in operation at this point
         """
 
-        if len(self.conditionals) == 0 or \
+        if not self.conditionals or \
                 self.conditionals[len(self.conditionals) - 1] is True:
             raise exceptions.DataSpecificationInvalidCommandException("ELSE")
 
@@ -2019,7 +2020,7 @@ class DataSpecificationGenerator(object):
             conditional in operation at this point
         """
 
-        if len(self.conditionals) == 0:
+        if not self.conditionals:
             raise exceptions.DataSpecificationInvalidCommandException("END_IF")
 
         self.conditionals.pop()
@@ -3371,11 +3372,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
-
         if self.spec_writer is None:
             raise exceptions.DataUndefinedWriterException(
                 "The spec file writer has not been initialised")
-        elif len(cmd_word_list) > 0:
+        elif cmd_word_list:
             self.spec_writer.write(cmd_word_list)
 
         if self.report_writer is not None:

@@ -187,6 +187,7 @@ class DataType(Enum):
 
     def __new__(cls, value, size, min_val, max_val, scale, struct_encoding,
                 doc=""):
+        # pylint: disable=protected-access, too-many-arguments
         obj = object.__new__(cls)
         obj._value_ = value
         obj.__doc__ = doc
@@ -199,6 +200,7 @@ class DataType(Enum):
 
     def __init__(self, value, size, min_val, max_val, scale, struct_encoding,
                  doc=""):
+        # pylint: disable=too-many-arguments
         self._value_ = value
         self.__doc__ = doc
         self.size = size

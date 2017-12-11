@@ -6,6 +6,7 @@ class AbstractExecutorFunctions(object):
         data specification file. Subclasses need to provide implementations\
         that work for the operations they wish to support.
     """
+    # pylint: disable=unused-argument
 
     __slots__ = []
 

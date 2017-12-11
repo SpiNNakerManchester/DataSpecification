@@ -137,6 +137,7 @@ class Commands(Enum):
         "Cleanly ends the parsing of the data specs")
 
     def __new__(cls, value, exec_function, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj.exec_function = exec_function

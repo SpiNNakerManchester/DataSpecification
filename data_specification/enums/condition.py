@@ -25,6 +25,7 @@ class Condition(Enum):
         "True if the first operand is >  the second")
 
     def __new__(cls, value, operator, doc=""):
+        # pylint: disable=protected-access
         obj = object.__new__(cls)
         obj._value_ = value
         obj.operator = operator

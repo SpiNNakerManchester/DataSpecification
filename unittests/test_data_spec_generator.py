@@ -5,20 +5,13 @@ from StringIO import StringIO
 
 from data_specification import constants
 from data_specification.exceptions \
-    import DataSpecificationTypeMismatchException,\
-    DataSpecificationParameterOutOfBoundsException,\
-    DataSpecificationRegionInUseException,\
-    DataSpecificationNotAllocatedException,\
-    DataSpecificationStructureInUseException,\
-    DataSpecificationInvalidOperationException,\
-    DataSpecificationNoRegionSelectedException,\
-    DataSpecificationInvalidCommandException,\
-    DataSpecificationWrongParameterNumberException,\
-    DataSpecificationDuplicateParameterException,\
-    DataSpecificationFunctionInUse,\
-    DataSpecificationRegionUnfilledException,\
-    DataSpecificationRandomNumberDistributionInUseException,\
-    DataSpecificationRNGInUseException
+    import TypeMismatchException, ParameterOutOfBoundsException,\
+    RegionInUseException, NotAllocatedException, StructureInUseException,\
+    InvalidOperationException, NoRegionSelectedException,\
+    InvalidCommandException, WrongParameterNumberException,\
+    DuplicateParameterException, FunctionInUseException,\
+    RegionUnfilledException, RandomNumberDistributionInUseException,\
+    RNGInUseException
 
 from data_specification.enums import DataType, Condition, RandomNumberGenerator
 from data_specification.enums import ArithmeticOperation, LogicOperation
@@ -92,11 +85,11 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.reserve_memory_region(3, 0x1122, empty=True)
         self.dsg.reserve_memory_region(4, 0x3344, label='test')
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.reserve_memory_region(-1, 0x100)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.reserve_memory_region(constants.MAX_MEM_REGIONS, 0x100)
-        with self.assertRaises(DataSpecificationRegionInUseException):
+        with self.assertRaises(RegionInUseException):
             self.dsg.reserve_memory_region(1, 0x100)
 
         # RESERVE for memory region 1
@@ -125,13 +118,13 @@ class TestDataSpecGeneration(unittest.TestCase):
         # START_STRUCT
         self.assertEqual(self.get_next_word(), 0x00300001)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.free_memory_region(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.free_memory_region(constants.MAX_MEM_REGIONS)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.free_memory_region(2)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.free_memory_region(1)
         self.assertEqual(self.dsg.mem_slot[1], 0)
 
@@ -142,14 +135,14 @@ class TestDataSpecGeneration(unittest.TestCase):
                                       ("third", DataType.INT16, None),
                                       ("fourth", DataType.UINT64,
                                        0x123456789ABCDEFL)])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.define_structure(-1, [("first", DataType.UINT8, 0xAB)])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.define_structure(constants.MAX_STRUCT_SLOTS,
                                       [("first", DataType.UINT8, 0xAB)])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.define_structure(1, [])
-        with self.assertRaises(DataSpecificationStructureInUseException):
+        with self.assertRaises(StructureInUseException):
             self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
 
         # STRUCT_ELEM
@@ -200,36 +193,36 @@ class TestDataSpecGeneration(unittest.TestCase):
                                            4, True, True, True)
 
         # Call exception raise for register values out of bounds
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_arithmetic_operation(-1, 0x12,
                                                ArithmeticOperation.ADD,
                                                0x34, True, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_arithmetic_operation(constants.MAX_REGISTERS, 0x12,
                                                ArithmeticOperation.ADD,
                                                0x34, True, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_arithmetic_operation(1, -1, ArithmeticOperation.ADD,
                                                0x34, True, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_arithmetic_operation(1, constants.MAX_REGISTERS,
                                                ArithmeticOperation.ADD, 2,
                                                False, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_arithmetic_operation(1, 5,
                                                ArithmeticOperation.SUBTRACT,
                                                -1, False, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_arithmetic_operation(1, 1,
                                                ArithmeticOperation.SUBTRACT,
                                                constants.MAX_REGISTERS,
                                                False, True, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_arithmetic_operation(1, 0x1,
                                                ArithmeticOperation.SUBTRACT,
                                                -1, False, False, True)
         # Test unknown type exception raise
-        with self.assertRaises(DataSpecificationInvalidOperationException):
+        with self.assertRaises(InvalidOperationException):
             self.dsg.call_arithmetic_operation(1, 1, LogicOperation.OR,
                                                2, 1, False)
 
@@ -249,8 +242,8 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x067F3342)
 
     def test_align_write_pointer(self):
-        # Test DataSpecificationNoRegionSelectedException raise
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        # Test NoRegionSelectedException raise
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.align_write_pointer(1)
 
         # Define a memory region and switch focus to it
@@ -266,19 +259,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.align_write_pointer(5, True, 3)
 
         # Test DataSpecificationOutOfBoundsException raise
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.align_write_pointer(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.align_write_pointer(33)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.align_write_pointer(-1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.align_write_pointer(constants.MAX_REGISTERS, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.align_write_pointer(1, False, -1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.align_write_pointer(1, False, constants.MAX_REGISTERS)
 
         self.skip_words(3)
@@ -290,7 +283,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x06563500)
 
     def test_break_loop(self):
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.break_loop()
 
         self.dsg.start_loop(0, 0, 0, True, True, True)
@@ -314,29 +307,29 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.call_function(0, [])
         self.dsg.call_function(1, [0, 1, 2])
 
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.call_function(2, [])
-        with self.assertRaises(DataSpecificationWrongParameterNumberException):
+        with self.assertRaises(WrongParameterNumberException):
             self.dsg.call_function(1, [])
-        with self.assertRaises(DataSpecificationWrongParameterNumberException):
+        with self.assertRaises(WrongParameterNumberException):
             self.dsg.call_function(1, [0, 1])
-        with self.assertRaises(DataSpecificationWrongParameterNumberException):
+        with self.assertRaises(WrongParameterNumberException):
             self.dsg.call_function(1, [0, 1, 2, 3])
-        with self.assertRaises(DataSpecificationDuplicateParameterException):
+        with self.assertRaises(DuplicateParameterException):
             self.dsg.call_function(1, [1, 1, 2])
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.call_function(1, [1, 2, 3])
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.call_function(1, [3, 2, 1])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_function(-1, [0, 1, 2])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_function(constants.MAX_CONSTRUCTORS, [0, 1])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_function(1, [0, -1, 2])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_function(1, [-1,  1, 2])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_function(1, [0, 2, constants.MAX_STRUCT_SLOTS])
 
         self.skip_words(16)
@@ -354,18 +347,18 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.no_operation()
         self.dsg.end_function()
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_function(-1, [True])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_function(constants.MAX_CONSTRUCTORS, [True])
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_function(2, [True, True, True, True, True, True])
-        with self.assertRaises(DataSpecificationFunctionInUse):
+        with self.assertRaises(FunctionInUseException):
             self.dsg.start_function(0, [])
 
         self.dsg.start_function(2, [False])
 
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.start_function(3, [])
 
         self.dsg.end_function()
@@ -377,7 +370,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(2)
 
     def test_end_function(self):
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.end_function()
 
         self.dsg.start_function(0, [])
@@ -397,19 +390,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.logical_and(4, 3, 5, True, True)
         self.dsg.logical_and(3, 3, 3, True, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_and(-1, 0x12, 0x34, False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_and(constants.MAX_REGISTERS, 0x12, 0x34,
                                  False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_and(1, -1, 0x34, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_and(1, constants.MAX_REGISTERS, 0x34,
                                  True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_and(1, 0x12, -1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_and(1, 0x34, constants.MAX_REGISTERS,
                                  False, True)
 
@@ -433,19 +426,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.logical_or(4, 3, 5, True, True)
         self.dsg.logical_or(3, 3, 3, True, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_or(-1, 0x12, 0x34, False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_or(constants.MAX_REGISTERS, 0x12, 0x34,
                                 False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_or(1, -1, 0x34, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_or(1, constants.MAX_REGISTERS, 0x34,
                                 True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_or(1, 0x12, -1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_or(1, 0x34, constants.MAX_REGISTERS,
                                 False, True)
 
@@ -469,19 +462,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.logical_xor(4, 3, 5, True, True)
         self.dsg.logical_xor(3, 3, 3, True, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_xor(-1, 0x12, 0x34, False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_xor(constants.MAX_REGISTERS, 0x12, 0x34,
                                  False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_xor(1, -1, 0x34, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_xor(1, constants.MAX_REGISTERS, 0x34,
                                  True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_xor(1, 0x12, -1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_xor(1, 0x34, constants.MAX_REGISTERS,
                                  False, True)
 
@@ -505,19 +498,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.logical_left_shift(4, 3, 5, True, True)
         self.dsg.logical_left_shift(3, 3, 3, True, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_left_shift(-1, 0x12, 0x34, False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_left_shift(constants.MAX_REGISTERS, 0x12, 0x34,
                                         False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_left_shift(1, -1, 0x34, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_left_shift(1, constants.MAX_REGISTERS, 0x34,
                                         True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_left_shift(1, 0x12, -1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_left_shift(1, 0x34, constants.MAX_REGISTERS,
                                         False, True)
 
@@ -536,13 +529,13 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.dsg.logical_not(3, 2, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_not(-1, 0x12, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_not(constants.MAX_REGISTERS, 0x12, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_not(1, -1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_not(1, constants.MAX_REGISTERS, True)
 
         # Logical NOT
@@ -559,19 +552,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.logical_right_shift(4, 3, 5, True, True)
         self.dsg.logical_right_shift(3, 3, 3, True, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_right_shift(-1, 0x12, 0x34, False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_right_shift(constants.MAX_REGISTERS, 0x12, 0x34,
                                          False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_right_shift(1, -1, 0x34, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_right_shift(1, constants.MAX_REGISTERS, 0x34,
                                          True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_right_shift(1, 0x12, -1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.logical_right_shift(1, 0x34, constants.MAX_REGISTERS,
                                          False, True)
 
@@ -604,26 +597,26 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.copy_structure(0, 3, False, True)
         self.dsg.copy_structure(3, 4, True, True)
 
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.copy_structure(2, 3)
-        with self.assertRaises(DataSpecificationDuplicateParameterException):
+        with self.assertRaises(DuplicateParameterException):
             self.dsg.copy_structure(2, 2)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(-1, 2, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(constants.MAX_REGISTERS, 2, True, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(1, -1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(1, constants.MAX_REGISTERS, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(-1, 2, False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(constants.MAX_STRUCT_SLOTS, 2, False,
                                     False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(1, -1, False, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure(1, constants.MAX_STRUCT_SLOTS, False, True)
 
         self.skip_words(11)
@@ -651,48 +644,48 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.copy_structure_parameter(1, 2, 2, -1,
                                           destination_is_register=True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(-1, 0, 1, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(constants.MAX_STRUCT_SLOTS, 0, 1,
                                               0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, -1, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, constants.MAX_STRUCT_SLOTS,
                                               0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, -1, 0, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, constants.MAX_REGISTERS, 0,
                                               True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, -1, 1, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, constants.MAX_STRUCT_ELEMENTS,
                                               1, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, 1, -1, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, 1,
                                               constants.MAX_STRUCT_ELEMENTS,
                                               False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, -1, 0, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.copy_structure_parameter(0, 0, constants.MAX_REGISTERS, 0,
                                               True)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.copy_structure_parameter(2, 0, 0, 0, False)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.copy_structure_parameter(0, 0, 2, 0, False)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.copy_structure_parameter(0, 4, 1, 0, False)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.copy_structure_parameter(0, 0, 1, 4, False)
-        with self.assertRaises(DataSpecificationDuplicateParameterException):
+        with self.assertRaises(DuplicateParameterException):
             self.dsg.copy_structure_parameter(0, 0, 0, 0, False)
-        with self.assertRaises(DataSpecificationTypeMismatchException):
+        with self.assertRaises(TypeMismatchException):
             self.dsg.copy_structure_parameter(0, 0, 1, 1, False)
 
         self.skip_words(13)
@@ -717,21 +710,21 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.start_loop(5, 1, 1, 1, False, False, False)
         self.dsg.start_loop(1, 1, 1, 1, True, True, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(-1, 0, 1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(constants.MAX_REGISTERS, 0, 1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(1, -1, 1, 1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(1, constants.MAX_REGISTERS, 0, 1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(1, 1, -1, 1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(1, 1, constants.MAX_REGISTERS, 1, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(1, 1, 1, -1, False, False, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_loop(1, 1, 1, constants.MAX_REGISTERS, False, False,
                                 True)
 
@@ -773,14 +766,14 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.start_conditional(4, Condition.LESS_THAN, 3, True)
         self.dsg.start_conditional(2, Condition.GREATER_THAN, 5, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_conditional(-1, Condition.EQUAL, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_conditional(constants.MAX_REGISTERS,
                                        Condition.EQUAL, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_conditional(0, Condition.EQUAL, -1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.start_conditional(0, Condition.EQUAL,
                                        constants.MAX_REGISTERS, True)
 
@@ -797,19 +790,19 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05530255)
 
     def test_else_conditional(self):
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.else_conditional()
 
         self.dsg.start_conditional(0, Condition.EQUAL, 0, True)
         self.dsg.else_conditional()
 
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.else_conditional()
 
         self.dsg.start_conditional(0, Condition.EQUAL, 0, False)
         self.dsg.else_conditional()
 
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.else_conditional()
 
         self.skip_words(1)
@@ -819,20 +812,20 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05600000)
 
     def test_end_conditional(self):
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.end_conditional()
 
         self.dsg.start_conditional(0, Condition.EQUAL, 0, True)
         self.dsg.end_conditional()
 
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.end_conditional()
 
         self.dsg.start_conditional(0, Condition.EQUAL, 0, False)
         self.dsg.else_conditional()
         self.dsg.end_conditional()
 
-        with self.assertRaises(DataSpecificationInvalidCommandException):
+        with self.assertRaises(InvalidCommandException):
             self.dsg.end_conditional()
 
         self.skip_words(1)
@@ -849,13 +842,13 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.switch_write_focus(0)
         self.dsg.switch_write_focus(2)
 
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.switch_write_focus(3)
-        with self.assertRaises(DataSpecificationRegionUnfilledException):
+        with self.assertRaises(RegionUnfilledException):
             self.dsg.switch_write_focus(1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.switch_write_focus(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.switch_write_focus(constants.MAX_MEM_REGIONS)
 
         self.skip_words(6)
@@ -864,21 +857,21 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05000200)
 
     def test_save_write_pointer(self):
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.save_write_pointer(0)
 
         self.dsg.reserve_memory_region(0, 100)
 
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.save_write_pointer(0)
 
         self.dsg.switch_write_focus(0)
         self.dsg.save_write_pointer(0)
         self.dsg.save_write_pointer(5)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.save_write_pointer(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.save_write_pointer(constants.MAX_REGISTERS)
 
         self.skip_words(3)
@@ -897,15 +890,15 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.print_struct(2, True)
         self.dsg.print_struct(3, True)
 
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.print_struct(2)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_struct(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_struct(-1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_struct(constants.MAX_STRUCT_SLOTS)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_struct(constants.MAX_REGISTERS, True)
 
         self.skip_words(11)
@@ -922,7 +915,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.print_text("test1234")
         self.dsg.print_text("test12345678")
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_text("test123456789")
 
         # PRINT_TEXT
@@ -944,13 +937,13 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.print_value(0x123456789ABCDEFL, False, DataType.UINT64)
         self.dsg.print_value(2, True, DataType.U88)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_value(0x123456789)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_value(-1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_value(constants.MAX_REGISTERS, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.print_value(0x12345678, False, DataType.INT16)
 
         # PRINT_VAL
@@ -974,15 +967,15 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.set_register_value(3, 2, True, DataType.UINT64)
         self.dsg.set_register_value(3, 2, True, DataType.U88)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_register_value(-1, 0)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_register_value(constants.MAX_REGISTERS, 0)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_register_value(0, -1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_register_value(0, constants.MAX_REGISTERS, True)
-        with self.assertRaises(DataSpecificationDuplicateParameterException):
+        with self.assertRaises(DuplicateParameterException):
             self.dsg.set_register_value(0, 0, True)
 
         # MV
@@ -996,7 +989,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x06063200)
 
     def test_set_write_pointer(self):
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.set_write_pointer(0x100)
 
         # Define a memory region and switch focus to it
@@ -1010,11 +1003,11 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.set_write_pointer(1, True, True)
         self.dsg.set_write_pointer(3, True, False)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_write_pointer(-1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_write_pointer(constants.MAX_REGISTERS, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_write_pointer(0x123456789L, False)
 
         self.skip_words(3)
@@ -1027,7 +1020,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x06420300)
 
     def test_write_value(self):
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_value(0x0)
 
         self.dsg.reserve_memory_region(0, 100)
@@ -1046,15 +1039,15 @@ class TestDataSpecGeneration(unittest.TestCase):
                                       DataType.UINT64)
         self.dsg.write_repeated_value(0x123, 2, True, DataType.UINT64)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_repeated_value(0, -1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_repeated_value(0, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_repeated_value(0, constants.MAX_REGISTERS, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_repeated_value(0, -1, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_repeated_value(0, 256, False)
 
         self.skip_words(3)
@@ -1074,7 +1067,7 @@ class TestDataSpecGeneration(unittest.TestCase):
                          [0x24213020, 0x00000123, 0x00000000])
 
     def test_write_structure(self):
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.write_structure(0)
 
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -1090,17 +1083,17 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.write_structure(0xA, 0xF)
         self.dsg.write_structure(0xA, 0xF, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_structure(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_structure(constants.MAX_STRUCT_SLOTS)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_structure(1, -1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_structure(1, constants.MAX_STRUCT_SLOTS, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_structure(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_structure(16)
 
         self.skip_words(15)
@@ -1113,7 +1106,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x04420F0A)
 
     def test_write_array_working_subset(self):
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_array([0, 1, 2, 3], DataType.UINT32)
 
         self.dsg.reserve_memory_region(0, 100)
@@ -1130,7 +1123,7 @@ class TestDataSpecGeneration(unittest.TestCase):
     @unittest.skip("buggy")
     def test_write_array(self):
         # TODO: Make write_array work with non-UINT32
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_array([0, 1, 2, 3], DataType.UINT8)
 
         self.dsg.reserve_memory_region(0, 100)
@@ -1156,7 +1149,7 @@ class TestDataSpecGeneration(unittest.TestCase):
                          [0x14300001, 5, 0x03020100, 0x00000004])
 
     def test_set_structure_value(self):
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.set_structure_value(0, 0, 0, DataType.UINT32)
 
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -1176,20 +1169,20 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.set_structure_value(1, 1, 3, DataType.UINT32, True)
         self.dsg.set_structure_value(10, 1, 5, DataType.UINT64, True)
 
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.set_structure_value(0, 1, 0, DataType.UINT8)
-        with self.assertRaises(DataSpecificationTypeMismatchException):
+        with self.assertRaises(TypeMismatchException):
             self.dsg.set_structure_value(0, 0, 0, DataType.UINT16)
-        with self.assertRaises(DataSpecificationTypeMismatchException):
+        with self.assertRaises(TypeMismatchException):
             self.dsg.set_structure_value(1, 1, 0, DataType.UINT8)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_structure_value(-1, 0, 0, DataType.UINT32)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_structure_value(constants.MAX_STRUCT_SLOTS, 0, 0,
                                          DataType.UINT32)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_structure_value(0, -1, 0, DataType.UINT32)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_structure_value(0, constants.MAX_STRUCT_ELEMENTS, 0,
                                          DataType.UINT32)
 
@@ -1220,20 +1213,20 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.declare_random_number_generator(
             3, RandomNumberGenerator.MERSENNE_TWISTER, 0x12)
 
-        with self.assertRaises(DataSpecificationRNGInUseException):
+        with self.assertRaises(RNGInUseException):
             self.dsg.declare_random_number_generator(
                 0, RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_random_number_generator(
                 -1, RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_random_number_generator(
                 constants.MAX_RANDOM_DISTS,
                 RandomNumberGenerator.MERSENNE_TWISTER, 0x12345678)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_random_number_generator(
                 1, RandomNumberGenerator.MERSENNE_TWISTER, 0x123456789)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_random_number_generator(
                 2, RandomNumberGenerator.MERSENNE_TWISTER, -1)
 
@@ -1248,31 +1241,31 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.declare_uniform_random_distribution(0, 0, 3, 10, 100)
         self.dsg.declare_uniform_random_distribution(2, 4, 3, 50, 200)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(-1, 2, 3, 10, 100)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(
                 constants.MAX_RANDOM_DISTS, 2, 3, 10, 100)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(1, -1, 3, 10, 100)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(
                 1, constants.MAX_STRUCT_SLOTS, 3, 10, 100)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(1, 1, -1, 10, 100)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(
                 1, 1, constants.MAX_RNGS, 10, 100)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(
                 1, 4, 3,  DataType.S1615.min - 1, 100)  # @UndefinedVariable
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.declare_uniform_random_distribution(
                 1, 4, 3, 100, DataType.S1615.max + 1)  # @UndefinedVariable
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.declare_uniform_random_distribution(1, 1, 1, 100, 200)
         with self.assertRaises(
-                DataSpecificationRandomNumberDistributionInUseException):
+                RandomNumberDistributionInUseException):
             self.dsg.declare_uniform_random_distribution(0, 1, 3, 100, 200)
 
         # DECLARE_RNG
@@ -1315,15 +1308,15 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.call_random_distribution(3, 1)
         self.dsg.call_random_distribution(3, 5)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_random_distribution(-1, 2)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_random_distribution(constants.MAX_RANDOM_DISTS, 2)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_random_distribution(3, -1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.call_random_distribution(3, constants.MAX_REGISTERS)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.call_random_distribution(1, 1)
 
         self.skip_words(13)
@@ -1348,27 +1341,27 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.get_structure_value(3, 0, 0, True)
         self.dsg.get_structure_value(3, 0, 5, True)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(-1, 0, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(constants.MAX_REGISTERS, 0, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(0, -1, 0, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(0, constants.MAX_STRUCT_SLOTS, 0,
                                          False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(0, 0, -1, False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(0, 0, constants.MAX_STRUCT_ELEMENTS,
                                          False)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(0, 0, -1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.get_structure_value(0, 0, constants.MAX_REGISTERS, True)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.get_structure_value(0, 2, 0)
-        with self.assertRaises(DataSpecificationNotAllocatedException):
+        with self.assertRaises(NotAllocatedException):
             self.dsg.get_structure_value(0, 0, 1)
 
         self.skip_words(14)
@@ -1390,9 +1383,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.read_value(5, DataType.UINT8)
         self.dsg.read_value(6, DataType.U88)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.read_value(-1, DataType.UINT32)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.read_value(constants.MAX_REGISTERS, DataType.UINT32)
 
         # READ
@@ -1405,7 +1398,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x04146002)
 
     def test_write_value_from_register(self):
-        with self.assertRaises(DataSpecificationNoRegionSelectedException):
+        with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_value_from_register(0)
 
         self.dsg.reserve_memory_region(0, 1000)
@@ -1422,17 +1415,17 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.write_value_from_register(5, 3, True, DataType.UINT8)
         self.dsg.write_value_from_register(5, 3, True, DataType.U88)
 
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_value_from_register(-1)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_value_from_register(constants.MAX_REGISTERS)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_value_from_register(0, 0)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_value_from_register(0, 256)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_value_from_register(0, -1, True)
-        with self.assertRaises(DataSpecificationParameterOutOfBoundsException):
+        with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_value_from_register(0, constants.MAX_REGISTERS,
                                                True)
 

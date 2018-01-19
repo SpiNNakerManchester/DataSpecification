@@ -28,7 +28,7 @@ class MemoryRegionCollection(object):
 
     def __setitem__(self, key, value):
         if self._regions[key] is not None:
-            raise exceptions.DataSpecificationRegionInUseException(key)
+            raise exceptions.RegionInUseException(key)
         self._regions[key] = value
 
     def __iter__(self):
@@ -60,11 +60,11 @@ class MemoryRegionCollection(object):
         :param region_id: the region id to which the test is being ran on
         :return: a boolean stating if the region needs to be written
         :rtype: boolean
-        :raise DataSpecificationNoRegionSelectedException: when the id is \
+        :raise NoRegionSelectedException: when the id is \
         beyond the expected region range
         """
         if region_id > self._n_regions:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 "the region id requested is beyond the supported number of"
                 "available region ids")
         if not self._regions[region_id].unfilled:

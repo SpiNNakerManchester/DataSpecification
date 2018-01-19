@@ -126,7 +126,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If there is an error in the command syntax
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the requested \
+            ParameterOutOfBoundsException: If the requested \
             size of the region is beyond the available memory space
         """
         self.__unpack_cmd__(cmd)
@@ -142,7 +142,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         unfilled = (cmd >> 7) & 0x1 == 0x1
 
         if not self.mem_regions.is_empty(region):
-            raise exceptions.DataSpecificationRegionInUseException(region)
+            raise exceptions.RegionInUseException(region)
 
         size_encoded = self.spec_reader.read(4)
         size = _ONE_WORD.unpack(str(size_encoded))[0]
@@ -150,7 +150,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             size = (size + 4) - (size & 0x3)
 
         if (size <= 0) or (size > self.memory_space):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "region size", size, 1, self.memory_space, "RESERVE")
 
         self.mem_regions[region] = MemoryRegion(
@@ -224,7 +224,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :return: No value returned
         :rtype: None
         :raise data_specification.exceptions.\
-            DataSpecificationRegionUnfilledException: If the focus is being \
+            RegionUnfilledException: If the focus is being \
             switched to a region of memory which has been declared to be kept \
             unfilled
         """
@@ -236,7 +236,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             region = self.registers[self.src1_reg]
 
         if self.mem_regions.is_empty(region):
-            raise exceptions.DataSpecificationRegionUnfilledException(
+            raise exceptions.RegionUnfilledException(
                 region, "SWITCH_FOCUS")
         else:
             self.current_region = region
@@ -286,7 +286,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             # relative to its current write pointer
             if self.mem_regions[self.current_region] is None:
 
-                raise exceptions.DataSpecificationNoRegionSelectedException(
+                raise exceptions.NoRegionSelectedException(
                     "the write pointer for this region is currently undefined")
             else:
 
@@ -336,25 +336,25 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :return: No value returned
         :rtype: None
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: raised if there is no \
+            NoRegionSelectedException: raised if there is no \
             memory region selected for the write operation
         :raise data_specification.exceptions.\
-            DataSpecificationRegionNotAllocated: raised if the selected region\
+            RegionNotAllocatedException: raised if the selected region\
             has not been allocated memory space
-        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.NoMoreException:\
             raised if the selected region has not enough available memory to \
             store the required data
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeLengthException: raised if the data \
+            UnknownTypeLengthException: raised if the data \
             type size is not 1, 2, 4, or 8 bytes
         """
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 command)
 
         if self.mem_regions.is_empty(self.current_region) is None:
-            raise exceptions.DataSpecificationRegionNotAllocated(
+            raise exceptions.RegionNotAllocatedException(
                 self.current_region, command)
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
@@ -365,7 +365,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         space_required = n_bytes * repeat
 
         if space_available < space_required:
-            raise exceptions.DataSpecificationNoMoreException(
+            raise exceptions.NoMoreException(
                 space_available, space_required, self.current_region)
 
         if n_bytes == 1:
@@ -377,7 +377,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         elif n_bytes == 8:
             encoded_value = _ONE_LONG.pack(value)
         else:
-            raise exceptions.DataSpecificationUnknownTypeLengthException(
+            raise exceptions.UnknownTypeLengthException(
                 n_bytes, command)
 
         encoded_array = encoded_value * repeat
@@ -402,23 +402,23 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :return: No value returned
         :rtype: None
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: raised if there is no \
+            NoRegionSelectedException: raised if there is no \
             memory region selected for the write operation
         :raise data_specification.exceptions.\
-            DataSpecificationRegionNotAllocated: raised if the selected region\
+            RegionNotAllocatedException: raised if the selected region\
             has not been allocated memory space
-        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.NoMoreException:\
             raised if the selected region has not enough available memory to \
             store the required data
         """
         data_length = len(data)
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 command)
 
         if self.mem_regions.is_empty(self.current_region) is None:
-            raise exceptions.DataSpecificationRegionNotAllocated(
+            raise exceptions.RegionNotAllocatedException(
                 self.current_region, command)
 
         space_allocated = self.mem_regions[self.current_region].allocated_size
@@ -429,7 +429,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         space_required = data_length
 
         if space_available < space_required:
-            raise exceptions.DataSpecificationNoMoreException(
+            raise exceptions.NoMoreException(
                 space_available, space_required, self.current_region)
 
         current_write_ptr = self.mem_regions[self.current_region].write_pointer

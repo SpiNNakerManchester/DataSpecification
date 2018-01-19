@@ -165,10 +165,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationRegionInUseException: If the region was already \
+            RegionInUseException: If the region was already \
             reserved
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the region
+            ParameterOutOfBoundsException: If the region
             requested was out of the allowed range, or that the size was too \
             big to fit in SDRAM
         """
@@ -176,7 +176,7 @@ class DataSpecificationGenerator(object):
             logger.error(
                 "Error: Memory region requested ({0:d}) is out of range 0 "
                 "to {1:d}.\n".format(region, constants.MAX_MEM_REGIONS - 1))
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "memory region identifier", region, 0,
                 (constants.MAX_MEM_REGIONS - 1),
                 Commands.RESERVE.name)  # @UndefinedVariable
@@ -186,10 +186,10 @@ class DataSpecificationGenerator(object):
                 region)
             error_string += "is already allocated.\n"
             logger.error(error_string)
-            raise exceptions.DataSpecificationRegionInUseException(region)
+            raise exceptions.RegionInUseException(region)
 
         if size > sdram.SDRAM.DEFAULT_SDRAM_BYTES:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "memory size", size, 1,
                 sdram.SDRAM.DEFAULT_SDRAM_BYTES,
                 Commands.RESERVE.name)  # @UndefinedVariable
@@ -231,19 +231,19 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: If the region was not\
+            NotAllocatedException: If the region was not\
             reserved
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the region \
+            ParameterOutOfBoundsException: If the region \
             requested was out of the allowed range
         """
         if (region < 0) or (region >= constants.MAX_MEM_REGIONS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "memory region identifier", region, 0,
                 (constants.MAX_MEM_REGIONS - 1),
                 Commands.RESERVE.name)  # @UndefinedVariable
         if self.mem_slot[region] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "region", region, Commands.FREE.name)  # @UndefinedVariable
 
         self.mem_slot[region] = 0
@@ -277,35 +277,35 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecification:\
             If there is no more space for a new generator
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+            UnknownTypeException: \
             If the rng_type is not one of the allowed values
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:
+            ParameterOutOfBoundsException:
             * If the seed is too big or too small
             * If the rng_id is not in the allowed range
         :raise data_specification.exceptions\
-            .DataSpecificationRNGInUseException:
+            .RNGInUseException:
             If the random number generator with the given id has already been\
             defined
         """
 
         if rng_id < 0 or rng_id >= constants.MAX_RNGS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "random number generator id", rng_id, 0,
                 (constants.MAX_RNGS - 1),
                 Commands.DECLARE_RNG.name)  # @UndefinedVariable
 
         if rng_type not in RandomNumberGenerator:
-            raise exceptions.DataSpecificationUnknownTypeException(
+            raise exceptions.UnknownTypeException(
                 rng_type.value,
                 Commands.DECLARE_RNG.name)  # @UndefinedVariable
 
         if self.rng[rng_id] is not 0:
-            raise exceptions.DataSpecificationRNGInUseException(rng_id)
+            raise exceptions.RNGInUseException(rng_id)
 
         if (seed > DataType.UINT32.max or  # @UndefinedVariable
                 seed < DataType.UINT32.min):  # @UndefinedVariable
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "seed", seed, DataType.UINT32.min,  # @UndefinedVariable
                 DataType.UINT32.max,  # @UndefinedVariable
                 Commands.DECLARE_RNG.name)  # @UndefinedVariable
@@ -354,55 +354,55 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If there is no more space for a new random distribution
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+            NotAllocatedException: \
             If the requested rng_id has not been allocated
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: \
+            ParameterOutOfBoundsException: \
             If rng_id, structure_id, min_value or max_value is out of range
         :raise data_specification.exceptions.\
-            DataSpecificationStructureInUseException: \
+            StructureInUseException: \
             If structure structure_id is already defined
         """
         if (distribution_id < 0 or
                 distribution_id >= constants.MAX_RANDOM_DISTS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "distribution id", distribution_id, 0,
                 constants.MAX_RANDOM_DISTS - 1,
                 Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
 
         if rng_id < 0 or rng_id >= constants.MAX_RNGS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "rng", rng_id, 0, constants.MAX_RNGS - 1,
                 Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
 
         if self.rng[rng_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "RNG", rng_id,
                 Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
 
         if min_value < DataType.S1615.min:  # @UndefinedVariable
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "min_value", min_value,
                 DataType.S1615.min,  # @UndefinedVariable
                 DataType.S1615.max,  # @UndefinedVariable
                 Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
 
         if max_value > DataType.S1615.max:  # @UndefinedVariable
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "max_value", max_value,
                 DataType.S1615.min,  # @UndefinedVariable
                 DataType.S1615.max,  # @UndefinedVariable
                 Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
 
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "structure id", structure_id, 0,
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
 
         if self.random_distribution[distribution_id] is not 0:
             raise exceptions.\
-                DataSpecificationRandomNumberDistributionInUseException(
+                RandomNumberDistributionInUseException(
                     distribution_id)
 
         parameters = [("distType", DataType.UINT32, 0),
@@ -446,26 +446,26 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+            NotAllocatedException: \
             If the random distribution id was not previously declared
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the \
+            ParameterOutOfBoundsException: If the \
             distribution_id or register_id specified was out of range
         """
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.GET_RANDOM_NUMBER.name)  # @UndefinedVariable
 
         if (distribution_id < 0 or
                 distribution_id >= constants.MAX_RANDOM_DISTS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "distribution_id", distribution_id, 0,
                 constants.MAX_RANDOM_DISTS - 1,
                 Commands.GET_RANDOM_NUMBER.name)  # @UndefinedVariable
 
         if self.random_distribution[distribution_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "random number distribution", distribution_id,
                 Commands.GET_RANDOM_NUMBER.name)  # @UndefinedVariable
 
@@ -506,32 +506,32 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataSpecificationNoMoreException:\
             If there are no more spaces for new structures
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If there are an incorrect number of parameters
             * If the size of one of the tuples is incorrect
             * If one of the values to be assigned has an integer data_type \
             but has a fractional part
             * If one of the values to be assigned would overflow its data_type
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+            UnknownTypeException: \
             If one of the data types in the structure is unknown
         """
         # start of struct
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "structure id", structure_id, 0,
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.START_STRUCT.name)  # @UndefinedVariable
 
         if not parameters or \
                 len(parameters) > constants.MAX_STRUCT_ELEMENTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "structure elements", len(parameters), 0,
                 constants.MAX_STRUCT_ELEMENTS,
                 Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
         if self.struct_slot[structure_id] != 0:
-            raise exceptions.DataSpecificationStructureInUseException(
+            raise exceptions.StructureInUseException(
                 structure_id)
         self.struct_slot[structure_id] = parameters
 
@@ -549,7 +549,7 @@ class DataSpecificationGenerator(object):
         for elem_index, i in enumerate(parameters):
             label, data_type, value = i
             if data_type not in DataType:
-                raise exceptions.DataSpecificationUnknownTypeException(
+                raise exceptions.UnknownTypeException(
                     data_type.value,
                     Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
@@ -557,7 +557,7 @@ class DataSpecificationGenerator(object):
 
                 if value < data_type.min or value > data_type.max:
                     raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
+                        ParameterOutOfBoundsException(
                             "value", value, data_type.min, data_type.max,
                             Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
@@ -574,7 +574,7 @@ class DataSpecificationGenerator(object):
                             20) |
                         data_type.value)
                 else:
-                    raise exceptions.DataSpecificationInvalidSizeException(
+                    raise exceptions.InvalidSizeException(
                         data_type.name, data_type.size,
                         Commands.STRUCT_ELEM.name)  # @UndefinedVariable
 
@@ -635,7 +635,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If structure_id is not in the allowed range
             * If parameter_index is larger than the number of parameters\
             declared in the original structure
@@ -643,30 +643,30 @@ class DataSpecificationGenerator(object):
             * If parameter_index_is_register is True and parameter_index is\
             not a valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+            NotAllocatedException: \
             If the structure requested has not been declared
         """
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "structure_id", structure_id, 0,
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.READ_PARAM.name)  # @UndefinedVariable
 
         if destination_id < 0 or destination_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "destination_id", destination_id, 0,
                 constants.MAX_REGISTERS - 1,
                 Commands.READ_PARAM.name)  # @UndefinedVariable
 
         if self.struct_slot[structure_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "structure", structure_id, Commands.READ_PARAM)
 
         if parameter_index_is_register is True:
             if (parameter_index < 0 or
                     parameter_index >= constants.MAX_REGISTERS):
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "parameter_index", parameter_index, 0,
                         constants.MAX_REGISTERS - 1,
                         Commands.READ_PARAM.name)  # @UndefinedVariable
@@ -686,13 +686,13 @@ class DataSpecificationGenerator(object):
             if (parameter_index < 0 or
                     parameter_index >= constants.MAX_STRUCT_ELEMENTS):
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "parameter_index", parameter_index, 0,
                         constants.MAX_STRUCT_ELEMENTS - 1,
                         Commands.READ_PARAM.name)  # @UndefinedVariable
 
             if len(self.struct_slot[structure_id]) <= parameter_index:
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise exceptions.NotAllocatedException(
                     "structure %d parameter" % structure_id,
                     parameter_index, Commands.READ_PARAM)
 
@@ -743,7 +743,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If structure_id is not in the allowed range
             * If parameter_index is larger than the number of parameters\
               declared in the original structure
@@ -755,40 +755,40 @@ class DataSpecificationGenerator(object):
             * If value_is_register is True, and value is not a valid register\
               id
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: If the structure requested\
+            NotAllocatedException: If the structure requested\
             has not been declared
         """
 
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "structure_id", structure_id, 0,
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
         if (parameter_index < 0 or
                 parameter_index >= constants.MAX_STRUCT_ELEMENTS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "parameter_index", parameter_index, 0,
                 constants.MAX_STRUCT_ELEMENTS - 1,
                 Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
         if self.struct_slot[structure_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "structure", structure_id, Commands.WRITE_PARAM)
 
         if len(self.struct_slot[structure_id]) <= parameter_index:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "structure %d parameter" % structure_id, parameter_index,
                 Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
         if self.struct_slot[structure_id][parameter_index][1] is not data_type:
-            raise exceptions.DataSpecificationTypeMismatchException(
+            raise exceptions.TypeMismatchException(
                 Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
         if value_is_register:
             if value < 0 or value >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "value", value, 0, constants.MAX_REGISTERS - 1,
                         Commands.WRITE_PARAM.name)  # @UndefinedVariable
             cmd_word = (
@@ -805,12 +805,12 @@ class DataSpecificationGenerator(object):
         else:
             if value < data_type.min or value > data_type.max:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "value", value, data_type.min, data_type.max,
                         Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
             if data_type.size > 4 and data_type.size != 8:
-                raise exceptions.DataSpecificationInvalidSizeException(
+                raise exceptions.InvalidSizeException(
                     data_type.name, data_type.size,
                     Commands.WRITE_PARAM.name)  # @UndefinedVariable
 
@@ -870,33 +870,33 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If repeats_is_register is False and structure_id is not\
               a valid id
             * If repeats_is_register is True and structure_id
             * If the number of repeats is out of range
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
+            NoRegionSelectedException: If no region has been \
             selected to write to
         :raise data_specification.exceptions.\
             DataSpecificationRegionExhaustedException: If the selected region \
             has no more space
         """
         if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "structure_id", structure_id, 0,
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.WRITE_STRUCT.name)  # @UndefinedVariable
 
         if self.struct_slot[structure_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "structure", structure_id,
                 Commands.WRITE_STRUCT.name)  # @UndefinedVariable
 
         if repeats_is_register:
             if repeats < 0 or repeats >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "repeats", repeats, 0, constants.MAX_REGISTERS - 1,
                         Commands.WRITE_STRUCT.name)  # @UndefinedVariable
 
@@ -917,7 +917,7 @@ class DataSpecificationGenerator(object):
         else:
             if repeats < 0 or repeats >= 16:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "repeats", repeats, 0, 15,
                         Commands.WRITE_STRUCT.name)  # @UndefinedVariable
 
@@ -955,30 +955,30 @@ class DataSpecificationGenerator(object):
         :return: The id of the function, between 0 and 31
         :rtype: int
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If there are too \
+            ParameterOutOfBoundsException: If there are too \
             many items in the list of arguments
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is already a \
+            InvalidCommandException: If there is already a \
             function being defined at this point
         :raise data_specification.exceptions.\
-            DataSpecificationFunctionInUse: If the function is already defined
+            FunctionInUseException: If the function is already defined
         """
         if self.ongoing_function_definition:
-            raise exceptions.DataSpecificationInvalidCommandException(
+            raise exceptions.InvalidCommandException(
                 Commands.START_CONSTRUCTOR.name)  # @UndefinedVariable
 
         if len(argument_by_value) > 5:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "number of arguments", len(argument_by_value), 0, 5,
                 Commands.START_CONSTRUCTOR.name)  # @UndefinedVariable
 
         if function_id < 0 or function_id >= constants.MAX_CONSTRUCTORS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "function_id", function_id, 0, constants.MAX_CONSTRUCTORS,
                 "START_CONSTRUCTOR")
 
         if self.function[function_id] != 0:
-            raise exceptions.DataSpecificationFunctionInUse(function_id)
+            raise exceptions.FunctionInUseException(function_id)
 
         self.function[function_id] = argument_by_value
 
@@ -1014,12 +1014,12 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no function \
+            InvalidCommandException: If there is no function \
             being defined at this point
         """
 
         if not self.ongoing_function_definition:
-            raise exceptions.DataSpecificationInvalidCommandException(
+            raise exceptions.InvalidCommandException(
                 Commands.END_CONSTRUCTOR.name)  # @UndefinedVariable
 
         self.ongoing_function_definition = False
@@ -1050,37 +1050,37 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If the function id is not valid
             * If any of the structure ids are not valid
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException:\
+            NotAllocatedException:\
             * If a function has not been defined with the given id
             * If no structure has been defined with one of the ids in\
               structure_ids
         :raise data_specification.exceptions.\
-            DataSpecificationWrongParameterNumberException:\
+            WrongParameterNumberException:\
             If a function is called with a wrong number of parameters
         :raise data_specification.exceptions.\
-            DataSpecificationDuplicateParameterException:\
+            DuplicateParameterException:\
             If a function is called with duplicate parameters
         """
         if function_id < 0 or function_id >= constants.MAX_CONSTRUCTORS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "function_id", function_id, 0, constants.MAX_CONSTRUCTORS - 1,
                 Commands.CONSTRUCT.name)  # @UndefinedVariable
 
         if self.function[function_id] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "function", function_id,
                 Commands.CONSTRUCT.name)  # @UndefinedVariable
 
         if len(structure_ids) != len(self.function[function_id]):
-            raise exceptions.DataSpecificationWrongParameterNumberException(
+            raise exceptions.WrongParameterNumberException(
                 function_id, len(self.function[function_id]), structure_ids)
 
         if len(structure_ids) != len(set(structure_ids)):
-            raise exceptions.DataSpecificationDuplicateParameterException(
+            raise exceptions.DuplicateParameterException(
                 "CONSTRUCT %d" % function_id, structure_ids)
 
         cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
@@ -1092,13 +1092,13 @@ class DataSpecificationGenerator(object):
                 if structure_ids[i] < 0 \
                         or structure_ids[i] >= constants.MAX_STRUCT_SLOTS:
                     raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
+                        ParameterOutOfBoundsException(
                             "structure argument {0:d}".format(i),
                             structure_ids[i], 0,
                             constants.MAX_STRUCT_SLOTS - 1,
                             Commands.CONSTRUCT.name)  # @UndefinedVariable
                 if self.struct_slot[structure_ids[i]] == 0:
-                    raise exceptions.DataSpecificationNotAllocatedException(
+                    raise exceptions.NotAllocatedException(
                         "structure argument {0:d}".format(i),
                         structure_ids[i],
                         Commands.CONSTRUCT.name)  # @UndefinedVariable
@@ -1141,11 +1141,11 @@ class DataSpecificationGenerator(object):
         cmd_field_usage = constants.DEST_ONLY
 
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
+            raise exceptions.UnknownTypeException(
                 data_type.value, Commands.WRITE.name)  # @UndefinedVariable
 
         if dest_id < 0 or dest_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "register", dest_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.READ.name)  # @UndefinedVariable
 
@@ -1184,19 +1184,19 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_type is an integer type, and data has a fractional part
             * If data would overflow the data type
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the data type is not\
+            UnknownTypeException: If the data type is not\
             known
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidSizeException: If the data size is invalid
+            InvalidSizeException: If the data size is invalid
         """
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
+            raise exceptions.UnknownTypeException(
                 data_type.value, Commands.WRITE.name)  # @UndefinedVariable
 
         data_size = data_type.size
@@ -1213,12 +1213,12 @@ class DataSpecificationGenerator(object):
             cmd_data_len = constants.LEN3
             data_len = 3
         else:
-            raise exceptions.DataSpecificationInvalidSizeException(
+            raise exceptions.InvalidSizeException(
                 data_type.name, data_size,
                 Commands.WRITE.name)  # @UndefinedVariable
 
         if (data_type.min > data) or (data_type.max < data):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "data", data, data_type.min, data_type.max,
                 Commands.WRITE.name)  # @UndefinedVariable
 
@@ -1269,22 +1269,22 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_type is an integer type, and data has a fractional part
             * If data would overflow the data type
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the data type is not\
+            UnknownTypeException: If the data type is not\
             known
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidSizeException: If the data size is invalid
+            InvalidSizeException: If the data size is invalid
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
+            NoRegionSelectedException: If no region has been \
             selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 "WRITE")
 
         (cmd_word_list, cmd_string) = self.create_cmd(data, data_type)
@@ -1307,11 +1307,11 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
+            NoRegionSelectedException: If no region has been \
             selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 "WRITE")
 
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -1346,26 +1346,26 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_type is an integer type, and data has a fractional part
             * If data would overflow the data type
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+            UnknownTypeException: \
             If the data type is not known
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidSizeException: If the data size is invalid
+            InvalidSizeException: If the data size is invalid
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: \
+            NoRegionSelectedException: \
             If no region has been selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 "WRITE")
 
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
+            raise exceptions.UnknownTypeException(
                 data_type.value, Commands.WRITE.name)  # @UndefinedVariable
 
         data_size = data_type.size
@@ -1382,26 +1382,26 @@ class DataSpecificationGenerator(object):
             cmd_data_len = constants.LEN3
             data_len = 3
         else:
-            raise exceptions.DataSpecificationInvalidSizeException(
+            raise exceptions.InvalidSizeException(
                 data_type.name, data_size,
                 Commands.WRITE.name)  # @UndefinedVariable
 
         if repeats_is_register is False:
             if (repeats <= 0) or (repeats > 255):
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "repeats", repeats, 0, 255,
                         Commands.WRITE.name)  # @UndefinedVariable
         else:
             if (repeats < 0) or (repeats >= constants.MAX_REGISTERS):
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "repeats_is_register", repeats_is_register, 0,
                         (constants.MAX_REGISTERS - 1),
                         Commands.WRITE.name)  # @UndefinedVariable
 
         if (data_type.min > data) or (data_type.max < data):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "data", data, data_type.min, data_type.max,
                 Commands.WRITE.name)  # @UndefinedVariable
 
@@ -1461,26 +1461,26 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_register is not a valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+            UnknownTypeException: \
             If the data type is not known
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: \
+            NoRegionSelectedException: \
             If no region has been selected to write to
         :raise data_specification.exceptions.\
             DataSpecificationRegionExhaustedException: \
             If the selected region has no more space
         """
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
+            raise exceptions.UnknownTypeException(
                 data_type.value, Commands.WRITE.name)  # @UndefinedVariable
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 Commands.WRITE.name)  # @UndefinedVariable
 
         data_size = data_type.size
@@ -1493,26 +1493,26 @@ class DataSpecificationGenerator(object):
         elif data_size == 8:
             cmd_data_len = 3
         else:
-            raise exceptions.DataSpecificationInvalidSizeException(
+            raise exceptions.InvalidSizeException(
                 data_type.name, data_size,
                 Commands.WRITE.name)  # @UndefinedVariable
 
         if repeats_is_register is False:
             if repeats <= 0 or repeats > 255:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "repeats", repeats, 0, 255,
                         Commands.WRITE.name)  # @UndefinedVariable
         else:
             if repeats < 0 or repeats >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "repeats", repeats, 0,
                         (constants.MAX_REGISTERS - 1),
                         Commands.WRITE.name)  # @UndefinedVariable
 
         if (data_register < 0) or (data_register >= constants.MAX_REGISTERS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "data_register", data_register, 0,
                 (constants.MAX_REGISTERS - 1),
                 Commands.WRITE.name)  # @UndefinedVariable
@@ -1558,13 +1558,13 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-               DataSpecificationNoRegionSelectedException:
+               NoRegionSelectedException:
             If no region has been previously selected
         """
         cmd_len = constants.LEN2
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 Commands.WRITE_ARRAY.name)  # @UndefinedVariable
 
         cmd_word = (
@@ -1592,27 +1592,27 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the region \
+            ParameterOutOfBoundsException: If the region \
             identifier is not valid
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: If the region has not been\
+            NotAllocatedException: If the region has not been\
             allocated
         :raise data_specification.exceptions.\
-            DataSpecificationRegionUnfilledException: If the selected region \
+            RegionUnfilledException: If the selected region \
             should not be filled
         """
         if region < 0 or region >= constants.MAX_MEM_REGIONS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "region", region, 0, (constants.MAX_MEM_REGIONS - 1),
                 Commands.SWITCH_FOCUS.name)  # @UndefinedVariable
 
         if self.mem_slot[region] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "region", region,
                 Commands.SWITCH_FOCUS.name)  # @UndefinedVariable
 
         if self.mem_slot[region][2]:
-            raise exceptions.DataSpecificationRegionUnfilledException(
+            raise exceptions.RegionUnfilledException(
                 region, Commands.SWITCH_FOCUS.name)  # @UndefinedVariable
 
         self.current_region = region
@@ -1676,7 +1676,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If counter_register_id is not a valid register id
             * If start_is_register is True and increment is not a valid\
               register_id
@@ -1699,7 +1699,7 @@ class DataSpecificationGenerator(object):
 
         if counter_register_id < 0 \
                 or counter_register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "counter_register_id", counter_register_id, 0,
                 constants.MAX_REGISTERS - 1,
                 Commands.LOOP.name)  # @UndefinedVariable
@@ -1710,7 +1710,7 @@ class DataSpecificationGenerator(object):
         if start_is_register:
             if start < 0 or start >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "start", start, 0, constants.MAX_REGISTERS - 1,
                         Commands.LOOP.name)  # @UndefinedVariable
             bit_field |= 0x4
@@ -1720,7 +1720,7 @@ class DataSpecificationGenerator(object):
             if (start < DataType.INT32.min or  # @UndefinedVariable
                     start > DataType.INT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "start", start,
                         DataType.INT32.min,  # @UndefinedVariable
                         DataType.INT32.max,  # @UndefinedVariable
@@ -1732,7 +1732,7 @@ class DataSpecificationGenerator(object):
         if end_is_register:
             if end < 0 or end >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "end", end, 0, constants.MAX_REGISTERS - 1,
                         Commands.LOOP.name)  # @UndefinedVariable
             bit_field |= 0x2
@@ -1742,7 +1742,7 @@ class DataSpecificationGenerator(object):
             if (end < DataType.INT32.min or  # @UndefinedVariable
                     end > DataType.INT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "end", end,
                         DataType.INT32.min,  # @UndefinedVariable
                         DataType.INT32.max,  # @UndefinedVariable
@@ -1754,7 +1754,7 @@ class DataSpecificationGenerator(object):
         if increment_is_register:
             if increment < 0 or increment >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "increment", increment, 0, constants.MAX_REGISTERS - 1,
                         Commands.LOOP.name)  # @UndefinedVariable
             bit_field |= 0x1
@@ -1765,7 +1765,7 @@ class DataSpecificationGenerator(object):
             if (increment < DataType.INT32.min or  # @UndefinedVariable
                     increment > DataType.INT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "increment", increment,
                         DataType.INT32.min,  # @UndefinedVariable
                         DataType.INT32.max,  # @UndefinedVariable
@@ -1793,12 +1793,12 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no loop in \
+            InvalidCommandException: If there is no loop in \
             operation at this point
         """
 
         if self.ongoing_loop is not True:
-            raise exceptions.DataSpecificationInvalidCommandException(
+            raise exceptions.InvalidCommandException(
                 "END_LOOP")
         cmd_word = (
             (constants.LEN1 << 28) |
@@ -1821,7 +1821,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no loop in \
+            InvalidCommandException: If there is no loop in \
             operation at this point
         """
         cmd_word = (
@@ -1860,12 +1860,12 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If the register_id is not a valid register id
             * if value_is_register is True and value is not a valid\
               register id
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the condition is not a \
+            UnknownTypeException: If the condition is not a \
             valid condition
         """
         data_encoded = bytearray()
@@ -1873,27 +1873,27 @@ class DataSpecificationGenerator(object):
         cmd_string = ""
 
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.IF.name)  # @UndefinedVariable
         if value_is_register:
             if value < 0 or value >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "value", value, 0, constants.MAX_REGISTERS - 1,
                         Commands.IF.name)  # @UndefinedVariable
         else:
             if (value < DataType.INT32.min or  # @UndefinedVariable
                     value > DataType.INT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "value", value,
                         DataType.INT32.min,  # @UndefinedVariable
                         DataType.INT32.max,  # @UndefinedVariable
                         Commands.IF.name)  # @UndefinedVariable
 
         if condition not in Condition:
-            raise exceptions.DataSpecificationUnknownConditionException(
+            raise exceptions.UnknownConditionException(
                 condition, Commands.IF.name)  # @UndefinedVariable
 
         if value_is_register:
@@ -1940,13 +1940,13 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no \
+            InvalidCommandException: If there is no \
             conditional in operation at this point
         """
 
         if not self.conditionals or \
                 self.conditionals[len(self.conditionals) - 1] is True:
-            raise exceptions.DataSpecificationInvalidCommandException("ELSE")
+            raise exceptions.InvalidCommandException("ELSE")
 
         self.conditionals[len(self.conditionals) - 1] = True
 
@@ -1970,12 +1970,12 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no \
+            InvalidCommandException: If there is no \
             conditional in operation at this point
         """
 
         if not self.conditionals:
-            raise exceptions.DataSpecificationInvalidCommandException("END_IF")
+            raise exceptions.InvalidCommandException("END_IF")
 
         self.conditionals.pop()
 
@@ -2010,7 +2010,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If register_id is not a valid register_id
             * If data_is_register is True, and data is not a valid\
               register id
@@ -2019,11 +2019,11 @@ class DataSpecificationGenerator(object):
             * If data_is_register if False, and data would overflow the\
               data type
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the data type is not\
+            UnknownTypeException: If the data type is not\
             known
         """
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.MV.name)  # @UndefinedVariable
 
@@ -2032,12 +2032,12 @@ class DataSpecificationGenerator(object):
             # Build command to move between registers:
             if data < 0 or data >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "data", data, 0, constants.MAX_REGISTERS - 1,
                         Commands.MV.name)  # @UndefinedVariable
 
             if data == register_id:
-                raise exceptions.DataSpecificationDuplicateParameterException(
+                raise exceptions.DuplicateParameterException(
                     Commands.MV.name,  # @UndefinedVariable
                     [register_id, data])
 
@@ -2058,7 +2058,7 @@ class DataSpecificationGenerator(object):
             # command has a second word (the immediate)
             if data_type.min > data or data_type.max < data:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "data", data, data_type.min, data_type.max,
                         Commands.MV.name)  # @UndefinedVariable
 
@@ -2100,18 +2100,18 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the register_id\
+            ParameterOutOfBoundsException: If the register_id\
             is not a valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
+            NoRegionSelectedException: If no region has been \
             selected
         """
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.GET_WR_PTR.name)  # @UndefinedVariable
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 "GET_WR_PTR")
         bit_field = 0x4
         cmd_word = (
@@ -2150,14 +2150,14 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the \
+            ParameterOutOfBoundsException: If the \
             address_is_register is True and address is not a valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
+            NoRegionSelectedException: If no region has been \
             selected
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 Commands.SET_WR_PTR.name)  # @UndefinedVariable
         if relative_to_current:
             relative = 1
@@ -2170,7 +2170,7 @@ class DataSpecificationGenerator(object):
         if address_is_register:
             if address < 0 or address >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "address", address, 0, constants.MAX_REGISTERS - 1,
                         Commands.SET_WR_PTR.name)  # @UndefinedVariable
             cmd_word = (
@@ -2186,7 +2186,7 @@ class DataSpecificationGenerator(object):
                 if (address < 0 or
                         address > DataType.UINT32.max):  # @UndefinedVariable
                     raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
+                        ParameterOutOfBoundsException(
                             "address", address, 0,
                             DataType.UINT32.max,  # @UndefinedVariable
                             Commands.SET_WR_PTR.name)  # @UndefinedVariable
@@ -2196,7 +2196,7 @@ class DataSpecificationGenerator(object):
                 if (address < DataType.INT32.min or  # @UndefinedVariable
                         address > DataType.INT32.max):  # @UndefinedVariable
                     raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
+                        ParameterOutOfBoundsException(
                             "address", address,
                             DataType.INT32.min,  # @UndefinedVariable
                             DataType.INT32.max,  # @UndefinedVariable
@@ -2246,7 +2246,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If log_block_size_is_register is False, and\
               log_block_size is not within the allowed range
             * If log_block_size_is_register is True and log_block_size\
@@ -2256,7 +2256,7 @@ class DataSpecificationGenerator(object):
             If the move of the pointer would put it outside of the\
             current region
         :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
+            NoRegionSelectedException: If no region has been \
             selected
         """
         bit_field = 0
@@ -2266,14 +2266,14 @@ class DataSpecificationGenerator(object):
         cmd_string = "ALIGN_WR_PTR"
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
+            raise exceptions.NoRegionSelectedException(
                 Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
 
         if return_register_id is not None:
             if return_register_id < 0 \
                     or return_register_id >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "return_register_id", return_register_id, 0,
                         constants.MAX_REGISTERS - 1,
                         Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
@@ -2285,7 +2285,7 @@ class DataSpecificationGenerator(object):
         if log_block_size_is_register:
             if log_block_size < 0 or log_block_size >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "log_block_size", log_block_size, 0,
                         constants.MAX_REGISTERS - 1,
                         Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
@@ -2296,7 +2296,7 @@ class DataSpecificationGenerator(object):
         else:
             if log_block_size < 0 or log_block_size > 31:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "log_block_size", log_block_size, 0, 31,
                         Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
             imm_value = log_block_size
@@ -2347,13 +2347,13 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+            UnknownTypeException: \
             If operation is not a known operation
         """
         bit_field = 0x4
@@ -2362,7 +2362,7 @@ class DataSpecificationGenerator(object):
         payload = bytearray()
 
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.ARITH_OP.name)  # @UndefinedVariable
 
@@ -2372,7 +2372,7 @@ class DataSpecificationGenerator(object):
         if operand_1_is_register:
             if operand_1 < 0 or operand_1 >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_1", operand_1, 0, constants.MAX_REGISTERS - 1,
                         Commands.ARITH_OP.name)  # @UndefinedVariable
             bit_field |= 2
@@ -2382,7 +2382,7 @@ class DataSpecificationGenerator(object):
             if (operand_1 < DataType.INT32.min or  # @UndefinedVariable
                     operand_1 > DataType.INT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_1", operand_1,
                         DataType.INT32.min,  # @UndefinedVariable
                         DataType.INT32.max,  # @UndefinedVariable
@@ -2393,7 +2393,7 @@ class DataSpecificationGenerator(object):
             if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_1 > DataType.UINT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_1", operand_1,
                         DataType.UINT32.min,  # @UndefinedVariable
                         DataType.UINT32.max,  # @UndefinedVariable
@@ -2402,7 +2402,7 @@ class DataSpecificationGenerator(object):
             cmd_string += " " + str(operand_1)
 
         if operation not in ArithmeticOperation:
-            raise exceptions.DataSpecificationInvalidOperationException(
+            raise exceptions.InvalidOperationException(
                 "arithmetic", operation.value,
                 Commands.ARITH_OP.name)  # @UndefinedVariable
 
@@ -2411,7 +2411,7 @@ class DataSpecificationGenerator(object):
         if operand_2_is_register:
             if operand_2 < 0 or operand_2 >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_2", operand_2, 0, constants.MAX_REGISTERS - 1,
                         Commands.ARITH_OP.name)  # @UndefinedVariable
             bit_field |= 1
@@ -2421,7 +2421,7 @@ class DataSpecificationGenerator(object):
             if (operand_2 < DataType.INT32.min or  # @UndefinedVariable
                     operand_2 > DataType.INT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_2", operand_2,
                         DataType.INT32.min,  # @UndefinedVariable
                         DataType.INT32.max,  # @UndefinedVariable
@@ -2432,7 +2432,7 @@ class DataSpecificationGenerator(object):
             if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_2 > DataType.UINT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_2", operand_2,
                         DataType.UINT32.min,  # @UndefinedVariable
                         DataType.UINT32.max,  # @UndefinedVariable
@@ -2480,7 +2480,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2516,7 +2516,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2553,7 +2553,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2591,7 +2591,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2628,7 +2628,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2657,7 +2657,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_is_register is True and operand_1 is not a\
               valid register id
         """
@@ -2693,13 +2693,13 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
         :raise data_specification.exceptions.\
-            DataSpecificationInvalidOperationException: If operation is not a\
+            InvalidOperationException: If operation is not a\
             known operation
         """
         bit_field = 0x4
@@ -2708,14 +2708,14 @@ class DataSpecificationGenerator(object):
         payload = bytearray()
 
         if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
                 Commands.LOGIC_OP.name)  # @UndefinedVariable
 
         cmd_string = "LOGIC_OP reg[{0:d}] =".format(register_id)
 
         if operation not in LogicOperation:
-            raise exceptions.DataSpecificationInvalidOperationException(
+            raise exceptions.InvalidOperationException(
                 "logic", operation.value,
                 Commands.LOGIC_OP.name)  # @UndefinedVariable
 
@@ -2725,7 +2725,7 @@ class DataSpecificationGenerator(object):
         if operand_1_is_register:
             if operand_1 < 0 or operand_1 >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_1", operand_1, 0, constants.MAX_REGISTERS - 1,
                         Commands.LOGIC_OP.name)  # @UndefinedVariable
             bit_field |= 2
@@ -2735,7 +2735,7 @@ class DataSpecificationGenerator(object):
             if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_1 > DataType.UINT32.max):  # @UndefinedVariable
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "operand_1", operand_1,
                         DataType.UINT32.min,  # @UndefinedVariable
                         DataType.UINT32.max,  # @UndefinedVariable
@@ -2749,7 +2749,7 @@ class DataSpecificationGenerator(object):
             if operand_2_is_register:
                 if operand_2 < 0 or operand_2 >= constants.MAX_REGISTERS:
                     raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
+                        ParameterOutOfBoundsException(
                             "operand_2", operand_2, 0,
                             constants.MAX_REGISTERS - 1,
                             Commands.LOGIC_OP.name)  # @UndefinedVariable
@@ -2760,7 +2760,7 @@ class DataSpecificationGenerator(object):
                 if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
                         operand_2 > DataType.UINT32.max):  # @UndefinedVariable
                     raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
+                        ParameterOutOfBoundsException(
                             "operand_2", operand_2,
                             DataType.UINT32.min,  # @UndefinedVariable
                             DataType.UINT32.max,  # @UndefinedVariable
@@ -2811,7 +2811,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If source_id_is_register is True and source_structure_id\
               is not a valid register id
             * If destination_id_is_register is True and\
@@ -2821,7 +2821,7 @@ class DataSpecificationGenerator(object):
             * If destination_id_is_register is False and\
               destination_structure_id is not a valid structure id
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException:\
+            NotAllocatedException:\
             * If no structure with id source_structure_id has been\
               allocated
         """
@@ -2830,7 +2830,7 @@ class DataSpecificationGenerator(object):
 
         if source_structure_id == destination_structure_id and \
            destination_id_is_register == source_id_is_register:
-            raise exceptions.DataSpecificationDuplicateParameterException(
+            raise exceptions.DuplicateParameterException(
                 "COPY_STRUCT",
                 [source_structure_id, destination_structure_id])
 
@@ -2838,7 +2838,7 @@ class DataSpecificationGenerator(object):
             if source_structure_id < 0 \
                     or source_structure_id >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "source_structure_id", source_structure_id, 0,
                         constants.MAX_REGISTERS - 1,
                         Commands.COPY_STRUCT.name)  # @UndefinedVariable
@@ -2849,12 +2849,12 @@ class DataSpecificationGenerator(object):
             if source_structure_id < 0 \
                     or source_structure_id >= constants.MAX_STRUCT_SLOTS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "source_structure_id", source_structure_id, 0,
                         constants.MAX_STRUCT_SLOTS - 1,
                         Commands.COPY_STRUCT.name)  # @UndefinedVariable
             if self.struct_slot[source_structure_id] == 0:
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise exceptions.NotAllocatedException(
                     "struct", source_structure_id, "COPY_STRUCT")
             cmd_string = "{0:s} source_struct = {1:d}".format(
                 cmd_string, source_structure_id)
@@ -2863,7 +2863,7 @@ class DataSpecificationGenerator(object):
             if destination_structure_id < 0 \
                     or destination_structure_id >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "destination_structure_id", destination_structure_id,
                         0, constants.MAX_REGISTERS - 1,
                         Commands.COPY_STRUCT.name)  # @UndefinedVariable
@@ -2874,7 +2874,7 @@ class DataSpecificationGenerator(object):
             if destination_structure_id < 0 \
                     or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "destination_structure_id", destination_structure_id,
                         0, constants.MAX_STRUCT_SLOTS - 1,
                         Commands.COPY_STRUCT.name)  # @UndefinedVariable
@@ -2922,7 +2922,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If source_structure_id is not a valid structure id
             * If destination_id is not a valid structure id
             * If source_parameter_index is not a valid parameter index\
@@ -2930,31 +2930,31 @@ class DataSpecificationGenerator(object):
             * If destination_parameter_index is not a valid parameter\
               index in the destination structure
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException:\
+            NotAllocatedException:\
             * If no structure with id destination_id has been allocated
             * If no structure with id source_structure_id has been allocated
         """
         if source_structure_id < 0 \
                 or source_structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "source_structure_id", source_structure_id, 0,
                 constants.MAX_STRUCT_SLOTS - 1,
                 Commands.COPY_PARAM.name)  # @UndefinedVariable
 
         if source_parameter_index < 0 \
                 or source_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "source_parameter_index", source_parameter_index, 0,
                 constants.MAX_STRUCT_ELEMENTS - 1,
                 Commands.COPY_PARAM.name)  # @UndefinedVariable
 
         if self.struct_slot[source_structure_id] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "structure", source_structure_id, "COPY_PARAM")
 
         if (len(self.struct_slot[source_structure_id]) <=
                 source_parameter_index):
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise exceptions.NotAllocatedException(
                 "parameter", source_parameter_index, "COPY_PARAM")
 
         if not destination_is_register:
@@ -2962,7 +2962,7 @@ class DataSpecificationGenerator(object):
                     destination_parameter_index >=
                     constants.MAX_STRUCT_ELEMENTS):
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "destination_parameter_index",
                         destination_parameter_index,
                         0, constants.MAX_STRUCT_ELEMENTS - 1,
@@ -2971,35 +2971,35 @@ class DataSpecificationGenerator(object):
             if destination_id < 0 \
                     or destination_id >= constants.MAX_STRUCT_SLOTS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "destination_structure_id", destination_id, 0,
                         constants.MAX_STRUCT_SLOTS - 1,
                         Commands.COPY_PARAM.name)  # @UndefinedVariable
 
             if self.struct_slot[destination_id] == 0:
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise exceptions.NotAllocatedException(
                     "structure", destination_id, "COPY_PARAM")
 
             if (len(self.struct_slot[source_structure_id]) <=
                     source_parameter_index):
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise exceptions.NotAllocatedException(
                     "parameter", destination_parameter_index, "COPY_PARAM")
 
             if (len(self.struct_slot[destination_id]) <=
                     destination_parameter_index):
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise exceptions.NotAllocatedException(
                     "parameter", destination_parameter_index, "COPY_PARAM")
 
             if (self.struct_slot[source_structure_id]
                     [source_parameter_index][1] !=
                     self.struct_slot[destination_id]
                     [destination_parameter_index][1]):
-                raise exceptions.DataSpecificationTypeMismatchException(
+                raise exceptions.TypeMismatchException(
                     "COPY_PARAM")
 
             if (source_structure_id == destination_id and
                     destination_parameter_index == source_parameter_index):
-                raise exceptions.DataSpecificationDuplicateParameterException(
+                raise exceptions.DuplicateParameterException(
                     "COPY_PARAM", [source_structure_id,
                                    source_parameter_index,
                                    destination_id,
@@ -3025,7 +3025,7 @@ class DataSpecificationGenerator(object):
             if destination_id < 0 \
                     or destination_id >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "destination_register_id", destination_id, 0,
                         constants.MAX_REGISTERS - 1,
                         Commands.COPY_PARAM.name)  # @UndefinedVariable
@@ -3071,7 +3071,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If value_is_register is True and value is not a valid\
               register id
             * If value_is_register is False, the data_type is an integer type\
@@ -3079,7 +3079,7 @@ class DataSpecificationGenerator(object):
             * If value_is_register is False and the value would overflow the\
               data type
         :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException:\
+            UnknownTypeException:\
             * If data_type is not a valid data type
         """
         cmd_word_length = constants.LEN1
@@ -3090,7 +3090,7 @@ class DataSpecificationGenerator(object):
         if value_is_register:
             if value < 0 or value >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "value", value, 0, constants.MAX_REGISTERS - 1,
                         Commands.PRINT_VAL.name)  # @UndefinedVariable
             bit_field |= 2
@@ -3099,7 +3099,7 @@ class DataSpecificationGenerator(object):
         else:
             if value < data_type.min or value > data_type.max:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "value", value, data_type.min, data_type.max,
                         Commands.PRINT_VAL.name)  # @UndefinedVariable
             if data_type.size <= 4:
@@ -3138,7 +3138,7 @@ class DataSpecificationGenerator(object):
         """
         text_len = len(text)
         if text_len > 12:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise exceptions.ParameterOutOfBoundsException(
                 "len(text)", text_len, 1, 12,
                 Commands.PRINT_TXT.name)  # @UndefinedVariable
 
@@ -3182,13 +3182,13 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DataUndefinedWriterException:\
             If the binary specification file writer has not been initialised
         :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+            ParameterOutOfBoundsException:\
             * If structure_id_is_register is True and structure_id is not a\
               valid register id
             * If structure_id_is_register is False and structure_id is not a\
               valid structure id
         :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+            NotAllocatedException: \
             If structure_id_is_register is False and structure_id is the id\
             of a structure that has not been allocated
         """
@@ -3199,7 +3199,7 @@ class DataSpecificationGenerator(object):
         if structure_id_is_register:
             if structure_id < 0 or structure_id >= constants.MAX_REGISTERS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "structure_id", structure_id, 0,
                         constants.MAX_REGISTERS - 1,
                         Commands.PRINT_STRUCT.name)  # @UndefinedVariable
@@ -3211,13 +3211,13 @@ class DataSpecificationGenerator(object):
         else:
             if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
                 raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
+                    ParameterOutOfBoundsException(
                         "structure_id", structure_id, 0,
                         constants.MAX_STRUCT_SLOTS - 1,
                         Commands.PRINT_STRUCT.name)  # @UndefinedVariable
 
             if self.struct_slot[structure_id] == 0:
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise exceptions.NotAllocatedException(
                     "structure", structure_id, "PRINT_STRUCT")
 
             cmd_string = "{0:s} struct({1:d})".format(

@@ -55,7 +55,7 @@ class DataSpecificationExecutor(object):
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationException:\
             If there is an error when executing the specification
-        :raise data_specification.exceptions.DataSpecificationTablePointerOutOfMemory:\
+        :raise data_specification.exceptions.TablePointerOutOfMemory:\
             If the table pointer generated as data header exceeds the size of\
             the available memory
         """

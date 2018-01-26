@@ -50,14 +50,12 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     def __init__(self, spec_reader, memory_space):
         """
-
-        :param spec_reader: The object to read the specification language file\
-            from
+        :param spec_reader: \
+            The object to read the specification language file from
         :type spec_reader:\
-            :py:class:`data_specification.abstract_data_reader.\
-            AbstractDataReader`
-        :param memory_space: Memory space available for the data to be\
-            generated
+            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
+        :param memory_space: \
+            Memory space available for the data to be generated
         :type memory_space: int
         """
         self.spec_reader = spec_reader
@@ -83,7 +81,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     def __unpack_cmd__(self, cmd):
         """ Routine to unpack the command read from the data spec file. The\
-        parameters of the command are stored in the class data
+            parameters of the command are stored in the class data
 
         :param cmd: The command read form the data spec file
         :type cmd: int
@@ -100,10 +98,13 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.src2_reg = (cmd >> 4) & 0xF
         self.data_len = (cmd >> 12) & 0x3
 
+    @property
+    def _region(self):
+        return self.mem_regions[self.current_region]
+
     def execute_break(self, cmd):
-        """
-        This command raises an exception to stop the execution of the data spec
-         executor (DSE)
+        """ This command raises an exception to stop the execution of the \
+            data spec executor (DSE)
 
         :param cmd: the command which triggered the function call
         :type cmd: int
@@ -116,8 +117,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             self.spec_reader.tell(), self.spec_reader.filename)
 
     def execute_reserve(self, cmd):
-        """
-        This command reserves a region and assigns some memory space to it
+        """ This command reserves a region and assigns some memory space to it
 
         :param cmd: the command which triggered the function call
         :type cmd: int
@@ -125,9 +125,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :rtype: None
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If there is an error in the command syntax
-        :raise data_specification.exceptions.\
-            ParameterOutOfBoundsException: If the requested \
-            size of the region is beyond the available memory space
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If the requested size of the region is beyond the available\
+            memory space
         """
         self.__unpack_cmd__(cmd)
         region = cmd & 0x1F  # cmd[4:0]
@@ -149,7 +149,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
-        if (size <= 0) or (size > self.memory_space):
+        if not (0 < size <= self.memory_space):
             raise exceptions.ParameterOutOfBoundsException(
                 "region size", size, 1, self.memory_space, "RESERVE")
 
@@ -158,10 +158,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.space_allocated += size
 
     def execute_write(self, cmd):
-        """
-        This command writes the given value in the specified region a number\
-         of times as identified by either a value in the command or a register\
-         value
+        """ This command writes the given value in the specified region a\
+            number of times as identified by either a value in the command or\
+            a register value
 
         :param cmd: the command which triggered the function call
         :type cmd: int
@@ -182,27 +181,24 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
+        elif self._cmd_size == constants.LEN2 and data_len != 8:
+            read_data = self.spec_reader.read(4)
+            value = _ONE_WORD.unpack(str(read_data))[0]
+        elif self._cmd_size == constants.LEN3 and data_len == 8:
+            read_data = self.spec_reader.read(8)
+            value = _ONE_LONG.unpack(str(read_data))[0]
         else:
-            if self._cmd_size == constants.LEN2 and data_len != 8:
-                read_data = self.spec_reader.read(4)
-                value = _ONE_WORD.unpack(str(read_data))[0]
-            elif self._cmd_size == constants.LEN3 and data_len == 8:
-                read_data = self.spec_reader.read(8)
-                value = _ONE_LONG.unpack(str(read_data))[0]
-            else:
-                raise exceptions.DataSpecificationSyntaxError(
-                    "Command {0:s} requires a value as an argument, but the "
-                    "current encoding ({1:X}) is specified to be {2:d} words "
-                    "long and the data length command argument is specified "
-                    "to be {3:d} bytes long".format(
-                        "WRITE", cmd, self._cmd_size,
-                        data_len))
+            raise exceptions.DataSpecificationSyntaxError(
+                "Command {0:s} requires a value as an argument, but the "
+                "current encoding ({1:X}) is specified to be {2:d} words "
+                "long and the data length command argument is specified "
+                "to be {3:d} bytes long".format(
+                    "WRITE", cmd, self._cmd_size, data_len))
 
         # Perform the writes
-        self._write_to_mem(
-            value, data_len, n_repeats, "WRITE")
+        self._write_to_mem(value, data_len, n_repeats, "WRITE")
 
-    def execute_write_array(self, cmd):
+    def execute_write_array(self, cmd):  # @UnusedVariable
         """ This command writes an array of values in the specified region
 
         :param cmd: the command which triggered the function call
@@ -223,10 +219,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.\
-            RegionUnfilledException: If the focus is being \
-            switched to a region of memory which has been declared to be kept \
-            unfilled
+        :raise data_specification.exceptions.RegionUnfilledException: \
+            If the focus is being switched to a region of memory which has\
+            been declared to be kept unfilled
         """
         self.__unpack_cmd__(cmd)
 
@@ -238,8 +233,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.mem_regions.is_empty(region):
             raise exceptions.RegionUnfilledException(
                 region, "SWITCH_FOCUS")
-        else:
-            self.current_region = region
+        self.current_region = region
 
     def execute_mv(self, cmd):
         """ This command moves an immediate value to a register or copies the \
@@ -250,9 +244,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :return: No value returned
         :rtype: None
         :raise data_specification.exceptions.DataSpecificationSyntaxError: \
-                if the destination register is not correctly specified - the \
-                destination must be a register and the appropriate bit needs \
-                to be set in the specification
+            If the destination register is not correctly specified - the\
+            destination must be a register and the appropriate bit needs to\
+            be set in the specification
         """
         self.__unpack_cmd__(cmd)
 
@@ -284,24 +278,20 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if cmd & 0x1 == 1:
 
             # relative to its current write pointer
-            if self.mem_regions[self.current_region] is None:
-
+            if self._region is None:
                 raise exceptions.NoRegionSelectedException(
                     "the write pointer for this region is currently undefined")
-            else:
 
-                # relative to the base address of the region (obsolete)
-                # noinspection PyTypeChecker
-                address = (
-                    self.mem_regions[self.current_region].write_pointer +
-                    future_address)
+            # relative to the base address of the region (obsolete)
+            # noinspection PyTypeChecker
+            address = self._region.write_pointer + future_address
         else:
             address = future_address
 
         # update write pointer
-        self.mem_regions[self.current_region].write_pointer = address
+        self._region.write_pointer = address
 
-    def execute_end_spec(self, cmd):
+    def execute_end_spec(self, cmd):  # @UnusedVariable
         """ Return the value which terminates the data spec executor
 
         :param cmd: the command which triggered the function call
@@ -335,39 +325,16 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type command: str
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.\
-            NoRegionSelectedException: raised if there is no \
-            memory region selected for the write operation
-        :raise data_specification.exceptions.\
-            RegionNotAllocatedException: raised if the selected region\
-            has not been allocated memory space
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            if there is no memory region selected for the write operation
+        :raise data_specification.exceptions.RegionNotAllocatedException: \
+            if the selected region has not been allocated memory space
         :raise data_specification.exceptions.NoMoreException:\
-            raised if the selected region has not enough available memory to \
+            if the selected region has not enough available memory to \
             store the required data
-        :raise data_specification.exceptions.\
-            UnknownTypeLengthException: raised if the data \
-            type size is not 1, 2, 4, or 8 bytes
+        :raise data_specification.exceptions.UnknownTypeLengthException: \
+            if the data type size is not 1, 2, 4, or 8 bytes
         """
-
-        if self.current_region is None:
-            raise exceptions.NoRegionSelectedException(
-                command)
-
-        if self.mem_regions.is_empty(self.current_region) is None:
-            raise exceptions.RegionNotAllocatedException(
-                self.current_region, command)
-
-        space_allocated = self.mem_regions[self.current_region].allocated_size
-        space_used = self.mem_regions[self.current_region].write_pointer
-
-        # noinspection PyTypeChecker
-        space_available = space_allocated - space_used
-        space_required = n_bytes * repeat
-
-        if space_available < space_required:
-            raise exceptions.NoMoreException(
-                space_available, space_required, self.current_region)
-
         if n_bytes == 1:
             encoded_value = _ONE_BYTE.pack(value)
         elif n_bytes == 2:
@@ -377,18 +344,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         elif n_bytes == 8:
             encoded_value = _ONE_LONG.pack(value)
         else:
-            raise exceptions.UnknownTypeLengthException(
-                n_bytes, command)
+            raise exceptions.UnknownTypeLengthException(n_bytes, command)
 
-        encoded_array = encoded_value * repeat
-        current_write_ptr = self.mem_regions[self.current_region].write_pointer
-
-        # noinspection PyTypeChecker
-        self.mem_regions[self.current_region].region_data[
-            current_write_ptr:current_write_ptr + len(
-                encoded_array)] = encoded_array
-        self.mem_regions[self.current_region].increment_write_pointer(
-            len(encoded_array))
+        self._write_bytes_to_mem(command, encoded_value * repeat)
 
     def _write_bytes_to_mem(self, data, command):
         """ Write raw bytes to data memory
@@ -401,41 +359,31 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type command: str
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.\
-            NoRegionSelectedException: raised if there is no \
-            memory region selected for the write operation
-        :raise data_specification.exceptions.\
-            RegionNotAllocatedException: raised if the selected region\
-            has not been allocated memory space
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            if there is no memory region selected for the write operation
+        :raise data_specification.exceptions.RegionNotAllocatedException: \
+            if the selected region has not been allocated memory space
         :raise data_specification.exceptions.NoMoreException:\
-            raised if the selected region has not enough available memory to \
+            if the selected region has not enough available memory to \
             store the required data
         """
-        data_length = len(data)
-
+        # A region must've been selected
         if self.current_region is None:
-            raise exceptions.NoRegionSelectedException(
-                command)
+            raise exceptions.NoRegionSelectedException(command)
 
+        # It must be a real region
         if self.mem_regions.is_empty(self.current_region) is None:
             raise exceptions.RegionNotAllocatedException(
                 self.current_region, command)
 
-        space_allocated = self.mem_regions[self.current_region].allocated_size
-        space_used = self.mem_regions[self.current_region].write_pointer
-
-        # noinspection PyTypeChecker
-        space_available = space_allocated - space_used
-        space_required = data_length
-
+        # It must have enough space
+        space_available = self._region.remaining_space
+        space_required = len(data)
         if space_available < space_required:
             raise exceptions.NoMoreException(
                 space_available, space_required, self.current_region)
 
-        current_write_ptr = self.mem_regions[self.current_region].write_pointer
-
-        # noinspection PyTypeChecker
-        self.mem_regions[self.current_region].region_data[
-            current_write_ptr:current_write_ptr + data_length] = data
-        self.mem_regions[self.current_region].increment_write_pointer(
-            data_length)
+        # We can safely write
+        write_ptr = self._region.write_pointer
+        self._region.region_data[write_ptr:write_ptr + len(data)] = data
+        self._region.increment_write_pointer(len(data))

@@ -3,25 +3,11 @@ class DataSpecificationException(Exception):
         wrong when interacting with a Data Specification
     """
 
-    def __init__(self, message):
-        """
-        :param message: message reporting the exception occurred
-        :type message: str
-        """
-        super(DataSpecificationException, self).__init__(message)
-
 
 class DataUndefinedWriterException(Exception):
-    """an exception that indicates that the file data writer has not been\
-       initialised
+    """ An exception that indicates that the file data writer has not been\
+        initialised
     """
-
-    def __init__(self, message):
-        """
-        :param message: A message to indicate what when wrong
-        :type message: str
-        """
-        super(DataUndefinedWriterException, self).__init__(message)
 
 
 class RegionInUseException(DataSpecificationException):
@@ -425,13 +411,6 @@ class DataSpecificationSyntaxError(DataSpecificationException):
     """ An exception which occurs when a command read from the data\
         specification file shows an inconsistency in the binary content.
     """
-
-    def __init__(self, message):
-        """
-        :param message: message describing the error occurred
-        :type message: str
-        """
-        super(DataSpecificationSyntaxError, self).__init__(message)
 
 
 class TablePointerOutOfMemoryException(DataSpecificationException):

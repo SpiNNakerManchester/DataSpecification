@@ -60,11 +60,21 @@ class MemoryRegion(object):
         return self._allocated_size
 
     @property
+    def remaining_space(self):
+        """ the amount of unused space in the region
+
+        :return: the number of bytes in the region that are not yet written
+        :rtype: int
+        :raise None: this method does not raise any known exception
+        """
+        return self._allocated_size - self._mem_pointer
+
+    @property
     def unfilled(self):
         """ property method to retrieve if the region is filled
 
-        :return: the the
-        :rtype: None
+        :return: True if the region needs to be filled when written
+        :rtype: bool
         :raise None: this method does not raise any known exception
         """
         return self._unfilled

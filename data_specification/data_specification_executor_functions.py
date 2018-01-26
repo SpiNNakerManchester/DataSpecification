@@ -346,7 +346,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         else:
             raise exceptions.UnknownTypeLengthException(n_bytes, command)
 
-        self._write_bytes_to_mem(command, encoded_value * repeat)
+        self._write_bytes_to_mem(encoded_value * repeat, command)
 
     def _write_bytes_to_mem(self, data, command):
         """ Write raw bytes to data memory

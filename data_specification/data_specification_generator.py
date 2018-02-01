@@ -1211,9 +1211,10 @@ class DataSpecificationGenerator(object):
             of bytes required to represent the data type. The data is passed\
             as a parameter to this function
 
-        Note: This method used to have two extra parameters repeats and\
-        repeats_is_register. They have been removed here. If you need them,\
-        use write_repeated_value
+        .. note::
+            This method used to have two extra parameters repeats and\
+            repeats_is_register. They have been removed here. If you need\
+            them, use write_repeated_value
 
         :param data: the data to write as a float.
         :type data: float

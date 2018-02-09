@@ -23,6 +23,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
+  - pip install python-coveralls
   - python ./setup.py install
   # C build checks
   - make -C c_data_specification -f test.mk build-test
@@ -30,8 +31,8 @@ install:
 
 script:
   # Tests
-  - py.test unittests
-  - py.test integration_tests
+  - py.test unittests --cov data_specification
+  - py.test integration_tests --cov data_specification --cov-append
   - make -C c_data_specification -f test.mk check
   # Code quality check
   - flake8 data_specification
@@ -42,3 +43,7 @@ script:
   - sphinx-build -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - sphinx-build -T -b json -d _build/doctrees-json -D language=en . _build/json
   - sphinx-build -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
+
+after_success:
+  - cd $TRAVIS_BUILD_DIR
+  - coveralls

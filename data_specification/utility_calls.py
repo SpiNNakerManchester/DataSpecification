@@ -14,7 +14,7 @@ import threading
 _lock_condition = threading.Condition()
 
 
-def mkdir(directory):
+def _mkdir(directory):
     # Guarded to stop us from hitting things twice internally; it's not
     # perfect since other processes could also happen along.
     with _lock_condition:
@@ -36,10 +36,15 @@ def get_region_base_address_offset(app_data_base_address, region):
             APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
 
 
+_DAT_TMPL = "{}_dataSpec_{}_{}_{}.dat"
+_RPT_TMPL = "{}_dataSpec_{}_{}_{}.txt"
+_RPT_DIR = "data_spec_text_files"
+
+
 def get_data_spec_and_file_writer_filename(
         processor_chip_x, processor_chip_y, processor_id,
-        hostname, report_directory, write_text_specs,
-        application_run_time_report_folder):
+        hostname, report_directory="TEMP", write_text_specs=False,
+        application_run_time_report_folder="TEMP"):
     """ Encapsulates the creation of the DSG writer and the file paths
 
     :param processor_chip_x: x-coordinate of the chip
@@ -56,59 +61,33 @@ def get_data_spec_and_file_writer_filename(
         True if a textual version of the specification should be written
     :type write_text_specs: bool
     :param application_run_time_report_folder:\
-        The folder to contain the resulting specification files
+        The folder to contain the resulting specification files; if 'TEMP'\
+        then a temporary directory is used.
     :type application_run_time_report_folder: str
     :return: the filename of the data writer and the data specification object
     :rtype: str, data_specification.DataSpecificationGenerator
     """
     # pylint: disable=too-many-arguments
-    binary_file_path = get_data_spec_file_path(
-        processor_chip_x, processor_chip_y, processor_id, hostname,
-        application_run_time_report_folder)
-    data_writer = FileDataWriter(binary_file_path)
+    if application_run_time_report_folder == "TEMP":
+        application_run_time_report_folder = tempfile.gettempdir()
+
+    data_writer = FileDataWriter(os.path.join(
+        application_run_time_report_folder, _DAT_TMPL.format(
+            hostname, processor_chip_x, processor_chip_y, processor_id)))
 
     # check if text reports are needed and if so initialise the report
     # writer to send down to DSG
     report_writer = None
     if write_text_specs:
-        new_report_directory = os.path.join(
-            report_directory, "data_spec_text_files")
-        mkdir(new_report_directory)
-        file_name = "{}_dataSpec_{}_{}_{}.txt" \
-            .format(hostname, processor_chip_x, processor_chip_y,
-                    processor_id)
+        if report_directory == "TEMP":
+            report_directory = tempfile.gettempdir()
+        new_report_directory = os.path.join(report_directory, _RPT_DIR)
+        _mkdir(new_report_directory)
         report_writer = FileDataWriter(
-            os.path.join(new_report_directory, file_name))
+            os.path.join(new_report_directory, _RPT_TMPL.format(
+                hostname, processor_chip_x, processor_chip_y, processor_id)))
 
     # build the file writer for the spec
     spec = DataSpecificationGenerator(data_writer, report_writer)
 
     return data_writer.filename, spec
-
-
-def get_data_spec_file_path(processor_chip_x, processor_chip_y,
-                            processor_id, hostname,
-                            application_run_time_folder="TEMP"):
-    """ Gets the file path for storing the dsg data
-
-    :param processor_chip_x: The x-coordinate of a chip
-    :type processor_chip_x: int
-    :param processor_chip_y: The y-coordinate of a chip
-    :type processor_chip_y: int
-    :param processor_id: The processor ID
-    :type processor_id: int
-    :param hostname: The hostname of the spinnaker machine
-    :type hostname: str
-    :param application_run_time_folder: \
-        The folder to contain the resulting specification files
-    :type application_run_time_folder: str
-    :return: the filename of the data writer and the data specification object
-    :rtype: str, data_specification.DataSpecificationGenerator
-    """
-
-    if application_run_time_folder == "TEMP":
-        application_run_time_folder = tempfile.gettempdir()
-
-    return os.path.join(
-        application_run_time_folder, "{}_dataSpec_{}_{}_{}.dat".format(
-            hostname, processor_chip_x, processor_chip_y, processor_id))

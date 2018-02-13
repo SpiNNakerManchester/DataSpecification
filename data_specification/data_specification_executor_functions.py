@@ -267,7 +267,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.use_src1_reg == 1:
 
             # the data is a register
-            future_address = self.registers[self.dest_reg]
+            future_address = self.registers[self.src1_reg]
         else:
 
             # the data is a raw address

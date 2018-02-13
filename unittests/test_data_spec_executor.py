@@ -78,6 +78,45 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertEqual(header[0], constants.APPDATA_MAGIC_NUM)
         self.assertEqual(header[1], constants.DSE_VERSION)
 
+    def test_trivial_spec(self):
+        temp_spec = mktemp()
+        spec = DataSpecificationGenerator(FileDataWriter(temp_spec))
+        spec.end_specification()
+
+        executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
+        executor.execute()
+        for r in range(constants.MAX_MEM_REGIONS):
+            self.assertIsNone(executor.get_region(r))
+
+    def test_complex_spec(self):
+        temp_spec = mktemp()
+        spec = DataSpecificationGenerator(FileDataWriter(temp_spec))
+        spec.reserve_memory_region(0, 32)
+        spec.switch_write_focus(0)
+        spec.set_register_value(3, 0x31323341)
+        spec.write_value_from_register(3)
+        spec.set_register_value(3, 0x31323342)
+        spec.write_value_from_register(3)
+        spec.set_register_value(3, 0x31323344)
+        spec.write_value_from_register(3)
+        spec.set_register_value(3, 0x31323347)
+        spec.write_value_from_register(3)
+        spec.set_register_value(3, 0x3132334B)
+        spec.write_value_from_register(3)
+        spec.set_register_value(2, 24)
+        spec.set_write_pointer(2, address_is_register=True)
+        spec.write_array([0x64636261])
+        spec.end_specification()
+
+        executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
+        executor.execute()
+        r = executor.get_region(0)
+        self.assertEqual(r.allocated_size, 32)
+        # self.assertEqual(r.max_write_pointer, 28)
+        self.assertFalse(r.unfilled)
+        self.assertEqual(r.region_data, bytearray(
+            "A321" "B321" "D321" "G321" "K321" "\0\0\0\0" "abcd" "\0\0\0\0"))
+
 
 if __name__ == '__main__':
     unittest.main()

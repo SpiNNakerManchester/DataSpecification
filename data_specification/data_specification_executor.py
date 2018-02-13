@@ -1,6 +1,7 @@
 import logging
 import numpy
 import struct
+import functools
 
 from .data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as ExecutorFuncs
@@ -43,12 +44,23 @@ class DataSpecificationExecutor(object):
         self.spec_reader = spec_reader
         self.dsef = ExecutorFuncs(self.spec_reader, memory_space)
 
+    def __operation_func(self, cmd, index):
+        try:
+            opcode = (cmd >> 20) & 0xFF
+            # noinspection PyArgumentList
+            # pylint: disable=no-value-for-parameter
+            return functools.partial(Commands(opcode).exec_function, self.dsef)
+        except (ValueError, TypeError):
+            logger.debug("problem decoding opcode %d at index %d",
+                         cmd, index, exc_info=True)
+            raise DataSpecificationException(
+                "Invalid command 0x{0:X} while reading file {1:s}".format(
+                    cmd, self.spec_reader.filename))
+
     def execute(self):
         """ Executes the specification
 
-        :return: The number of bytes used by the image and the number of \
-            bytes written by the image
-        :rtype: int
+        :return: None
         :raise spinn_storage_handlers.exceptions.DataReadException:\
             If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
@@ -57,25 +69,14 @@ class DataSpecificationExecutor(object):
             If there is an error when executing the specification
         """
         index = 0
-        return_value = END_SPEC_EXECUTOR + 1
-        while return_value != END_SPEC_EXECUTOR:
-            instruction_spec = self.spec_reader.read(4)
-            if len(instruction_spec) == 0:
-                break
+        instruction_spec = self.spec_reader.read(4)
+        while instruction_spec:
             # process the received command
             cmd = _ONE_WORD.unpack(instruction_spec)[0]
-
-            opcode = (cmd >> 20) & 0xFF
-
-            try:
-                # noinspection PyArgumentList
-                return_value = Commands(opcode).exec_function(self.dsef, cmd)
-            except (ValueError, TypeError):
-                logger.debug("problem decoding opcode %d at index %d",
-                             cmd, index, exc_info=True)
-                raise DataSpecificationException(
-                    "Invalid command 0x{0:X} while reading file {1:s}".format(
-                        cmd, self.spec_reader.filename))
+            operation_fn = self.__operation_func(cmd, index)
+            if operation_fn(cmd) == END_SPEC_EXECUTOR:
+                break
+            instruction_spec = self.spec_reader.read(4)
             index += 4
 
     def get_region(self, region_id):

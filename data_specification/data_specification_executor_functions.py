@@ -21,7 +21,7 @@ _ONE_LONG = struct.Struct("<Q")
 _ONE_SIGNED_INT = struct.Struct("<i")
 
 
-def _unpack(self, cmd):
+def _unpack(cmd):
     """ Routine to unpack the command read from the data spec file.
 
     :param cmd: The command read form the data spec file

@@ -150,7 +150,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If there is an error in the command syntax
         """
-        _cmd_size, _dest_reg, src1_reg, src2_reg, data_len = _unpack(cmd)
+        cmd_size, _dest_reg, src1_reg, src2_reg, data_len = _unpack(cmd)
 
         if src2_reg is not None:
             n_repeats = self.registers[src2_reg]
@@ -162,9 +162,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         if src1_reg is not None:
             value = self.registers[src1_reg]
-        elif self._cmd_size == LEN2 and data_len != 8:
+        elif cmd_size == LEN2 and data_len != 8:
             value = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
-        elif self._cmd_size == LEN3 and data_len == 8:
+        elif cmd_size == LEN3 and data_len == 8:
             value = _ONE_LONG.unpack(self.spec_reader.read(8))[0]
         else:
             raise DataSpecificationSyntaxError(
@@ -172,7 +172,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
                 "current encoding ({1:X}) is specified to be {2:d} words "
                 "long and the data length command argument is specified "
                 "to be {3:d} bytes long".format(
-                    "WRITE", cmd, self._cmd_size, data_len))
+                    "WRITE", cmd, cmd_size, data_len))
 
         # Perform the writes
         self._write_to_mem(value, data_len, n_repeats, "WRITE")

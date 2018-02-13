@@ -43,6 +43,8 @@ class MemoryRegionCollection(object):
         return self._regions[region] is None
 
     def is_unfilled(self, region):
+        if self.is_empty(region):
+            return True
         return self._regions[region].unfilled
 
     def count_used_regions(self):
@@ -62,9 +64,8 @@ class MemoryRegionCollection(object):
             raise NoRegionSelectedException(
                 "the region id requested is beyond the supported number of"
                 "available region ids")
-        if not self._regions[region].unfilled:
+        if not self.is_unfilled(region):
             return True
         return any(
-            self._regions[r_id] is not None
-            and not self._regions[r_id].unfilled
+            not self.is_unfilled(r_id)
             for r_id in range(region, len(self._regions)))

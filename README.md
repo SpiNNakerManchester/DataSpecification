@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/SpiNNakerManchester/DataSpecification.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/DataSpecification)
+[![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/DataSpecification/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/DataSpecification?branch=master)
 
 This package provides utilities for specifying binary data algorithmically,
 and executing the specifications to produce the data.

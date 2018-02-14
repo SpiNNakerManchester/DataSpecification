@@ -1,6 +1,7 @@
 import unittest
 from tempfile import mktemp
 import struct
+from data_specification.enums.data_type import DataType
 
 from data_specification \
     import DataSpecificationExecutor, DataSpecificationGenerator, constants
@@ -91,7 +92,7 @@ class TestDataSpecExecutor(unittest.TestCase):
     def test_complex_spec(self):
         temp_spec = mktemp()
         spec = DataSpecificationGenerator(FileDataWriter(temp_spec))
-        spec.reserve_memory_region(0, 32)
+        spec.reserve_memory_region(0, 44)
         spec.switch_write_focus(0)
         spec.set_register_value(3, 0x31323341)
         spec.write_value_from_register(3)
@@ -105,17 +106,22 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.write_value_from_register(3)
         spec.set_register_value(2, 24)
         spec.set_write_pointer(2, address_is_register=True)
-        spec.write_array([0x64636261])
+        spec.write_array([0x61, 0x62, 0x63, 0x64], data_type=DataType.UINT8)
+        spec.set_register_value(5, 4)
+        spec.write_repeated_value(0x70, 5, repeats_is_register=True,
+                                  data_type=DataType.UINT8)
+        spec.write_value(0x7d, data_type=DataType.INT64)
         spec.end_specification()
 
         executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
         executor.execute()
         r = executor.get_region(0)
-        self.assertEqual(r.allocated_size, 32)
-        # self.assertEqual(r.max_write_pointer, 28)
+        self.assertEqual(r.allocated_size, 44)
+        self.assertEqual(r.max_write_pointer, 40)
         self.assertFalse(r.unfilled)
         self.assertEqual(r.region_data, bytearray(
-            "A321" "B321" "D321" "G321" "K321" "\0\0\0\0" "abcd" "\0\0\0\0"))
+            "A321" "B321" "D321" "G321" "K321" "\0\0\0\0" "abcd" "pppp"
+            "}\0\0\0" "\0\0\0\0" "\0\0\0\0"))
 
 
 if __name__ == '__main__':

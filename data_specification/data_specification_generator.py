@@ -954,12 +954,12 @@ class DataSpecificationGenerator(object):
 
         read_only_flags = 0
         for i in xrange(len(argument_by_value)):
-            cmd_string = "{0:s} arg[{1:d}]=".format(cmd_string, i + 1)
+            cmd_string += " arg[{0:d}]=".format(i + 1)
             if argument_by_value[i]:
                 read_only_flags |= 2 ** i
-                cmd_string = "{0:s}read-only".format(cmd_string)
+                cmd_string += "read-only"
             else:
-                cmd_string = "{0:s}read-write".format(cmd_string)
+                cmd_string += "read-write"
 
         cmd_word = (
             (constants.LEN1 << 28) |
@@ -1063,8 +1063,8 @@ class DataSpecificationGenerator(object):
                         Commands.CONSTRUCT.name)  # @UndefinedVariable
 
                 param_word |= structure_ids[i] << (6 * i)
-                cmd_string = "{0:s} arg[{1:d}]=struct[{2:d}]".format(
-                    cmd_string, i, structure_ids[i])
+                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(
+                    i, structure_ids[i])
 
         param_word_encoded = bytearray()
         if param_word is None:
@@ -1128,7 +1128,6 @@ class DataSpecificationGenerator(object):
             of bytes required to represent the data type. The data is passed\
             as a parameter to this function
 
-
         :param data: the data to write as a float.
         :type data: float
         :param data_type: the type to convert data to
@@ -1184,9 +1183,6 @@ class DataSpecificationGenerator(object):
             cmd_string = "WRITE data=0x%8.8X" % data
 
         repeat_reg_usage = constants.NO_REGS
-        if self.report_writer is not None:
-            cmd_string = "{0:s}".format(cmd_string)
-
         cmd_word = (
             (cmd_data_len << 28) |
             (Commands.WRITE.value << 20) |  # @UndefinedVariable
@@ -1200,8 +1196,7 @@ class DataSpecificationGenerator(object):
             "<I{}{}x".format(data_type.struct_encoding, padding),
             cmd_word, data_value)
         if self.report_writer is not None:
-            cmd_string = "{0:s}, dataType={1:s}".format(
-                cmd_string, data_type.name)
+            cmd_string += ", dataType={0:s}".format(data_type.name)
         return (cmd_word_list, cmd_string)
 
     def write_value(
@@ -1463,12 +1458,11 @@ class DataSpecificationGenerator(object):
         if repeats_is_register:
             reg_usage = constants.SRC1_AND_SRC2
             parameters |= repeats << 4
-            cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
-                                                            repeats)
+            cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
             reg_usage = constants.SRC1_ONLY
             parameters |= repeats
-            cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
+            cmd_string += ", repeats={0:d}".format(repeats)
 
         cmd_word = (
             (constants.LEN1 << 28) |
@@ -1479,7 +1473,7 @@ class DataSpecificationGenerator(object):
 
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word
-        cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
+        cmd_string += ", dataType={0:s}".format(data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_array(self, array_values, data_type=DataType.UINT32):
@@ -1502,20 +1496,27 @@ class DataSpecificationGenerator(object):
         """
         cmd_len = constants.LEN2
 
+        if data_type.numpy_typename is None:
+            raise exceptions.TypeMismatchException(
+                Commands.WRITE_ARRAY.name)
         if self.current_region is None:
             raise exceptions.NoRegionSelectedException(
-                Commands.WRITE_ARRAY.name)  # @UndefinedVariable
+                Commands.WRITE_ARRAY.name)
 
         cmd_word = (
             (cmd_len << 28) |
-            (Commands.WRITE_ARRAY.value << 20) |  # @UndefinedVariable
+            (Commands.WRITE_ARRAY.value << 20) |
             data_type.size)
 
-        data = numpy.array(array_values, dtype='uint32')
+        data = numpy.array(array_values, dtype=data_type.numpy_typename)
+        size = data.size * data_type.size
+        if size % 4 != 0:
+            raise exceptions.UnknownTypeLengthException(
+                size, Commands.WRITE_ARRAY.name)
 
-        cmd_string = "WRITE_ARRAY, %d elements\n" % (data.size)
+        cmd_string = "WRITE_ARRAY, {0:d} elements\n".format(size / 4)
 
-        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, data.size))
+        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, size / 4))
         self.write_command_to_files(cmd_word_list, cmd_string)
         self.spec_writer.write(data.tostring())
 
@@ -1638,8 +1639,8 @@ class DataSpecificationGenerator(object):
                 constants.MAX_REGISTERS - 1,
                 Commands.LOOP.name)  # @UndefinedVariable
         cmd_word |= counter_register_id
-        cmd_string = "{0:s} counter_register_id=reg[{1:d}],".format(
-            cmd_string, counter_register_id)
+        cmd_string += " counter_register_id=reg[{0:d}],".format(
+            counter_register_id)
 
         if start_is_register:
             if start < 0 or start >= constants.MAX_REGISTERS:
@@ -1648,7 +1649,7 @@ class DataSpecificationGenerator(object):
                     Commands.LOOP.name)  # @UndefinedVariable
             bit_field |= 0x4
             cmd_word |= (start << 12)
-            cmd_string = "{0:s} start=reg[{1:d}],".format(cmd_string, start)
+            cmd_string += " start=reg[{0:d}],".format(start)
         else:
             if (start < DataType.INT32.min or  # @UndefinedVariable
                     start > DataType.INT32.max):  # @UndefinedVariable
@@ -1659,7 +1660,7 @@ class DataSpecificationGenerator(object):
                     Commands.LOOP.name)  # @UndefinedVariable
             length += 1
             encoded_values += bytearray(_ONE_SINT.pack(start))
-            cmd_string = "{0:s} start={1:d},".format(cmd_string, start)
+            cmd_string += " start={0:d},".format(start)
 
         if end_is_register:
             if end < 0 or end >= constants.MAX_REGISTERS:
@@ -1668,7 +1669,7 @@ class DataSpecificationGenerator(object):
                     Commands.LOOP.name)  # @UndefinedVariable
             bit_field |= 0x2
             cmd_word |= (end << 8)
-            cmd_string = "{0:s} end=reg[{1:d}],".format(cmd_string, end)
+            cmd_string += " end=reg[{0:d}],".format(end)
         else:
             if (end < DataType.INT32.min or  # @UndefinedVariable
                     end > DataType.INT32.max):  # @UndefinedVariable
@@ -1679,7 +1680,7 @@ class DataSpecificationGenerator(object):
                     Commands.LOOP.name)  # @UndefinedVariable
             length += 1
             encoded_values += bytearray(_ONE_SINT.pack(end))
-            cmd_string = "{0:s} end={1:d},".format(cmd_string, end)
+            cmd_string += " end={0:d},".format(end)
 
         if increment_is_register:
             if increment < 0 or increment >= constants.MAX_REGISTERS:
@@ -1688,8 +1689,7 @@ class DataSpecificationGenerator(object):
                     Commands.LOOP.name)  # @UndefinedVariable
             bit_field |= 0x1
             cmd_word |= (increment << 4)
-            cmd_string = "{0:s} increment=reg[{1:d}],".format(
-                cmd_string, increment)
+            cmd_string += " increment=reg[{0:d}],".format(increment)
         else:
             if (increment < DataType.INT32.min or  # @UndefinedVariable
                     increment > DataType.INT32.max):  # @UndefinedVariable
@@ -1700,7 +1700,7 @@ class DataSpecificationGenerator(object):
                     Commands.LOOP.name)  # @UndefinedVariable
             length += 1
             encoded_values += bytearray(_ONE_SINT.pack(increment))
-            cmd_string = "{0:s} increment={1:d},".format(cmd_string, increment)
+            cmd_string += " increment={0:d},".format(increment)
 
         self.ongoing_loop = True
 
@@ -2183,8 +2183,7 @@ class DataSpecificationGenerator(object):
                     Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
             bit_field |= 0x4
             return_register_value = return_register_id
-            cmd_string = "{0:s} reg[{1:d}] =".format(
-                cmd_string, return_register_value)
+            cmd_string += " reg[{0:d}] =".format(return_register_value)
 
         if log_block_size_is_register:
             if log_block_size < 0 or log_block_size >= constants.MAX_REGISTERS:
@@ -2194,16 +2193,14 @@ class DataSpecificationGenerator(object):
                     Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
             bit_field |= 0x2
             block_size_reg = log_block_size
-            cmd_string = "{0:s} align(reg[{1:d}])".format(
-                cmd_string, block_size_reg)
+            cmd_string += " align(reg[{0:d}])".format(block_size_reg)
         else:
             if log_block_size < 0 or log_block_size > 31:
                 raise exceptions.ParameterOutOfBoundsException(
                     "log_block_size", log_block_size, 0, 31,
                     Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
             imm_value = log_block_size
-            cmd_string = "{0:s} align({1:d})".format(
-                cmd_string, imm_value)
+            cmd_string += " align({0:d})".format(imm_value)
 
         cmd_word = (
             (constants.LEN1 << 28) |
@@ -2720,8 +2717,8 @@ class DataSpecificationGenerator(object):
                     constants.MAX_REGISTERS - 1,
                     Commands.COPY_STRUCT.name)  # @UndefinedVariable
             bit_field |= constants.SRC1_ONLY
-            cmd_string = "{0:s} source_struct = reg[{1:d}]".format(
-                cmd_string, source_structure_id)
+            cmd_string += " source_struct = reg[{0:d}]".format(
+                source_structure_id)
         else:
             if source_structure_id < 0 \
                     or source_structure_id >= constants.MAX_STRUCT_SLOTS:
@@ -2732,8 +2729,7 @@ class DataSpecificationGenerator(object):
             if self.struct_slot[source_structure_id] == 0:
                 raise exceptions.NotAllocatedException(
                     "struct", source_structure_id, "COPY_STRUCT")
-            cmd_string = "{0:s} source_struct = {1:d}".format(
-                cmd_string, source_structure_id)
+            cmd_string += " source_struct = {0:d}".format(source_structure_id)
 
         if destination_id_is_register:
             if destination_structure_id < 0 \
@@ -2743,8 +2739,8 @@ class DataSpecificationGenerator(object):
                     0, constants.MAX_REGISTERS - 1,
                     Commands.COPY_STRUCT.name)  # @UndefinedVariable
             bit_field |= constants.DEST_ONLY
-            cmd_string = "{0:s} destination_struct = reg[{1:d}]".format(
-                cmd_string, destination_structure_id)
+            cmd_string += " destination_struct = reg[{0:d}]".format(
+                destination_structure_id)
         else:
             if destination_structure_id < 0 \
                     or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
@@ -2752,8 +2748,8 @@ class DataSpecificationGenerator(object):
                     "destination_structure_id", destination_structure_id,
                     0, constants.MAX_STRUCT_SLOTS - 1,
                     Commands.COPY_STRUCT.name)  # @UndefinedVariable
-            cmd_string = "{0:s} destination_struct = {1:d}".format(
-                cmd_string, destination_structure_id)
+            cmd_string += " destination_struct = {0:d}".format(
+                destination_structure_id)
 
         cmd_word = (
             (constants.LEN1 << 28) |
@@ -3068,8 +3064,7 @@ class DataSpecificationGenerator(object):
             struct_register = structure_id
             structure_id = 0
             bit_field = 0x2
-            cmd_string = "{0:s} struct(reg[{1:d}])".format(
-                cmd_string, struct_register)
+            cmd_string += " struct(reg[{0:d}])".format(struct_register)
         else:
             if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
                 raise exceptions.ParameterOutOfBoundsException(
@@ -3081,8 +3076,7 @@ class DataSpecificationGenerator(object):
                 raise exceptions.NotAllocatedException(
                     "structure", structure_id, "PRINT_STRUCT")
 
-            cmd_string = "{0:s} struct({1:d})".format(
-                cmd_string, structure_id)
+            cmd_string += " struct({0:d})".format(structure_id)
 
         cmd_word = (
             (constants.LEN1 << 28) |
@@ -3164,17 +3158,14 @@ class DataSpecificationGenerator(object):
 
         if self.report_writer is not None:
             if outdent is True:
-                self.txt_indent -= 1
-                if self.txt_indent < 0:
-                    self.txt_indent = 0
+                self.txt_indent = min(self.txt_indent - 1, 0)
+            indent_string = "   " * self.txt_indent
             if no_instruction_number is True:
                 formatted_cmd_string = "{0:s}{1:s}\n".format(
-                    "   " * self.txt_indent, cmd_string)
+                    indent_string, cmd_string)
             else:
                 formatted_cmd_string = "%8.8X. %s%s\n" % (
-                    self.instruction_counter,
-                    "   " * self.txt_indent,
-                    cmd_string)
+                    self.instruction_counter, indent_string, cmd_string)
                 self.instruction_counter += len(cmd_word_list)
             self.report_writer.write(formatted_cmd_string)
             if indent is True:

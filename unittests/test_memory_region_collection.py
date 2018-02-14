@@ -10,7 +10,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(mrc), 16)
         self.assertEqual(mrc.count_used_regions(), 0)
         mr = MemoryRegion(0, False, 32)
-        mrB = MemoryRegion(32, True, 16)
+        mr_b = MemoryRegion(32, True, 16)
         mrc[2] = mr
         self.assertEqual(len(mrc), 16)
         self.assertEqual(mrc.count_used_regions(), 1)
@@ -27,7 +27,7 @@ class MyTestCase(unittest.TestCase):
         for r in range(16):
             if r != 2:
                 self.assertTrue(mrc.is_empty(r))
-        mrc[7] = mrB
+        mrc[7] = mr_b
         self.assertEqual(mrc.count_used_regions(), 2)
         self.assertFalse(mrc.is_empty(7))
         self.assertTrue(mrc.is_unfilled(7))
@@ -35,7 +35,7 @@ class MyTestCase(unittest.TestCase):
         for r in range(7):
             if mrc.is_empty(r):
                 mrc[r] = mr0
-        assert mrc[7] == mrB
+        assert mrc[7] == mr_b
         self.assertEqual(mrc.count_used_regions(), 8)
         assert [mrc[r] is not None for r in range(len(mrc))] == [
             True, True, True, True, True, True, True, True,

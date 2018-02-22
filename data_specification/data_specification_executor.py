@@ -29,17 +29,16 @@ class DataSpecificationExecutor(object):
 
     def __init__(self, spec_reader, memory_space):
         """
-        :param spec_reader: The object to read the specification language file\
-                    from
+        :param spec_reader: \
+            The object to read the specification language file from
         :type spec_reader:\
-                    :py:class:`data_specification.abstract_data_reader.\
-                    AbstractDataReader`
+            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
         :param memory_space: memory available on the destination architecture
         :type memory_space: int
         :raise spinn_storage_handlers.exceptions.DataReadException:\
-                    If a read from external storage fails
+            If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
-                    If a write to external storage fails
+            If a write to external storage fails
         """
         self.spec_reader = spec_reader
         self.dsef = Dsef(self.spec_reader, memory_space)
@@ -47,19 +46,18 @@ class DataSpecificationExecutor(object):
     def execute(self):
         """ Executes the specification
 
-        :return: The number of bytes used by the image and \
-                the number of bytes written by the image
+        :return: The number of bytes used by the image and the number of\
+            bytes written by the image
         :rtype: int
         :raise spinn_storage_handlers.exceptions.DataReadException:\
-                    If a read from external storage fails
+            If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
-                    If a write to external storage fails
+            If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationException:\
-                    If there is an error when executing the specification
-        :raise data_specification.exceptions.\
-                    DataSpecificationTablePointerOutOfMemory:\
-                    If the table pointer generated as data header exceeds the \
-                    size of the available memory
+            If there is an error when executing the specification
+        :raise data_specification.exceptions.TablePointerOutOfMemory:\
+            If the table pointer generated as data header exceeds the size of\
+            the available memory
         """
         index = 0
         instruction_spec = self.spec_reader.read(4)
@@ -108,14 +106,12 @@ class DataSpecificationExecutor(object):
         pointer_table_size = MAX_MEM_REGIONS * 4
         next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
-        for i in xrange(MAX_MEM_REGIONS):
-            memory_region = self.dsef.mem_regions[i]
+        for i, memory_region in enumerate(self.dsef.mem_regions):
             if memory_region is not None:
                 pointer_table[i] = next_free_offset + start_address
                 next_free_offset += memory_region.allocated_size
             else:
                 pointer_table[i] = 0
-
         return pointer_table
 
     def get_constructed_data_size(self):
@@ -124,9 +120,7 @@ class DataSpecificationExecutor(object):
         :return: size of the data that will be written to memory
         :rtype: unsigned int
         """
-        size = APP_PTR_TABLE_BYTE_SIZE
-        for i in xrange(MAX_MEM_REGIONS):
-            memory_region = self.dsef.mem_regions[i]
-            if memory_region is not None:
-                size += memory_region.allocated_size
-        return size
+        return APP_PTR_TABLE_BYTE_SIZE + sum(
+            memory_region.allocated_size
+            for memory_region in self.dsef.mem_regions
+            if memory_region is not None)

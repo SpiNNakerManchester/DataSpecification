@@ -2,7 +2,19 @@ import logging
 import struct
 import decimal
 
-from data_specification import constants, exceptions
+from data_specification.constants import \
+    MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS, \
+    MAX_RNGS, MAX_STRUCT_ELEMENTS, MAX_STRUCT_SLOTS, LEN1, LEN2, LEN3, LEN4, \
+    NO_REGS, DEST_AND_SRC1, DEST_ONLY, SRC1_ONLY, SRC1_AND_SRC2
+from data_specification.exceptions import \
+    DataUndefinedWriterException, DuplicateParameterException, \
+    FunctionInUseException, InvalidCommandException, \
+    InvalidOperationException, InvalidSizeException, NotAllocatedException, \
+    NoRegionSelectedException, ParameterOutOfBoundsException, \
+    RandomNumberDistributionInUseException, RegionInUseException, \
+    RegionUnfilledException, RNGInUseException, StructureInUseException, \
+    TypeMismatchException, UnknownConditionException, UnknownTypeException, \
+    UnknownTypeLengthException, WrongParameterNumberException
 from data_specification.enums import \
     DataType, RandomNumberGenerator, Commands, Condition, LogicOperation, \
     ArithmeticOperation
@@ -69,24 +81,23 @@ class DataSpecificationGenerator(object):
     def __init__(self, spec_writer, report_writer=None):
         """
         :param spec_writer: The object to write the specification to
-        :type spec_writer: Implementation of\
-        :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+        :type spec_writer: \
+            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
         :param report_writer: \
-            Determines if a text version of the specification is to be written
-        :type report_writer: Implementation of\
-        :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
-            If a write to external storage fails
+            Determines if a text version of the specification is to be\
+            written and, if so, where. No report is written if this is None.
+        :type report_writer: \
+            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
         """
         self.spec_writer = spec_writer
         self.report_writer = report_writer
         self.txt_indent = 0
         self.instruction_counter = 0
-        self.mem_slot = [0] * constants.MAX_MEM_REGIONS
-        self.function = [0] * constants.MAX_CONSTRUCTORS
-        self.struct_slot = [0] * constants.MAX_STRUCT_SLOTS
-        self.rng = [0] * constants.MAX_RNGS
-        self.random_distribution = [0] * constants.MAX_RANDOM_DISTS
+        self.mem_slot = [0] * MAX_MEM_REGIONS
+        self.function = [0] * MAX_CONSTRUCTORS
+        self.struct_slot = [0] * MAX_STRUCT_SLOTS
+        self.rng = [0] * MAX_RNGS
+        self.random_distribution = [0] * MAX_RANDOM_DISTS
         self.conditionals = []
         self.current_region = None
         self.ongoing_function_definition = False
@@ -99,9 +110,9 @@ class DataSpecificationGenerator(object):
         :param comment: The comment to write
         :type comment: str
         :return: Nothing is returned
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
         self.write_command_to_files(
@@ -112,14 +123,14 @@ class DataSpecificationGenerator(object):
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.BREAK.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.BREAK.value << 20))
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "BREAK"
@@ -130,14 +141,14 @@ class DataSpecificationGenerator(object):
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.NOP.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.NOP.value << 20))
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word
         cmd_string = "NOP"
@@ -160,45 +171,41 @@ class DataSpecificationGenerator(object):
         :type shrink: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationRegionInUseException: If the region was already \
-            reserved
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the region
-            requested was out of the allowed range, or that the size was too \
-            big to fit in SDRAM
+        :raise data_specification.exceptions.RegionInUseException: \
+            If the region was already reserved
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If the region requested was out of the allowed range, or that the\
+            size was too big to fit in SDRAM
         """
-        if (region < 0) or (region >= constants.MAX_MEM_REGIONS):
+        if region < 0 or region >= MAX_MEM_REGIONS:
             logger.error(
                 "Error: Memory region requested ({0:d}) is out of range 0 "
-                "to {1:d}.\n".format(region, constants.MAX_MEM_REGIONS - 1))
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                "to {1:d}.\n".format(region, MAX_MEM_REGIONS - 1))
+            raise ParameterOutOfBoundsException(
                 "memory region identifier", region, 0,
-                (constants.MAX_MEM_REGIONS - 1),
-                Commands.RESERVE.name)  # @UndefinedVariable
+                MAX_MEM_REGIONS - 1, Commands.RESERVE.name)
 
         if self.mem_slot[region] != 0:
             error_string = "Error: Requested memory region ({0:d}) ".format(
                 region)
             error_string += "is already allocated.\n"
             logger.error(error_string)
-            raise exceptions.DataSpecificationRegionInUseException(region)
+            raise RegionInUseException(region)
 
         if size > sdram.SDRAM.DEFAULT_SDRAM_BYTES:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "memory size", size, 1,
-                sdram.SDRAM.DEFAULT_SDRAM_BYTES,
-                Commands.RESERVE.name)  # @UndefinedVariable
+            raise ParameterOutOfBoundsException(
+                "memory size", size, 1, sdram.SDRAM.DEFAULT_SDRAM_BYTES,
+                Commands.RESERVE.name)
 
         self.mem_slot[region] = [size, label, empty]
 
-        cmd_word = ((constants.LEN2 << 28) |
-                    (Commands.RESERVE.value << 20) |  # @UndefinedVariable
-                    (constants.NO_REGS << 16) |
+        cmd_word = ((LEN2 << 28) |
+                    (Commands.RESERVE.value << 20) |
+                    (NO_REGS << 16) |
                     (int(bool(empty)) << 7) |
                     (int(bool(shrink)) << 6) |
                     region)
@@ -226,32 +233,29 @@ class DataSpecificationGenerator(object):
         :type region: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: If the region was not\
-            reserved
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the region \
-            requested was out of the allowed range
+        :raise data_specification.exceptions.NotAllocatedException: \
+            If the region was not reserved
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If the region requested was out of the allowed range
         """
-        if (region < 0) or (region >= constants.MAX_MEM_REGIONS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if region < 0 or region >= MAX_MEM_REGIONS:
+            raise ParameterOutOfBoundsException(
                 "memory region identifier", region, 0,
-                (constants.MAX_MEM_REGIONS - 1),
-                Commands.RESERVE.name)  # @UndefinedVariable
+                MAX_MEM_REGIONS - 1, Commands.RESERVE.name)
         if self.mem_slot[region] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "region", region, Commands.FREE.name)  # @UndefinedVariable
+            raise NotAllocatedException(
+                "region", region, Commands.FREE.name)
 
         self.mem_slot[region] = 0
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.FREE.value << 20) |  # @UndefinedVariable
-            (constants.NO_REGS << 16) |
+            (LEN1 << 28) |
+            (Commands.FREE.value << 20) |
+            (NO_REGS << 16) |
             region)
         cmd_string = "FREE memRegion={0:d}".format(region)
 
@@ -267,54 +271,47 @@ class DataSpecificationGenerator(object):
         :type rng_type: :py:class:`RandomNumberGenerator`
         :param seed: The seed of the random number generator >= 0
         :type seed: int
-        :return: The id of the created random number generator,\
-            between 0 and 15
+        :return: \
+            The id of the created random number generator, between 0 and 15
         :rtype: int
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecification:\
-            If there is no more space for a new generator
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+        :raise data_specification.exceptions.UnknownTypeException: \
             If the rng_type is not one of the allowed values
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:
+        :raise data_specification.exceptions.ParameterOutOfBoundsException:
             * If the seed is too big or too small
             * If the rng_id is not in the allowed range
-        :raise data_specification.exceptions\
-            .DataSpecificationRNGInUseException:
+        :raise data_specification.exceptions.RNGInUseException: \
             If the random number generator with the given id has already been\
             defined
         """
 
-        if rng_id < 0 or rng_id >= constants.MAX_RNGS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if rng_id < 0 or rng_id >= MAX_RNGS:
+            raise ParameterOutOfBoundsException(
                 "random number generator id", rng_id, 0,
-                (constants.MAX_RNGS - 1),
-                Commands.DECLARE_RNG.name)  # @UndefinedVariable
+                MAX_RNGS - 1, Commands.DECLARE_RNG.name)
 
         if rng_type not in RandomNumberGenerator:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                rng_type.value,
-                Commands.DECLARE_RNG.name)  # @UndefinedVariable
+            raise UnknownTypeException(
+                rng_type.value, Commands.DECLARE_RNG.name)
 
         if self.rng[rng_id] is not 0:
-            raise exceptions.DataSpecificationRNGInUseException(rng_id)
+            raise RNGInUseException(rng_id)
 
         if (seed > DataType.UINT32.max or  # @UndefinedVariable
                 seed < DataType.UINT32.min):  # @UndefinedVariable
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise ParameterOutOfBoundsException(
                 "seed", seed, DataType.UINT32.min,  # @UndefinedVariable
                 DataType.UINT32.max,  # @UndefinedVariable
-                Commands.DECLARE_RNG.name)  # @UndefinedVariable
+                Commands.DECLARE_RNG.name)
 
         self.rng[rng_id] = [rng_type, seed]
 
         cmd_word = (
-            (constants.LEN2 << 28) |
-            (Commands.DECLARE_RNG.value << 20) |  # @UndefinedVariable
+            (LEN2 << 28) |
+            (Commands.DECLARE_RNG.value << 20) |
             (rng_id << 12) |
             (rng_type.value << 8))
 
@@ -333,7 +330,7 @@ class DataSpecificationGenerator(object):
 
         :param distribution_id: id of the distribution being set up
         :param distribution_id: int
-        :param structure_id: id of an empty structure slot to fill with the
+        :param structure_id: id of an empty structure slot to fill with the\
             uniform random distribution data
         :type structure_id: int
         :param rng_id: The id of the random number generator, between 0 and 15
@@ -347,63 +344,55 @@ class DataSpecificationGenerator(object):
         :return: The id of the created uniform random distribution to be used\
             in future calls of the distribution between 0 and 63
         :rtype: int
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.NoMoreException: \
             If there is no more space for a new random distribution
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+        :raise data_specification.exceptions.NotAllocatedException: \
             If the requested rng_id has not been allocated
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: \
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             If rng_id, structure_id, min_value or max_value is out of range
-        :raise data_specification.exceptions.\
-            DataSpecificationStructureInUseException: \
+        :raise data_specification.exceptions.StructureInUseException: \
             If structure structure_id is already defined
         """
         if (distribution_id < 0 or
-                distribution_id >= constants.MAX_RANDOM_DISTS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                distribution_id >= MAX_RANDOM_DISTS):
+            raise ParameterOutOfBoundsException(
                 "distribution id", distribution_id, 0,
-                constants.MAX_RANDOM_DISTS - 1,
-                Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
+                MAX_RANDOM_DISTS - 1, Commands.DECLARE_RANDOM_DIST.name)
 
-        if rng_id < 0 or rng_id >= constants.MAX_RNGS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "rng", rng_id, 0, constants.MAX_RNGS - 1,
-                Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
+        if rng_id < 0 or rng_id >= MAX_RNGS:
+            raise ParameterOutOfBoundsException(
+                "rng", rng_id, 0, MAX_RNGS - 1,
+                Commands.DECLARE_RANDOM_DIST.name)
 
         if self.rng[rng_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "RNG", rng_id,
-                Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
+            raise NotAllocatedException(
+                "RNG", rng_id, Commands.DECLARE_RANDOM_DIST.name)
 
         if min_value < DataType.S1615.min:  # @UndefinedVariable
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise ParameterOutOfBoundsException(
                 "min_value", min_value,
                 DataType.S1615.min,  # @UndefinedVariable
                 DataType.S1615.max,  # @UndefinedVariable
-                Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
+                Commands.DECLARE_RANDOM_DIST.name)
 
         if max_value > DataType.S1615.max:  # @UndefinedVariable
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise ParameterOutOfBoundsException(
                 "max_value", max_value,
                 DataType.S1615.min,  # @UndefinedVariable
                 DataType.S1615.max,  # @UndefinedVariable
-                Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
+                Commands.DECLARE_RANDOM_DIST.name)
 
-        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "structure id", structure_id, 0,
-                constants.MAX_STRUCT_SLOTS - 1,
-                Commands.DECLARE_RANDOM_DIST.name)  # @UndefinedVariable
+        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
+            raise ParameterOutOfBoundsException(
+                "structure id", structure_id, 0, MAX_STRUCT_SLOTS - 1,
+                Commands.DECLARE_RANDOM_DIST.name)
 
         if self.random_distribution[distribution_id] is not 0:
-            raise exceptions.\
-                DataSpecificationRandomNumberDistributionInUseException(
-                    distribution_id)
+            raise RandomNumberDistributionInUseException(distribution_id)
 
         parameters = [("distType", DataType.UINT32, 0),
                       ("rngID", DataType.UINT32, rng_id),
@@ -415,8 +404,8 @@ class DataSpecificationGenerator(object):
         self.define_structure(structure_id, parameters)
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.DECLARE_RANDOM_DIST.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.DECLARE_RANDOM_DIST.value << 20) |
             (distribution_id << 8) |
             structure_id)
 
@@ -441,41 +430,38 @@ class DataSpecificationGenerator(object):
         :type register_id: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+        :raise data_specification.exceptions.NotAllocatedException: \
             If the random distribution id was not previously declared
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the \
-            distribution_id or register_id specified was out of range
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If the distribution_id or register_id specified was out of range
         """
-        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.GET_RANDOM_NUMBER.name)  # @UndefinedVariable
+        if register_id < 0 or register_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "register_id", register_id, 0, MAX_REGISTERS - 1,
+                Commands.GET_RANDOM_NUMBER.name)
 
         if (distribution_id < 0 or
-                distribution_id >= constants.MAX_RANDOM_DISTS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "distribution_id", distribution_id, 0,
-                constants.MAX_RANDOM_DISTS - 1,
-                Commands.GET_RANDOM_NUMBER.name)  # @UndefinedVariable
+                distribution_id >= MAX_RANDOM_DISTS):
+            raise ParameterOutOfBoundsException(
+                "distribution_id", distribution_id, 0, MAX_RANDOM_DISTS - 1,
+                Commands.GET_RANDOM_NUMBER.name)
 
         if self.random_distribution[distribution_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise NotAllocatedException(
                 "random number distribution", distribution_id,
-                Commands.GET_RANDOM_NUMBER.name)  # @UndefinedVariable
+                Commands.GET_RANDOM_NUMBER.name)
 
         bit_field = 0x4
 
         cmd_string = "GET_RANDOM_NUMBER distribution={0:d} " \
                      "dest=reg[{1:d}]".format(distribution_id, register_id)
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.GET_RANDOM_NUMBER.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.GET_RANDOM_NUMBER.value << 20) |
             (bit_field << 16) |
             (register_id << 12) |
             distribution_id)
@@ -499,45 +485,39 @@ class DataSpecificationGenerator(object):
         :type parameters: list of (str, :py:class:`DataType`, float)
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationNoMoreException:\
+        :raise data_specification.exceptions.NoMoreException: \
             If there are no more spaces for new structures
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If there are an incorrect number of parameters
             * If the size of one of the tuples is incorrect
             * If one of the values to be assigned has an integer data_type \
             but has a fractional part
             * If one of the values to be assigned would overflow its data_type
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+        :raise data_specification.exceptions.UnknownTypeException: \
             If one of the data types in the structure is unknown
         """
         # start of struct
-        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
+            raise ParameterOutOfBoundsException(
                 "structure id", structure_id, 0,
-                constants.MAX_STRUCT_SLOTS - 1,
-                Commands.START_STRUCT.name)  # @UndefinedVariable
+                MAX_STRUCT_SLOTS - 1, Commands.START_STRUCT.name)
 
-        if not parameters or \
-                len(parameters) > constants.MAX_STRUCT_ELEMENTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "structure elements", len(parameters), 0,
-                constants.MAX_STRUCT_ELEMENTS,
-                Commands.WRITE_PARAM.name)  # @UndefinedVariable
+        if not parameters or len(parameters) > MAX_STRUCT_ELEMENTS:
+            raise ParameterOutOfBoundsException(
+                "structure elements", len(parameters), 0, MAX_STRUCT_ELEMENTS,
+                Commands.WRITE_PARAM.name)
 
         if self.struct_slot[structure_id] != 0:
-            raise exceptions.DataSpecificationStructureInUseException(
-                structure_id)
+            raise StructureInUseException(structure_id)
         self.struct_slot[structure_id] = parameters
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.START_STRUCT.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.START_STRUCT.value << 20) |
             structure_id)
 
         cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word))
@@ -549,34 +529,32 @@ class DataSpecificationGenerator(object):
         for elem_index, i in enumerate(parameters):
             label, data_type, value = i
             if data_type not in DataType:
-                raise exceptions.DataSpecificationUnknownTypeException(
-                    data_type.value,
-                    Commands.WRITE_PARAM.name)  # @UndefinedVariable
+                raise UnknownTypeException(
+                    data_type.value, Commands.WRITE_PARAM.name)
 
+            cmd_string = ("STRUCT_ELEM element_id={0:d}, element_type={1:s}"
+                          .format(elem_index, data_type.name))
             if value is not None:
 
                 if value < data_type.min or value > data_type.max:
-                    raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
-                            "value", value, data_type.min, data_type.max,
-                            Commands.WRITE_PARAM.name)  # @UndefinedVariable
+                    raise ParameterOutOfBoundsException(
+                        "value", value, data_type.min, data_type.max,
+                        Commands.WRITE_PARAM.name)
 
                 if data_type.size <= 4:
                     cmd_word = (
-                        (constants.LEN2 << 28) |
-                        (Commands.STRUCT_ELEM.value <<  # @UndefinedVariable
-                            20) |
+                        (LEN2 << 28) |
+                        (Commands.STRUCT_ELEM.value << 20) |
                         data_type.value)
                 elif data_type.size == 8:
                     cmd_word = (
-                        (constants.LEN3 << 28) |
-                        (Commands.STRUCT_ELEM.value <<  # @UndefinedVariable
-                            20) |
+                        (LEN3 << 28) |
+                        (Commands.STRUCT_ELEM.value << 20) |
                         data_type.value)
                 else:
-                    raise exceptions.DataSpecificationInvalidSizeException(
+                    raise InvalidSizeException(
                         data_type.name, data_type.size,
-                        Commands.STRUCT_ELEM.name)  # @UndefinedVariable
+                        Commands.STRUCT_ELEM.name)
 
                 data_format = "<{}".format(data_type.struct_encoding)
                 data_value = decimal.Decimal(str(value)) * data_type.scale
@@ -584,31 +562,23 @@ class DataSpecificationGenerator(object):
 
                 cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word)) + \
                     value_encoded + bytearray((4 - data_type.size % 4) % 4)
-
-                cmd_string = "STRUCT_ELEM element_id={0:d}, element_type="\
-                             "{1:s}, value = {2:d}".format(
-                                 elem_index, data_type.name, value)
-                if label != "":
-                    cmd_string += ", label = {0:s}".format(label)
+                cmd_string += ", value={0:d}".format(value)
             else:
                 cmd_word = (
-                    (constants.LEN1 << 28) |
-                    (Commands.STRUCT_ELEM.value << 20) |   # @UndefinedVariable
+                    (LEN1 << 28) |
+                    (Commands.STRUCT_ELEM.value << 20) |
                     data_type.value)
 
                 cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word))
 
-                cmd_string = "STRUCT_ELEM element_id={0:d}, element_type="\
-                             "{1:s}".format(elem_index, data_type.name)
-                if label != "":
-                    cmd_string += ", label = {0:s}".format(label)
-
+            if label != "":
+                cmd_string += ", label={0:s}".format(label)
             self.write_command_to_files(cmd_word_list, cmd_string)
 
         # end of struct
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.END_STRUCT.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.END_STRUCT.value << 20))
         cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_string = "END_STRUCT id={0:d}".format(structure_id)
         self.write_command_to_files(cmd_word_list, cmd_string)
@@ -630,82 +600,71 @@ class DataSpecificationGenerator(object):
         :type parameter_index_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If structure_id is not in the allowed range
             * If parameter_index is larger than the number of parameters\
             declared in the original structure
             * If destination_id is not the id of a valid register
             * If parameter_index_is_register is True and parameter_index is\
             not a valid register id
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+        :raise data_specification.exceptions.NotAllocatedException: \
             If the structure requested has not been declared
         """
-        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
+            raise ParameterOutOfBoundsException(
                 "structure_id", structure_id, 0,
-                constants.MAX_STRUCT_SLOTS - 1,
-                Commands.READ_PARAM.name)  # @UndefinedVariable
+                MAX_STRUCT_SLOTS - 1, Commands.READ_PARAM.name)
 
-        if destination_id < 0 or destination_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if destination_id < 0 or destination_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
                 "destination_id", destination_id, 0,
-                constants.MAX_REGISTERS - 1,
-                Commands.READ_PARAM.name)  # @UndefinedVariable
+                MAX_REGISTERS - 1, Commands.READ_PARAM.name)
 
         if self.struct_slot[structure_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise NotAllocatedException(
                 "structure", structure_id, Commands.READ_PARAM)
 
+        cmd_string = "READ_PARAM structure_id={0:d}, ".format(structure_id)
+
         if parameter_index_is_register is True:
-            if (parameter_index < 0 or
-                    parameter_index >= constants.MAX_REGISTERS):
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "parameter_index", parameter_index, 0,
-                        constants.MAX_REGISTERS - 1,
-                        Commands.READ_PARAM.name)  # @UndefinedVariable
+            if parameter_index < 0 or parameter_index >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "parameter_index", parameter_index, 0,
+                    MAX_REGISTERS - 1, Commands.READ_PARAM.name)
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.READ_PARAM.value << 20) |  # @UndefinedVariable
-                (constants.DEST_AND_SRC1 << 16) |
+                (LEN1 << 28) |
+                (Commands.READ_PARAM.value << 20) |
+                (DEST_AND_SRC1 << 16) |
                 (destination_id << 12) |
                 (parameter_index << 8) |
                 structure_id)
-            cmd_string = "READ_PARAM structure_id={0:d}, "  \
-                         "element_id_from_register={1:d}, " \
-                         "destination_register={2:d}".format(structure_id,
-                                                             parameter_index,
-                                                             destination_id)
+            cmd_string += ("element_id_from_register={0:d}, "
+                           "destination_register={1:d}".format(
+                               parameter_index, destination_id))
         else:
-            if (parameter_index < 0 or
-                    parameter_index >= constants.MAX_STRUCT_ELEMENTS):
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "parameter_index", parameter_index, 0,
-                        constants.MAX_STRUCT_ELEMENTS - 1,
-                        Commands.READ_PARAM.name)  # @UndefinedVariable
+            if parameter_index < 0 or parameter_index >= MAX_STRUCT_ELEMENTS:
+                raise ParameterOutOfBoundsException(
+                    "parameter_index", parameter_index, 0,
+                    MAX_STRUCT_ELEMENTS - 1, Commands.READ_PARAM.name)
 
             if len(self.struct_slot[structure_id]) <= parameter_index:
-                raise exceptions.DataSpecificationNotAllocatedException(
-                    "structure %d parameter" % structure_id,
+                raise NotAllocatedException(
+                    "structure {0:d} parameter".format(structure_id),
                     parameter_index, Commands.READ_PARAM)
 
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.READ_PARAM.value << 20) |  # @UndefinedVariable
-                (constants.DEST_ONLY << 16) |
+                (LEN1 << 28) |
+                (Commands.READ_PARAM.value << 20) |
+                (DEST_ONLY << 16) |
                 (destination_id << 12) |
                 (parameter_index << 4) |
                 structure_id)
-            cmd_string = "READ_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "destination_register={2:d}".\
-                format(structure_id, parameter_index, destination_id)
+            cmd_string += ("element_id={0:d}, destination_register={1:d}"
+                           .format(parameter_index, destination_id))
 
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         self.write_command_to_files(encoded_cmd_word, cmd_string)
@@ -715,9 +674,9 @@ class DataSpecificationGenerator(object):
         """ Insert command to set a value in a structure
 
         :param structure_id:
-            * If called outside of a function, the id of the structure\
+            * If called outside of a function, the id of the structure,\
               between 0 and 15
-            * If called within a function, the id of the structure
+            * If called within a function, the id of the structure\
               argument, between 0 and 4
         :type structure_id: int
         :param parameter_index: The index of the value to assign in the\
@@ -738,12 +697,11 @@ class DataSpecificationGenerator(object):
         :type value_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If structure_id is not in the allowed range
             * If parameter_index is larger than the number of parameters\
               declared in the original structure
@@ -754,72 +712,65 @@ class DataSpecificationGenerator(object):
               position in the structure
             * If value_is_register is True, and value is not a valid register\
               id
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: If the structure requested\
-            has not been declared
+        :raise data_specification.exceptions.NotAllocatedException: \
+            If the structure requested has not been declared
         """
 
-        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
+            raise ParameterOutOfBoundsException(
                 "structure_id", structure_id, 0,
-                constants.MAX_STRUCT_SLOTS - 1,
-                Commands.WRITE_PARAM.name)  # @UndefinedVariable
+                MAX_STRUCT_SLOTS - 1, Commands.WRITE_PARAM.name)
 
-        if (parameter_index < 0 or
-                parameter_index >= constants.MAX_STRUCT_ELEMENTS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if parameter_index < 0 or parameter_index >= MAX_STRUCT_ELEMENTS:
+            raise ParameterOutOfBoundsException(
                 "parameter_index", parameter_index, 0,
-                constants.MAX_STRUCT_ELEMENTS - 1,
-                Commands.WRITE_PARAM.name)  # @UndefinedVariable
+                MAX_STRUCT_ELEMENTS - 1, Commands.WRITE_PARAM.name)
 
         if self.struct_slot[structure_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise NotAllocatedException(
                 "structure", structure_id, Commands.WRITE_PARAM)
 
         if len(self.struct_slot[structure_id]) <= parameter_index:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise NotAllocatedException(
                 "structure %d parameter" % structure_id, parameter_index,
-                Commands.WRITE_PARAM.name)  # @UndefinedVariable
+                Commands.WRITE_PARAM.name)
 
         if self.struct_slot[structure_id][parameter_index][1] is not data_type:
-            raise exceptions.DataSpecificationTypeMismatchException(
-                Commands.WRITE_PARAM.name)  # @UndefinedVariable
+            raise TypeMismatchException(Commands.WRITE_PARAM.name)
+
+        cmd_string = ("WRITE_PARAM structure_id={0:d}, element_id={1:d}, "
+                      .format(structure_id, parameter_index))
 
         if value_is_register:
-            if value < 0 or value >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "value", value, 0, constants.MAX_REGISTERS - 1,
-                        Commands.WRITE_PARAM.name)  # @UndefinedVariable
+            if value < 0 or value >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "value", value, 0, MAX_REGISTERS - 1,
+                    Commands.WRITE_PARAM.name)
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.WRITE_PARAM.value << 20) |  # @UndefinedVariable
-                (constants.SRC1_ONLY << 16) |
+                (LEN1 << 28) |
+                (Commands.WRITE_PARAM.value << 20) |
+                (SRC1_ONLY << 16) |
                 (structure_id << 12) |
                 (value << 8) |
                 parameter_index)
             value_encoded = bytearray()
-            cmd_string = "WRITE_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "value=reg[{2:d}]".format(structure_id,
-                                                   parameter_index, value)
+            cmd_string += "value=reg[{0:d}]".format(value)
         else:
             if value < data_type.min or value > data_type.max:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "value", value, data_type.min, data_type.max,
-                        Commands.WRITE_PARAM.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "value", value, data_type.min, data_type.max,
+                    Commands.WRITE_PARAM.name)
 
             if data_type.size > 4 and data_type.size != 8:
-                raise exceptions.DataSpecificationInvalidSizeException(
-                    data_type.name, data_type.size,
-                    Commands.WRITE_PARAM.name)  # @UndefinedVariable
+                raise InvalidSizeException(
+                    data_type.name, data_type.size, Commands.WRITE_PARAM.name)
 
-            cmd_len = constants.LEN2 if data_type.size <= 4 else constants.LEN3
+            cmd_len = LEN2 if data_type.size <= 4 else LEN3
 
             cmd_word = (
                 (cmd_len << 28) |
-                (Commands.WRITE_PARAM.value << 20) |  # @UndefinedVariable
-                (constants.NO_REGS << 16) |
+                (Commands.WRITE_PARAM.value << 20) |
+                (NO_REGS << 16) |
                 (structure_id << 12) |
                 parameter_index)
 
@@ -834,9 +785,7 @@ class DataSpecificationGenerator(object):
                 padding = bytearray()
 
             value_encoded += padding
-            cmd_string = "WRITE_PARAM structure_id={0:d}, element_id={1:d}, " \
-                         "value={2:d}".format(structure_id,
-                                              parameter_index, value)
+            cmd_string += "value={0:d}".format(value)
 
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word + value_encoded
@@ -865,45 +814,39 @@ class DataSpecificationGenerator(object):
         :type repeats_is_register: bool
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If repeats_is_register is False and structure_id is not\
               a valid id
             * If repeats_is_register is True and structure_id
             * If the number of repeats is out of range
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
-            selected to write to
-        :raise data_specification.exceptions.\
-            DataSpecificationRegionExhaustedException: If the selected region \
-            has no more space
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            If no region has been  selected to write to
+        :raise data_specification.exceptions.RegionExhaustedException: \
+            If the selected region has no more space
         """
-        if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
+            raise ParameterOutOfBoundsException(
                 "structure_id", structure_id, 0,
-                constants.MAX_STRUCT_SLOTS - 1,
-                Commands.WRITE_STRUCT.name)  # @UndefinedVariable
+                MAX_STRUCT_SLOTS - 1, Commands.WRITE_STRUCT.name)
 
         if self.struct_slot[structure_id] is 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "structure", structure_id,
-                Commands.WRITE_STRUCT.name)  # @UndefinedVariable
+            raise NotAllocatedException(
+                "structure", structure_id, Commands.WRITE_STRUCT.name)
 
         if repeats_is_register:
-            if repeats < 0 or repeats >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "repeats", repeats, 0, constants.MAX_REGISTERS - 1,
-                        Commands.WRITE_STRUCT.name)  # @UndefinedVariable
+            if repeats < 0 or repeats >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "repeats", repeats, 0, MAX_REGISTERS - 1,
+                    Commands.WRITE_STRUCT.name)
 
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.WRITE_STRUCT.value << 20) |  # @UndefinedVariable
-                (constants.SRC1_ONLY << 16) |
+                (LEN1 << 28) |
+                (Commands.WRITE_STRUCT.value << 20) |
+                (SRC1_ONLY << 16) |
                 (repeats << 8) |
                 structure_id)
 
@@ -916,14 +859,12 @@ class DataSpecificationGenerator(object):
 
         else:
             if repeats < 0 or repeats >= 16:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "repeats", repeats, 0, 15,
-                        Commands.WRITE_STRUCT.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "repeats", repeats, 0, 15, Commands.WRITE_STRUCT.name)
 
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.WRITE_STRUCT.value << 20) |  # @UndefinedVariable
+                (LEN1 << 28) |
+                (Commands.WRITE_STRUCT.value << 20) |
                 (repeats << 8) |
                 structure_id)
 
@@ -936,49 +877,46 @@ class DataSpecificationGenerator(object):
 
     def start_function(self, function_id, argument_by_value):
         """ Insert command to start a function definition, with up to 5\
-            arguments, which are the ids of structures to be used within the\
+            arguments, which are the IDs of structures to be used within the\
             function, each of which can be passed by reference or by value.\
             In the commands following this command up to the end_function\
             command, structures can only be referenced using the numbers 1 to\
             5 which address the arguments, rather than the original structure\
-            ids
+            IDs
 
         :param function_id: The id of the function currently defined.
         :type function_id: int
         :param argument_by_value: A list of up to 5 booleans indicating if the\
             structure to be passed as an argument is to be passed by\
-            reference (i.e. changes made within the function are\
-            persisted) or by value (i.e. changes made within the\
-            function are lost when the function exits.  The number of\
-            arguments is determined by the length of this list.
+            reference (i.e., changes made within the function are persisted)\
+            or by value (i.e., changes made within the function are lost when\
+            the function exits. The number of arguments is determined by the\
+            length of this list.
         :type argument_by_value: list of bool
         :return: The id of the function, between 0 and 31
         :rtype: int
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If there are too \
-            many items in the list of arguments
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is already a \
-            function being defined at this point
-        :raise data_specification.exceptions.\
-            DataSpecificationFunctionInUse: If the function is already defined
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If there are too many items in the list of arguments
+        :raise data_specification.exceptions.InvalidCommandException: \
+            If there is already a function being defined at this point
+        :raise data_specification.exceptions.FunctionInUseException: \
+            If the function is already defined
         """
         if self.ongoing_function_definition:
-            raise exceptions.DataSpecificationInvalidCommandException(
-                Commands.START_CONSTRUCTOR.name)  # @UndefinedVariable
+            raise InvalidCommandException(Commands.START_CONSTRUCTOR.name)
 
         if len(argument_by_value) > 5:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+            raise ParameterOutOfBoundsException(
                 "number of arguments", len(argument_by_value), 0, 5,
-                Commands.START_CONSTRUCTOR.name)  # @UndefinedVariable
+                Commands.START_CONSTRUCTOR.name)
 
-        if function_id < 0 or function_id >= constants.MAX_CONSTRUCTORS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "function_id", function_id, 0, constants.MAX_CONSTRUCTORS,
-                "START_CONSTRUCTOR")
+        if function_id < 0 or function_id >= MAX_CONSTRUCTORS:
+            raise ParameterOutOfBoundsException(
+                "function_id", function_id, 0, MAX_CONSTRUCTORS,
+                Commands.START_CONSTRUCTOR.name)
 
         if self.function[function_id] != 0:
-            raise exceptions.DataSpecificationFunctionInUse(function_id)
+            raise FunctionInUseException(function_id)
 
         self.function[function_id] = argument_by_value
 
@@ -989,16 +927,16 @@ class DataSpecificationGenerator(object):
 
         read_only_flags = 0
         for i in xrange(len(argument_by_value)):
-            cmd_string = "{0:s} arg[{1:d}]=".format(cmd_string, i + 1)
+            cmd_string += " arg[{0:d}]=".format(i + 1)
             if argument_by_value[i]:
                 read_only_flags |= 2 ** i
-                cmd_string = "{0:s}read-only".format(cmd_string)
+                cmd_string += "read-only"
             else:
-                cmd_string = "{0:s}read-write".format(cmd_string)
+                cmd_string += "read-write"
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.START_CONSTRUCTOR.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.START_CONSTRUCTOR.value << 20) |
             (function_id << 11) |
             (len(argument_by_value) << 8) |
             read_only_flags)
@@ -1013,20 +951,18 @@ class DataSpecificationGenerator(object):
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no function \
-            being defined at this point
+        :raise data_specification.exceptions.InvalidCommandException: \
+            If there is no function being defined at this point
         """
 
         if not self.ongoing_function_definition:
-            raise exceptions.DataSpecificationInvalidCommandException(
-                Commands.END_CONSTRUCTOR.name)  # @UndefinedVariable
+            raise InvalidCommandException(Commands.END_CONSTRUCTOR.name)
 
         self.ongoing_function_definition = False
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.END_CONSTRUCTOR.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.END_CONSTRUCTOR.value << 20))
         cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
 
@@ -1037,50 +973,45 @@ class DataSpecificationGenerator(object):
     def call_function(self, function_id, structure_ids):
         """ Insert command to call a function
 
-        :param function_id: The id of a previously defined function, between 0\
-            and 31
+        :param function_id: \
+            The id of a previously defined function, between 0 and 31
         :type function_id: int
         :param structure_ids: A list of structure_ids that will be passed into\
             the function, each between 0 and 15
         :type structure_ids: list of int
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If the function id is not valid
             * If any of the structure ids are not valid
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.NotAllocatedException: \
             * If a function has not been defined with the given id
             * If no structure has been defined with one of the ids in\
               structure_ids
-        :raise data_specification.exceptions.\
-            DataSpecificationWrongParameterNumberException:\
+        :raise data_specification.exceptions.WrongParameterNumberException: \
             If a function is called with a wrong number of parameters
-        :raise data_specification.exceptions.\
-            DataSpecificationDuplicateParameterException:\
+        :raise data_specification.exceptions.DuplicateParameterException: \
             If a function is called with duplicate parameters
         """
-        if function_id < 0 or function_id >= constants.MAX_CONSTRUCTORS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "function_id", function_id, 0, constants.MAX_CONSTRUCTORS - 1,
-                Commands.CONSTRUCT.name)  # @UndefinedVariable
+        if function_id < 0 or function_id >= MAX_CONSTRUCTORS:
+            raise ParameterOutOfBoundsException(
+                "function_id", function_id, 0, MAX_CONSTRUCTORS - 1,
+                Commands.CONSTRUCT.name)
 
         if self.function[function_id] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "function", function_id,
-                Commands.CONSTRUCT.name)  # @UndefinedVariable
+            raise NotAllocatedException(
+                "function", function_id, Commands.CONSTRUCT.name)
 
         if len(structure_ids) != len(self.function[function_id]):
-            raise exceptions.DataSpecificationWrongParameterNumberException(
+            raise WrongParameterNumberException(
                 function_id, len(self.function[function_id]), structure_ids)
 
         if len(structure_ids) != len(set(structure_ids)):
-            raise exceptions.DataSpecificationDuplicateParameterException(
+            raise DuplicateParameterException(
                 "CONSTRUCT %d" % function_id, structure_ids)
 
         cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
@@ -1090,33 +1021,30 @@ class DataSpecificationGenerator(object):
             param_word = 0
             for i in xrange(len(structure_ids)):
                 if structure_ids[i] < 0 \
-                        or structure_ids[i] >= constants.MAX_STRUCT_SLOTS:
-                    raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
-                            "structure argument {0:d}".format(i),
-                            structure_ids[i], 0,
-                            constants.MAX_STRUCT_SLOTS - 1,
-                            Commands.CONSTRUCT.name)  # @UndefinedVariable
-                if self.struct_slot[structure_ids[i]] == 0:
-                    raise exceptions.DataSpecificationNotAllocatedException(
+                        or structure_ids[i] >= MAX_STRUCT_SLOTS:
+                    raise ParameterOutOfBoundsException(
                         "structure argument {0:d}".format(i),
-                        structure_ids[i],
-                        Commands.CONSTRUCT.name)  # @UndefinedVariable
+                        structure_ids[i], 0, MAX_STRUCT_SLOTS - 1,
+                        Commands.CONSTRUCT.name)
+                if self.struct_slot[structure_ids[i]] == 0:
+                    raise NotAllocatedException(
+                        "structure argument {0:d}".format(i),
+                        structure_ids[i], Commands.CONSTRUCT.name)
 
                 param_word |= structure_ids[i] << (6 * i)
-                cmd_string = "{0:s} arg[{1:d}]=struct[{2:d}]".format(
-                    cmd_string, i, structure_ids[i])
+                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(
+                    i, structure_ids[i])
 
         param_word_encoded = bytearray()
         if param_word is None:
-            cmd_word_length = constants.LEN1
+            cmd_word_length = LEN1
         else:
-            cmd_word_length = constants.LEN2
+            cmd_word_length = LEN2
             param_word_encoded = bytearray(_ONE_WORD.pack(param_word))
 
         cmd_word = (
             (cmd_word_length << 28) |
-            (Commands.CONSTRUCT.value << 20) |  # @UndefinedVariable
+            (Commands.CONSTRUCT.value << 20) |
             (function_id << 8))
         cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded + param_word_encoded
@@ -1136,18 +1064,17 @@ class DataSpecificationGenerator(object):
         :rtype: None
         """
 
-        cmd_len = constants.LEN1
-        cmd_code = Commands.READ.value  # @UndefinedVariable
-        cmd_field_usage = constants.DEST_ONLY
+        cmd_len = LEN1
+        cmd_code = Commands.READ.value
+        cmd_field_usage = DEST_ONLY
 
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                data_type.value, Commands.WRITE.name)  # @UndefinedVariable
+            raise UnknownTypeException(data_type.value, Commands.WRITE.name)
 
-        if dest_id < 0 or dest_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "register", dest_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.READ.name)  # @UndefinedVariable
+        if dest_id < 0 or dest_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "register", dest_id, 0, MAX_REGISTERS - 1,
+                Commands.READ.name)
 
         cmd_word = (
             (cmd_len << 28) |
@@ -1158,81 +1085,73 @@ class DataSpecificationGenerator(object):
 
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
 
-        cmd_string = "READ {0:d} bytes in register {1:d}" \
-            .format(data_type.size, dest_id)
+        cmd_string = "READ {0:d} bytes in register {1:d}".format(
+            data_type.size, dest_id)
 
         self.write_command_to_files(encoded_cmd_word, cmd_string)
 
     def create_cmd(self, data, data_type=DataType.UINT32):
-        """ Creates command to write a value one or more times to the current\
-            write pointer, causing the write pointer to move on by the number\
-            of bytes required to represent the data type. The data is passed\
-            as a parameter to this function
+        """ Creates command to write a value to the current write pointer,\
+            causing the write pointer to move on by the number of bytes\
+            required to represent the data type. The data is passed as a\
+            parameter to this function.
 
+        .. note::
+            This does not actually insert the WRITE command in the spec;\
+            that is done by :py:meth:`write_cmd`.
 
         :param data: the data to write as a float.
         :type data: float
         :param data_type: the type to convert data to
         :type data_type: :py:class:`DataType`
-        :return:  cmd_word_list; list of binary words to be added to the
-            binary data specification file and
+        :return: cmd_word_list; list of binary words to be added to the\
+            binary data specification file, and
             cmd_string; string describing the command to be added to the\
             report for the data specification file
         :rtype: (bytearray, str)
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
-            If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
-            If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_type is an integer type, and data has a fractional part
             * If data would overflow the data type
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the data type is not\
-            known
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidSizeException: If the data size is invalid
+        :raise data_specification.exceptions.UnknownTypeException: \
+            If the data type is not known
+        :raise data_specification.exceptions.InvalidSizeException: \
+            If the data size is invalid
         """
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                data_type.value, Commands.WRITE.name)  # @UndefinedVariable
+            raise UnknownTypeException(data_type.value, Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 0
         elif data_size == 2:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 1
         elif data_size == 4:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 2
         elif data_size == 8:
-            cmd_data_len = constants.LEN3
+            cmd_data_len = LEN3
             data_len = 3
         else:
-            raise exceptions.DataSpecificationInvalidSizeException(
-                data_type.name, data_size,
-                Commands.WRITE.name)  # @UndefinedVariable
+            raise InvalidSizeException(
+                data_type.name, data_size, Commands.WRITE.name)
 
-        if (data_type.min > data) or (data_type.max < data):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if data_type.min > data or data_type.max < data:
+            raise ParameterOutOfBoundsException(
                 "data", data, data_type.min, data_type.max,
-                Commands.WRITE.name)  # @UndefinedVariable
+                Commands.WRITE.name)
 
         cmd_string = None
         if self.report_writer is not None:
             cmd_string = "WRITE data=0x%8.8X" % data
 
-        repeat_reg_usage = constants.NO_REGS
-        if self.report_writer is not None:
-            cmd_string = "{0:s}".format(cmd_string)
-
+        repeat_reg_usage = NO_REGS
         cmd_word = (
             (cmd_data_len << 28) |
-            (Commands.WRITE.value << 20) |  # @UndefinedVariable
+            (Commands.WRITE.value << 20) |
             (repeat_reg_usage << 16) | (data_len << 12) | 1)
         # 1 is based on parameters = 0, repeats = 1 and parameters |= repeats
 
@@ -1243,20 +1162,19 @@ class DataSpecificationGenerator(object):
             "<I{}{}x".format(data_type.struct_encoding, padding),
             cmd_word, data_value)
         if self.report_writer is not None:
-            cmd_string = "{0:s}, dataType={1:s}".format(
-                cmd_string, data_type.name)
+            cmd_string += ", dataType={0:s}".format(data_type.name)
         return (cmd_word_list, cmd_string)
 
-    def write_value(
-            self, data, data_type=DataType.UINT32):
+    def write_value(self, data, data_type=DataType.UINT32):
         """ Insert command to write a value one or more times to the current\
             write pointer, causing the write pointer to move on by the number\
             of bytes required to represent the data type. The data is passed\
             as a parameter to this function
 
-        Note: This method used to have two extra parameters repeats and\
-        repeats_is_register. They have been removed here. If you need them,\
-        use write_repeated_value
+        .. note::
+            This method used to have two extra parameters repeats and\
+            repeats_is_register. They have been removed here. If you need\
+            them, use write_repeated_value
 
         :param data: the data to write as a float.
         :type data: float
@@ -1264,37 +1182,34 @@ class DataSpecificationGenerator(object):
         :type data_type: :py:class:`DataType`
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_type is an integer type, and data has a fractional part
             * If data would overflow the data type
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the data type is not\
-            known
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidSizeException: If the data size is invalid
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
-            selected to write to
+        :raise data_specification.exceptions.UnknownTypeException: \
+            If the data type is not known
+        :raise data_specification.exceptions.InvalidSizeException: \
+            If the data size is invalid
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            If no region has been selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                "WRITE")
+            raise NoRegionSelectedException("WRITE")
 
-        (cmd_word_list, cmd_string) = self.create_cmd(data, data_type)
+        cmd_word_list, cmd_string = self.create_cmd(data, data_type)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_cmd(self, cmd_word_list, cmd_string):
-        """ Writes cmd values created previously created and cached
+        """ Applies write commands created previously created (and cached).
 
-        See: create_cmd which is the ONLY way the parameters should have\
-        been created.
+        .. note::
+            See :py:meth:`create_cmd` for how to create the arguments to\
+            this method.
 
         :param cmd_word_list: list of binary words to be added to the binary\
             data specification file
@@ -1304,16 +1219,13 @@ class DataSpecificationGenerator(object):
         :type cmd_string: str
         :return: Nothing is returned
         :rtype: None
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
-            selected to write to
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            If no region has been selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                "WRITE")
-
+            raise NoRegionSelectedException("WRITE")
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_repeated_value(
@@ -1341,69 +1253,59 @@ class DataSpecificationGenerator(object):
         :type data_type: :py:class:`DataType`
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_type is an integer type, and data has a fractional part
             * If data would overflow the data type
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+        :raise data_specification.exceptions.UnknownTypeException: \
             If the data type is not known
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidSizeException: If the data size is invalid
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: \
+        :raise data_specification.exceptions.InvalidSizeException: \
+            If the data size is invalid
+        :raise data_specification.exceptions.NoRegionSelectedException: \
             If no region has been selected to write to
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                "WRITE")
+            raise NoRegionSelectedException("WRITE")
 
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                data_type.value, Commands.WRITE.name)  # @UndefinedVariable
+            raise UnknownTypeException(data_type.value, Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 0
         elif data_size == 2:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 1
         elif data_size == 4:
-            cmd_data_len = constants.LEN2
+            cmd_data_len = LEN2
             data_len = 2
         elif data_size == 8:
-            cmd_data_len = constants.LEN3
+            cmd_data_len = LEN3
             data_len = 3
         else:
-            raise exceptions.DataSpecificationInvalidSizeException(
-                data_type.name, data_size,
-                Commands.WRITE.name)  # @UndefinedVariable
+            raise InvalidSizeException(
+                data_type.name, data_size, Commands.WRITE.name)
 
         if repeats_is_register is False:
-            if (repeats <= 0) or (repeats > 255):
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "repeats", repeats, 0, 255,
-                        Commands.WRITE.name)  # @UndefinedVariable
+            if repeats <= 0 or repeats > 255:
+                raise ParameterOutOfBoundsException(
+                    "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if (repeats < 0) or (repeats >= constants.MAX_REGISTERS):
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "repeats_is_register", repeats_is_register, 0,
-                        (constants.MAX_REGISTERS - 1),
-                        Commands.WRITE.name)  # @UndefinedVariable
+            if repeats < 0 or repeats >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "repeats_is_register", repeats_is_register, 0,
+                    MAX_REGISTERS - 1, Commands.WRITE.name)
 
-        if (data_type.min > data) or (data_type.max < data):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if data_type.min > data or data_type.max < data:
+            raise ParameterOutOfBoundsException(
                 "data", data, data_type.min, data_type.max,
-                Commands.WRITE.name)  # @UndefinedVariable
+                Commands.WRITE.name)
 
         parameters = 0
         cmd_string = "WRITE data=0x%8.8X" % data
@@ -1413,13 +1315,13 @@ class DataSpecificationGenerator(object):
             parameters |= (repeats << 4)
             cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
-            repeat_reg_usage = constants.NO_REGS
+            repeat_reg_usage = NO_REGS
             parameters |= repeats
             cmd_string += ", repeats={0:d}".format(repeats)
 
         cmd_word = (
             (cmd_data_len << 28) |
-            (Commands.WRITE.value << 20) |  # @UndefinedVariable
+            (Commands.WRITE.value << 20) |
             (repeat_reg_usage << 16) | (data_len << 12) | parameters)
 
         data_value = decimal.Decimal("{}".format(data)) * data_type.scale
@@ -1456,32 +1358,27 @@ class DataSpecificationGenerator(object):
         :type data_type: :py:class:`DataType`
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If repeats_register is None, and repeats is out of range
             * If repeats_register is not a valid register id
             * If data_register is not a valid register id
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+        :raise data_specification.exceptions.UnknownTypeException: \
             If the data type is not known
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: \
+        :raise data_specification.exceptions.NoRegionSelectedException: \
             If no region has been selected to write to
-        :raise data_specification.exceptions.\
-            DataSpecificationRegionExhaustedException: \
+        :raise data_specification.exceptions.RegionExhaustedException: \
             If the selected region has no more space
         """
         if data_type not in DataType:
-            raise exceptions.DataSpecificationUnknownTypeException(
-                data_type.value, Commands.WRITE.name)  # @UndefinedVariable
+            raise UnknownTypeException(
+                data_type.value, Commands.WRITE.name)
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                Commands.WRITE.name)  # @UndefinedVariable
+            raise NoRegionSelectedException(Commands.WRITE.name)
 
         data_size = data_type.size
         if data_size == 1:
@@ -1493,53 +1390,46 @@ class DataSpecificationGenerator(object):
         elif data_size == 8:
             cmd_data_len = 3
         else:
-            raise exceptions.DataSpecificationInvalidSizeException(
-                data_type.name, data_size,
-                Commands.WRITE.name)  # @UndefinedVariable
+            raise InvalidSizeException(
+                data_type.name, data_size, Commands.WRITE.name)
 
         if repeats_is_register is False:
             if repeats <= 0 or repeats > 255:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "repeats", repeats, 0, 255,
-                        Commands.WRITE.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "repeats", repeats, 0, 255, Commands.WRITE.name)
         else:
-            if repeats < 0 or repeats >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "repeats", repeats, 0,
-                        (constants.MAX_REGISTERS - 1),
-                        Commands.WRITE.name)  # @UndefinedVariable
+            if repeats < 0 or repeats >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "repeats", repeats, 0, MAX_REGISTERS - 1,
+                    Commands.WRITE.name)
 
-        if (data_register < 0) or (data_register >= constants.MAX_REGISTERS):
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "data_register", data_register, 0,
-                (constants.MAX_REGISTERS - 1),
-                Commands.WRITE.name)  # @UndefinedVariable
+        if data_register < 0 or data_register >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "data_register", data_register, 0, MAX_REGISTERS - 1,
+                Commands.WRITE.name)
 
         parameters = 0
         cmd_string = "WRITE data=reg[{0:d}]".format(data_register)
 
         if repeats_is_register:
-            reg_usage = constants.SRC1_AND_SRC2
+            reg_usage = SRC1_AND_SRC2
             parameters |= repeats << 4
-            cmd_string = "{0:s}, repeats=reg[{1:d}]".format(cmd_string,
-                                                            repeats)
+            cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
-            reg_usage = constants.SRC1_ONLY
+            reg_usage = SRC1_ONLY
             parameters |= repeats
-            cmd_string = "{0:s}, repeats={1:d}".format(cmd_string, repeats)
+            cmd_string += ", repeats={0:d}".format(repeats)
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.WRITE.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.WRITE.value << 20) |
             (reg_usage << 16) |
             (cmd_data_len << 12) |
             (data_register << 8) | parameters)
 
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = encoded_cmd_word
-        cmd_string = "{0:s}, dataType={1:s}".format(cmd_string, data_type.name)
+        cmd_string += ", dataType={0:s}".format(data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_array(self, array_values, data_type=DataType.UINT32):
@@ -1553,30 +1443,33 @@ class DataSpecificationGenerator(object):
         :return: The position of the write pointer within the current region,\
             in bytes from the start of the region
         :rtype: int
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-               DataSpecificationNoRegionSelectedException:
+        :raise data_specification.exceptions.NoRegionSelectedException: \
             If no region has been previously selected
         """
-        cmd_len = constants.LEN2
+        cmd_len = LEN2
 
+        if data_type.numpy_typename is None:
+            raise TypeMismatchException(Commands.WRITE_ARRAY.name)
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                Commands.WRITE_ARRAY.name)  # @UndefinedVariable
+            raise NoRegionSelectedException(Commands.WRITE_ARRAY.name)
 
         cmd_word = (
             (cmd_len << 28) |
-            (Commands.WRITE_ARRAY.value << 20) |  # @UndefinedVariable
+            (Commands.WRITE_ARRAY.value << 20) |
             data_type.size)
 
-        data = numpy.array(array_values, dtype='uint32')
+        data = numpy.array(array_values, dtype=data_type.numpy_typename)
+        size = data.size * data_type.size
+        if size % 4 != 0:
+            raise UnknownTypeLengthException(size, Commands.WRITE_ARRAY.name)
 
-        cmd_string = "WRITE_ARRAY, %d elements\n" % (data.size)
+        cmd_string = "WRITE_ARRAY, {0:d} elements\n".format(size / 4)
 
-        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, data.size))
+        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, size / 4))
         self.write_command_to_files(cmd_word_list, cmd_string)
         self.spec_writer.write(data.tostring())
 
@@ -1587,33 +1480,28 @@ class DataSpecificationGenerator(object):
         :type region: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the region \
-            identifier is not valid
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: If the region has not been\
-            allocated
-        :raise data_specification.exceptions.\
-            DataSpecificationRegionUnfilledException: If the selected region \
-            should not be filled
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If the region identifier is not valid
+        :raise data_specification.exceptions.NotAllocatedException: \
+            If the region has not been allocated
+        :raise data_specification.exceptions.RegionUnfilledException: \
+            If the selected region should not be filled
         """
-        if region < 0 or region >= constants.MAX_MEM_REGIONS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "region", region, 0, (constants.MAX_MEM_REGIONS - 1),
-                Commands.SWITCH_FOCUS.name)  # @UndefinedVariable
+        if region < 0 or region >= MAX_MEM_REGIONS:
+            raise ParameterOutOfBoundsException(
+                "region", region, 0, MAX_MEM_REGIONS - 1,
+                Commands.SWITCH_FOCUS.name)
 
         if self.mem_slot[region] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
-                "region", region,
-                Commands.SWITCH_FOCUS.name)  # @UndefinedVariable
+            raise NotAllocatedException(
+                "region", region, Commands.SWITCH_FOCUS.name)
 
         if self.mem_slot[region][2]:
-            raise exceptions.DataSpecificationRegionUnfilledException(
-                region, Commands.SWITCH_FOCUS.name)  # @UndefinedVariable
+            raise RegionUnfilledException(region, Commands.SWITCH_FOCUS.name)
 
         self.current_region = region
 
@@ -1623,8 +1511,8 @@ class DataSpecificationGenerator(object):
 
         # Write command to switch focus:
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.SWITCH_FOCUS.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.SWITCH_FOCUS.value << 20) |
             (reg_usage << 16) |
             (parameters << 8))
 
@@ -1642,11 +1530,10 @@ class DataSpecificationGenerator(object):
             counter, between 0 and 15
         :type counter_register_id: int
         :param start:
-            * If start_is_register is False, the number at which to\
-              start the loop counter, >= 0
-            * If start_is_register is True, the id of the register\
-              containing the number at which to start the loop counter,\
-              between 0 and 15
+            * If start_is_register is False, the number at which to start the\
+              loop counter, >= 0
+            * If start_is_register is True, the id of the register containing\
+              the number at which to start the loop counter, between 0 and 15
         :type start: int
         :param end:
             * If end_is_register is False, the number which the loop\
@@ -1660,8 +1547,8 @@ class DataSpecificationGenerator(object):
             * If increment_is_register is False, the amount by which to\
               increment the loop counter on each run of the loop, >= 0
             * If increment_is_register is True, the id of the register\
-              containing the amount by which to increment the loop\
-              counter on each run of the loop, between 0 and 15
+              containing the amount by which to increment the loop counter on\
+              each run of the loop, between 0 and 15
         :type increment: int
         :param start_is_register: Indicates if start is a register id
         :type start_is_register: bool
@@ -1671,18 +1558,17 @@ class DataSpecificationGenerator(object):
         :type increment_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If counter_register_id is not a valid register id
             * If start_is_register is True and increment is not a valid\
               register_id
             * If end_is_register is True and increment is not a valid\
               register_id
-            * If increment_is_register is True, and increment is not a
+            * If increment_is_register is True, and increment is not a\
               valid register_id
             * If start_is_register is False and start is not in the\
               allowed range
@@ -1692,87 +1578,76 @@ class DataSpecificationGenerator(object):
               in the allowed range
         """
         bit_field = 0
-        length = constants.LEN1
+        length = LEN1
         encoded_values = bytearray()
-        cmd_word = (Commands.LOOP.value << 20)  # @UndefinedVariable
+        cmd_word = (Commands.LOOP.value << 20)
         cmd_string = "LOOP"
 
-        if counter_register_id < 0 \
-                or counter_register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if counter_register_id < 0 or counter_register_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
                 "counter_register_id", counter_register_id, 0,
-                constants.MAX_REGISTERS - 1,
-                Commands.LOOP.name)  # @UndefinedVariable
+                MAX_REGISTERS - 1, Commands.LOOP.name)
         cmd_word |= counter_register_id
-        cmd_string = "{0:s} counter_register_id=reg[{1:d}],".format(
-            cmd_string, counter_register_id)
+        cmd_string += " counter_register_id=reg[{0:d}],".format(
+            counter_register_id)
 
         if start_is_register:
-            if start < 0 or start >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "start", start, 0, constants.MAX_REGISTERS - 1,
-                        Commands.LOOP.name)  # @UndefinedVariable
+            if start < 0 or start >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "start", start, 0, MAX_REGISTERS - 1, Commands.LOOP.name)
             bit_field |= 0x4
             cmd_word |= (start << 12)
-            cmd_string = "{0:s} start=reg[{1:d}],".format(cmd_string, start)
+            cmd_string += " start=reg[{0:d}],".format(start)
         else:
             if (start < DataType.INT32.min or  # @UndefinedVariable
                     start > DataType.INT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "start", start,
-                        DataType.INT32.min,  # @UndefinedVariable
-                        DataType.INT32.max,  # @UndefinedVariable
-                        Commands.LOOP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "start", start,
+                    DataType.INT32.min,  # @UndefinedVariable
+                    DataType.INT32.max,  # @UndefinedVariable
+                    Commands.LOOP.name)
             length += 1
             encoded_values += bytearray(_ONE_SINT.pack(start))
-            cmd_string = "{0:s} start={1:d},".format(cmd_string, start)
+            cmd_string += " start={0:d},".format(start)
 
         if end_is_register:
-            if end < 0 or end >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "end", end, 0, constants.MAX_REGISTERS - 1,
-                        Commands.LOOP.name)  # @UndefinedVariable
+            if end < 0 or end >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "end", end, 0, MAX_REGISTERS - 1, Commands.LOOP.name)
             bit_field |= 0x2
             cmd_word |= (end << 8)
-            cmd_string = "{0:s} end=reg[{1:d}],".format(cmd_string, end)
+            cmd_string += " end=reg[{0:d}],".format(end)
         else:
             if (end < DataType.INT32.min or  # @UndefinedVariable
                     end > DataType.INT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "end", end,
-                        DataType.INT32.min,  # @UndefinedVariable
-                        DataType.INT32.max,  # @UndefinedVariable
-                        Commands.LOOP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "end", end,
+                    DataType.INT32.min,  # @UndefinedVariable
+                    DataType.INT32.max,  # @UndefinedVariable
+                    Commands.LOOP.name)
             length += 1
             encoded_values += bytearray(_ONE_SINT.pack(end))
-            cmd_string = "{0:s} end={1:d},".format(cmd_string, end)
+            cmd_string += " end={0:d},".format(end)
 
         if increment_is_register:
-            if increment < 0 or increment >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "increment", increment, 0, constants.MAX_REGISTERS - 1,
-                        Commands.LOOP.name)  # @UndefinedVariable
+            if increment < 0 or increment >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "increment", increment, 0, MAX_REGISTERS - 1,
+                    Commands.LOOP.name)
             bit_field |= 0x1
             cmd_word |= (increment << 4)
-            cmd_string = "{0:s} increment=reg[{1:d}],".format(
-                cmd_string, increment)
+            cmd_string += " increment=reg[{0:d}],".format(increment)
         else:
             if (increment < DataType.INT32.min or  # @UndefinedVariable
                     increment > DataType.INT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "increment", increment,
-                        DataType.INT32.min,  # @UndefinedVariable
-                        DataType.INT32.max,  # @UndefinedVariable
-                        Commands.LOOP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "increment", increment,
+                    DataType.INT32.min,  # @UndefinedVariable
+                    DataType.INT32.max,  # @UndefinedVariable
+                    Commands.LOOP.name)
             length += 1
             encoded_values += bytearray(_ONE_SINT.pack(increment))
-            cmd_string = "{0:s} increment={1:d},".format(cmd_string, increment)
+            cmd_string += " increment={0:d},".format(increment)
 
         self.ongoing_loop = True
 
@@ -1788,21 +1663,19 @@ class DataSpecificationGenerator(object):
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no loop in \
-            operation at this point
+        :raise data_specification.exceptions.InvalidCommandException: \
+            If there is no loop in operation at this point
         """
 
-        if self.ongoing_loop is not True:
-            raise exceptions.DataSpecificationInvalidCommandException(
-                "END_LOOP")
+        if not self.ongoing_loop:
+            raise InvalidCommandException("END_LOOP")
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.BREAK_LOOP.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.BREAK_LOOP.value << 20))
         cmd_string = "BREAK_LOOP"
         cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
@@ -1816,17 +1689,16 @@ class DataSpecificationGenerator(object):
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no loop in \
-            operation at this point
+        :raise data_specification.exceptions.InvalidCommandException: \
+            If there is no loop in operation at this point
         """
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.END_LOOP.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.END_LOOP.value << 20))
         cmd_string = "END_LOOP"
         cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
@@ -1842,65 +1714,59 @@ class DataSpecificationGenerator(object):
 
         :param register_id: The id of a register to compare the value of
         :type register_id: int
-        :param condition: The condition which must be true to execute the\
-            following commands
+        :param condition: \
+            The condition which must be true to execute the following commands
         :type condition: :py:class:`Condition`
         :param value:
-            * If value_is_register is False, the value to compare to\
-              the value in the register
-            * If value_is_register is True, the id of the register\
-              containing the value to compare, between 0 and 15
+            * If value_is_register is False, the value to compare to the\
+              value in the register
+            * If value_is_register is True, the id of the register containing\
+              the value to compare, between 0 and 15
         :type value: int
         :param value_is_register: Indicates if value is a register id
         :type value_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If the register_id is not a valid register id
             * if value_is_register is True and value is not a valid\
               register id
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the condition is not a \
-            valid condition
+        :raise data_specification.exceptions.UnknownTypeException: \
+            If the condition is not a valid condition
         """
         data_encoded = bytearray()
         cmd_word = 0
         cmd_string = ""
 
-        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.IF.name)  # @UndefinedVariable
+        if register_id < 0 or register_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "register_id", register_id, 0, MAX_REGISTERS - 1,
+                Commands.IF.name)
         if value_is_register:
-            if value < 0 or value >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "value", value, 0, constants.MAX_REGISTERS - 1,
-                        Commands.IF.name)  # @UndefinedVariable
+            if value < 0 or value >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "value", value, 0, MAX_REGISTERS - 1, Commands.IF.name)
         else:
             if (value < DataType.INT32.min or  # @UndefinedVariable
                     value > DataType.INT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "value", value,
-                        DataType.INT32.min,  # @UndefinedVariable
-                        DataType.INT32.max,  # @UndefinedVariable
-                        Commands.IF.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "value", value,
+                    DataType.INT32.min,  # @UndefinedVariable
+                    DataType.INT32.max,  # @UndefinedVariable
+                    Commands.IF.name)
 
         if condition not in Condition:
-            raise exceptions.DataSpecificationUnknownConditionException(
-                condition, Commands.IF.name)  # @UndefinedVariable
+            raise UnknownConditionException(condition, Commands.IF.name)
 
         if value_is_register:
             bit_field = 0x3
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.IF.value << 20) |  # @UndefinedVariable
+                (LEN1 << 28) |
+                (Commands.IF.value << 20) |
                 (bit_field << 16) |
                 (register_id << 8) |
                 (value << 4) |
@@ -1911,8 +1777,8 @@ class DataSpecificationGenerator(object):
         elif not value_is_register:
             bit_field = 0x2
             cmd_word = (
-                (constants.LEN2 << 28) |
-                (Commands.IF.value << 20) |  # @UndefinedVariable
+                (LEN2 << 28) |
+                (Commands.IF.value << 20) |
                 (bit_field << 16) |
                 (register_id << 8) |
                 condition.value)
@@ -1935,24 +1801,23 @@ class DataSpecificationGenerator(object):
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no \
-            conditional in operation at this point
+        :raise data_specification.exceptions.InvalidCommandException: \
+            If there is no conditional in operation at this point
         """
 
         if not self.conditionals or \
                 self.conditionals[len(self.conditionals) - 1] is True:
-            raise exceptions.DataSpecificationInvalidCommandException("ELSE")
+            raise InvalidCommandException("ELSE")
 
         self.conditionals[len(self.conditionals) - 1] = True
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.ELSE.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.ELSE.value << 20))
         cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
         cmd_string = "ELSE"
@@ -1965,23 +1830,22 @@ class DataSpecificationGenerator(object):
 
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidCommandException: If there is no \
-            conditional in operation at this point
+        :raise data_specification.exceptions.InvalidCommandException: \
+            If there is no conditional in operation at this point
         """
 
         if not self.conditionals:
-            raise exceptions.DataSpecificationInvalidCommandException("END_IF")
+            raise InvalidCommandException("END_IF")
 
         self.conditionals.pop()
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.END_IF.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.END_IF.value << 20))
         cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded
         cmd_string = "END_IF"
@@ -2005,48 +1869,43 @@ class DataSpecificationGenerator(object):
         :type data_type: :py:class:`DataType`
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If register_id is not a valid register_id
             * If data_is_register is True, and data is not a valid\
               register id
-            * If data_is_register is False, data_type is an integer\
-              type and data has a fractional part
+            * If data_is_register is False, data_type is an integer type and\
+              data has a fractional part
             * If data_is_register if False, and data would overflow the\
               data type
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: If the data type is not\
-            known
+        :raise data_specification.exceptions.UnknownTypeException: \
+            If the data type is not known
         """
-        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.MV.name)  # @UndefinedVariable
+        if register_id < 0 or register_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "register_id", register_id, 0, MAX_REGISTERS - 1,
+                Commands.MV.name)
 
         if data_is_register:
 
             # Build command to move between registers:
-            if data < 0 or data >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "data", data, 0, constants.MAX_REGISTERS - 1,
-                        Commands.MV.name)  # @UndefinedVariable
+            if data < 0 or data >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "data", data, 0, MAX_REGISTERS - 1, Commands.MV.name)
 
             if data == register_id:
-                raise exceptions.DataSpecificationDuplicateParameterException(
-                    Commands.MV.name,  # @UndefinedVariable
-                    [register_id, data])
+                raise DuplicateParameterException(
+                    Commands.MV.name, [register_id, data])
 
             dest_reg = register_id
             src_reg = data
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.MV.value << 20) |  # @UndefinedVariable
-                (constants.DEST_AND_SRC1 << 16) |
+                (LEN1 << 28) |
+                (Commands.MV.value << 20) |
+                (DEST_AND_SRC1 << 16) |
                 (dest_reg << 12) |
                 (src_reg << 8))
             encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
@@ -2057,21 +1916,20 @@ class DataSpecificationGenerator(object):
             # Build command to assign from an immediate:
             # command has a second word (the immediate)
             if data_type.min > data or data_type.max < data:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "data", data, data_type.min, data_type.max,
-                        Commands.MV.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "data", data, data_type.min, data_type.max,
+                    Commands.MV.name)
 
             if data_type.size > 4:
-                length = constants.LEN3
+                length = LEN3
             else:
-                length = constants.LEN2
+                length = LEN2
 
             dest_reg = register_id
             cmd_word = (
                 (length << 28) |
-                (Commands.MV.value << 20) |  # @UndefinedVariable
-                (constants.DEST_ONLY << 16) |
+                (Commands.MV.value << 20) |
+                (DEST_ONLY << 16) |
                 (dest_reg << 12))
 
             scaled_data = int(data * data_type.scale)
@@ -2095,28 +1953,25 @@ class DataSpecificationGenerator(object):
         :type register_id: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the register_id\
-            is not a valid register id
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
-            selected
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If the register_id is not a valid register id
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            If no region has been selected
         """
-        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.GET_WR_PTR.name)  # @UndefinedVariable
+        if register_id < 0 or register_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "register_id", register_id, 0, MAX_REGISTERS - 1,
+                Commands.GET_WR_PTR.name)
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                "GET_WR_PTR")
+            raise NoRegionSelectedException(Commands.GET_WR_PTR.name)
         bit_field = 0x4
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.GET_WR_PTR.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.GET_WR_PTR.value << 20) |
             (bit_field << 16) |
             (register_id << 12))
         cmd_string = "GET_WR_PTR reg[{0:d}]".format(register_id)
@@ -2139,26 +1994,24 @@ class DataSpecificationGenerator(object):
         :param address_is_register: Indicates if the the address is a\
             register id
         :type address_is_register: bool
-        :param relative_to_current: Indicates if the address is to be added to\
-            the current address, or used as an absolute address from\
-            the start of the current region
+        :param relative_to_current: \
+            Indicates if the address is to be added to the current address,\
+            or used as an absolute address from the start of the current region
         :type relative_to_current: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException: If the \
-            address_is_register is True and address is not a valid register id
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
-            selected
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+            If the address_is_register is True and address is not a valid\
+            register id
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            If no region has been selected
         """
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                Commands.SET_WR_PTR.name)  # @UndefinedVariable
+            raise NoRegionSelectedException(Commands.SET_WR_PTR.name)
         if relative_to_current:
             relative = 1
             relative_string = "RELATIVE"
@@ -2168,15 +2021,14 @@ class DataSpecificationGenerator(object):
 
         data_encoded = bytearray()
         if address_is_register:
-            if address < 0 or address >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "address", address, 0, constants.MAX_REGISTERS - 1,
-                        Commands.SET_WR_PTR.name)  # @UndefinedVariable
+            if address < 0 or address >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "address", address, 0, MAX_REGISTERS - 1,
+                    Commands.SET_WR_PTR.name)
             cmd_word = (
-                (constants.LEN1 << 28) |
-                (Commands.SET_WR_PTR.value << 20) |  # @UndefinedVariable
-                (constants.SRC1_ONLY << 16) |
+                (LEN1 << 28) |
+                (Commands.SET_WR_PTR.value << 20) |
+                (SRC1_ONLY << 16) |
                 (address << 8) |
                 relative)
             cmd_string = "SET_WR_PTR reg[{0:d}] {1:s}".format(
@@ -2185,29 +2037,27 @@ class DataSpecificationGenerator(object):
             if not relative_to_current:
                 if (address < 0 or
                         address > DataType.UINT32.max):  # @UndefinedVariable
-                    raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
-                            "address", address, 0,
-                            DataType.UINT32.max,  # @UndefinedVariable
-                            Commands.SET_WR_PTR.name)  # @UndefinedVariable
+                    raise ParameterOutOfBoundsException(
+                        "address", address, 0,
+                        DataType.UINT32.max,  # @UndefinedVariable
+                        Commands.SET_WR_PTR.name)
                 else:
                     data_encoded = bytearray(_ONE_WORD.pack(address))
             else:
                 if (address < DataType.INT32.min or  # @UndefinedVariable
                         address > DataType.INT32.max):  # @UndefinedVariable
-                    raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
-                            "address", address,
-                            DataType.INT32.min,  # @UndefinedVariable
-                            DataType.INT32.max,  # @UndefinedVariable
-                            Commands.SET_WR_PTR.name)  # @UndefinedVariable
+                    raise ParameterOutOfBoundsException(
+                        "address", address,
+                        DataType.INT32.min,  # @UndefinedVariable
+                        DataType.INT32.max,  # @UndefinedVariable
+                        Commands.SET_WR_PTR.name)
                 else:
                     data_encoded = bytearray(_ONE_SINT.pack(address))
 
             cmd_word = (
-                (constants.LEN2 << 28) |
-                (Commands.SET_WR_PTR.value << 20) |  # @UndefinedVariable
-                (constants.NO_REGS << 16) |
+                (LEN2 << 28) |
+                (Commands.SET_WR_PTR.value << 20) |
+                (NO_REGS << 16) |
                 relative)
             cmd_string = "SET_WR_PTR {0:d} {1:s}".format(
                 address, relative_string)
@@ -2226,14 +2076,13 @@ class DataSpecificationGenerator(object):
         :param log_block_size:
             * If log_block_size_is_register is False, log to base 2 of\
               the block size (e.g. The write pointer will be moved so\
-              that it is a multiple of 2^(log_block_size)),\
-              between 0 and 32
+              that it is a multiple of 2^(log_block_size)), between 0 and 32
             * If log_block_size_is_register is True, the id of the\
               register containing log to the base 2 of the block size,\
               between 0 and 15
         :type log_block_size: int
-        :param log_block_size_is_register: Indicates if log_block_size is a\
-            register id
+        :param log_block_size_is_register: \
+            Indicates if log_block_size is a register id
         :type log_block_size_is_register: bool
         :param return_register_id: The id of a register where the write\
             pointer will be written to once it has been updated, between\
@@ -2241,23 +2090,20 @@ class DataSpecificationGenerator(object):
         :type return_register_id: int
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If log_block_size_is_register is False, and\
               log_block_size is not within the allowed range
             * If log_block_size_is_register is True and log_block_size\
               is not a valid register id
-        :raise data_specification.exceptions.\
-            DataSpecificationRegionOutOfBoundsException:\
+        :raise data_specification.exceptions.RegionOutOfBoundsException: \
             If the move of the pointer would put it outside of the\
             current region
-        :raise data_specification.exceptions.\
-            DataSpecificationNoRegionSelectedException: If no region has been \
-            selected
+        :raise data_specification.exceptions.NoRegionSelectedException: \
+            If no region has been selected
         """
         bit_field = 0
         imm_value = 0
@@ -2266,46 +2112,36 @@ class DataSpecificationGenerator(object):
         cmd_string = "ALIGN_WR_PTR"
 
         if self.current_region is None:
-            raise exceptions.DataSpecificationNoRegionSelectedException(
-                Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
+            raise NoRegionSelectedException(Commands.ALIGN_WR_PTR.name)
 
         if return_register_id is not None:
-            if return_register_id < 0 \
-                    or return_register_id >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "return_register_id", return_register_id, 0,
-                        constants.MAX_REGISTERS - 1,
-                        Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
+            if return_register_id < 0 or return_register_id >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "return_register_id", return_register_id, 0,
+                    MAX_REGISTERS - 1, Commands.ALIGN_WR_PTR.name)
             bit_field |= 0x4
             return_register_value = return_register_id
-            cmd_string = "{0:s} reg[{1:d}] =".format(
-                cmd_string, return_register_value)
+            cmd_string += " reg[{0:d}] =".format(return_register_value)
 
         if log_block_size_is_register:
-            if log_block_size < 0 or log_block_size >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "log_block_size", log_block_size, 0,
-                        constants.MAX_REGISTERS - 1,
-                        Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
+            if log_block_size < 0 or log_block_size >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "log_block_size", log_block_size, 0,
+                    MAX_REGISTERS - 1, Commands.ALIGN_WR_PTR.name)
             bit_field |= 0x2
             block_size_reg = log_block_size
-            cmd_string = "{0:s} align(reg[{1:d}])".format(
-                cmd_string, block_size_reg)
+            cmd_string += " align(reg[{0:d}])".format(block_size_reg)
         else:
             if log_block_size < 0 or log_block_size > 31:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "log_block_size", log_block_size, 0, 31,
-                        Commands.ALIGN_WR_PTR.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "log_block_size", log_block_size, 0, 31,
+                    Commands.ALIGN_WR_PTR.name)
             imm_value = log_block_size
-            cmd_string = "{0:s} align({1:d})".format(
-                cmd_string, imm_value)
+            cmd_string += " align({0:d})".format(imm_value)
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.ALIGN_WR_PTR.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.ALIGN_WR_PTR.value << 20) |
             (bit_field << 16) |
             (return_register_value << 12) |
             (block_size_reg << 8) |
@@ -2342,18 +2178,16 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException: \
+        :raise data_specification.exceptions.UnknownTypeException: \
             If operation is not a known operation
         """
         bit_field = 0x4
@@ -2361,88 +2195,81 @@ class DataSpecificationGenerator(object):
         register_op_2 = 0
         payload = bytearray()
 
-        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.ARITH_OP.name)  # @UndefinedVariable
+        if register_id < 0 or register_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "register_id", register_id, 0, MAX_REGISTERS - 1,
+                Commands.ARITH_OP.name)
 
         cmd_string = "ARTIH_OP {0:s} reg[{1:d}] =".format(
             "SIGNED" if signed else "UNSIGNED", register_id)
 
         if operand_1_is_register:
-            if operand_1 < 0 or operand_1 >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_1", operand_1, 0, constants.MAX_REGISTERS - 1,
-                        Commands.ARITH_OP.name)  # @UndefinedVariable
+            if operand_1 < 0 or operand_1 >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "operand_1", operand_1, 0, MAX_REGISTERS - 1,
+                    Commands.ARITH_OP.name)
             bit_field |= 2
             register_op_1 = operand_1
             cmd_string += " reg[{0:d}]".format(register_op_1)
         elif signed:
             if (operand_1 < DataType.INT32.min or  # @UndefinedVariable
                     operand_1 > DataType.INT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_1", operand_1,
-                        DataType.INT32.min,  # @UndefinedVariable
-                        DataType.INT32.max,  # @UndefinedVariable
-                        Commands.ARITH_OP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "operand_1", operand_1,
+                    DataType.INT32.min,  # @UndefinedVariable
+                    DataType.INT32.max,  # @UndefinedVariable
+                    Commands.ARITH_OP.name)
             payload += bytearray(_ONE_SINT.pack(operand_1))
             cmd_string += " " + str(operand_1)
         else:
             if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_1 > DataType.UINT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_1", operand_1,
-                        DataType.UINT32.min,  # @UndefinedVariable
-                        DataType.UINT32.max,  # @UndefinedVariable
-                        Commands.ARITH_OP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "operand_1", operand_1,
+                    DataType.UINT32.min,  # @UndefinedVariable
+                    DataType.UINT32.max,  # @UndefinedVariable
+                    Commands.ARITH_OP.name)
             payload += bytearray(_ONE_WORD.pack(operand_1))
             cmd_string += " " + str(operand_1)
 
         if operation not in ArithmeticOperation:
-            raise exceptions.DataSpecificationInvalidOperationException(
-                "arithmetic", operation.value,
-                Commands.ARITH_OP.name)  # @UndefinedVariable
+            raise InvalidOperationException(
+                "arithmetic", operation.value, Commands.ARITH_OP.name)
 
         cmd_string += " " + operation.operator
 
         if operand_2_is_register:
-            if operand_2 < 0 or operand_2 >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_2", operand_2, 0, constants.MAX_REGISTERS - 1,
-                        Commands.ARITH_OP.name)  # @UndefinedVariable
+            if operand_2 < 0 or operand_2 >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "operand_2", operand_2, 0, MAX_REGISTERS - 1,
+                    Commands.ARITH_OP.name)
             bit_field |= 1
             register_op_2 = operand_2
             cmd_string += " reg[{0:d}]".format(register_op_2)
         elif signed:
             if (operand_2 < DataType.INT32.min or  # @UndefinedVariable
                     operand_2 > DataType.INT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_2", operand_2,
-                        DataType.INT32.min,  # @UndefinedVariable
-                        DataType.INT32.max,  # @UndefinedVariable
-                        Commands.ARITH_OP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "operand_2", operand_2,
+                    DataType.INT32.min,  # @UndefinedVariable
+                    DataType.INT32.max,  # @UndefinedVariable
+                    Commands.ARITH_OP.name)
             payload += bytearray(_ONE_SINT.pack(operand_2))
             cmd_string += " " + str(operand_2)
         else:
             if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_2 > DataType.UINT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_2", operand_2,
-                        DataType.UINT32.min,  # @UndefinedVariable
-                        DataType.UINT32.max,  # @UndefinedVariable
-                        Commands.ARITH_OP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "operand_2", operand_2,
+                    DataType.UINT32.min,  # @UndefinedVariable
+                    DataType.UINT32.max,  # @UndefinedVariable
+                    Commands.ARITH_OP.name)
             payload += bytearray(_ONE_WORD.pack(operand_2))
             cmd_string += " " + str(operand_2)
 
         cmd_word = (
             (len(payload) << 26) |
-            (Commands.ARITH_OP.value << 20) |  # @UndefinedVariable
+            (Commands.ARITH_OP.value << 20) |
             (int(signed) << 19) |
             (bit_field << 16) |
             (register_id << 12) |
@@ -2475,12 +2302,11 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2511,12 +2337,11 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2548,12 +2373,11 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2586,12 +2410,11 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2623,12 +2446,11 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
@@ -2652,12 +2474,11 @@ class DataSpecificationGenerator(object):
         :type operand: int
         :param operand_is_register: Indicates if operand_1 is a register id
         :type operand_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_is_register is True and operand_1 is not a\
               valid register id
         """
@@ -2688,89 +2509,81 @@ class DataSpecificationGenerator(object):
         :type operand_1_is_register: bool
         :param operand_2_is_register: Indicates if operand_2 is a register id
         :type operand_2_is_register: bool
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If operand_1_is_register is True and operand_1 is not a\
               valid register id
             * If operand_2_is_register is True and operand_2 is not a\
               valid register id
-        :raise data_specification.exceptions.\
-            DataSpecificationInvalidOperationException: If operation is not a\
-            known operation
+        :raise data_specification.exceptions.InvalidOperationException: \
+            If operation is not a known operation
         """
         bit_field = 0x4
         register_op_1 = 0
         register_op_2 = 0
         payload = bytearray()
 
-        if register_id < 0 or register_id >= constants.MAX_REGISTERS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "register_id", register_id, 0, constants.MAX_REGISTERS - 1,
-                Commands.LOGIC_OP.name)  # @UndefinedVariable
+        if register_id < 0 or register_id >= MAX_REGISTERS:
+            raise ParameterOutOfBoundsException(
+                "register_id", register_id, 0, MAX_REGISTERS - 1,
+                Commands.LOGIC_OP.name)
 
         cmd_string = "LOGIC_OP reg[{0:d}] =".format(register_id)
 
         if operation not in LogicOperation:
-            raise exceptions.DataSpecificationInvalidOperationException(
-                "logic", operation.value,
-                Commands.LOGIC_OP.name)  # @UndefinedVariable
+            raise InvalidOperationException(
+                "logic", operation.value, Commands.LOGIC_OP.name)
 
-        if operation.value == LogicOperation.NOT.value:  # @UndefinedVariable
+        if operation.value == LogicOperation.NOT.value:
             cmd_string += " " + operation.operator
 
         if operand_1_is_register:
-            if operand_1 < 0 or operand_1 >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_1", operand_1, 0, constants.MAX_REGISTERS - 1,
-                        Commands.LOGIC_OP.name)  # @UndefinedVariable
+            if operand_1 < 0 or operand_1 >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "operand_1", operand_1, 0, MAX_REGISTERS - 1,
+                    Commands.LOGIC_OP.name)
             bit_field |= 2
             register_op_1 = operand_1
             cmd_string += " reg[{0:d}]".format(register_op_1)
         else:
             if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
                     operand_1 > DataType.UINT32.max):  # @UndefinedVariable
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "operand_1", operand_1,
-                        DataType.UINT32.min,  # @UndefinedVariable
-                        DataType.UINT32.max,  # @UndefinedVariable
-                        Commands.LOGIC_OP.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "operand_1", operand_1,
+                    DataType.UINT32.min,  # @UndefinedVariable
+                    DataType.UINT32.max,  # @UndefinedVariable
+                    Commands.LOGIC_OP.name)
             payload += bytearray(_ONE_WORD.pack(operand_1))
             cmd_string += " " + str(operand_1)
 
-        if operation.value != LogicOperation.NOT.value:  # @UndefinedVariable
+        if operation.value != LogicOperation.NOT.value:
             cmd_string += " " + operation.operator
 
             if operand_2_is_register:
-                if operand_2 < 0 or operand_2 >= constants.MAX_REGISTERS:
-                    raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
-                            "operand_2", operand_2, 0,
-                            constants.MAX_REGISTERS - 1,
-                            Commands.LOGIC_OP.name)  # @UndefinedVariable
+                if operand_2 < 0 or operand_2 >= MAX_REGISTERS:
+                    raise ParameterOutOfBoundsException(
+                        "operand_2", operand_2, 0, MAX_REGISTERS - 1,
+                        Commands.LOGIC_OP.name)
                 bit_field |= 1
                 register_op_2 = operand_2
                 cmd_string += " reg[{0:d}]".format(register_op_2)
             else:
                 if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
                         operand_2 > DataType.UINT32.max):  # @UndefinedVariable
-                    raise exceptions.\
-                        DataSpecificationParameterOutOfBoundsException(
-                            "operand_2", operand_2,
-                            DataType.UINT32.min,  # @UndefinedVariable
-                            DataType.UINT32.max,  # @UndefinedVariable
-                            Commands.LOGIC_OP.name)  # @UndefinedVariable
+                    raise ParameterOutOfBoundsException(
+                        "operand_2", operand_2,
+                        DataType.UINT32.min,  # @UndefinedVariable
+                        DataType.UINT32.max,  # @UndefinedVariable
+                        Commands.LOGIC_OP.name)
                 payload += bytearray(_ONE_WORD.pack(operand_2))
                 cmd_string += " " + str(operand_2)
 
         cmd_word = (
             (len(payload) << 26) |
-            (Commands.LOGIC_OP.value << 20) |  # @UndefinedVariable
+            (Commands.LOGIC_OP.value << 20) |
             (bit_field << 16) |
             (register_id << 12) |
             (register_op_1 << 8) |
@@ -2792,26 +2605,24 @@ class DataSpecificationGenerator(object):
             * Otherwise, the id of the source structure, between 0 and 15
         :type source_structure_id: int
         :param destination_structure_id:
-            * If destination_id_is_register is True, the id of the\
-              register holding the destination structure id, between\
-              0 and 15
+            * If destination_id_is_register is True, the id of the register\
+              holding the destination structure id, between 0 and 15
             * If destination_id_is_register is False, the id of the\
               destination structure, between 0 and 15
         :type destination_structure_id: int
-        :param source_id_is_register: Indicates if source_structure_id is a\
-            register id
+        :param source_id_is_register: \
+            Indicates if source_structure_id is a register id
         :type source_id_is_register: bool
-        :param destination_id_is_register: Indicates if\
-            destination_structure_id is a register id
+        :param destination_id_is_register: \
+            Indicates if destination_structure_id is a register id
         :type destination_id_is_register: bool
         :return: The id of the copied structure, between 0 and 15
         :rtype: int
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If source_id_is_register is True and source_structure_id\
               is not a valid register id
             * If destination_id_is_register is True and\
@@ -2820,70 +2631,59 @@ class DataSpecificationGenerator(object):
               is not a valid structure id
             * If destination_id_is_register is False and\
               destination_structure_id is not a valid structure id
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException:\
-            * If no structure with id source_structure_id has been\
-              allocated
+        :raise data_specification.exceptions.NotAllocatedException: \
+            * If no structure with id source_structure_id has been allocated
         """
         bit_field = 0
         cmd_string = "COPY_STRUCT"
 
         if source_structure_id == destination_structure_id and \
-           destination_id_is_register == source_id_is_register:
-            raise exceptions.DataSpecificationDuplicateParameterException(
+                destination_id_is_register == source_id_is_register:
+            raise DuplicateParameterException(
                 "COPY_STRUCT",
                 [source_structure_id, destination_structure_id])
 
         if source_id_is_register:
-            if source_structure_id < 0 \
-                    or source_structure_id >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "source_structure_id", source_structure_id, 0,
-                        constants.MAX_REGISTERS - 1,
-                        Commands.COPY_STRUCT.name)  # @UndefinedVariable
-            bit_field |= constants.SRC1_ONLY
-            cmd_string = "{0:s} source_struct = reg[{1:d}]".format(
-                cmd_string, source_structure_id)
+            if source_structure_id < 0 or source_structure_id >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "source_structure_id", source_structure_id, 0,
+                    MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            bit_field |= SRC1_ONLY
+            cmd_string += " source_struct = reg[{0:d}]".format(
+                source_structure_id)
         else:
             if source_structure_id < 0 \
-                    or source_structure_id >= constants.MAX_STRUCT_SLOTS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "source_structure_id", source_structure_id, 0,
-                        constants.MAX_STRUCT_SLOTS - 1,
-                        Commands.COPY_STRUCT.name)  # @UndefinedVariable
+                    or source_structure_id >= MAX_STRUCT_SLOTS:
+                raise ParameterOutOfBoundsException(
+                    "source_structure_id", source_structure_id, 0,
+                    MAX_STRUCT_SLOTS - 1, Commands.COPY_STRUCT.name)
             if self.struct_slot[source_structure_id] == 0:
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise NotAllocatedException(
                     "struct", source_structure_id, "COPY_STRUCT")
-            cmd_string = "{0:s} source_struct = {1:d}".format(
-                cmd_string, source_structure_id)
+            cmd_string += " source_struct = {0:d}".format(source_structure_id)
 
         if destination_id_is_register:
             if destination_structure_id < 0 \
-                    or destination_structure_id >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "destination_structure_id", destination_structure_id,
-                        0, constants.MAX_REGISTERS - 1,
-                        Commands.COPY_STRUCT.name)  # @UndefinedVariable
-            bit_field |= constants.DEST_ONLY
-            cmd_string = "{0:s} destination_struct = reg[{1:d}]".format(
-                cmd_string, destination_structure_id)
+                    or destination_structure_id >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "destination_structure_id", destination_structure_id,
+                    0, MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            bit_field |= DEST_ONLY
+            cmd_string += " destination_struct = reg[{0:d}]".format(
+                destination_structure_id)
         else:
             if destination_structure_id < 0 \
-                    or destination_structure_id >= constants.MAX_STRUCT_SLOTS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "destination_structure_id", destination_structure_id,
-                        0, constants.MAX_STRUCT_SLOTS - 1,
-                        Commands.COPY_STRUCT.name)  # @UndefinedVariable
-            cmd_string = "{0:s} destination_struct = {1:d}".format(
-                cmd_string, destination_structure_id)
+                    or destination_structure_id >= MAX_STRUCT_SLOTS:
+                raise ParameterOutOfBoundsException(
+                    "destination_structure_id", destination_structure_id,
+                    0, MAX_STRUCT_SLOTS - 1,
+                    Commands.COPY_STRUCT.name)
+            cmd_string += " destination_struct = {0:d}".format(
+                destination_structure_id)
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.COPY_STRUCT.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.COPY_STRUCT.value << 20) |
             (bit_field << 16) |
             (destination_structure_id << 12) |
             (source_structure_id << 8))
@@ -2900,11 +2700,11 @@ class DataSpecificationGenerator(object):
         """ Insert command to copy the value of a parameter from one structure
         to another
 
-        :param source_structure_id: The id of the source structure,\
-            between 0 and 15
+        :param source_structure_id: \
+            The id of the source structure, between 0 and 15
         :type source_structure_id: int
-        :param source_parameter_index: The index of the parameter in the\
-            source structure
+        :param source_parameter_index: \
+            The index of the parameter in the source structure
         :type source_parameter_index: int
         :param destination_id: The id of the destination structure, or the
             id of the destination register, between 0 and 15
@@ -2913,102 +2713,90 @@ class DataSpecificationGenerator(object):
             destination structure. Ignored when writing to a register.
         :type destination_parameter_index: int
         :return: Nothing is returned
-        :param destination_is_register: Indicates whether the destination is
-                                        a structure or a register.
+        :param destination_is_register: \
+            Indicates whether the destination is a structure or a register.
         :type destination_is_register: boolean
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If source_structure_id is not a valid structure id
             * If destination_id is not a valid structure id
             * If source_parameter_index is not a valid parameter index\
               in the source structure
             * If destination_parameter_index is not a valid parameter\
               index in the destination structure
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException:\
+        :raise data_specification.exceptions.NotAllocatedException: \
             * If no structure with id destination_id has been allocated
             * If no structure with id source_structure_id has been allocated
         """
-        if source_structure_id < 0 \
-                or source_structure_id >= constants.MAX_STRUCT_SLOTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+        if source_structure_id < 0 or source_structure_id >= MAX_STRUCT_SLOTS:
+            raise ParameterOutOfBoundsException(
                 "source_structure_id", source_structure_id, 0,
-                constants.MAX_STRUCT_SLOTS - 1,
-                Commands.COPY_PARAM.name)  # @UndefinedVariable
+                MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
 
         if source_parameter_index < 0 \
-                or source_parameter_index >= constants.MAX_STRUCT_ELEMENTS:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
+                or source_parameter_index >= MAX_STRUCT_ELEMENTS:
+            raise ParameterOutOfBoundsException(
                 "source_parameter_index", source_parameter_index, 0,
-                constants.MAX_STRUCT_ELEMENTS - 1,
-                Commands.COPY_PARAM.name)  # @UndefinedVariable
+                MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
 
         if self.struct_slot[source_structure_id] == 0:
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise NotAllocatedException(
                 "structure", source_structure_id, "COPY_PARAM")
 
         if (len(self.struct_slot[source_structure_id]) <=
                 source_parameter_index):
-            raise exceptions.DataSpecificationNotAllocatedException(
+            raise NotAllocatedException(
                 "parameter", source_parameter_index, "COPY_PARAM")
 
         if not destination_is_register:
             if (destination_parameter_index < 0 or
-                    destination_parameter_index >=
-                    constants.MAX_STRUCT_ELEMENTS):
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "destination_parameter_index",
-                        destination_parameter_index,
-                        0, constants.MAX_STRUCT_ELEMENTS - 1,
-                        Commands.COPY_PARAM.name)  # @UndefinedVariable
+                    destination_parameter_index >= MAX_STRUCT_ELEMENTS):
+                raise ParameterOutOfBoundsException(
+                    "destination_parameter_index", destination_parameter_index,
+                    0, MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
 
-            if destination_id < 0 \
-                    or destination_id >= constants.MAX_STRUCT_SLOTS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "destination_structure_id", destination_id, 0,
-                        constants.MAX_STRUCT_SLOTS - 1,
-                        Commands.COPY_PARAM.name)  # @UndefinedVariable
+            if destination_id < 0 or destination_id >= MAX_STRUCT_SLOTS:
+                raise ParameterOutOfBoundsException(
+                    "destination_structure_id", destination_id, 0,
+                    MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
 
             if self.struct_slot[destination_id] == 0:
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise NotAllocatedException(
                     "structure", destination_id, "COPY_PARAM")
 
             if (len(self.struct_slot[source_structure_id]) <=
                     source_parameter_index):
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise NotAllocatedException(
                     "parameter", destination_parameter_index, "COPY_PARAM")
 
             if (len(self.struct_slot[destination_id]) <=
                     destination_parameter_index):
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise NotAllocatedException(
                     "parameter", destination_parameter_index, "COPY_PARAM")
 
             if (self.struct_slot[source_structure_id]
                     [source_parameter_index][1] !=
                     self.struct_slot[destination_id]
                     [destination_parameter_index][1]):
-                raise exceptions.DataSpecificationTypeMismatchException(
+                raise TypeMismatchException(
                     "COPY_PARAM")
 
             if (source_structure_id == destination_id and
                     destination_parameter_index == source_parameter_index):
-                raise exceptions.DataSpecificationDuplicateParameterException(
+                raise DuplicateParameterException(
                     "COPY_PARAM", [source_structure_id,
                                    source_parameter_index,
                                    destination_id,
                                    destination_parameter_index])
 
             cmd_word_1 = (
-                (constants.LEN2 << 28) |
-                (Commands.COPY_PARAM.value << 20) |  # @UndefinedVariable
-                (constants.NO_REGS << 16) |
+                (LEN2 << 28) |
+                (Commands.COPY_PARAM.value << 20) |
+                (NO_REGS << 16) |
                 (destination_id << 12) |
                 (source_structure_id << 8))
             cmd_word_2 = ((destination_parameter_index << 8) |
@@ -3022,18 +2810,15 @@ class DataSpecificationGenerator(object):
                     source_structure_id, source_parameter_index,
                     destination_id, destination_parameter_index))
         else:
-            if destination_id < 0 \
-                    or destination_id >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "destination_register_id", destination_id, 0,
-                        constants.MAX_REGISTERS - 1,
-                        Commands.COPY_PARAM.name)  # @UndefinedVariable
+            if destination_id < 0 or destination_id >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "destination_register_id", destination_id, 0,
+                    MAX_REGISTERS - 1, Commands.COPY_PARAM.name)
 
             cmd_word_1 = (
-                (constants.LEN2 << 28) |
-                (Commands.COPY_PARAM.value << 20) |  # @UndefinedVariable
-                (constants.DEST_ONLY << 16) |
+                (LEN2 << 28) |
+                (Commands.COPY_PARAM.value << 20) |
+                (DEST_ONLY << 16) |
                 (destination_id << 12) |
                 (source_structure_id << 8))
             cmd_word_2 = source_parameter_index
@@ -3066,46 +2851,42 @@ class DataSpecificationGenerator(object):
         :type data_type: :py:class:`DataType`
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If value_is_register is True and value is not a valid\
               register id
             * If value_is_register is False, the data_type is an integer type\
               and value has a fractional part
             * If value_is_register is False and the value would overflow the\
               data type
-        :raise data_specification.exceptions.\
-            DataSpecificationUnknownTypeException:\
+        :raise data_specification.exceptions.UnknownTypeException: \
             * If data_type is not a valid data type
         """
-        cmd_word_length = constants.LEN1
+        cmd_word_length = LEN1
         source_register_id = 0
         bit_field = 0
         data_encoded = bytearray()
 
         if value_is_register:
-            if value < 0 or value >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "value", value, 0, constants.MAX_REGISTERS - 1,
-                        Commands.PRINT_VAL.name)  # @UndefinedVariable
+            if value < 0 or value >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "value", value, 0, MAX_REGISTERS - 1,
+                    Commands.PRINT_VAL.name)
             bit_field |= 2
             source_register_id = value
             cmd_string = "PRINT_VAL reg[{0:d}]".format(source_register_id)
         else:
             if value < data_type.min or value > data_type.max:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "value", value, data_type.min, data_type.max,
-                        Commands.PRINT_VAL.name)  # @UndefinedVariable
+                raise ParameterOutOfBoundsException(
+                    "value", value, data_type.min, data_type.max,
+                    Commands.PRINT_VAL.name)
             if data_type.size <= 4:
-                cmd_word_length = constants.LEN2
+                cmd_word_length = LEN2
             else:
-                cmd_word_length = constants.LEN3
+                cmd_word_length = LEN3
             data_encoding_string = "<{0:s}".format(data_type.struct_encoding)
             data_encoded = bytearray(struct.pack(data_encoding_string, value))
             while len(data_encoded) % 4:
@@ -3114,7 +2895,7 @@ class DataSpecificationGenerator(object):
 
         cmd_word = (
             (cmd_word_length << 28) |
-            (Commands.PRINT_VAL.value << 20) |  # @UndefinedVariable
+            (Commands.PRINT_VAL.value << 20) |
             (bit_field << 16) |
             (source_register_id << 8) |
             data_type.value)
@@ -3131,23 +2912,22 @@ class DataSpecificationGenerator(object):
         :type text: str
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
         text_len = len(text)
         if text_len > 12:
-            raise exceptions.DataSpecificationParameterOutOfBoundsException(
-                "len(text)", text_len, 1, 12,
-                Commands.PRINT_TXT.name)  # @UndefinedVariable
+            raise ParameterOutOfBoundsException(
+                "len(text)", text_len, 1, 12, Commands.PRINT_TXT.name)
 
         if text_len <= 4:
-            cmd_word_len = constants.LEN2
+            cmd_word_len = LEN2
         elif text_len <= 8:
-            cmd_word_len = constants.LEN3
+            cmd_word_len = LEN3
         else:
-            cmd_word_len = constants.LEN4
+            cmd_word_len = LEN4
 
         text_encoded = bytearray(text)
         # add final padding to the encoded text
@@ -3158,7 +2938,7 @@ class DataSpecificationGenerator(object):
 
         cmd_word = (
             (cmd_word_len << 28) |
-            (Commands.PRINT_TXT.value << 20) |  # @UndefinedVariable
+            (Commands.PRINT_TXT.value << 20) |
             (text_len - 1))
         cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
         cmd_word_list = cmd_word_encoded + text_encoded
@@ -3179,16 +2959,14 @@ class DataSpecificationGenerator(object):
         :type structure_id_is_register: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise data_specification.exceptions.\
-            DataSpecificationParameterOutOfBoundsException:\
+        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             * If structure_id_is_register is True and structure_id is not a\
               valid register id
             * If structure_id_is_register is False and structure_id is not a\
               valid structure id
-        :raise data_specification.exceptions.\
-            DataSpecificationNotAllocatedException: \
+        :raise data_specification.exceptions.NotAllocatedException: \
             If structure_id_is_register is False and structure_id is the id\
             of a structure that has not been allocated
         """
@@ -3197,35 +2975,29 @@ class DataSpecificationGenerator(object):
         cmd_string = "PRINT_STRUCT"
 
         if structure_id_is_register:
-            if structure_id < 0 or structure_id >= constants.MAX_REGISTERS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "structure_id", structure_id, 0,
-                        constants.MAX_REGISTERS - 1,
-                        Commands.PRINT_STRUCT.name)  # @UndefinedVariable
+            if structure_id < 0 or structure_id >= MAX_REGISTERS:
+                raise ParameterOutOfBoundsException(
+                    "structure_id", structure_id, 0,
+                    MAX_REGISTERS - 1, Commands.PRINT_STRUCT.name)
             struct_register = structure_id
             structure_id = 0
             bit_field = 0x2
-            cmd_string = "{0:s} struct(reg[{1:d}])".format(
-                cmd_string, struct_register)
+            cmd_string += " struct(reg[{0:d}])".format(struct_register)
         else:
-            if structure_id < 0 or structure_id >= constants.MAX_STRUCT_SLOTS:
-                raise exceptions.\
-                    DataSpecificationParameterOutOfBoundsException(
-                        "structure_id", structure_id, 0,
-                        constants.MAX_STRUCT_SLOTS - 1,
-                        Commands.PRINT_STRUCT.name)  # @UndefinedVariable
+            if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
+                raise ParameterOutOfBoundsException(
+                    "structure_id", structure_id, 0,
+                    MAX_STRUCT_SLOTS - 1, Commands.PRINT_STRUCT.name)
 
             if self.struct_slot[structure_id] == 0:
-                raise exceptions.DataSpecificationNotAllocatedException(
+                raise NotAllocatedException(
                     "structure", structure_id, "PRINT_STRUCT")
 
-            cmd_string = "{0:s} struct({1:d})".format(
-                cmd_string, structure_id)
+            cmd_string += " struct({0:d})".format(structure_id)
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.PRINT_STRUCT.value << 20) |  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.PRINT_STRUCT.value << 20) |
             (bit_field << 16) |
             (struct_register << 8) |
             structure_id)
@@ -3239,21 +3011,21 @@ class DataSpecificationGenerator(object):
         """ Insert a command to indicate that the specification has finished\
             and finish writing
 
-        :param close_writer: Indicates whether to close the underlying\
-            writer(s)
+        :param close_writer: \
+            Indicates whether to close the underlying writer(s)
         :type close_writer: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
         self.comment("\nEnd of specification:")
 
         cmd_word = (
-            (constants.LEN1 << 28) |
-            (Commands.END_SPEC.value << 20))  # @UndefinedVariable
+            (LEN1 << 28) |
+            (Commands.END_SPEC.value << 20))
         encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
         parameter = -1
         encoded_parameter = _ONE_SINT.pack(parameter)
@@ -3290,30 +3062,27 @@ class DataSpecificationGenerator(object):
         :param no_instruction_number: bool
         :return: Nothing is returned
         :rtype: None
-        :raise data_specification.exceptions.DataUndefinedWriterException:\
+        :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
         if self.spec_writer is None:
-            raise exceptions.DataUndefinedWriterException(
+            raise DataUndefinedWriterException(
                 "The spec file writer has not been initialised")
         elif cmd_word_list:
             self.spec_writer.write(cmd_word_list)
 
         if self.report_writer is not None:
             if outdent is True:
-                self.txt_indent -= 1
-                if self.txt_indent < 0:
-                    self.txt_indent = 0
+                self.txt_indent = min(self.txt_indent - 1, 0)
+            indent_string = "   " * self.txt_indent
             if no_instruction_number is True:
                 formatted_cmd_string = "{0:s}{1:s}\n".format(
-                    "   " * self.txt_indent, cmd_string)
+                    indent_string, cmd_string)
             else:
                 formatted_cmd_string = "%8.8X. %s%s\n" % (
-                    self.instruction_counter,
-                    "   " * self.txt_indent,
-                    cmd_string)
+                    self.instruction_counter, indent_string, cmd_string)
                 self.instruction_counter += len(cmd_word_list)
             self.report_writer.write(formatted_cmd_string)
             if indent is True:

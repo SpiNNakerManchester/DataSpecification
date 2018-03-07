@@ -22,11 +22,8 @@ class DataSpecificationExecutor(object):
     __slots__ = [
         # The object to read the specification language file
         "spec_reader",
-
-        # The executer functions
-        "dsef"
-
-    ]
+        # The executor functions
+        "dsef"]
 
     def __init__(self, spec_reader, memory_space):
         """
@@ -67,6 +64,9 @@ class DataSpecificationExecutor(object):
             If a write to external storage fails
         :raise data_specification.exceptions.DataSpecificationException:\
             If there is an error when executing the specification
+        :raise data_specification.exceptions.TablePointerOutOfMemory:\
+            If the table pointer generated as data header exceeds the size of\
+            the available memory
         """
         index = 0
         instruction_spec = self.spec_reader.read(4)
@@ -108,7 +108,6 @@ class DataSpecificationExecutor(object):
                 next_free_offset += region.allocated_size
             else:
                 pointer_table[i] = 0
-
         return pointer_table
 
     def get_constructed_data_size(self):

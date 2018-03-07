@@ -60,22 +60,22 @@ class MemoryRegion(object):
         return self._allocated_size
 
     @property
-    def available_space(self):
+    def remaining_space(self):
         """ The maximum number of bytes that can be added to the region \
-        starting at the current write location
+            starting at the current write location
 
-        :return: the maximum size of write at the current write pointer
+        :return: the number of bytes in the region that are not yet written
         :rtype: int
         :raise None: this method does not raise any known exception
         """
-        return self._allocated_size - self._write_pointer
+        return self._allocated_size - self._mem_pointer
 
     @property
     def unfilled(self):
         """ Whether the region is unfilled
 
-        :return: the the
-        :rtype: None
+        :return: True if the region needs to be filled when written
+        :rtype: bool
         :raise None: this method does not raise any known exception
         """
         return self._unfilled

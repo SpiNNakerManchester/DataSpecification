@@ -926,10 +926,10 @@ class DataSpecificationGenerator(object):
         self.ongoing_function_definition = True
 
         read_only_flags = 0
-        for i in xrange(len(argument_by_value)):
+        for i, abv in enumerate(argument_by_value):
             cmd_string += " arg[{0:d}]=".format(i + 1)
-            if argument_by_value[i]:
-                read_only_flags |= 2 ** i
+            if abv:
+                read_only_flags |= 1 << i
                 cmd_string += "read-only"
             else:
                 cmd_string += "read-write"
@@ -1019,21 +1019,19 @@ class DataSpecificationGenerator(object):
         param_word = None
         if structure_ids:
             param_word = 0
-            for i in xrange(len(structure_ids)):
-                if structure_ids[i] < 0 \
-                        or structure_ids[i] >= MAX_STRUCT_SLOTS:
+            for i, struct_id in enumerate(structure_ids):
+                if struct_id < 0 or struct_id >= MAX_STRUCT_SLOTS:
                     raise ParameterOutOfBoundsException(
                         "structure argument {0:d}".format(i),
-                        structure_ids[i], 0, MAX_STRUCT_SLOTS - 1,
+                        struct_id, 0, MAX_STRUCT_SLOTS - 1,
                         Commands.CONSTRUCT.name)
-                if self.struct_slot[structure_ids[i]] == 0:
+                if self.struct_slot[struct_id] == 0:
                     raise NotAllocatedException(
                         "structure argument {0:d}".format(i),
-                        structure_ids[i], Commands.CONSTRUCT.name)
+                        struct_id, Commands.CONSTRUCT.name)
 
-                param_word |= structure_ids[i] << (6 * i)
-                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(
-                    i, structure_ids[i])
+                param_word |= struct_id << (6 * i)
+                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(i, struct_id)
 
         param_word_encoded = bytearray()
         if param_word is None:
@@ -3094,6 +3092,4 @@ class DataSpecificationGenerator(object):
         """ A list of sizes of each region that has been reserved. Note that\
             the list will include 0s for each non-reserved region.
         """
-        return [
-            self.mem_slot[i] if self.mem_slot[i] == 0 else self.mem_slot[i][0]
-            for i in range(len(self.mem_slot))]
+        return [0 if slot == 0 else slot[0] for slot in self.mem_slot]

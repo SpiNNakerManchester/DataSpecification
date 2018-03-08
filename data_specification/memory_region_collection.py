@@ -7,7 +7,7 @@ class MemoryRegionCollection(object):
     """
 
     __slots__ = [
-        # map of region id to region data
+        # map of region ID to region data
         "_regions"
     ]
 
@@ -25,8 +25,8 @@ class MemoryRegionCollection(object):
     def __setitem__(self, key, value):
         if key < 0 or key >= len(self._regions):
             raise NoRegionSelectedException(
-                "the region id requested is beyond the supported number of"
-                "available region ids")
+                "the region ID requested is beyond the supported number of"
+                "available region IDs")
         if self._regions[key] is not None:
             raise RegionInUseException(key)
         self._regions[key] = value
@@ -54,16 +54,16 @@ class MemoryRegionCollection(object):
         """ Helper method which determines if a unfilled region actually \
             needs to be written (optimisation to stop large data files).
 
-        :param region: the region id to which the test is being ran on
+        :param region: the region ID to which the test is being ran on
         :return: a boolean stating if the region needs to be written
         :rtype: bool
         :raise NoRegionSelectedException: \
-            when the id is beyond the expected region range
+            when the ID is beyond the expected region range
         """
         if region >= len(self._regions):
             raise NoRegionSelectedException(
-                "the region id requested is beyond the supported number of"
-                "available region ids")
+                "the region ID requested is beyond the supported number of"
+                "available region IDs")
         if not self.is_unfilled(region):
             return True
         return any(

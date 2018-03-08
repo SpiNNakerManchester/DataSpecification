@@ -80,9 +80,9 @@ class DataSpecificationExecutor(object):
             index += 4
 
     def get_region(self, region_id):
-        """ Get a region with a given id
+        """ Get a region with a given ID
 
-        :param region_id: The id of the region to get
+        :param region_id: The ID of the region to get
         :type region_id: int
         :return: The region, or None if the region was not allocated
         """

@@ -294,7 +294,7 @@ class DataSpecificationGenerator(object):
             If the random number generator with the given ID has already been\
             defined
         """
-        _bounds(Commands.DECLARE_RNG, "random number generator id",
+        _bounds(Commands.DECLARE_RNG, "random number generator ID",
                 rng_id, 0, MAX_RNGS)
         if rng_type not in RandomNumberGenerator:
             raise UnknownTypeException(
@@ -312,7 +312,7 @@ class DataSpecificationGenerator(object):
         encoded_seed = _ONE_WORD.pack(seed)
 
         cmd_string = Commands.DECLARE_RNG.name
-        cmd_string += " id={0:d}, source={1:d}, seed={2:d}".format(
+        cmd_string += " ID={0:d}, source={1:d}, seed={2:d}".format(
             rng_id, rng_type.value, seed)
         self.write_command_to_files(cmd_word + encoded_seed, cmd_string)
 
@@ -325,7 +325,7 @@ class DataSpecificationGenerator(object):
         :param structure_id: ID of an empty structure slot to fill with the\
             uniform random distribution data
         :type structure_id: int
-        :param rng_id: The IS of the random number generator, between 0 and 15
+        :param rng_id: The ID of the random number generator, between 0 and 15
         :type rng_id: int
         :param min_value: The minimum value that should be returned from the\
             distribution between -32768.0 and max_value
@@ -349,15 +349,15 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.StructureInUseException: \
             If structure structure_id is already defined
         """
-        _bounds(Commands.DECLARE_RANDOM_DIST, "distribution id",
+        _bounds(Commands.DECLARE_RANDOM_DIST, "distribution ID",
                 distribution_id, 0, MAX_RANDOM_DISTS)
-        _bounds(Commands.DECLARE_RANDOM_DIST, "rng id",
+        _bounds(Commands.DECLARE_RANDOM_DIST, "rng ID",
                 rng_id, 0, MAX_RNGS)
         _typebounds(Commands.DECLARE_RANDOM_DIST, "min_value",
                     min_value, DataType.S1615)
         _typebounds(Commands.DECLARE_RANDOM_DIST, "max_value",
                     max_value, DataType.S1615)
-        _bounds(Commands.DECLARE_RANDOM_DIST, "structure id",
+        _bounds(Commands.DECLARE_RANDOM_DIST, "structure ID",
                 structure_id, 0, MAX_STRUCT_SLOTS)
 
         if self.rng[rng_id] is None:
@@ -455,7 +455,7 @@ class DataSpecificationGenerator(object):
             If one of the data types in the structure is unknown
         """
         # start of struct
-        _bounds(Commands.START_STRUCT, "structure id",
+        _bounds(Commands.START_STRUCT, "structure ID",
                 structure_id, 0, MAX_STRUCT_SLOTS)
         _bounds(Commands.START_STRUCT, "structure elements",
                 len(parameters), 1, MAX_STRUCT_ELEMENTS)
@@ -466,7 +466,7 @@ class DataSpecificationGenerator(object):
         cmd_word = _binencode(LEN1, Commands.START_STRUCT, [
             structure_id])
         cmd_string = Commands.START_STRUCT.name
-        cmd_string += " id={0:d}".format(structure_id)
+        cmd_string += " ID={0:d}".format(structure_id)
         self.write_command_to_files(cmd_word, cmd_string)
 
         # elements of the struct
@@ -509,7 +509,7 @@ class DataSpecificationGenerator(object):
         # end of struct
         cmd_word = _binencode(LEN1, Commands.END_STRUCT)
         cmd_string = Commands.END_STRUCT.name
-        cmd_string += " id={0:d}".format(structure_id)
+        cmd_string += " ID={0:d}".format(structure_id)
         self.write_command_to_files(cmd_word, cmd_string)
 
     def get_structure_value(
@@ -769,7 +769,7 @@ class DataSpecificationGenerator(object):
         self.function_slots[function_id] = argument_by_value
 
         cmd_string = Commands.START_CONSTRUCTOR.name
-        cmd_string += " id={0:d} number_of_args={1:d}".format(
+        cmd_string += " ID={0:d} number_of_args={1:d}".format(
             function_id, len(argument_by_value))
 
         self.ongoing_function_definition = True

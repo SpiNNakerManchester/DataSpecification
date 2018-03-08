@@ -150,13 +150,13 @@ class NotAllocatedException(DataSpecificationException):
         """
         :param item_type: The type of the item being used
         :type item_type: str
-        :param item_id: The id of the item being used
+        :param item_id: The ID of the item being used
         :type item_id: int
         :param command: The command being executed
         :type command: str
         """
         super(NotAllocatedException, self).__init__(
-            "Using unallocated item with type {0:s} and id {1:d} during "
+            "Using unallocated item with type {0:s} and ID {1:d} during "
             "command {2:s}".format(item_type, item_id, command))
 
 
@@ -185,7 +185,7 @@ class FunctionInUseException(DataSpecificationException):
 
     def __init__(self, function_id):
         """
-        :param function_id: The id of the function
+        :param function_id: The ID of the function
         :type function_id: int
         """
         super(FunctionInUseException, self).__init__(
@@ -199,7 +199,7 @@ class RNGInUseException(DataSpecificationException):
 
     def __init__(self, rng_id):
         """
-        :param rng_id: The id of the rng
+        :param rng_id: The ID of the rng
         :type rng_id: int
         """
         super(RNGInUseException, self).__init__(
@@ -213,7 +213,7 @@ class RandomNumberDistributionInUseException(DataSpecificationException):
 
     def __init__(self, rng_id):
         """
-        :param rng_id: The id of the random number distribution
+        :param rng_id: The ID of the random number distribution
         :type rng_id: int
         """
         super(RandomNumberDistributionInUseException, self).__init__(
@@ -228,7 +228,7 @@ class WrongParameterNumberException(DataSpecificationException):
 
     def __init__(self, function_id, no_of_parameters_required, parameters):
         """
-        :param function_id: The id of the function
+        :param function_id: The ID of the function
         :type function_id: int
         :param parameters: The parameters used in the function call
         :type parameters: list
@@ -289,13 +289,13 @@ class UnknownTypeException(DataSpecificationException):
 
     def __init__(self, type_id, command):
         """
-        :param type_id: The id of the requested type
+        :param type_id: The ID of the requested type
         :type type_id: int
         :param command: The command being executed
         :type command: str
         """
         super(UnknownTypeException, self).__init__(
-            "Unknown id value {0:d} for data type during command {1:s}".format(
+            "Unknown ID value {0:d} for data type during command {1:s}".format(
                 type_id, command))
 
 
@@ -357,13 +357,13 @@ class UnknownConditionException(DataSpecificationException):
 
     def __init__(self, condition_id, command):
         """
-        :param condition_id: id of the condition being requested
+        :param condition_id: ID of the condition being requested
         :type condition_id: int
         :param command: The command being executed
         :type command: str
         """
         super(UnknownConditionException, self).__init__(
-            "The requested condition with id {0:d} does not belong to the "
+            "The requested condition with ID {0:d} does not belong to the "
             "list of possible tests during command {1:s}".format(
                 condition_id, command))
 
@@ -378,13 +378,13 @@ class InvalidOperationException(DataSpecificationException):
         :param operation_type: \
             The type of operation requested (i.e. arithmetic or logic)
         :type operation_type: str
-        :param requested_operation_id: The id of the requested operation
+        :param requested_operation_id: The ID of the requested operation
         :type requested_operation_id: int
         :param command: The command being executed
         :type command: str
         """
         super(InvalidOperationException, self).__init__(
-            "The {0:s} operation requested with id {1:d} does not match "
+            "The {0:s} operation requested with ID {1:d} does not match "
             "the possible operations available during command {2:s}".format(
                 operation_type, requested_operation_id, command))
 

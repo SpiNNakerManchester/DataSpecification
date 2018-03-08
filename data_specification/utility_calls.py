@@ -30,7 +30,7 @@ def get_region_base_address_offset(app_data_base_address, region):
     """ Find the address of the of a given region for the DSG
 
     :param app_data_base_address: base address for the core
-    :param region: the region id we're looking for
+    :param region: the region ID we're looking for
     """
     return (app_data_base_address +
             APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))

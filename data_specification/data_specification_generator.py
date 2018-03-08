@@ -2917,7 +2917,7 @@ class DataSpecificationGenerator(object):
         :param text: The text to write (max 12 characters)
         :type text: str
         :param encoding: \
-            The character encoding to use for the string. Defaults to ASCII. 
+            The character encoding to use for the string. Defaults to ASCII.
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \

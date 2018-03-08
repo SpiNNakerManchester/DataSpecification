@@ -20,6 +20,7 @@ from data_specification.enums import \
     ArithmeticOperation
 from spinn_machine import sdram
 import numpy
+from spinn_storage_handlers.abstract_classes import AbstractDataWriter
 
 logger = logging.getLogger(__name__)
 _ONE_SBYTE = struct.Struct("<b")
@@ -87,14 +88,20 @@ class DataSpecificationGenerator(object):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: \
-            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         :param report_writer: \
             Determines if a text version of the specification is to be\
             written and, if so, where. No report is written if this is None.
         :type report_writer: \
-            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         """
+        if not isinstance(spec_writer, AbstractDataWriter):
+            raise TypeError("spec_writer must be an AbstractDataWriter")
         self.spec_writer = spec_writer
+        if report_writer is not None and not isinstance(
+                report_writer, AbstractDataWriter):
+            raise TypeError(
+                "report_writer must be an AbstractDataWriter or None")
         self.report_writer = report_writer
         self.txt_indent = 0
         self.instruction_counter = 0
@@ -3082,10 +3089,11 @@ class DataSpecificationGenerator(object):
                 formatted_cmd_string = "{0:s}{1:s}\n".format(
                     indent_string, cmd_string)
             else:
-                formatted_cmd_string = "%8.8X. %s%s\n" % (
-                    self.instruction_counter, indent_string, cmd_string)
+                pc = "%8.8X" % self.instruction_counter
+                formatted_cmd_string = "{}. {}{}\n".format(
+                    pc, indent_string, cmd_string)
                 self.instruction_counter += len(cmd_word_list)
-            self.report_writer.write(formatted_cmd_string)
+            self.report_writer.write(formatted_cmd_string.encode("UTF-8"))
             if indent is True:
                 self.txt_indent += 1
         return

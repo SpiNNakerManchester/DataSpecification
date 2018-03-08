@@ -1,10 +1,9 @@
 import unittest
 import struct
-from io import BytesIO
-try:
-    from io import StringIO
-except ImportError:
-    from StringIO import StringIO
+import os
+import tempfile
+from io import FileIO
+from spinn_storage_handlers import FileDataWriter
 
 from data_specification import constants
 from data_specification.exceptions \
@@ -24,33 +23,32 @@ _64BIT_VALUE = 0x1234567890ABCDEF
 
 class TestDataSpecGeneration(unittest.TestCase):
     def setUp(self):
-        # Indicate if there has been a previous read
-        self.previous_read = False
-
-        self.spec_writer = BytesIO()
-        self.report_writer = StringIO()
+        self.temp_dir = tempfile.mkdtemp()
+        self.spec_file = os.path.join(self.temp_dir, "spec")
+        self.report_file = os.path.join(self.temp_dir, "report")
+        self.spec_writer = FileDataWriter(self.spec_file)
+        self.report_writer = FileDataWriter(self.report_file)
+        self.spec_reader = FileIO(self.spec_file)
+        self.report_reader = FileIO(self.report_file)
         self.dsg = DataSpecificationGenerator(self.spec_writer,
                                               self.report_writer)
 
     def tearDown(self):
-        pass
+        os.remove(self.spec_file)
+        os.remove(self.report_file)
+        os.rmdir(self.temp_dir)
 
     def get_next_word(self, count=1):
-        if not self.previous_read:
-            self.spec_writer.seek(0)
-            self.previous_read = True
+        self.spec_writer._file_container._flush()
         if count < 2:
-            return struct.unpack("<I", self.spec_writer.read(4))[0]
+            return struct.unpack("<I", self.spec_reader.read(4))[0]
         words = list()
         for _ in range(count):
-            words.append(struct.unpack("<I", self.spec_writer.read(4))[0])
+            words.append(struct.unpack("<I", self.spec_reader.read(4))[0])
         return words
 
     def skip_words(self, words):
-        if not self.previous_read:
-            self.spec_writer.seek(0)
-            self.previous_read = True
-        self.spec_writer.read(4 * words)
+        self.spec_reader.read(4 * words)
 
     def test_new_data_spec_generator(self):
         # DSG spec writer not initialized correctly
@@ -74,14 +72,14 @@ class TestDataSpecGeneration(unittest.TestCase):
         # BREAK added more words
         self.assertEqual(self.get_next_word(), 0x00000000)
         # NOP wrong command word
-        self.assertEqual(self.spec_writer.read(1), b"")
+        self.assertEqual(self.spec_reader.read(1), b"")
 
     def test_no_operation(self):
         self.dsg.no_operation()
         # NOP added more words
         self.assertEqual(self.get_next_word(), 0x00100000)
         # RESERVE wrong command word for memory region 1
-        self.assertEqual(self.spec_writer.read(1), b"")
+        self.assertEqual(self.spec_reader.read(1), b"")
 
     def test_reserve_memory_region(self):
         self.dsg.reserve_memory_region(1, 0x111)
@@ -586,8 +584,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.comment("test")
 
         # Comment generated data specification
+        self.report_writer._file_container._flush()
         self.assertEqual(self.spec_writer.tell(), 0)
-        self.assertEqual(self.report_writer.getvalue(), "test\n")
+        self.assertEqual(self.report_reader.read(), b"test\n")
 
     def test_copy_structure(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])

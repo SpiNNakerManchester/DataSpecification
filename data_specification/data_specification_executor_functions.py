@@ -150,8 +150,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if not self.mem_regions.is_empty(region):
             raise RegionInUseException(region)
 
-        size_encoded = self.spec_reader.read(4)
-        size = _ONE_WORD.unpack(str(size_encoded))[0]
+        size = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
@@ -188,11 +187,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.use_src1_reg:
             value = self.registers[self.src1_reg]
         elif self._cmd_size == LEN2 and data_len != 8:
-            read_data = self.spec_reader.read(4)
-            value = _ONE_WORD.unpack(str(read_data))[0]
+            value = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
         elif self._cmd_size == LEN3 and data_len == 8:
-            read_data = self.spec_reader.read(8)
-            value = _ONE_LONG.unpack(str(read_data))[0]
+            value = _ONE_LONG.unpack(self.spec_reader.read(8))[0]
         else:
             raise DataSpecificationSyntaxError(
                 "Command {0:s} requires a value as an argument, but the "
@@ -212,8 +209,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :return: No value returned
         :rtype: None
         """
-        length_encoded = self.spec_reader.read(4)
-        length = _ONE_WORD.unpack(str(length_encoded))[0]
+        length = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
         value_encoded = self.spec_reader.read(4 * length)
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
@@ -262,26 +258,21 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.use_src1_reg:
             self.registers[self.dest_reg] = self.registers[self.src1_reg]
         else:
-            data_encoded = self.spec_reader.read(4)
-            data = _ONE_WORD.unpack(str(data_encoded))[0]
+            data = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
             self.registers[self.dest_reg] = data
 
     def execute_set_wr_ptr(self, cmd):
         address = None
         self.__unpack_cmd__(cmd)
         if self.use_src1_reg == 1:
-
             # the data is a register
             future_address = self.registers[self.src1_reg]
         else:
-
             # the data is a raw address
-            data_encoded = self.spec_reader.read(4)
-            future_address = _ONE_WORD.unpack(str(data_encoded))[0]
+            future_address = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
 
         # check that the address is relative or absolute
         if cmd & 0x1 == 1:
-
             # relative to its current write pointer
             if self._region is None:
                 raise NoRegionSelectedException(
@@ -306,12 +297,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If command END_SPEC != -1
         """
-        read_data = self.spec_reader.read(4)
-        value = _ONE_SIGNED_INT.unpack(str(read_data))[0]
+        value = _ONE_SIGNED_INT.unpack(self.spec_reader.read(4))[0]
         if value != -1:
             raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
-                "current argument value is {0:d}".format(value))
+                "current argument value is {0}".format(value))
         return END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):

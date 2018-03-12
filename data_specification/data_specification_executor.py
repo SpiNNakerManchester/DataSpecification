@@ -1,6 +1,7 @@
 import logging
 import numpy
 import struct
+from six import raise_from
 
 from .data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as Dsef
@@ -71,12 +72,12 @@ class DataSpecificationExecutor(object):
                 # noinspection PyArgumentList
                 # pylint: disable=no-value-for-parameter
                 return_value = Commands(opcode).exec_function(self.dsef, cmd)
-            except (ValueError, TypeError):
+            except (ValueError, TypeError) as e:
                 logger.debug("problem decoding opcode %d at index %d",
                              cmd, index, exc_info=True)
-                raise DataSpecificationException(
+                raise_from(DataSpecificationException(
                     "Invalid command {0} while reading file {1}".format(
-                        hex(cmd), self.spec_reader.filename))
+                        hex(cmd), self.spec_reader.filename)), e)
 
             if return_value == END_SPEC_EXECUTOR:
                 break

@@ -1,7 +1,9 @@
 import unittest
 import struct
-from io import BytesIO
-from StringIO import StringIO
+import os
+import tempfile
+from io import FileIO
+from spinn_storage_handlers import FileDataWriter
 
 from data_specification import constants
 from data_specification.exceptions \
@@ -12,41 +14,41 @@ from data_specification.exceptions \
     DuplicateParameterException, FunctionInUseException,\
     RegionUnfilledException, RandomNumberDistributionInUseException,\
     RNGInUseException
-
 from data_specification.enums import DataType, Condition, RandomNumberGenerator
 from data_specification.enums import ArithmeticOperation, LogicOperation
 from data_specification import DataSpecificationGenerator
 
+_64BIT_VALUE = 0x1234567890ABCDEF
+
 
 class TestDataSpecGeneration(unittest.TestCase):
     def setUp(self):
-        # Indicate if there has been a previous read
-        self.previous_read = False
-
-        self.spec_writer = BytesIO()
-        self.report_writer = StringIO()
+        self.temp_dir = tempfile.mkdtemp()
+        self.spec_file = os.path.join(self.temp_dir, "spec")
+        self.report_file = os.path.join(self.temp_dir, "report")
+        self.spec_writer = FileDataWriter(self.spec_file)
+        self.report_writer = FileDataWriter(self.report_file)
+        self.spec_reader = FileIO(self.spec_file)
+        self.report_reader = FileIO(self.report_file)
         self.dsg = DataSpecificationGenerator(self.spec_writer,
                                               self.report_writer)
 
     def tearDown(self):
-        pass
+        os.remove(self.spec_file)
+        os.remove(self.report_file)
+        os.rmdir(self.temp_dir)
 
     def get_next_word(self, count=1):
-        if not self.previous_read:
-            self.spec_writer.seek(0)
-            self.previous_read = True
+        self.spec_writer._file_container._flush()
         if count < 2:
-            return struct.unpack("<I", self.spec_writer.read(4))[0]
+            return struct.unpack("<I", self.spec_reader.read(4))[0]
         words = list()
         for _ in range(count):
-            words.append(struct.unpack("<I", self.spec_writer.read(4))[0])
+            words.append(struct.unpack("<I", self.spec_reader.read(4))[0])
         return words
 
     def skip_words(self, words):
-        if not self.previous_read:
-            self.spec_writer.seek(0)
-            self.previous_read = True
-        self.spec_writer.read(4 * words)
+        self.spec_reader.read(4 * words)
 
     def test_new_data_spec_generator(self):
         # DSG spec writer not initialized correctly
@@ -70,14 +72,14 @@ class TestDataSpecGeneration(unittest.TestCase):
         # BREAK added more words
         self.assertEqual(self.get_next_word(), 0x00000000)
         # NOP wrong command word
-        self.assertEqual(self.spec_writer.read(1), "")
+        self.assertEqual(self.spec_reader.read(1), b"")
 
     def test_no_operation(self):
         self.dsg.no_operation()
         # NOP added more words
         self.assertEqual(self.get_next_word(), 0x00100000)
         # RESERVE wrong command word for memory region 1
-        self.assertEqual(self.spec_writer.read(1), "")
+        self.assertEqual(self.spec_reader.read(1), b"")
 
     def test_reserve_memory_region(self):
         self.dsg.reserve_memory_region(1, 0x111)
@@ -134,7 +136,7 @@ class TestDataSpecGeneration(unittest.TestCase):
                                       ("second", DataType.UINT32, 0x12345679),
                                       ("third", DataType.INT16, None),
                                       ("fourth", DataType.UINT64,
-                                       0x123456789ABCDEFL)])
+                                       _64BIT_VALUE)])
         with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.define_structure(-1, [("first", DataType.UINT8, 0xAB)])
         with self.assertRaises(ParameterOutOfBoundsException):
@@ -154,7 +156,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(2), [0x11100002, 0x12345679])
         self.assertEqual(self.get_next_word(), 0x01100005)
         self.assertEqual(self.get_next_word(3),
-                         [0x21100003, 0x89ABCDEF, 0x01234567])
+                         [0x21100003, 0x90ABCDEF, 0x12345678])
         # Call addition signed and unsigned
         self.assertEqual(self.get_next_word(), 0x01200000)
 
@@ -582,8 +584,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.comment("test")
 
         # Comment generated data specification
+        self.report_writer._file_container._flush()
         self.assertEqual(self.spec_writer.tell(), 0)
-        self.assertEqual(self.report_writer.getvalue(), "test\n")
+        self.assertEqual(self.report_reader.read(), b"test\n")
 
     def test_copy_structure(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -934,7 +937,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.print_value(2, True)
         self.dsg.print_value(2, True, DataType.INT32)
         self.dsg.print_value(2, True, DataType.INT64)
-        self.dsg.print_value(0x123456789ABCDEFL, False, DataType.UINT64)
+        self.dsg.print_value(_64BIT_VALUE, False, DataType.UINT64)
         self.dsg.print_value(2, True, DataType.U88)
 
         with self.assertRaises(ParameterOutOfBoundsException):
@@ -954,12 +957,12 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x08020206)
         self.assertEqual(self.get_next_word(), 0x08020207)
         self.assertEqual(self.get_next_word(3),
-                         [0x28000003, 0x89ABCDEF, 0x01234567])
+                         [0x28000003, 0x90ABCDEF, 0x12345678])
 
     def test_set_register_value(self):
         self.dsg.set_register_value(0, 0, False, DataType.UINT32)
         self.dsg.set_register_value(1, 0x12345678, False, DataType.UINT32)
-        self.dsg.set_register_value(2, 0x123456789ABCDEFL, False,
+        self.dsg.set_register_value(2, _64BIT_VALUE, False,
                                     DataType.UINT64)
         self.dsg.set_register_value(2, 0x01234567, False, DataType.INT32)
         self.dsg.set_register_value(3, 0x67, False, DataType.UINT8)
@@ -982,7 +985,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(2), [0x16040000, 0x00000000])
         self.assertEqual(self.get_next_word(2), [0x16041000, 0x12345678])
         self.assertEqual(self.get_next_word(3),
-                         [0x26042000, 0x89ABCDEF, 0x01234567])
+                         [0x26042000, 0x90ABCDEF, 0x12345678])
         self.assertEqual(self.get_next_word(2), [0x16042000, 0x01234567])
         self.assertEqual(self.get_next_word(2), [0x16043000, 0x00000067])
         self.assertEqual(self.get_next_word(), 0x06063200)
@@ -1008,7 +1011,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.set_write_pointer(constants.MAX_REGISTERS, True)
         with self.assertRaises(ParameterOutOfBoundsException):
-            self.dsg.set_write_pointer(0x123456789L, False)
+            self.dsg.set_write_pointer(0x123456789, False)
 
         self.skip_words(3)
         # SET_WR_PTR
@@ -1033,10 +1036,8 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.write_repeated_value(0x12, 12)
         self.dsg.write_repeated_value(0x12, 0xFF, False, DataType.UINT8)
         self.dsg.write_repeated_value(0x12, 5, False, DataType.UINT16)
-        self.dsg.write_repeated_value(0x123456789ABCDEFL, 5, False,
-                                      DataType.UINT64)
-        self.dsg.write_repeated_value(0x123456789ABCDEFL, 5, True,
-                                      DataType.UINT64)
+        self.dsg.write_repeated_value(_64BIT_VALUE, 5, False, DataType.UINT64)
+        self.dsg.write_repeated_value(_64BIT_VALUE, 5, True, DataType.UINT64)
         self.dsg.write_repeated_value(0x123, 2, True, DataType.UINT64)
 
         with self.assertRaises(ParameterOutOfBoundsException):
@@ -1060,9 +1061,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(2), [0x142000FF, 0x00000012])
         self.assertEqual(self.get_next_word(2), [0x14201005, 0x00000012])
         self.assertEqual(self.get_next_word(3),
-                         [0x24203005, 0x89ABCDEF, 0x01234567])
+                         [0x24203005, 0x90ABCDEF, 0x12345678])
         self.assertEqual(self.get_next_word(3),
-                         [0x24213050, 0x89ABCDEF, 0x01234567])
+                         [0x24213050, 0x90ABCDEF, 0x12345678])
         self.assertEqual(self.get_next_word(3),
                          [0x24213020, 0x00000123, 0x00000000])
 
@@ -1162,7 +1163,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.set_structure_value(0, 0, 0x12, DataType.UINT8)
         self.dsg.set_structure_value(1, 2, 0x1234, DataType.INT16)
         self.dsg.set_structure_value(1, 1, 0x12345678, DataType.UINT32)
-        self.dsg.set_structure_value(10, 1, 0x123456789ABCDEFL,
+        self.dsg.set_structure_value(10, 1, _64BIT_VALUE,
                                      DataType.UINT64)
 
         self.dsg.set_structure_value(1, 0, 2, DataType.UINT8, True)
@@ -1192,7 +1193,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(2), [0x17201002, 0x00001234])
         self.assertEqual(self.get_next_word(2), [0x17201001, 0x12345678])
         self.assertEqual(self.get_next_word(3),
-                         [0x2720A001, 0x89ABCDEF, 0x01234567])
+                         [0x2720A001, 0x90ABCDEF, 0x12345678])
         self.assertEqual(self.get_next_word(), 0x07221200)
         self.assertEqual(self.get_next_word(), 0x07221301)
         self.assertEqual(self.get_next_word(), 0x0722A501)
@@ -1330,7 +1331,7 @@ class TestDataSpecGeneration(unittest.TestCase):
                                       ("second", DataType.UINT32, 0x12345679),
                                       ("third", DataType.INT16, None),
                                       ("fourth", DataType.UINT64,
-                                       0x123456789ABCDEFL)])
+                                       _64BIT_VALUE)])
 
         self.dsg.get_structure_value(0, 0, 0, False)
         self.dsg.get_structure_value(3, 0, 0, False)

@@ -37,7 +37,7 @@ class MyTestCase(unittest.TestCase):
                 mrc[r] = mr0
         assert mrc[7] == mr_b
         self.assertEqual(mrc.count_used_regions(), 8)
-        assert [mrc[r] is not None for r in range(len(mrc))] == [
+        assert [region is not None for region in mrc] == [
             True, True, True, True, True, True, True, True,
             False, False, False, False, False, False, False, False]
         assert [mrc.needs_to_write_region(r) for r in range(len(mrc))] == [

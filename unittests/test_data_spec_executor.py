@@ -121,7 +121,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertFalse(r.unfilled)
         self.assertEqual(r.region_data, bytearray(
             "A321" "B321" "D321" "G321" "K321" "\0\0\0\0" "abcd" "pppp"
-            "}\0\0\0" "\0\0\0\0" "\0\0\0\0"))
+            "}\0\0\0" "\0\0\0\0" "\0\0\0\0".encode("ISO 8859-1")))
 
 
 if __name__ == '__main__':

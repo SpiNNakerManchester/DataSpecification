@@ -20,12 +20,18 @@ from data_specification.enums import \
     ArithmeticOperation
 from spinn_machine import sdram
 import numpy
+from spinn_storage_handlers.abstract_classes import AbstractDataWriter
 
 logger = logging.getLogger(__name__)
 _ONE_SBYTE = struct.Struct("<b")
 _ONE_WORD = struct.Struct("<I")
 _ONE_SINT = struct.Struct("<i")
 _TWO_WORDS = struct.Struct("<II")
+
+
+def _rescale(data, data_type):
+    data_value = decimal.Decimal(str(data)) * data_type.scale
+    return int(data_value.to_integral_value())
 
 
 class DataSpecificationGenerator(object):
@@ -82,14 +88,20 @@ class DataSpecificationGenerator(object):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: \
-            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         :param report_writer: \
             Determines if a text version of the specification is to be\
             written and, if so, where. No report is written if this is None.
         :type report_writer: \
-            :py:class:`data_specification.abstract_data_writer.AbstractDataWriter`
+            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         """
+        if not isinstance(spec_writer, AbstractDataWriter):
+            raise TypeError("spec_writer must be an AbstractDataWriter")
         self.spec_writer = spec_writer
+        if report_writer is not None and not isinstance(
+                report_writer, AbstractDataWriter):
+            raise TypeError(
+                "report_writer must be an AbstractDataWriter or None")
         self.report_writer = report_writer
         self.txt_indent = 0
         self.instruction_counter = 0
@@ -556,9 +568,9 @@ class DataSpecificationGenerator(object):
                         data_type.name, data_type.size,
                         Commands.STRUCT_ELEM.name)
 
-                data_format = "<{}".format(data_type.struct_encoding)
-                data_value = decimal.Decimal(str(value)) * data_type.scale
-                value_encoded = bytearray(struct.pack(data_format, data_value))
+                value_encoded = bytearray(struct.pack(
+                    "<{}".format(data_type.struct_encoding),
+                    _rescale(value, data_type)))
 
                 cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word)) + \
                     value_encoded + bytearray((4 - data_type.size % 4) % 4)
@@ -926,10 +938,10 @@ class DataSpecificationGenerator(object):
         self.ongoing_function_definition = True
 
         read_only_flags = 0
-        for i in xrange(len(argument_by_value)):
+        for i, abv in enumerate(argument_by_value):
             cmd_string += " arg[{0:d}]=".format(i + 1)
-            if argument_by_value[i]:
-                read_only_flags |= 2 ** i
+            if abv:
+                read_only_flags |= 1 << i
                 cmd_string += "read-only"
             else:
                 cmd_string += "read-write"
@@ -1019,21 +1031,19 @@ class DataSpecificationGenerator(object):
         param_word = None
         if structure_ids:
             param_word = 0
-            for i in xrange(len(structure_ids)):
-                if structure_ids[i] < 0 \
-                        or structure_ids[i] >= MAX_STRUCT_SLOTS:
+            for i, struct_id in enumerate(structure_ids):
+                if struct_id < 0 or struct_id >= MAX_STRUCT_SLOTS:
                     raise ParameterOutOfBoundsException(
                         "structure argument {0:d}".format(i),
-                        structure_ids[i], 0, MAX_STRUCT_SLOTS - 1,
+                        struct_id, 0, MAX_STRUCT_SLOTS - 1,
                         Commands.CONSTRUCT.name)
-                if self.struct_slot[structure_ids[i]] == 0:
+                if self.struct_slot[struct_id] == 0:
                     raise NotAllocatedException(
                         "structure argument {0:d}".format(i),
-                        structure_ids[i], Commands.CONSTRUCT.name)
+                        struct_id, Commands.CONSTRUCT.name)
 
-                param_word |= structure_ids[i] << (6 * i)
-                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(
-                    i, structure_ids[i])
+                param_word |= struct_id << (6 * i)
+                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(i, struct_id)
 
         param_word_encoded = bytearray()
         if param_word is None:
@@ -1100,8 +1110,8 @@ class DataSpecificationGenerator(object):
             This does not actually insert the WRITE command in the spec;\
             that is done by :py:meth:`write_cmd`.
 
-        :param data: the data to write as a float.
-        :type data: float
+        :param data: the data to write.
+        :type data: int or float
         :param data_type: the type to convert data to
         :type data_type: :py:class:`DataType`
         :return: cmd_word_list; list of binary words to be added to the\
@@ -1155,12 +1165,10 @@ class DataSpecificationGenerator(object):
             (repeat_reg_usage << 16) | (data_len << 12) | 1)
         # 1 is based on parameters = 0, repeats = 1 and parameters |= repeats
 
-        data_value = decimal.Decimal("{}".format(data)) * data_type.scale
         padding = 4 - data_type.size if data_type.size < 4 else 0
-
         cmd_word_list = struct.pack(
             "<I{}{}x".format(data_type.struct_encoding, padding),
-            cmd_word, data_value)
+            cmd_word, _rescale(data, data_type))
         if self.report_writer is not None:
             cmd_string += ", dataType={0:s}".format(data_type.name)
         return (cmd_word_list, cmd_string)
@@ -1324,12 +1332,10 @@ class DataSpecificationGenerator(object):
             (Commands.WRITE.value << 20) |
             (repeat_reg_usage << 16) | (data_len << 12) | parameters)
 
-        data_value = decimal.Decimal("{}".format(data)) * data_type.scale
         padding = 4 - data_type.size if data_type.size < 4 else 0
-
         cmd_word_list = struct.pack(
             "<I{}{}x".format(data_type.struct_encoding, padding),
-            cmd_word, data_value)
+            cmd_word, _rescale(data, data_type))
         cmd_string += ", dataType={0:s}".format(data_type.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -1467,9 +1473,9 @@ class DataSpecificationGenerator(object):
         if size % 4 != 0:
             raise UnknownTypeLengthException(size, Commands.WRITE_ARRAY.name)
 
-        cmd_string = "WRITE_ARRAY, {0:d} elements\n".format(size / 4)
+        cmd_string = "WRITE_ARRAY, {0:d} elements\n".format(size // 4)
 
-        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, size / 4))
+        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, size // 4))
         self.write_command_to_files(cmd_word_list, cmd_string)
         self.spec_writer.write(data.tostring())
 
@@ -2905,11 +2911,13 @@ class DataSpecificationGenerator(object):
 
         self.write_command_to_files(cmd_word_list, cmd_string)
 
-    def print_text(self, text):
+    def print_text(self, text, encoding="ASCII"):
         """ Insert command to print some text (for debugging)
 
         :param text: The text to write (max 12 characters)
         :type text: str
+        :param encoding: \
+            The character encoding to use for the string. Defaults to ASCII.
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -2917,7 +2925,8 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
-        text_len = len(text)
+        text_encoded = bytearray(text.encode(encoding=encoding))
+        text_len = len(text_encoded)
         if text_len > 12:
             raise ParameterOutOfBoundsException(
                 "len(text)", text_len, 1, 12, Commands.PRINT_TXT.name)
@@ -2929,7 +2938,6 @@ class DataSpecificationGenerator(object):
         else:
             cmd_word_len = LEN4
 
-        text_encoded = bytearray(text)
         # add final padding to the encoded text
         if text_len % 4 is not 0:
             text_encoded += bytearray(4 - (text_len % 4))
@@ -3081,10 +3089,11 @@ class DataSpecificationGenerator(object):
                 formatted_cmd_string = "{0:s}{1:s}\n".format(
                     indent_string, cmd_string)
             else:
-                formatted_cmd_string = "%8.8X. %s%s\n" % (
-                    self.instruction_counter, indent_string, cmd_string)
+                pc = "%8.8X" % self.instruction_counter
+                formatted_cmd_string = "{}. {}{}\n".format(
+                    pc, indent_string, cmd_string)
                 self.instruction_counter += len(cmd_word_list)
-            self.report_writer.write(formatted_cmd_string)
+            self.report_writer.write(formatted_cmd_string.encode("UTF-8"))
             if indent is True:
                 self.txt_indent += 1
         return
@@ -3094,6 +3103,4 @@ class DataSpecificationGenerator(object):
         """ A list of sizes of each region that has been reserved. Note that\
             the list will include 0s for each non-reserved region.
         """
-        return [
-            self.mem_slot[i] if self.mem_slot[i] == 0 else self.mem_slot[i][0]
-            for i in range(len(self.mem_slot))]
+        return [0 if slot == 0 else slot[0] for slot in self.mem_slot]

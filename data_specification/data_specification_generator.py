@@ -35,8 +35,8 @@ def _rescale(data, data_type):
 
 
 class DataSpecificationGenerator(object):
-    """ Used to generate a data specification language file that can be\
-        executed to produce a memory image
+    """ Used to generate a SpiNNaker data specification language file that\
+        can be executed to produce a memory image
     """
     # pylint: disable=too-many-arguments
 
@@ -88,12 +88,12 @@ class DataSpecificationGenerator(object):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: \
-            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
+            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         :param report_writer: \
             Determines if a text version of the specification is to be\
             written and, if so, where. No report is written if this is None.
         :type report_writer: \
-            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
+            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         """
         if not isinstance(spec_writer, AbstractDataWriter):
             raise TypeError("spec_writer must be an AbstractDataWriter")
@@ -280,7 +280,7 @@ class DataSpecificationGenerator(object):
         :param rng_id: The ID of the random number generator
         :type rng_id: int
         :param rng_type: The type of the random number generator
-        :type rng_type: :py:class:`RandomNumberGenerator`
+        :type rng_type: :py:class:`~RandomNumberGenerator`
         :param seed: The seed of the random number generator >= 0
         :type seed: int
         :return: \
@@ -494,7 +494,7 @@ class DataSpecificationGenerator(object):
             * data_type is the data type of the element
             * value is the value of the element, or None if no value is to\
             be assigned
-        :type parameters: list of (str, :py:class:`DataType`, float)
+        :type parameters: list of (str, :py:class:`~DataType`, float)
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -704,7 +704,7 @@ class DataSpecificationGenerator(object):
         :param data_type: type of the data to be stored in the structure.\
             If parameter value_is_register is set to true, this variable is\
             disregarded
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :param value_is_register: Identifies if value identifies a register
         :type value_is_register: bool
         :return: Nothing is returned
@@ -1069,7 +1069,7 @@ class DataSpecificationGenerator(object):
         :param dest_id: The ID of the destination register.
         :type dest_id: int
         :param data_type: The type of the data to be read.
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         """
@@ -1113,7 +1113,7 @@ class DataSpecificationGenerator(object):
         :param data: the data to write.
         :type data: int or float
         :param data_type: the type to convert data to
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: cmd_word_list; list of binary words to be added to the\
             binary data specification file, and
             cmd_string; string describing the command to be added to the\
@@ -1187,7 +1187,7 @@ class DataSpecificationGenerator(object):
         :param data: the data to write as a float.
         :type data: float
         :param data_type: the type to convert data to
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1258,7 +1258,7 @@ class DataSpecificationGenerator(object):
             containing the number of repeats of the value to write
         :type repeats_is_register: bool
         :param data_type: the type to convert data to
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1361,7 +1361,7 @@ class DataSpecificationGenerator(object):
             number of repeats of the value to write
         :type repeats_is_register: None or int
         :param data_type: the type of the data held in the register
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1445,7 +1445,7 @@ class DataSpecificationGenerator(object):
         :param array_values: An array of words to be written
         :type array_values: list of unsigned int
         :param data_type: Type of data contained in the array
-        :type data_type: data_specification.enums.DataType
+        :type data_type: :py:class:`~data_specification.enums.DataType`
         :return: The position of the write pointer within the current region,\
             in bytes from the start of the region
         :rtype: int
@@ -1872,7 +1872,7 @@ class DataSpecificationGenerator(object):
         :param data_is_register: Indicates if data is a register ID
         :type data_is_register: bool
         :param data_type: The type of the data to be assigned
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1997,8 +1997,8 @@ class DataSpecificationGenerator(object):
             * If address_is_register is False, the address to move the\
               write pointer to
         :type address: int
-        :param address_is_register: Indicates if the the address is a\
-            register ID
+        :param address_is_register: \
+            Indicates if the the address is a register ID
         :type address_is_register: bool
         :param relative_to_current: \
             Indicates if the address is to be added to the current address,\
@@ -2172,7 +2172,7 @@ class DataSpecificationGenerator(object):
             * If operand_1_is_register is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
-        :type operation: :py:class:`ArithmeticOperation`
+        :type operation: :py:class:`~ArithmeticOperation`
         :param operand_2:
             * If operand_2_is_register is True, the ID of a register where\
               the second operand can be found, between 0 and 15
@@ -2505,7 +2505,7 @@ class DataSpecificationGenerator(object):
             * If operand_1_is_register is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
-        :type operation: :py:class:`LogicOperation`
+        :type operation: :py:class:`~LogicOperation`
         :param operand_2:
             * If operand_2_is_register is True, the ID of a register\
               where the second operand can be found. between 0 and 15
@@ -2703,8 +2703,8 @@ class DataSpecificationGenerator(object):
                                  destination_id,
                                  destination_parameter_index=None,
                                  destination_is_register=False):
-        """ Insert command to copy the value of a parameter from one structure
-        to another
+        """ Insert command to copy the value of a parameter from one\
+            structure to another.
 
         :param source_structure_id: \
             The ID of the source structure, between 0 and 15
@@ -2721,7 +2721,7 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :param destination_is_register: \
             Indicates whether the destination is a structure or a register.
-        :type destination_is_register: boolean
+        :type destination_is_register: bool
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
@@ -2854,7 +2854,7 @@ class DataSpecificationGenerator(object):
         :param value_is_register: Indicates if the value is a register
         :type value_is_register: bool
         :param data_type: The type of the data to be printed
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \

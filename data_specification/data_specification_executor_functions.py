@@ -60,7 +60,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :param spec_reader: \
             The object to read the specification language file from
         :type spec_reader:\
-            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
+            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataReader`
         :param memory_space: \
             Memory space available for the data to be generated
         :type memory_space: int

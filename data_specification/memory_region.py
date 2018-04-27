@@ -26,7 +26,6 @@ class MemoryRegion(object):
 
     def __init__(self, memory_pointer, unfilled, size):
         """
-
         :param memory_pointer: the write pointer position
         :param unfilled: if the region needs to be filled when written
         :rtype: None
@@ -41,7 +40,7 @@ class MemoryRegion(object):
 
     @property
     def memory_pointer(self):
-        """ property method to retrieve memory write pointer
+        """ the memory write pointer
 
         :return: the memory pointer of the region
         :rtype: int
@@ -51,7 +50,7 @@ class MemoryRegion(object):
 
     @property
     def allocated_size(self):
-        """ property method for the size of the region
+        """ the size of the region
 
         :return: the size of the region
         :rtype: int
@@ -71,7 +70,7 @@ class MemoryRegion(object):
 
     @property
     def unfilled(self):
-        """ property method to retrieve if the region is filled
+        """ whether the region is filled
 
         :return: True if the region needs to be filled when written
         :rtype: bool

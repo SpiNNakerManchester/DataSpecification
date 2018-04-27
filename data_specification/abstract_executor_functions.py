@@ -2,7 +2,7 @@ from .exceptions import UnimplementedDSECommandError
 
 
 class AbstractExecutorFunctions(object):
-    """This class defines a function related to each of the commands of the\
+    """ This class defines a function related to each of the commands of the\
         data specification file. Subclasses need to provide implementations\
         that work for the operations they wish to support.
     """
@@ -14,8 +14,7 @@ class AbstractExecutorFunctions(object):
         raise UnimplementedDSECommandError("BREAK")
 
     def execute_nop(self, cmd):
-        """
-        This command executes no operation
+        """ This command executes no operation
 
         :param cmd: the command which triggered the function call
         :type cmd: int

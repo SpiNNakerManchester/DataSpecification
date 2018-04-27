@@ -1,14 +1,15 @@
 language: python
-python: "2.7"
+python:
+  - 2.7
+  - 3.6
 dist: trusty
+cache: pip
 
 addons:
   apt:
     packages:
       - vera++
       - cutter-testing-framework-bin
-
-cache: pip
 
 before_install:
   # Work around ludicrous Travis bug

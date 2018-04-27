@@ -1,5 +1,4 @@
-"""
-utility calls for interpreting bits of the DSG
+""" utility calls for interpreting bits of the DSG
 """
 
 from .constants import APP_PTR_TABLE_HEADER_BYTE_SIZE
@@ -53,7 +52,7 @@ def get_data_spec_and_file_writer_filename(
     :type processor_chip_y: int
     :param processor_id: The processor ID
     :type processor_id: int
-    :param hostname: The hostname of the spinnaker machine
+    :param hostname: The hostname of the SpiNNaker machine
     :type hostname: str
     :param report_directory: the directory for the reports folder
     :type report_directory: file path
@@ -65,7 +64,8 @@ def get_data_spec_and_file_writer_filename(
         then a temporary directory is used.
     :type application_run_time_report_folder: str
     :return: the filename of the data writer and the data specification object
-    :rtype: str, data_specification.DataSpecificationGenerator
+    :rtype: tuple(str, \
+        :py:class:`~data_specification.DataSpecificationGenerator`)
     """
     # pylint: disable=too-many-arguments
     if application_run_time_report_folder == "TEMP":

@@ -10,3 +10,4 @@ DataSpecification.egg-info
 .cache/
 .coverage
 .cache/
+.pytest_cache/

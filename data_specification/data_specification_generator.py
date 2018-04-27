@@ -1,18 +1,14 @@
 import decimal
 from enum import Enum
 import logging
-import numpy
 import struct
-from spinn_machine import sdram
+import numpy
 
 from .constants import \
     MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,\
     MAX_RNGS, MAX_STRUCT_ELEMENTS, MAX_STRUCT_SLOTS, \
     LEN1, LEN2, LEN3, LEN4, \
     NO_REGS, SRC1_ONLY, SRC1_AND_SRC2, DEST_AND_SRC1, DEST_ONLY
-from .enums import \
-    DataType, RandomNumberGenerator, Commands, Condition, LogicOperation, \
-    ArithmeticOperation
 from .exceptions import \
     DataUndefinedWriterException, DuplicateParameterException, \
     FunctionInUseException, InvalidCommandException, \
@@ -22,6 +18,12 @@ from .exceptions import \
     RegionUnfilledException, RNGInUseException, StructureInUseException, \
     TypeMismatchException, UnknownConditionException, UnknownTypeException, \
     UnknownTypeLengthException, WrongParameterNumberException
+
+from data_specification.enums import \
+    DataType, RandomNumberGenerator, Commands, Condition, LogicOperation, \
+    ArithmeticOperation
+from spinn_machine import sdram
+from spinn_storage_handlers.abstract_classes import AbstractDataWriter
 
 logger = logging.getLogger(__name__)
 _ONE_SBYTE = struct.Struct("<b")
@@ -66,6 +68,11 @@ def _binencode(length, command, arguments=None):
     return bytearray(_ONE_WORD.pack(cmd_word))
 
 
+def _rescale(data, data_type):
+    data_value = decimal.Decimal(str(data)) * data_type.scale
+    return int(data_value.to_integral_value())
+
+
 class _MemSlot(object):
     __slots__ = ["label", "size", "empty"]
 
@@ -76,8 +83,8 @@ class _MemSlot(object):
 
 
 class DataSpecificationGenerator(object):
-    """ Used to generate a data specification language file that can be\
-        executed to produce a memory image
+    """ Used to generate a SpiNNaker data specification language file that\
+        can be executed to produce a memory image
     """
     # pylint: disable=too-many-arguments
 
@@ -116,17 +123,23 @@ class DataSpecificationGenerator(object):
     def __init__(self, spec_writer, report_writer=None):
         """
         :param spec_writer: The object to write the specification to
-        :type spec_writer: Subclass of\
-            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
+        :type spec_writer: \
+            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         :param report_writer: \
             Determines if a text version of the specification is to be\
             written and, if so, where. No report is written if this is None.
-        :type report_writer: Subclass of\
-            :py:class:`spinn_storage_handlers.abstract_classes.AbstractDataWriter`
+        :type report_writer: \
+            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataWriter`
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
+        if not isinstance(spec_writer, AbstractDataWriter):
+            raise TypeError("spec_writer must be an AbstractDataWriter")
         self.spec_writer = spec_writer
+        if report_writer is not None and not isinstance(
+                report_writer, AbstractDataWriter):
+            raise TypeError(
+                "report_writer must be an AbstractDataWriter or None")
         self.report_writer = report_writer
         self.txt_indent = 0
         self.instruction_counter = 0
@@ -275,7 +288,7 @@ class DataSpecificationGenerator(object):
         :param rng_id: The ID of the random number generator
         :type rng_id: int
         :param rng_type: The type of the random number generator
-        :type rng_type: :py:class:`RandomNumberGenerator`
+        :type rng_type: :py:class:`~RandomNumberGenerator`
         :param seed: The seed of the random number generator >= 0
         :type seed: int
         :return: \
@@ -436,7 +449,7 @@ class DataSpecificationGenerator(object):
             * data_type is the data type of the element
             * value is the value of the element, or None if no value is to\
             be assigned
-        :type parameters: list of (str, :py:class:`DataType`, float)
+        :type parameters: list of (str, :py:class:`~DataType`, float)
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -605,7 +618,7 @@ class DataSpecificationGenerator(object):
         :param data_type: type of the data to be stored in the structure.\
             If parameter value_is_register is set to true, this variable is\
             disregarded
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :param value_is_register: Identifies if value identifies a register
         :type value_is_register: bool
         :return: Nothing is returned
@@ -775,10 +788,10 @@ class DataSpecificationGenerator(object):
         self.ongoing_function_definition = True
 
         read_only_flags = 0
-        for i in xrange(len(argument_by_value)):
+        for i, abv in enumerate(argument_by_value):
             cmd_string += " arg[{0:d}]=".format(i + 1)
-            if argument_by_value[i]:
-                read_only_flags |= 2 ** i
+            if abv:
+                read_only_flags |= 1 << i
                 cmd_string += "read-only"
             else:
                 cmd_string += "read-write"
@@ -854,18 +867,18 @@ class DataSpecificationGenerator(object):
         cmd_word_length = LEN1
         if structure_ids:
             param_word = 0
-            for i in xrange(len(structure_ids)):
+            for i, struct_id in enumerate(structure_ids):
                 _bounds(Commands.CONSTRUCT,
                         "structure argument {0:d}".format(i),
                         structure_ids[i], 0, MAX_STRUCT_SLOTS)
-                if self.struct_slots[structure_ids[i]] is None:
+                if self.struct_slot[struct_id] == 0:
                     raise NotAllocatedException(
                         "structure argument {0:d}".format(i),
-                        structure_ids[i], Commands.CONSTRUCT.name)
+                        struct_id, Commands.CONSTRUCT.name)
 
-                param_word |= structure_ids[i] << (6 * i)
-                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(
-                    i, structure_ids[i])
+                param_word |= struct_id << (6 * i)
+                cmd_string += " arg[{0:d}]=struct[{1:d}]".format(i, struct_id)
+
             cmd_word_length = LEN2
             param_word_encoded += _ONE_WORD.pack(param_word)
 
@@ -881,7 +894,7 @@ class DataSpecificationGenerator(object):
         :param dest_id: The ID of the destination register.
         :type dest_id: int
         :param data_type: The type of the data to be read.
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         """
@@ -909,10 +922,10 @@ class DataSpecificationGenerator(object):
             This does not actually insert the WRITE command in the spec;\
             that is done by :py:meth:`write_cmd`.
 
-        :param data: the data to write as a float.
-        :type data: float
+        :param data: the data to write.
+        :type data: int or float
         :param data_type: the type to convert data to
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: cmd_word_list; list of binary words to be added to the\
             binary data specification file, and
             cmd_string; string describing the command to be added to the\
@@ -962,12 +975,7 @@ class DataSpecificationGenerator(object):
             1])
         # 1 is based on parameters = 0, repeats = 1 and parameters |= repeats
 
-        data_value = decimal.Decimal("{}".format(data)) * data_type.scale
-        padding = 4 - data_type.size if data_type.size < 4 else 0
-
-        cmd_word_list = cmd_word + struct.pack(
-            "<{}{}x".format(data_type.struct_encoding, padding),
-            data_value)
+        cmd_word_list = cmd_word + data_type.encode(data)
         if self.report_writer is not None:
             cmd_string += ", dataType={0:s}".format(data_type.name)
         return (cmd_word_list, cmd_string)
@@ -986,7 +994,7 @@ class DataSpecificationGenerator(object):
         :param data: the data to write as a float.
         :type data: float
         :param data_type: the type to convert data to
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1056,7 +1064,7 @@ class DataSpecificationGenerator(object):
             containing the number of repeats of the value to write
         :type repeats_is_register: bool
         :param data_type: the type to convert data to
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1146,7 +1154,7 @@ class DataSpecificationGenerator(object):
             number of repeats of the value to write
         :type repeats_is_register: None or int
         :param data_type: the type of the data held in the register
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1216,7 +1224,7 @@ class DataSpecificationGenerator(object):
         :param array_values: An array of words to be written
         :type array_values: list of unsigned int
         :param data_type: Type of data contained in the array
-        :type data_type: data_specification.enums.DataType
+        :type data_type: :py:class:`~data_specification.enums.DataType`
         :return: The position of the write pointer within the current region,\
             in bytes from the start of the region
         :rtype: int
@@ -1549,7 +1557,7 @@ class DataSpecificationGenerator(object):
         :param data_is_register: Indicates if data is a register ID
         :type data_is_register: bool
         :param data_type: The type of the data to be assigned
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -1640,8 +1648,8 @@ class DataSpecificationGenerator(object):
             * If address_is_register is False, the address to move the\
               write pointer to
         :type address: int
-        :param address_is_register: Indicates if the the address is a\
-            register ID
+        :param address_is_register: \
+            Indicates if the the address is a register ID
         :type address_is_register: bool
         :param relative_to_current: \
             Indicates if the address is to be added to the current address,\
@@ -1782,7 +1790,7 @@ class DataSpecificationGenerator(object):
             * If operand_1_is_register is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
-        :type operation: :py:class:`ArithmeticOperation`
+        :type operation: :py:class:`~ArithmeticOperation`
         :param operand_2:
             * If operand_2_is_register is True, the ID of a register where\
               the second operand can be found, between 0 and 15
@@ -2087,7 +2095,7 @@ class DataSpecificationGenerator(object):
             * If operand_1_is_register is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
-        :type operation: :py:class:`LogicOperation`
+        :type operation: :py:class:`~LogicOperation`
         :param operand_2:
             * If operand_2_is_register is True, the ID of a register\
               where the second operand can be found. between 0 and 15
@@ -2249,8 +2257,8 @@ class DataSpecificationGenerator(object):
                                  destination_id,
                                  destination_parameter_index=None,
                                  destination_is_register=False):
-        """ Insert command to copy the value of a parameter from one structure\
-            to another
+        """ Insert command to copy the value of a parameter from one\
+            structure to another.
 
         :param source_structure_id: \
             The ID of the source structure, between 0 and 15
@@ -2267,7 +2275,7 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :param destination_is_register: \
             Indicates whether the destination is a structure or a register.
-        :type destination_is_register: boolean
+        :type destination_is_register: bool
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
@@ -2369,7 +2377,7 @@ class DataSpecificationGenerator(object):
         :param value_is_register: Indicates if the value is a register
         :type value_is_register: bool
         :param data_type: The type of the data to be printed
-        :type data_type: :py:class:`DataType`
+        :type data_type: :py:class:`~DataType`
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -2417,7 +2425,8 @@ class DataSpecificationGenerator(object):
 
         :param text: The text to write (max 12 *bytes* once encoded)
         :type text: str
-        :param encoding: The encoding to use for the text (default: ASCII)
+        :param encoding: \
+            The character encoding to use for the string. Defaults to ASCII.
         :return: Nothing is returned
         :rtype: None
         :raise data_specification.exceptions.DataUndefinedWriterException: \
@@ -2425,9 +2434,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
-        text_encoded = bytearray(text.encode(encoding))
+        text_encoded = bytearray(text.encode(encoding=encoding))
         text_len = len(text_encoded)
         _bounds(Commands.PRINT_TXT, "len(text)", text_len, 1, 13)
+
         if text_len <= 4:
             cmd_word_len = LEN2
         elif text_len <= 8:
@@ -2563,10 +2573,11 @@ class DataSpecificationGenerator(object):
                 formatted_cmd_string = "{0:s}{1:s}\n".format(
                     indent_string, cmd_string)
             else:
-                formatted_cmd_string = "%8.8X. %s%s\n" % (
-                    self.instruction_counter, indent_string, cmd_string)
+                pc = "%8.8X" % self.instruction_counter
+                formatted_cmd_string = "{}. {}{}\n".format(
+                    pc, indent_string, cmd_string)
                 self.instruction_counter += len(cmd_word_list)
-            self.report_writer.write(formatted_cmd_string)
+            self.report_writer.write(formatted_cmd_string.encode("UTF-8"))
             if indent is True:
                 self.txt_indent += 1
         return

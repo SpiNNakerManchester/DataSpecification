@@ -2,6 +2,7 @@ import logging
 import numpy
 import struct
 import functools
+from six import raise_from
 
 from .data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as ExecutorFuncs
@@ -15,8 +16,8 @@ _ONE_WORD = struct.Struct("<I")
 
 
 class DataSpecificationExecutor(object):
-    """ Used to execute a data specification language file to produce a memory\
-        image
+    """ Used to execute a SpiNNaker data specification language file to\
+        produce a memory image
     """
 
     __slots__ = [
@@ -30,7 +31,7 @@ class DataSpecificationExecutor(object):
         :param spec_reader: \
             The object to read the specification language file from
         :type spec_reader:\
-            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
+            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataReader`
         :param memory_space: memory available on the destination architecture
         :type memory_space: int
         :raise spinn_storage_handlers.exceptions.DataReadException:\
@@ -42,22 +43,24 @@ class DataSpecificationExecutor(object):
         self.dsef = ExecutorFuncs(self.spec_reader, memory_space)
 
     def __operation_func(self, cmd, index):
+        """ Decode the command and select an implementation of the command.
+        """
         try:
             opcode = (cmd >> 20) & 0xFF
             # noinspection PyArgumentList
             # pylint: disable=no-value-for-parameter
             return functools.partial(Commands(opcode).exec_function, self.dsef)
-        except (ValueError, TypeError):
+        except (ValueError, TypeError) as e:
             logger.debug("problem decoding opcode %d at index %d",
                          cmd, index, exc_info=True)
-            raise DataSpecificationException(
+            raise_from(DataSpecificationException(
                 "Invalid command 0x{0:X} while reading file {1:s}".format(
-                    cmd, self.spec_reader.filename))
+                    cmd, self.spec_reader.filename)), e)
 
     def execute(self):
         """ Executes the specification
 
-        :return: None
+        :return: Nothing
         :raise spinn_storage_handlers.exceptions.DataReadException:\
             If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
@@ -85,6 +88,7 @@ class DataSpecificationExecutor(object):
         :param region_id: The ID of the region to get
         :type region_id: int
         :return: The region, or None if the region was not allocated
+        :rtype: :py:class:`MemoryRegion`
         """
         return self.dsef.mem_regions[region_id]
 
@@ -97,6 +101,7 @@ class DataSpecificationExecutor(object):
         """ Get the pointer table as a numpy array
 
         :param start_address: The base address of the data to be written
+        :rtype: numpy.array
         """
         pointer_table = numpy.zeros(MAX_MEM_REGIONS, dtype="<u4")
         pointer_table_size = MAX_MEM_REGIONS * 4
@@ -114,7 +119,7 @@ class DataSpecificationExecutor(object):
         """ Return the size of the data that will be written to memory
 
         :return: size of the data that will be written to memory
-        :rtype: unsigned int
+        :rtype: int
         """
         return APP_PTR_TABLE_BYTE_SIZE + sum(
             region.allocated_size

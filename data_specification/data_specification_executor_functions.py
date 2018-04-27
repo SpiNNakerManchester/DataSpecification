@@ -50,7 +50,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :param spec_reader: \
             The object to read the specification language file from
         :type spec_reader:\
-            :py:class:`data_specification.abstract_data_reader.AbstractDataReader`
+            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataReader`
         :param memory_space: \
             Memory space available for the data to be generated
         :type memory_space: int
@@ -288,7 +288,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if value != -1:
             raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
-                "current argument value is {0:d}".format(value))
+                "current argument value is {0}".format(value))
         return END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):

@@ -26,7 +26,6 @@ class MemoryRegion(object):
 
     def __init__(self, memory_pointer, unfilled, size):
         """
-
         :param memory_pointer: the write pointer position
         :param unfilled: if the region needs to be filled when written
         :rtype: None

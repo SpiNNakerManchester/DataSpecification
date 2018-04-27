@@ -1,6 +1,5 @@
-"""
-Constants used by the Data Structure Generator (DSG)
-and the Spec Executor
+""" Constants used by the Data Structure Generator (DSG) \
+    and the Specification Executor.
 """
 
 # MAGIC Numbers:

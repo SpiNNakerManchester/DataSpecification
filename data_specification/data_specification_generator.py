@@ -646,7 +646,8 @@ class DataSpecificationGenerator(object):
                 "structure %d parameter" % structure_id, parameter_index,
                 Commands.WRITE_PARAM.name)
 
-        if self.struct_slots[structure_id][parameter_index][1] is not data_type:
+        if self.struct_slots[
+                structure_id][parameter_index][1] is not data_type:
             raise TypeMismatchException(Commands.WRITE_PARAM.name)
 
         cmd_string = Commands.WRITE_PARAM.name

@@ -279,7 +279,7 @@ class DataType(Enum):
         self._struct = struct.Struct("<" + struct_encoding)
 
     def encode(self, value):
-        """ Encode the Python value for SpiNNaker according to this type. 
+        """ Encode the Python value for SpiNNaker according to this type.
         """
         if self._apply_scale:
             value = int(decimal.Decimal(str(value)) * self.scale)

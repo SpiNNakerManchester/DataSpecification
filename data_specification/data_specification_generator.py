@@ -5,7 +5,6 @@ import struct
 import numpy
 from spinn_machine import sdram
 from spinn_storage_handlers.abstract_classes import AbstractDataWriter
-
 from .constants import (
     MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,
     MAX_RNGS, MAX_STRUCT_ELEMENTS, MAX_STRUCT_SLOTS,
@@ -263,7 +262,7 @@ class DataSpecificationGenerator(object):
         cmd_string = Commands.RESERVE.name
         cmd_string += " memRegion={0:d} size={1:d}".format(region, size)
         if label is not None:
-            cmd_string += " label='{2:s}'".format(label)
+            cmd_string += " label='{0:s}'".format(label)
         if empty:
             cmd_string += " UNFILLED"
 
@@ -908,7 +907,7 @@ class DataSpecificationGenerator(object):
                 _bounds(Commands.CONSTRUCT,
                         "structure argument {0:d}".format(i),
                         structure_ids[i], 0, MAX_STRUCT_SLOTS)
-                if self.struct_slot[struct_id] == 0:
+                if self.struct_slots[struct_id] is None:
                     raise NotAllocatedException(
                         "structure argument {0:d}".format(i),
                         struct_id, Commands.CONSTRUCT.name)
@@ -1291,8 +1290,8 @@ class DataSpecificationGenerator(object):
             _Field.LENGTH: LEN2,
             _Field.IMMEDIATE: data_type.size})
         cmd_string = Commands.WRITE_ARRAY.name
-        cmd_string += " {0:d} elements\n".format(size / 4)
-        arg_word = _ONE_WORD.pack(size / 4)
+        cmd_string += " {0:d} elements\n".format(size // 4)
+        arg_word = _ONE_WORD.pack(size // 4)
         self.write_command_to_files(cmd_word + arg_word, cmd_string)
         self.spec_writer.write(data.tostring())
 
@@ -2279,7 +2278,7 @@ class DataSpecificationGenerator(object):
         else:
             _bounds(Commands.COPY_STRUCT, "source_structure_id",
                     source_structure_id, 0, MAX_STRUCT_SLOTS)
-            if self.struct_slots[source_structure_id] == 0:
+            if self.struct_slots[source_structure_id] is None:
                 raise NotAllocatedException(
                     "struct", source_structure_id, Commands.COPY_STRUCT.name)
             cmd_string += " source_struct={0:d}".format(source_structure_id)
@@ -2346,7 +2345,7 @@ class DataSpecificationGenerator(object):
                 source_structure_id, 0, MAX_STRUCT_SLOTS)
         _bounds(Commands.COPY_PARAM, "source_parameter_index",
                 source_parameter_index, 0, MAX_STRUCT_ELEMENTS)
-        if self.struct_slots[source_structure_id] == 0:
+        if self.struct_slots[source_structure_id] is None:
             raise NotAllocatedException(
                 "structure", source_structure_id, Commands.COPY_PARAM.name)
         if (len(self.struct_slots[source_structure_id]) <=
@@ -2360,7 +2359,7 @@ class DataSpecificationGenerator(object):
                     destination_parameter_index, 0, MAX_STRUCT_ELEMENTS)
             _bounds(Commands.COPY_PARAM, "destination_structure_id",
                     destination_id, 0, MAX_STRUCT_SLOTS)
-            if self.struct_slots[destination_id] == 0:
+            if self.struct_slots[destination_id] is None:
                 raise NotAllocatedException(
                     "structure", destination_id, Commands.COPY_PARAM.name)
             if (len(self.struct_slots[source_structure_id]) <=
@@ -2542,7 +2541,7 @@ class DataSpecificationGenerator(object):
         else:
             _bounds(Commands.PRINT_STRUCT, "structure_id",
                     structure_id, 0, MAX_STRUCT_SLOTS)
-            if self.struct_slots[structure_id] == 0:
+            if self.struct_slots[structure_id] is None:
                 raise NotAllocatedException(
                     "structure", structure_id, Commands.PRINT_STRUCT.name)
             struct_register = 0

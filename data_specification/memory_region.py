@@ -1,7 +1,5 @@
-
 class MemoryRegion(object):
     """ Memory region storage object
-
     """
 
     __slots__ = [

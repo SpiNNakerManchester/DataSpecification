@@ -3,11 +3,11 @@ import numpy
 import struct
 import functools
 from six import raise_from
-
 from .data_specification_executor_functions \
     import DataSpecificationExecutorFunctions as ExecutorFuncs
-from .constants import APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR, \
-    MAX_MEM_REGIONS, APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE
+from .constants import (
+    APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR, MAX_MEM_REGIONS,
+    APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE)
 from .enums import Commands
 from .exceptions import DataSpecificationException
 

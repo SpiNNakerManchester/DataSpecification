@@ -1,5 +1,5 @@
-from .exceptions \
-    import RegionInUseException, NoRegionSelectedException
+from .exceptions import (
+    RegionInUseException, NoRegionSelectedException)
 
 
 class MemoryRegionCollection(object):

@@ -1,29 +1,28 @@
 import decimal
-from enum import Enum
+from enum import Enum, IntEnum
 import logging
 import struct
 import numpy
-
-from .constants import \
-    MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,\
-    MAX_RNGS, MAX_STRUCT_ELEMENTS, MAX_STRUCT_SLOTS, \
-    LEN1, LEN2, LEN3, LEN4, \
-    NO_REGS, SRC1_ONLY, SRC1_AND_SRC2, DEST_AND_SRC1, DEST_ONLY
-from .exceptions import \
-    DataUndefinedWriterException, DuplicateParameterException, \
-    FunctionInUseException, InvalidCommandException, \
-    InvalidOperationException, InvalidSizeException, NotAllocatedException, \
-    NoRegionSelectedException, ParameterOutOfBoundsException, \
-    RandomNumberDistributionInUseException, RegionInUseException, \
-    RegionUnfilledException, RNGInUseException, StructureInUseException, \
-    TypeMismatchException, UnknownConditionException, UnknownTypeException, \
-    UnknownTypeLengthException, WrongParameterNumberException
-
-from data_specification.enums import \
-    DataType, RandomNumberGenerator, Commands, Condition, LogicOperation, \
-    ArithmeticOperation
 from spinn_machine import sdram
 from spinn_storage_handlers.abstract_classes import AbstractDataWriter
+
+from .constants import (
+    MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,
+    MAX_RNGS, MAX_STRUCT_ELEMENTS, MAX_STRUCT_SLOTS,
+    LEN1, LEN2, LEN3, LEN4,
+    NO_REGS, SRC1_ONLY, SRC1_AND_SRC2, DEST_AND_SRC1, DEST_ONLY)
+from .exceptions import (
+    DataUndefinedWriterException, DuplicateParameterException,
+    FunctionInUseException, InvalidCommandException,
+    InvalidOperationException, InvalidSizeException, NotAllocatedException,
+    NoRegionSelectedException, ParameterOutOfBoundsException,
+    RandomNumberDistributionInUseException, RegionInUseException,
+    RegionUnfilledException, RNGInUseException, StructureInUseException,
+    TypeMismatchException, UnknownConditionException, UnknownTypeException,
+    UnknownTypeLengthException, WrongParameterNumberException)
+from data_specification.enums import (
+    DataType, RandomNumberGenerator, Commands, Condition, LogicOperation,
+    ArithmeticOperation)
 
 logger = logging.getLogger(__name__)
 _ONE_SBYTE = struct.Struct("<b")
@@ -48,22 +47,41 @@ def _typebounds(cmd, name, value, valuetype):
             name, value, valuetype.min, valuetype.max, cmd.name)
 
 
-def _binencode(length, command, arguments=None):
-    if arguments is None:
-        arguments = []
-    if len(arguments) & 1 == 1:
-        arguments.append(0)
-    cmd_word = (length << 28) | (command.value << 20)
-    i = 0
-    while i < len(arguments):
-        val = arguments[i]
-        i += 1
-        if isinstance(val, Enum):
-            val = val.value
-        shift = arguments[i] if i < len(arguments) else 0
-        i += 1
+class _Field(IntEnum):
+    """ Various shifts for fields used with :py:func:`_binencode`.
+    """
+    LENGTH = 28
+    COMMAND = 20
+    SIGNED = 19
+    USAGE = 16
+    DESTINATION = 12
+    FUNCTION = 11
+    SOURCE_1 = 8
+    EMPTY = 7
+    SHRINK = 6
+    SOURCE_2 = 4
+    IMMEDIATE = 0
+
+
+def _binencode(command, arguments):
+    """ Encodes commands as binary words.
+
+    :param command: The code of the command being encoded.
+    :type command: :py:class:`data_specification.enums.Commands`
+    :param arguments: How to parameterise the command.
+    :type arguments: dict(:py:class:`_Field`,int)
+    :return: the encoded command
+    :rtype: bytearray
+    """
+    cmd_word = command.value << _Field.COMMAND
+    for shift in arguments:
         if shift < 0 or shift > 31:
             raise KeyError()
+        val = arguments[shift]
+        if isinstance(val, Enum):
+            val = val.value
+        else:
+            val = int(val)
         cmd_word |= val << shift
     return bytearray(_ONE_WORD.pack(cmd_word))
 
@@ -178,7 +196,8 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
-        cmd_word = _binencode(LEN1, Commands.BREAK)
+        cmd_word = _binencode(Commands.BREAK, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.BREAK.name
         self.write_command_to_files(cmd_word, cmd_string)
 
@@ -192,7 +211,8 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
-        cmd_word = _binencode(LEN1, Commands.NOP)
+        cmd_word = _binencode(Commands.NOP, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.NOP.name
         self.write_command_to_files(cmd_word, cmd_string)
         return
@@ -232,11 +252,12 @@ class DataSpecificationGenerator(object):
 
         self.mem_slots[region] = _MemSlot(label, size, empty)
 
-        cmd_word = _binencode(LEN2, Commands.RESERVE, [
-            NO_REGS, 16,
-            bool(empty), 7,
-            bool(shrink), 6,
-            region])
+        cmd_word = _binencode(Commands.RESERVE, {
+            _Field.LENGTH: LEN2,
+            _Field.USAGE: NO_REGS,
+            _Field.EMPTY: bool(empty),
+            _Field.SHRINK: bool(shrink),
+            _Field.IMMEDIATE: region})
         encoded_size = _ONE_WORD.pack(size)
 
         cmd_string = Commands.RESERVE.name
@@ -273,7 +294,10 @@ class DataSpecificationGenerator(object):
         label = self.mem_slots[region].label
         self.mem_slots[region] = None
 
-        cmd_word = _binencode(LEN1, Commands.FREE, [NO_REGS, 16, region])
+        cmd_word = _binencode(Commands.FREE, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: NO_REGS,
+            _Field.IMMEDIATE: region})
         cmd_string = Commands.FREE.name
         cmd_string += " memRegion={0:d}".format(region)
         if label is not None:
@@ -317,8 +341,10 @@ class DataSpecificationGenerator(object):
 
         self.rng[rng_id] = [rng_type, seed]
 
-        cmd_word = _binencode(
-            LEN2, Commands.DECLARE_RNG, [rng_id, 12, rng_type, 8])
+        cmd_word = _binencode(Commands.DECLARE_RNG, {
+            _Field.LENGTH: LEN2,
+            _Field.DESTINATION: rng_id,
+            _Field.SOURCE_1: rng_type})
         encoded_seed = _ONE_WORD.pack(seed)
 
         cmd_string = Commands.DECLARE_RNG.name
@@ -384,9 +410,10 @@ class DataSpecificationGenerator(object):
         self.random_distribution[distribution_id] = parameters
         self.define_structure(structure_id, parameters)
 
-        cmd_word = _binencode(
-            LEN1, Commands.DECLARE_RANDOM_DIST,
-            [distribution_id, 8, structure_id])
+        cmd_word = _binencode(Commands.DECLARE_RANDOM_DIST, {
+            _Field.LENGTH: LEN1,
+            _Field.SOURCE_1: distribution_id,
+            _Field.IMMEDIATE: structure_id})
 
         cmd_string = Commands.DECLARE_RANDOM_DIST.name
         cmd_string += " distribution_id={0:d} structure_id={1:d}".format(
@@ -424,10 +451,11 @@ class DataSpecificationGenerator(object):
                 "random number distribution", distribution_id,
                 Commands.GET_RANDOM_NUMBER.name)
 
-        bit_field = 0x4
-        cmd_word = _binencode(
-            LEN1, Commands.GET_RANDOM_NUMBER,
-            [bit_field, 16, register_id, 12, distribution_id])
+        cmd_word = _binencode(Commands.GET_RANDOM_NUMBER, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: 0x4,
+            _Field.DESTINATION: register_id,
+            _Field.IMMEDIATE: distribution_id})
         cmd_string = Commands.GET_RANDOM_NUMBER.name
         cmd_string += " distribution={0:d} dest=reg[{1:d}]".format(
             distribution_id, register_id)
@@ -472,7 +500,9 @@ class DataSpecificationGenerator(object):
             raise StructureInUseException(structure_id)
 
         self.struct_slots[structure_id] = parameters
-        cmd_word = _binencode(LEN1, Commands.START_STRUCT, [structure_id])
+        cmd_word = _binencode(Commands.START_STRUCT, {
+            _Field.LENGTH: LEN1,
+            _Field.IMMEDIATE: structure_id})
         cmd_string = Commands.START_STRUCT.name
         cmd_string += " ID={0:d}".format(structure_id)
         self.write_command_to_files(cmd_word, cmd_string)
@@ -490,11 +520,13 @@ class DataSpecificationGenerator(object):
             if value is not None:
                 _typebounds(Commands.WRITE_PARAM, "value", value, data_type)
                 if data_type.size <= 4:
-                    cmd_word = _binencode(
-                        LEN2, Commands.STRUCT_ELEM, [data_type])
+                    cmd_word = _binencode(Commands.STRUCT_ELEM, {
+                        _Field.LENGTH: LEN2,
+                        _Field.IMMEDIATE: data_type})
                 elif data_type.size == 8:
-                    cmd_word = _binencode(
-                        LEN3, Commands.STRUCT_ELEM, [data_type])
+                    cmd_word = _binencode(Commands.STRUCT_ELEM, {
+                        _Field.LENGTH: LEN3,
+                        _Field.IMMEDIATE: data_type})
                 else:
                     raise InvalidSizeException(
                         data_type.name, data_type.size,
@@ -508,14 +540,16 @@ class DataSpecificationGenerator(object):
                         value, label)
                 self.write_command_to_files(cmd_word + value_bytes, cmd_string)
             else:
-                cmd_word = _binencode(LEN1, Commands.STRUCT_ELEM, [
-                    data_type])
+                cmd_word = _binencode(Commands.STRUCT_ELEM, {
+                    _Field.LENGTH: LEN1,
+                    _Field.IMMEDIATE: data_type})
                 if len(label):
                     cmd_string += ", label={0:s}".format(label)
                 self.write_command_to_files(cmd_word, cmd_string)
 
         # end of struct
-        cmd_word = _binencode(LEN1, Commands.END_STRUCT)
+        cmd_word = _binencode(Commands.END_STRUCT, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.END_STRUCT.name
         cmd_string += " ID={0:d}".format(structure_id)
         self.write_command_to_files(cmd_word, cmd_string)
@@ -565,10 +599,12 @@ class DataSpecificationGenerator(object):
         if parameter_index_is_register is True:
             _bounds(Commands.READ_PARAM, "parameter_index",
                     parameter_index, 0, MAX_REGISTERS)
-            cmd_word = _binencode(
-                LEN1, Commands.READ_PARAM,
-                [DEST_AND_SRC1, 16, destination_id, 12, parameter_index, 8,
-                 structure_id])
+            cmd_word = _binencode(Commands.READ_PARAM, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: DEST_AND_SRC1,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_1: parameter_index,
+                _Field.IMMEDIATE: structure_id})
             cmd_string += ("element_id_from_register={0:d}, "
                            "destination_register={1:d}".format(
                                parameter_index, destination_id))
@@ -579,10 +615,12 @@ class DataSpecificationGenerator(object):
                 raise NotAllocatedException(
                     "structure {0:d} parameter".format(structure_id),
                     parameter_index, Commands.READ_PARAM.name)
-            cmd_word = _binencode(
-                LEN1, Commands.READ_PARAM,
-                [DEST_ONLY, 16, destination_id, 12, parameter_index, 4,
-                 structure_id])
+            cmd_word = _binencode(Commands.READ_PARAM, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: DEST_ONLY,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_2: parameter_index,
+                _Field.IMMEDIATE: structure_id})
             cmd_string += ("element_id={0:d}, destination_register={1:d}"
                            .format(parameter_index, destination_id))
 
@@ -656,9 +694,12 @@ class DataSpecificationGenerator(object):
 
         if value_is_register:
             _bounds(Commands.WRITE_PARAM, "value", value, 0, MAX_REGISTERS)
-            cmd_word = _binencode(
-                LEN1, Commands.WRITE_PARAM,
-                [SRC1_ONLY, 16, structure_id, 12, value, 8, parameter_index])
+            cmd_word = _binencode(Commands.WRITE_PARAM, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: SRC1_ONLY,
+                _Field.DESTINATION: structure_id,
+                _Field.SOURCE_1: value,
+                _Field.IMMEDIATE: parameter_index})
             cmd_string += "value=reg[{0:d}]".format(value)
             self.write_command_to_files(cmd_word, cmd_string)
         else:
@@ -666,10 +707,11 @@ class DataSpecificationGenerator(object):
             if data_type.size > 4 and data_type.size != 8:
                 raise InvalidSizeException(
                     data_type.name, data_type.size, Commands.WRITE_PARAM.name)
-            cmd_word = _binencode(
-                (LEN2 if data_type.size <= 4 else LEN3),
-                Commands.WRITE_PARAM,
-                [NO_REGS, 16, structure_id, 12, parameter_index])
+            cmd_word = _binencode(Commands.WRITE_PARAM, {
+                _Field.LENGTH: LEN2 if data_type.size <= 4 else LEN3,
+                _Field.USAGE: NO_REGS,
+                _Field.DESTINATION: structure_id,
+                _Field.IMMEDIATE: parameter_index})
             value_encoded = data_type.encode(value)
             cmd_string += "value={0:d}".format(value)
             self.write_command_to_files(cmd_word + value_encoded, cmd_string)
@@ -721,14 +763,18 @@ class DataSpecificationGenerator(object):
         if repeats_is_register:
             _bounds(Commands.WRITE_STRUCT, "repeats",
                     repeats, 0, MAX_REGISTERS)
-            cmd_word = _binencode(
-                LEN1, Commands.WRITE_STRUCT,
-                [SRC1_ONLY, 16, repeats, 8, structure_id])
+            cmd_word = _binencode(Commands.WRITE_STRUCT, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: SRC1_ONLY,
+                _Field.SOURCE_1: repeats,
+                _Field.IMMEDIATE: structure_id})
             cmd_string += "repeats=reg[{0:d}]".format(repeats)
         else:
             _bounds(Commands.WRITE_STRUCT, "repeats", repeats, 0, 16)
-            cmd_word = _binencode(
-                LEN1, Commands.WRITE_STRUCT, [repeats, 8, structure_id])
+            cmd_word = _binencode(Commands.WRITE_STRUCT, {
+                _Field.LENGTH: LEN1,
+                _Field.SOURCE_1: repeats,
+                _Field.IMMEDIATE: structure_id})
             cmd_string += "repeats={0:d}".format(repeats)
         self.write_command_to_files(cmd_word, cmd_string)
 
@@ -785,9 +831,11 @@ class DataSpecificationGenerator(object):
             else:
                 cmd_string += "read-write"
 
-        cmd_word = _binencode(
-            LEN1, Commands.START_CONSTRUCTOR,
-            [function_id, 11, len(argument_by_value), 8, read_only_flags])
+        cmd_word = _binencode(Commands.START_CONSTRUCTOR, {
+            _Field.LENGTH: LEN1,
+            _Field.FUNCTION: function_id,
+            _Field.SOURCE_1: len(argument_by_value),
+            _Field.IMMEDIATE: read_only_flags})
         self.write_command_to_files(cmd_word, cmd_string, indent=True)
 
     def end_function(self):
@@ -803,7 +851,8 @@ class DataSpecificationGenerator(object):
 
         self.ongoing_function_definition = False
 
-        cmd_word = _binencode(LEN1, Commands.END_CONSTRUCTOR)
+        cmd_word = _binencode(Commands.END_CONSTRUCTOR, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.END_CONSTRUCTOR.name
         self.write_command_to_files(cmd_word, cmd_string, outdent=True)
 
@@ -870,8 +919,9 @@ class DataSpecificationGenerator(object):
             cmd_word_length = LEN2
             param_word_encoded += _ONE_WORD.pack(param_word)
 
-        cmd_word = _binencode(
-            cmd_word_length, Commands.CONSTRUCT, [function_id, 8])
+        cmd_word = _binencode(Commands.CONSTRUCT, {
+            _Field.LENGTH: cmd_word_length,
+            _Field.SOURCE_1: function_id})
         self.write_command_to_files(cmd_word + param_word_encoded, cmd_string)
 
     def read_value(self, dest_id, data_type):
@@ -891,8 +941,11 @@ class DataSpecificationGenerator(object):
                 data_type.value, Commands.READ.name)
         _bounds(Commands.READ, "register", dest_id, 0, MAX_REGISTERS)
 
-        cmd_word = _binencode(
-            LEN1, Commands.READ, [DEST_ONLY, 16, dest_id, 12, data_type.size])
+        cmd_word = _binencode(Commands.READ, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: DEST_ONLY,
+            _Field.DESTINATION: dest_id,
+            _Field.IMMEDIATE: data_type.size})
         cmd_string = Commands.READ.name
         cmd_string += " {0:d} bytes in register {1:d}".format(
             data_type.size, dest_id)
@@ -955,9 +1008,11 @@ class DataSpecificationGenerator(object):
             cmd_string += " data=0x%8.8X" % data
 
         repeat_reg_usage = NO_REGS
-        cmd_word = _binencode(
-            cmd_data_len, Commands.WRITE,
-            [repeat_reg_usage, 16, data_len, 12, 1])
+        cmd_word = _binencode(Commands.WRITE, {
+            _Field.LENGTH: cmd_data_len,
+            _Field.USAGE: repeat_reg_usage,
+            _Field.DESTINATION: data_len,
+            _Field.IMMEDIATE: 1})
         # 1 is based on parameters = 0, repeats = 1 and parameters |= repeats
 
         cmd_word_list = cmd_word + data_type.encode(data)
@@ -1109,9 +1164,11 @@ class DataSpecificationGenerator(object):
             parameters |= repeats & 0xFF
             cmd_string += ", repeats={0:d}".format(repeats)
 
-        cmd_word = _binencode(
-            cmd_data_len, Commands.WRITE,
-            [repeat_reg_usage, 16, data_len, 12, parameters])
+        cmd_word = _binencode(Commands.WRITE, {
+            _Field.LENGTH: cmd_data_len,
+            _Field.USAGE: repeat_reg_usage,
+            _Field.DESTINATION: data_len,
+            _Field.IMMEDIATE: parameters})
         data_word = data_type.encode(data)
         cmd_string += ", dataType={0:s}".format(data_type.name)
         self.write_command_to_files(cmd_word + data_word, cmd_string)
@@ -1193,9 +1250,12 @@ class DataSpecificationGenerator(object):
             parameters = repeats & 0xFF
             cmd_string += ", repeats={0:d}".format(repeats)
 
-        cmd_word = _binencode(
-            LEN1, Commands.WRITE,
-            [reg_usage, 16, cmd_data_len, 12, data_register, 8, parameters])
+        cmd_word = _binencode(Commands.WRITE, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: reg_usage,
+            _Field.DESTINATION: cmd_data_len,
+            _Field.SOURCE_1: data_register,
+            _Field.IMMEDIATE: parameters})
         cmd_string += ", dataType={0:s}".format(data_type.name)
         self.write_command_to_files(cmd_word, cmd_string)
 
@@ -1227,7 +1287,9 @@ class DataSpecificationGenerator(object):
         if size % 4 != 0:
             raise UnknownTypeLengthException(size, Commands.WRITE_ARRAY.name)
 
-        cmd_word = _binencode(LEN2, Commands.WRITE_ARRAY, [data_type.size])
+        cmd_word = _binencode(Commands.WRITE_ARRAY, {
+            _Field.LENGTH: LEN2,
+            _Field.IMMEDIATE: data_type.size})
         cmd_string = Commands.WRITE_ARRAY.name
         cmd_string += " {0:d} elements\n".format(size / 4)
         arg_word = _ONE_WORD.pack(size / 4)
@@ -1264,8 +1326,10 @@ class DataSpecificationGenerator(object):
         cmd_string = Commands.SWITCH_FOCUS.name
         cmd_string += " memRegion = {0:d}".format(region)
         # Write command to switch focus:
-        cmd_word = _binencode(
-            LEN1, Commands.SWITCH_FOCUS, [0x0, 16, region & 0xF, 8])
+        cmd_word = _binencode(Commands.SWITCH_FOCUS, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: 0x0,
+            _Field.SOURCE_1: region})
         self.write_command_to_files(cmd_word, cmd_string)
 
     def start_loop(self, counter_register_id, start, end, increment=1,
@@ -1328,15 +1392,15 @@ class DataSpecificationGenerator(object):
         bit_field = 0
         length = LEN1
         encoded_values = bytearray()
-        params = 0
         cmd_string = Commands.LOOP.name
         cmd_string += " counter_register_id=reg[{0:d}],".format(
             counter_register_id)
+        r1 = r2 = r3 = 0
 
         if start_is_register:
             _bounds(Commands.LOOP, "start", start, 0, MAX_REGISTERS)
             bit_field |= 0x4
-            params |= start << 8
+            r1 = start
             cmd_string += " start=reg[{0:d}],".format(start)
         else:
             _typebounds(Commands.LOOP, "start", start, DataType.INT32)
@@ -1347,7 +1411,7 @@ class DataSpecificationGenerator(object):
         if end_is_register:
             _bounds(Commands.LOOP, "end", end, 0, MAX_REGISTERS)
             bit_field |= 0x2
-            params |= end << 4
+            r2 = end
             cmd_string += " end=reg[{0:d}],".format(end)
         else:
             _typebounds(Commands.LOOP, "end", end, DataType.INT32)
@@ -1358,7 +1422,7 @@ class DataSpecificationGenerator(object):
         if increment_is_register:
             _bounds(Commands.LOOP, "increment", increment, 0, MAX_REGISTERS)
             bit_field |= 0x1
-            params |= increment
+            r3 = increment
             cmd_string += " increment=reg[{0:d}],".format(increment)
         else:
             _typebounds(Commands.LOOP, "increment", increment, DataType.INT32)
@@ -1368,9 +1432,13 @@ class DataSpecificationGenerator(object):
 
         self.ongoing_loop = True
 
-        cmd_word = _binencode(
-            length, Commands.LOOP,
-            [bit_field, 16, params, 4, counter_register_id])
+        cmd_word = _binencode(Commands.LOOP, {
+            _Field.LENGTH: length,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: r1,   # non-standard usage
+            _Field.SOURCE_1: r2,      # non-standard usage
+            _Field.SOURCE_2: r3,      # non-standard usage
+            _Field.IMMEDIATE: counter_register_id})
         self.write_command_to_files(cmd_word + encoded_values, cmd_string)
 
     def break_loop(self):
@@ -1388,7 +1456,8 @@ class DataSpecificationGenerator(object):
         if not self.ongoing_loop:
             raise InvalidCommandException(Commands.BREAK_LOOP.name)
 
-        cmd_word = _binencode(LEN1, Commands.BREAK_LOOP)
+        cmd_word = _binencode(Commands.BREAK_LOOP, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.BREAK_LOOP.name
         self.write_command_to_files(cmd_word, cmd_string)
 
@@ -1406,7 +1475,8 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.InvalidCommandException: \
             If there is no loop in operation at this point
         """
-        cmd_word = _binencode(LEN1, Commands.END_LOOP)
+        cmd_word = _binencode(Commands.END_LOOP, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.END_LOOP.name
         self.ongoing_loop = False
         self.write_command_to_files(cmd_word, cmd_string)
@@ -1452,17 +1522,21 @@ class DataSpecificationGenerator(object):
         cmd_string = Commands.IF.name
         if value_is_register:
             _bounds(Commands.IF, "value", value, 0, MAX_REGISTERS)
-            bit_field = 0x3
-            cmd_word = _binencode(
-                LEN1, Commands.IF,
-                [bit_field, 16, register_id, 8, value, 4, condition])
+            cmd_word = _binencode(Commands.IF, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: 0x3,
+                _Field.SOURCE_1: register_id,
+                _Field.SOURCE_2: value,
+                _Field.IMMEDIATE: condition})
             cmd_string += " reg[{0:d}] {1:s} reg[{2:d}]".format(
                 register_id, condition.operator, value)
         else:
             _typebounds(Commands.IF, "value", value, DataType.INT32)
-            bit_field = 0x2
-            cmd_word = _binencode(
-                LEN2, Commands.IF, [bit_field, 16, register_id, 8, condition])
+            cmd_word = _binencode(Commands.IF, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: 0x2,
+                _Field.SOURCE_1: register_id,
+                _Field.IMMEDIATE: condition})
             data_encoded += _ONE_SIGNED_INT.pack(value)
             cmd_string += " reg[{0:d}] {1:s} {2:d}".format(
                 register_id, condition.operator, value)
@@ -1493,7 +1567,8 @@ class DataSpecificationGenerator(object):
             raise InvalidCommandException(Commands.ELSE.name)
 
         self.conditionals[len(self.conditionals) - 1] = True
-        cmd_word = _binencode(LEN1, Commands.ELSE)
+        cmd_word = _binencode(Commands.ELSE, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.ELSE.name
         self.write_command_to_files(
             cmd_word, cmd_string, indent=True, outdent=True)
@@ -1514,7 +1589,8 @@ class DataSpecificationGenerator(object):
             raise InvalidCommandException(Commands.END_IF.name)
 
         self.conditionals.pop()
-        cmd_word = _binencode(LEN1, Commands.END_IF)
+        cmd_word = _binencode(Commands.END_IF, {
+            _Field.LENGTH: LEN1})
         cmd_string = Commands.END_IF.name
         self.write_command_to_files(cmd_word, cmd_string, outdent=True)
 
@@ -1559,25 +1635,25 @@ class DataSpecificationGenerator(object):
                 raise DuplicateParameterException(
                     Commands.MV.name, [register_id, data])
 
-            dest_reg = register_id
-            src_reg = data
-            cmd_word = _binencode(
-                LEN1, Commands.MV,
-                [DEST_AND_SRC1, 16, dest_reg, 12, src_reg, 8])
+            cmd_word = _binencode(Commands.MV, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: DEST_AND_SRC1,
+                _Field.DESTINATION: register_id,
+                _Field.SOURCE_1: data})
             encoded_data = bytearray()
-            cmd_string = "reg[{0:d}] = reg[{1:d}]".format(dest_reg, src_reg)
+            cmd_string = "reg[{0:d}] = reg[{1:d}]".format(register_id, data)
         else:
             # Build command to assign from an immediate:
             # command has a second word (the immediate)
             _typebounds(Commands.MV, "data", data, data_type)
 
-            length = LEN3 if data_type.size > 4 else LEN2
-            dest_reg = register_id
-            cmd_word = _binencode(
-                length, Commands.MV, [DEST_ONLY, 16, dest_reg, 12])
+            cmd_word = _binencode(Commands.MV, {
+                _Field.LENGTH: LEN3 if data_type.size > 4 else LEN2,
+                _Field.USAGE: DEST_ONLY,
+                _Field.DESTINATION: register_id})
             encoded_data = data_type.encode(data)
             cmd_string = "reg[{0:d}] = {1:d} (0x{2:X})".format(
-                dest_reg, data, data)
+                register_id, data, data)
 
         self.write_command_to_files(cmd_word + encoded_data, cmd_string)
 
@@ -1602,9 +1678,10 @@ class DataSpecificationGenerator(object):
         if self.current_region is None:
             raise NoRegionSelectedException(Commands.GET_WR_PTR.name)
 
-        bit_field = 0x4
-        cmd_word = _binencode(
-            LEN1, Commands.GET_WR_PTR, [bit_field, 16, register_id, 12])
+        cmd_word = _binencode(Commands.GET_WR_PTR, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: 0x4,
+            _Field.DESTINATION: register_id})
         cmd_string = Commands.GET_WR_PTR.name
         cmd_string += " reg[{0:d}]".format(register_id)
         self.write_command_to_files(cmd_word, cmd_string)
@@ -1641,21 +1718,18 @@ class DataSpecificationGenerator(object):
         """
         if self.current_region is None:
             raise NoRegionSelectedException(Commands.SET_WR_PTR.name)
-        if relative_to_current:
-            relative = 1
-            relative_string = "RELATIVE"
-        else:
-            relative = 0
-            relative_string = "ABSOLUTE"
+        relative = bool(relative_to_current)
+        relative_string = "RELATIVE" if relative else "ABSOLUTE"
 
         data_encoded = bytearray()
         cmd_string = Commands.SET_WR_PTR.name
         if address_is_register:
             _bounds(Commands.SET_WR_PTR, "address", address, 0, MAX_REGISTERS)
-            cmd_word = _binencode(LEN1, Commands.SET_WR_PTR, [
-                SRC1_ONLY, 16,
-                address, 8,
-                relative])
+            cmd_word = _binencode(Commands.SET_WR_PTR, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: SRC1_ONLY,
+                _Field.SOURCE_1: address,
+                _Field.IMMEDIATE: relative})
             cmd_string += " reg[{0:d}] {1:s}".format(address, relative_string)
         else:
             if not relative_to_current:
@@ -1667,8 +1741,10 @@ class DataSpecificationGenerator(object):
                             address, DataType.INT32)
                 data_encoded += _ONE_SIGNED_INT.pack(address)
 
-            cmd_word = _binencode(
-                LEN2, Commands.SET_WR_PTR, [NO_REGS, 16, relative])
+            cmd_word = _binencode(Commands.SET_WR_PTR, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: NO_REGS,
+                _Field.IMMEDIATE: relative})
             cmd_string += " {0:d} {1:s}".format(address, relative_string)
 
         self.write_command_to_files(cmd_word + data_encoded, cmd_string)
@@ -1739,10 +1815,12 @@ class DataSpecificationGenerator(object):
             imm_value = log_block_size
             cmd_string += " align({0:d})".format(imm_value)
 
-        cmd_word = _binencode(
-            LEN1, Commands.ALIGN_WR_PTR,
-            [bit_field, 16, return_register_value, 12, block_size_reg, 8,
-             imm_value])
+        cmd_word = _binencode(Commands.ALIGN_WR_PTR, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: return_register_value,
+            _Field.SOURCE_1: block_size_reg,
+            _Field.IMMEDIATE: imm_value})
         self.write_command_to_files(cmd_word, cmd_string)
 
     def call_arithmetic_operation(self, register_id, operand_1, operation,
@@ -1840,10 +1918,14 @@ class DataSpecificationGenerator(object):
             encoded_operands += _ONE_WORD.pack(operand_2)
             cmd_string += " {0:d}".format(operand_2)
 
-        cmd_word = _binencode(
-            cmd_length, Commands.ARITH_OP,
-            [1 if signed else 0, 19, bit_field, 16, register_id, 12,
-             register_op_1, 8, register_op_2, 4, operation])
+        cmd_word = _binencode(Commands.ARITH_OP, {
+            _Field.LENGTH: cmd_length,
+            _Field.SIGNED: bool(signed),
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: register_id,
+            _Field.SOURCE_1: register_op_1,
+            _Field.SOURCE_2: register_op_2,
+            _Field.IMMEDIATE: operation})
         self.write_command_to_files(cmd_word + encoded_operands, cmd_string)
 
     def logical_and(self, register_id, operand_1, operand_2,
@@ -2129,10 +2211,13 @@ class DataSpecificationGenerator(object):
                 encoded_operands += _ONE_WORD.pack(operand_2)
                 cmd_string += " " + str(operand_2)
 
-        cmd_word = _binencode(
-            cmd_length, Commands.LOGIC_OP,
-            [bit_field, 16, register_id, 12, register_op_1, 8, register_op_2,
-             4, operation])
+        cmd_word = _binencode(Commands.LOGIC_OP, {
+            _Field.LENGTH: cmd_length,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: register_id,
+            _Field.SOURCE_1: register_op_1,
+            _Field.SOURCE_2: register_op_2,
+            _Field.IMMEDIATE: operation})
         self.write_command_to_files(cmd_word + encoded_operands, cmd_string)
 
     def copy_structure(self, source_structure_id, destination_structure_id,
@@ -2211,10 +2296,11 @@ class DataSpecificationGenerator(object):
             cmd_string += " destination_struct={0:d}".format(
                 destination_structure_id)
 
-        cmd_word = _binencode(
-            LEN1, Commands.COPY_STRUCT,
-            [bit_field, 16, destination_structure_id, 12, source_structure_id,
-             8])
+        cmd_word = _binencode(Commands.COPY_STRUCT, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: destination_structure_id,
+            _Field.SOURCE_1: source_structure_id})
         self.write_command_to_files(cmd_word, cmd_string)
 
     def copy_structure_parameter(
@@ -2299,9 +2385,11 @@ class DataSpecificationGenerator(object):
                         source_structure_id, source_parameter_index,
                         destination_id, destination_parameter_index])
 
-            cmd_word_1 = _binencode(
-                LEN2, Commands.COPY_PARAM,
-                [NO_REGS, 16, destination_id, 12, source_structure_id, 8])
+            cmd_word_1 = _binencode(Commands.COPY_PARAM, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: NO_REGS,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_1: source_structure_id})
             param_word = ((destination_parameter_index << 8) |
                           source_parameter_index)
             cmd_string += (
@@ -2314,9 +2402,11 @@ class DataSpecificationGenerator(object):
             _bounds(Commands.COPY_PARAM, "destination_register_id",
                     destination_id, 0, MAX_REGISTERS)
 
-            cmd_word_1 = _binencode(
-                LEN2, Commands.COPY_PARAM,
-                [DEST_ONLY, 16, destination_id, 12, source_structure_id, 8])
+            cmd_word_1 = _binencode(Commands.COPY_PARAM, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: DEST_ONLY,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_1: source_structure_id})
             param_word = source_parameter_index
             cmd_string += (
                 " source_structure_id = {0:d}, source_parameter_id = {1:d}, "
@@ -2356,7 +2446,6 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.UnknownTypeException: \
             * If data_type is not a valid data type
         """
-        cmd_word_length = LEN1
         source_register_id = 0
         bit_field = 0
         data_encoded = bytearray()
@@ -2364,21 +2453,21 @@ class DataSpecificationGenerator(object):
 
         if value_is_register:
             _bounds(Commands.PRINT_VAL, "value", value, 0, MAX_REGISTERS)
+            cmd_word_length = LEN1
             bit_field |= 2
             source_register_id = value
             cmd_string += " reg[{0:d}]".format(source_register_id)
         else:
             _typebounds(Commands.PRINT_VAL, "value", value, data_type)
-            if data_type.size <= 4:
-                cmd_word_length = LEN2
-            else:
-                cmd_word_length = LEN3
+            cmd_word_length = LEN2 if data_type.size <= 4 else LEN3
             data_encoded += data_type.encode(value)
             cmd_string += " {0:d}".format(value)
 
-        cmd_word = _binencode(
-            cmd_word_length, Commands.PRINT_VAL,
-            [bit_field, 16, source_register_id, 8, data_type])
+        cmd_word = _binencode(Commands.PRINT_VAL, {
+            _Field.LENGTH: cmd_word_length,
+            _Field.USAGE: bit_field,
+            _Field.SOURCE_1: source_register_id,
+            _Field.IMMEDIATE: data_type})
         self.write_command_to_files(cmd_word + data_encoded, cmd_string)
 
     def print_text(self, text, encoding="ASCII"):
@@ -2412,7 +2501,9 @@ class DataSpecificationGenerator(object):
 
         cmd_string = Commands.PRINT_TXT.name
         cmd_string += " \"{0:s}\"".format(text)
-        cmd_word = _binencode(cmd_word_len, Commands.PRINT_TXT, [text_len - 1])
+        cmd_word = _binencode(Commands.PRINT_TXT, {
+            _Field.LENGTH: cmd_word_len,
+            _Field.IMMEDIATE: text_len - 1})
         self.write_command_to_files(cmd_word + text_encoded, cmd_string)
 
     def print_struct(self, structure_id, structure_id_is_register=False):
@@ -2458,9 +2549,11 @@ class DataSpecificationGenerator(object):
             bit_field = 0
             cmd_string += " struct({0:d})".format(structure_id)
 
-        cmd_word = _binencode(
-            LEN1, Commands.PRINT_STRUCT,
-            [bit_field, 16, struct_register, 8, structure_id])
+        cmd_word = _binencode(Commands.PRINT_STRUCT, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: bit_field,
+            _Field.SOURCE_1: struct_register,
+            _Field.IMMEDIATE: structure_id})
         self.write_command_to_files(cmd_word, cmd_string)
 
     def end_specification(self, close_writer=True):
@@ -2479,7 +2572,8 @@ class DataSpecificationGenerator(object):
         """
         self.comment("\nEnd of specification:")
 
-        cmd_word = _binencode(LEN1, Commands.END_SPEC)
+        cmd_word = _binencode(Commands.END_SPEC, {
+            _Field.LENGTH: LEN1})
         encoded_parameter = _ONE_SIGNED_INT.pack(-1)
         cmd_string = Commands.END_SPEC.name
         self.write_command_to_files(cmd_word + encoded_parameter, cmd_string)

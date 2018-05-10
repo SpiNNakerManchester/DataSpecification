@@ -3,8 +3,8 @@ import numpy
 import struct
 import functools
 from six import raise_from
-from .data_specification_executor_functions \
-    import DataSpecificationExecutorFunctions as ExecutorFuncs
+from .data_specification_executor_functions import (
+    DataSpecificationExecutorFunctions)
 from .constants import (
     APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR, MAX_MEM_REGIONS,
     APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE)
@@ -40,7 +40,8 @@ class DataSpecificationExecutor(object):
             If a write to external storage fails
         """
         self.spec_reader = spec_reader
-        self.dsef = ExecutorFuncs(self.spec_reader, memory_space)
+        self.dsef = DataSpecificationExecutorFunctions(
+            self.spec_reader, memory_space)
 
     def __operation_func(self, cmd, index):
         """ Decode the command and select an implementation of the command.

@@ -1,6 +1,6 @@
-from enum import Enum
 import decimal
 import struct
+from enum import Enum
 import numpy as np
 
 

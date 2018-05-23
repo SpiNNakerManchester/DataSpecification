@@ -1156,7 +1156,7 @@ class DataSpecificationGenerator(object):
 
         cmd_string = None
         if self.report_writer is not None:
-            cmd_string = "WRITE data=0x%8.8X" % data
+            cmd_string = "WRITE data={}".format(data)
 
         repeat_reg_usage = NO_REGS
         cmd_word = (
@@ -1316,7 +1316,7 @@ class DataSpecificationGenerator(object):
                 Commands.WRITE.name)
 
         parameters = 0
-        cmd_string = "WRITE data=0x%8.8X" % data
+        cmd_string = "WRITE data={}".format(data)
 
         if repeats_is_register is not False:
             repeat_reg_usage = 1

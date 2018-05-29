@@ -680,8 +680,8 @@ class DataSpecificationGenerator(object):
                 "structure", structure_id, Commands.WRITE_PARAM.name)
         if len(self.struct_slots[structure_id]) <= parameter_index:
             raise NotAllocatedException(
-                "structure %d parameter" % structure_id, parameter_index,
-                Commands.WRITE_PARAM.name)
+                "structure {} parameter".format(structure_id),
+                parameter_index, Commands.WRITE_PARAM.name)
 
         if self.struct_slots[
                 structure_id][parameter_index][1] is not data_type:
@@ -893,7 +893,7 @@ class DataSpecificationGenerator(object):
                 structure_ids)
         if len(structure_ids) != len(set(structure_ids)):
             raise DuplicateParameterException(
-                "%s %d" % (Commands.CONSTRUCT.name, function_id),
+                "{} {}".format(Commands.CONSTRUCT.name, function_id),
                 structure_ids)
 
         cmd_string = Commands.CONSTRUCT.name
@@ -1004,7 +1004,7 @@ class DataSpecificationGenerator(object):
         cmd_string = None
         if self.report_writer is not None:
             cmd_string = Commands.WRITE.name
-            cmd_string += " data=0x%8.8X" % data
+            cmd_string += " data={}".format(data)
 
         repeat_reg_usage = NO_REGS
         cmd_word = _binencode(Commands.WRITE, {
@@ -1152,7 +1152,7 @@ class DataSpecificationGenerator(object):
 
         parameters = 0
         cmd_string = Commands.WRITE.name
-        cmd_string += " data=0x%8.8X" % data
+        cmd_string += " data={}".format(data)
 
         if repeats_is_register:
             repeat_reg_usage = 1
@@ -2621,13 +2621,12 @@ class DataSpecificationGenerator(object):
             if outdent is True:
                 self.txt_indent = min(self.txt_indent - 1, 0)
             indent_string = "   " * self.txt_indent
-            if no_instruction_number is True:
-                formatted_cmd_string = "{0:s}{1:s}\n".format(
+            if no_instruction_number:
+                formatted_cmd_string = "{}{}\n".format(
                     indent_string, cmd_string)
             else:
-                pc = "%8.8X" % self.instruction_counter
-                formatted_cmd_string = "{}. {}{}\n".format(
-                    pc, indent_string, cmd_string)
+                formatted_cmd_string = "{:08X}. {}{}\n".format(
+                    self.instruction_counter, indent_string, cmd_string)
                 self.instruction_counter += len(cmd_word_list)
             self.report_writer.write(formatted_cmd_string.encode("UTF-8"))
             if indent is True:

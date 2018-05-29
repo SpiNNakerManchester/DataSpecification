@@ -1,12 +1,10 @@
 import unittest
-from tempfile import mktemp
 import struct
-from data_specification.enums.data_type import DataType
-
-from data_specification \
-    import DataSpecificationExecutor, DataSpecificationGenerator, constants
-
+from tempfile import mktemp
 from spinn_storage_handlers import FileDataWriter, FileDataReader
+from data_specification.enums import DataType
+from data_specification import (
+    DataSpecificationExecutor, DataSpecificationGenerator, constants)
 
 
 class TestDataSpecExecutor(unittest.TestCase):

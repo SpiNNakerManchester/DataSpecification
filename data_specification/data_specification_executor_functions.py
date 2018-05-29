@@ -1,11 +1,11 @@
 import struct
-from .constants import \
-    END_SPEC_EXECUTOR, LEN2, LEN3, MAX_MEM_REGIONS, MAX_REGISTERS
-from .exceptions import \
-    DataSpecificationSyntaxError, ExecuteBreakInstruction, NoMoreException, \
-    NoRegionSelectedException, ParameterOutOfBoundsException, \
-    RegionInUseException, RegionNotAllocatedException, \
-    RegionUnfilledException, UnknownTypeLengthException
+from .constants import (
+    END_SPEC_EXECUTOR, LEN2, LEN3, MAX_MEM_REGIONS, MAX_REGISTERS)
+from .exceptions import (
+    DataSpecificationSyntaxError, ExecuteBreakInstruction, NoMoreException,
+    NoRegionSelectedException, ParameterOutOfBoundsException,
+    RegionInUseException, RegionNotAllocatedException,
+    RegionUnfilledException, UnknownTypeLengthException)
 from .memory_region_collection import MemoryRegionCollection
 from .memory_region import MemoryRegion
 from .abstract_executor_functions import AbstractExecutorFunctions

@@ -1,12 +1,12 @@
 import logging
-import numpy
 import struct
+import numpy
 from six import raise_from
-
-from .data_specification_executor_functions \
-    import DataSpecificationExecutorFunctions as Dsef
-from .constants import APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR, \
-    MAX_MEM_REGIONS, APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE
+from .data_specification_executor_functions import (
+    DataSpecificationExecutorFunctions)
+from .constants import (
+    APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR,
+    MAX_MEM_REGIONS, APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE)
 from .enums import Commands
 from .exceptions import DataSpecificationException
 
@@ -25,7 +25,6 @@ class DataSpecificationExecutor(object):
 
         # The executer functions
         "dsef"
-
     ]
 
     def __init__(self, spec_reader, memory_space):
@@ -42,7 +41,8 @@ class DataSpecificationExecutor(object):
             If a write to external storage fails
         """
         self.spec_reader = spec_reader
-        self.dsef = Dsef(self.spec_reader, memory_space)
+        self.dsef = DataSpecificationExecutorFunctions(
+            self.spec_reader, memory_space)
 
     def execute(self):
         """ Executes the specification

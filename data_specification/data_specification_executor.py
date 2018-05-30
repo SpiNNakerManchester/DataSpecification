@@ -1,13 +1,13 @@
 import logging
-import numpy
 import struct
 import functools
+import numpy
 from six import raise_from
 from .data_specification_executor_functions import (
     DataSpecificationExecutorFunctions)
 from .constants import (
-    APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR, MAX_MEM_REGIONS,
-    APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE)
+    APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR,
+    MAX_MEM_REGIONS, APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE)
 from .enums import Commands
 from .exceptions import DataSpecificationException
 
@@ -23,8 +23,10 @@ class DataSpecificationExecutor(object):
     __slots__ = [
         # The object to read the specification language file
         "spec_reader",
-        # The executor functions
-        "dsef"]
+
+        # The executer functions
+        "dsef"
+    ]
 
     def __init__(self, spec_reader, memory_space):
         """

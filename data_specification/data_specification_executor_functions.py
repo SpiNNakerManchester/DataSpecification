@@ -1,7 +1,4 @@
 import struct
-from .abstract_executor_functions import AbstractExecutorFunctions
-from .memory_region import MemoryRegion
-from .memory_region_collection import MemoryRegionCollection
 from .constants import (
     END_SPEC_EXECUTOR, LEN2, LEN3, MAX_MEM_REGIONS, MAX_REGISTERS)
 from .exceptions import (
@@ -9,6 +6,9 @@ from .exceptions import (
     NoRegionSelectedException, ParameterOutOfBoundsException,
     RegionInUseException, RegionNotAllocatedException,
     RegionUnfilledException, UnknownTypeLengthException)
+from .abstract_executor_functions import AbstractExecutorFunctions
+from .memory_region import MemoryRegion
+from .memory_region_collection import MemoryRegionCollection
 
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")

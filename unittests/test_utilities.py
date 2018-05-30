@@ -1,7 +1,7 @@
 import os.path
 import unittest
-from data_specification.utility_calls import \
-    get_region_base_address_offset, get_data_spec_and_file_writer_filename
+from data_specification.utility_calls import (
+    get_region_base_address_offset, get_data_spec_and_file_writer_filename)
 
 
 class TestingUtilities(unittest.TestCase):

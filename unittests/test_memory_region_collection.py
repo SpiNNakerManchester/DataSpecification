@@ -1,7 +1,7 @@
 import unittest
 from data_specification import MemoryRegionCollection, MemoryRegion
-from data_specification.exceptions import RegionInUseException,\
-    NoRegionSelectedException
+from data_specification.exceptions import (
+    RegionInUseException, NoRegionSelectedException)
 
 
 class MyTestCase(unittest.TestCase):

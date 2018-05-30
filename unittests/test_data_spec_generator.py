@@ -1,22 +1,21 @@
 import unittest
 import struct
 import os
-import tempfile
 from io import FileIO
+import tempfile
 from spinn_storage_handlers import FileDataWriter
-
-from data_specification import constants
-from data_specification.exceptions \
-    import TypeMismatchException, ParameterOutOfBoundsException,\
-    RegionInUseException, NotAllocatedException, StructureInUseException,\
-    InvalidOperationException, NoRegionSelectedException,\
-    InvalidCommandException, WrongParameterNumberException,\
-    DuplicateParameterException, FunctionInUseException,\
-    RegionUnfilledException, RandomNumberDistributionInUseException,\
-    RNGInUseException
-from data_specification.enums import DataType, Condition, RandomNumberGenerator
-from data_specification.enums import ArithmeticOperation, LogicOperation
-from data_specification import DataSpecificationGenerator
+from data_specification import constants, DataSpecificationGenerator
+from data_specification.exceptions import (
+    TypeMismatchException, ParameterOutOfBoundsException,
+    RegionInUseException, NotAllocatedException, StructureInUseException,
+    InvalidOperationException, NoRegionSelectedException,
+    InvalidCommandException, WrongParameterNumberException,
+    DuplicateParameterException, FunctionInUseException,
+    RegionUnfilledException, RandomNumberDistributionInUseException,
+    RNGInUseException)
+from data_specification.enums import (
+    DataType, Condition, RandomNumberGenerator, ArithmeticOperation,
+    LogicOperation)
 
 _64BIT_VALUE = 0x1234567890ABCDEF
 

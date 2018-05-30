@@ -1,13 +1,12 @@
 """ utility calls for interpreting bits of the DSG
 """
 
-from .constants import APP_PTR_TABLE_HEADER_BYTE_SIZE
-from .data_specification_generator import DataSpecificationGenerator
-from spinn_storage_handlers import FileDataWriter
-
-import tempfile
 import os
 import threading
+import tempfile
+from spinn_storage_handlers import FileDataWriter
+from .constants import APP_PTR_TABLE_HEADER_BYTE_SIZE
+from .data_specification_generator import DataSpecificationGenerator
 
 # used to stop file conflicts
 _lock_condition = threading.Condition()

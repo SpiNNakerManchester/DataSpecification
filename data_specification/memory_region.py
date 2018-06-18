@@ -39,7 +39,7 @@ class MemoryRegion(object):
 
     @property
     def memory_pointer(self):
-        """ the memory write pointer
+        """ The memory write pointer
 
         :return: the memory pointer of the region
         :rtype: int
@@ -49,7 +49,7 @@ class MemoryRegion(object):
 
     @property
     def allocated_size(self):
-        """ the size of the region
+        """ The size of the region
 
         :return: the size of the region
         :rtype: int
@@ -59,7 +59,7 @@ class MemoryRegion(object):
 
     @property
     def remaining_space(self):
-        """ the amount of unused space in the region
+        """ The amount of unused space in the region
 
         :return: the number of bytes in the region that are not yet written
         :rtype: int
@@ -69,7 +69,7 @@ class MemoryRegion(object):
 
     @property
     def unfilled(self):
-        """ whether the region is filled
+        """ Whether the region is filled
 
         :return: True if the region needs to be filled when written
         :rtype: bool
@@ -79,7 +79,7 @@ class MemoryRegion(object):
 
     @property
     def region_data(self):
-        """ the container which holds the data written in this region
+        """ The container which holds the data written in this region
 
         :return: the region data container
         :rtype: bytearray

@@ -3,7 +3,7 @@ from data_specification.exceptions import (
 
 
 class MemoryRegionCollection(object):
-    """Collection of memory regions.
+    """ Collection of memory regions.
     """
 
     __slots__ = [

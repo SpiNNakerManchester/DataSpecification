@@ -10,7 +10,7 @@ class MemoryRegion(object):
         # flag that states if the region is filled or not
         "_unfilled",
 
-        # the amount of memory allocated to this dsg
+        # the amount of memory allocated to this DSG
         "_allocated_size",
 
         # the region address map????

@@ -8,11 +8,11 @@
 void stack_push(void *new_item);
 
 //! \brief Function to remove the first element of the internal stack of DSE.
-//! \brief return The top of the stack.
+//! \return The top of the stack.
 void *stack_pop();
 
 //! \brief Function to get the first element of the internal stack of DSE.
-//! \brief return The top of the stack.
+//! \return The top of the stack.
 void *stack_top();
 
 #endif

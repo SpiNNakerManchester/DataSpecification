@@ -173,7 +173,7 @@ void c_main(void) {
     // length of the data specification to execute
     currentBlock_size = (uint32_t) dse_exec_data_struct->currentBlock_size;
 
-    // the future application id for which the data
+    // the future application ID for which the data
     // specification is currently being executed
     future_app_id = (uint8_t) dse_exec_data_struct->future_app_id;
 

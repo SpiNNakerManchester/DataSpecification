@@ -133,10 +133,10 @@ void execute_reserve(Command cmd) {
         rt_error(RTE_ABORT);
     }
 
-    // Get the region id and perform some checks on it.
+    // Get the region ID and perform some checks on it.
     uint8_t region_id = cmd.cmdWord & 0x1F;
     if (region_id > MAX_MEM_REGIONS) {
-        log_error("RESERVE memory region id %d out of bounds", region_id);
+        log_error("RESERVE memory region ID %d out of bounds", region_id);
         rt_error(RTE_ABORT);
     }
     if (memory_regions[region_id] != NULL) {
@@ -444,7 +444,7 @@ void execute_loop(Command cmd) {
 //!        Reads the entire structure definition, up to the END_STRUCT command.
 //! \param[in] cmd The command to be executed.
 void execute_start_struct(Command cmd) {
-    // The id of the new struct.
+    // The ID of the new struct.
     int struct_id = cmd.cmdWord & 0x1F;
 
     // Save the command pointer.
@@ -504,7 +504,7 @@ void execute_write_struct(Command cmd) {
         n_repeats = (cmd.cmdWord & 0xF00) >> 8;
     }
 
-    // The id of the struct to be printed.
+    // The ID of the struct to be printed.
     uint8_t struct_id = cmd.cmdWord & 0xF;
 
     if (structs[struct_id] == NULL) {
@@ -525,7 +525,7 @@ void execute_write_struct(Command cmd) {
 //! \brief Execute a MV instruction.
 //! \param[in] cmd The command to be executed.
 void execute_mv(Command cmd) {
-    // The id of the destination register.
+    // The ID of the destination register.
     uint8_t dest_id = command_get_destReg(cmd.cmdWord);
 
     // The data to be moved.
@@ -568,7 +568,7 @@ void execute_logic_op(Command cmd) {
         }
     }
 
-    // The id of the destination register.
+    // The ID of the destination register.
     uint8_t dest_id = command_get_destReg(cmd.cmdWord);
 
     switch (operation) {
@@ -617,7 +617,7 @@ void execute_write_param(Command cmd) {
         rt_error(RTE_ABORT);
     }
     if (structs[struct_id]->size <= elem_id) {
-        log_error("WRITE_PARAM %d is not a valid element id in structure %d",
+        log_error("WRITE_PARAM %d is not a valid element ID in structure %d",
             struct_id, elem_id);
         rt_error(RTE_ABORT);
     }
@@ -728,9 +728,9 @@ void execute_print_struct(Command cmd) {
 }
 
 //! \brief Check if a parameter of a constructor is read-only.
-//! \param[in] constructor_id The id of the constructor whose parameter is
+//! \param[in] constructor_id The ID of the constructor whose parameter is
 //!                           being checked.
-//! \param[in] param_id The id of the parameter being checked.
+//! \param[in] param_id The ID of the parameter being checked.
 //! \return 1, if the parameter param_id of the constructor constructor_id
 //!            is read only,
 //!         0, otherwise
@@ -738,12 +738,12 @@ int param_read_only(int constructor_id, int param_id) {
     return !!(constructors[constructor_id].arg_read_only & (1 << param_id));
 }
 
-//! \brief Get the id of a specific structure parameter from a CONSTRUCT
+//! \brief Get the ID of a specific structure parameter from a CONSTRUCT
 //!        command.
 //! \param[in] cmd The command to be analysed.
-//! \param[in] param_n The id of the parameter to be returned.
+//! \param[in] param_n The ID of the parameter to be returned.
 //!
-//! \return The id of the structure used as the nth parameter in this
+//! \return The ID of the structure used as the nth parameter in this
 //!         constructor.
 int get_nth_struct_arg(Command cmd, int param_n) {
     return (cmd.dataWords[0] & (0x1F << (6 * param_n))) >> (6 * param_n);
@@ -775,7 +775,7 @@ void execute_construct(Command cmd) {
     // Space to temporarily save the read only structs.
     Struct *temp[MAX_STRUCT_ARGS];
 
-    // Save read only structs and swap struct ids such that the first
+    // Save read only structs and swap struct IDs such that the first
     // 5 elements of the structs array point to the arguments of the
     // constructor.
     for (int struct_arg_id = 0;

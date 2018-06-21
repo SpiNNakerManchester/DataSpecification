@@ -1,4 +1,4 @@
-""" utility calls for interpreting bits of the DSG
+""" Utility calls for interpreting bits of the DSG
 """
 
 import os

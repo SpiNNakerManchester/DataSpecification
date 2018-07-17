@@ -361,8 +361,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         """ Does the actual write to the region, enforcing that writes cannot\
             go outside the region.
 
-        :param blob: The data to write
-        :type blob: str
+        :param data: The data to write
+        :type data: str
         :raise data_specification.exceptions.NoMoreException:\
             if the selected region has not enough space to store the data
         """

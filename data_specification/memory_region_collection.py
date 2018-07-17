@@ -1,4 +1,4 @@
-from data_specification.exceptions import (
+from .exceptions import (
     RegionInUseException, NoRegionSelectedException)
 
 

@@ -1,5 +1,6 @@
 import logging
 import struct
+import functools
 import numpy
 from six import raise_from
 from .data_specification_executor_functions import (
@@ -44,6 +45,21 @@ class DataSpecificationExecutor(object):
         self.dsef = DataSpecificationExecutorFunctions(
             self.spec_reader, memory_space)
 
+    def __operation_func(self, cmd, index):
+        """ Decode the command and select an implementation of the command.
+        """
+        try:
+            opcode = (cmd >> 20) & 0xFF
+            # noinspection PyArgumentList
+            # pylint: disable=no-value-for-parameter
+            return functools.partial(Commands(opcode).exec_function, self.dsef)
+        except (ValueError, TypeError) as e:
+            logger.debug("problem decoding opcode %d at index %d",
+                         cmd, index, exc_info=True)
+            raise_from(DataSpecificationException(
+                "Invalid command 0x{0:X} while reading file {1:s}".format(
+                    cmd, self.spec_reader.filename)), e)
+
     def execute(self):
         """ Executes the specification
 
@@ -63,21 +79,8 @@ class DataSpecificationExecutor(object):
         while instruction_spec:
             # process the received command
             cmd = _ONE_WORD.unpack(instruction_spec)[0]
-
-            opcode = (cmd >> 20) & 0xFF
-
-            try:
-                # noinspection PyArgumentList
-                # pylint: disable=no-value-for-parameter
-                return_value = Commands(opcode).exec_function(self.dsef, cmd)
-            except (ValueError, TypeError) as e:
-                logger.debug("problem decoding opcode %d at index %d",
-                             cmd, index, exc_info=True)
-                raise_from(DataSpecificationException(
-                    "Invalid command {0} while reading file {1}".format(
-                        hex(cmd), self.spec_reader.filename)), e)
-
-            if return_value == END_SPEC_EXECUTOR:
+            operation_fn = self.__operation_func(cmd, index)
+            if operation_fn(cmd) == END_SPEC_EXECUTOR:
                 break
             instruction_spec = self.spec_reader.read(4)
             index += 4
@@ -107,10 +110,10 @@ class DataSpecificationExecutor(object):
         pointer_table_size = MAX_MEM_REGIONS * 4
         next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
-        for i, memory_region in enumerate(self.dsef.mem_regions):
-            if memory_region is not None:
+        for i, region in enumerate(self.dsef.mem_regions):
+            if region is not None:
                 pointer_table[i] = next_free_offset + start_address
-                next_free_offset += memory_region.allocated_size
+                next_free_offset += region.allocated_size
             else:
                 pointer_table[i] = 0
         return pointer_table
@@ -122,6 +125,5 @@ class DataSpecificationExecutor(object):
         :rtype: int
         """
         return APP_PTR_TABLE_BYTE_SIZE + sum(
-            memory_region.allocated_size
-            for memory_region in self.dsef.mem_regions
-            if memory_region is not None)
+            region.allocated_size
+            for region in self.dsef.mem_regions if region is not None)

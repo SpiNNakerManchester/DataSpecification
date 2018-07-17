@@ -6,9 +6,9 @@ from .exceptions import (
     NoRegionSelectedException, ParameterOutOfBoundsException,
     RegionInUseException, RegionNotAllocatedException,
     RegionUnfilledException, UnknownTypeLengthException)
-from .memory_region_collection import MemoryRegionCollection
-from .memory_region import MemoryRegion
 from .abstract_executor_functions import AbstractExecutorFunctions
+from .memory_region import MemoryRegion
+from .memory_region_collection import MemoryRegionCollection
 
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")
@@ -25,7 +25,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     __slots__ = [
         # Where we are reading the data spec from
         "spec_reader",
-        # ????????????
+        # How much space do we have available? Maximum *PER REGION*
         "memory_space",
         # How much space has been allocated
         "space_allocated",
@@ -35,25 +35,14 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "registers",
         # The collection of memory regions that can be written to
         "mem_regions",
-        # ????????????
-        "_cmd_size",
-        # ????????????
+
+        # Decodings of the current command
+        "cmd_size",
         "opcode",
-        # ????????????
-        "use_dest_reg",
-        # ????????????
-        "use_src1_reg",
-        # ????????????
-        "use_src2_reg",
-        # ????????????
         "dest_reg",
-        # ????????????
         "src1_reg",
-        # ????????????
         "src2_reg",
-        # ????????????
-        "data_len"
-    ]
+        "data_len"]
 
     def __init__(self, spec_reader, memory_space):
         """
@@ -75,37 +64,36 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
 
         # storage objects
-        self._cmd_size = None
+        self.cmd_size = None
         self.opcode = None
-        self.use_dest_reg = None
-        self.use_src1_reg = None
-        self.use_src2_reg = None
         self.dest_reg = None
         self.src1_reg = None
         self.src2_reg = None
         self.data_len = None
 
-    def __unpack_cmd__(self, cmd):
+    def __unpack_cmd(self, cmd):
         """ Routine to unpack the command read from the data spec file. The\
-            parameters of the command are stored in the class data
+            parameters of the command are stored in the class data.
 
         :param cmd: The command read form the data spec file
         :type cmd: int
         :return: No value returned
         :rtype: None
         """
-        self._cmd_size = (cmd >> 28) & 0x3
+        self.cmd_size = (cmd >> 28) & 0x3
         self.opcode = (cmd >> 20) & 0xFF
-        self.use_dest_reg = (cmd >> 18) & 0x1 == 0x1
-        self.use_src1_reg = (cmd >> 17) & 0x1 == 0x1
-        self.use_src2_reg = (cmd >> 16) & 0x1 == 0x1
-        self.dest_reg = (cmd >> 12) & 0xF
-        self.src1_reg = (cmd >> 8) & 0xF
-        self.src2_reg = (cmd >> 4) & 0xF
+        use_dest_reg = (cmd >> 18) & 0x1 == 0x1
+        use_src1_reg = (cmd >> 17) & 0x1 == 0x1
+        use_src2_reg = (cmd >> 16) & 0x1 == 0x1
+        self.dest_reg = (cmd >> 12) & 0xF if use_dest_reg else None
+        self.src1_reg = (cmd >> 8) & 0xF if use_src1_reg else None
+        self.src2_reg = (cmd >> 4) & 0xF if use_src2_reg else None
         self.data_len = (cmd >> 12) & 0x3
 
     @property
     def _region(self):
+        if self.current_region is None:
+            return None
         return self.mem_regions[self.current_region]
 
     def execute_break(self, cmd):
@@ -135,15 +123,15 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             If the requested size of the region is beyond the available\
             memory space
         """
-        self.__unpack_cmd__(cmd)
+        self.__unpack_cmd(cmd)
         region = cmd & 0x1F  # cmd[4:0]
 
-        if self._cmd_size != LEN2:
+        if self.cmd_size != LEN2:
             raise DataSpecificationSyntaxError(
                 "Command {0:s} requires one word as argument (total 2 words), "
                 "but the current encoding ({1:X}) is specified to be {2:d} "
                 "words long".format(
-                    "RESERVE", cmd, self._cmd_size))
+                    "RESERVE", cmd, self.cmd_size))
 
         unfilled = (cmd >> 7) & 0x1 == 0x1
 
@@ -174,21 +162,21 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise data_specification.exceptions.DataSpecificationSyntaxError:\
             If there is an error in the command syntax
         """
-        self.__unpack_cmd__(cmd)
+        self.__unpack_cmd(cmd)
 
-        if self.use_src2_reg:
+        if self.src2_reg is not None:
             n_repeats = self.registers[self.src2_reg]
         else:
             n_repeats = cmd & 0xFF
 
         # Convert data length to bytes
-        data_len = (1 << self.data_len)
+        data_len = 1 << self.data_len
 
-        if self.use_src1_reg:
+        if self.src1_reg is not None:
             value = self.registers[self.src1_reg]
-        elif self._cmd_size == LEN2 and data_len != 8:
+        elif self.cmd_size == LEN2 and data_len != 8:
             value = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
-        elif self._cmd_size == LEN3 and data_len == 8:
+        elif self.cmd_size == LEN3 and data_len == 8:
             value = _ONE_LONG.unpack(self.spec_reader.read(8))[0]
         else:
             raise DataSpecificationSyntaxError(
@@ -196,7 +184,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
                 "current encoding ({1:X}) is specified to be {2:d} words "
                 "long and the data length command argument is specified "
                 "to be {3:d} bytes long".format(
-                    "WRITE", cmd, self._cmd_size, data_len))
+                    "WRITE", cmd, self.cmd_size, data_len))
 
         # Perform the writes
         self._write_to_mem(value, data_len, n_repeats, "WRITE")
@@ -225,12 +213,12 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             If the focus is being switched to a region of memory which has\
             been declared to be kept unfilled
         """
-        self.__unpack_cmd__(cmd)
+        self.__unpack_cmd(cmd)
 
-        if not self.use_src1_reg:
-            region = (cmd >> 8) & 0xF
-        else:
+        if self.src1_reg is not None:
             region = self.registers[self.src1_reg]
+        else:
+            region = (cmd >> 8) & 0xF
 
         if self.mem_regions.is_empty(region):
             raise RegionUnfilledException(region, "SWITCH_FOCUS")
@@ -249,22 +237,20 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             destination must be a register and the appropriate bit needs to\
             be set in the specification
         """
-        self.__unpack_cmd__(cmd)
-
-        if not self.use_dest_reg:
+        self.__unpack_cmd(cmd)
+        if self.dest_reg is None:
             raise DataSpecificationSyntaxError(
                 "Destination register not correctly specified")
 
-        if self.use_src1_reg:
+        if self.src1_reg is not None:
             self.registers[self.dest_reg] = self.registers[self.src1_reg]
         else:
-            data = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
-            self.registers[self.dest_reg] = data
+            self.registers[self.dest_reg] = \
+                _ONE_WORD.unpack(self.spec_reader.read(4))[0]
 
     def execute_set_wr_ptr(self, cmd):
-        address = None
-        self.__unpack_cmd__(cmd)
-        if self.use_src1_reg == 1:
+        self.__unpack_cmd(cmd)
+        if self.src1_reg is not None:
             # the data is a register
             future_address = self.registers[self.src1_reg]
         else:
@@ -331,17 +317,16 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             if the data type size is not 1, 2, 4, or 8 bytes
         """
         if n_bytes == 1:
-            encoded_value = _ONE_BYTE.pack(value)
+            encoder = _ONE_BYTE
         elif n_bytes == 2:
-            encoded_value = _ONE_SHORT.pack(value)
+            encoder = _ONE_SHORT
         elif n_bytes == 4:
-            encoded_value = _ONE_WORD.pack(value)
+            encoder = _ONE_WORD
         elif n_bytes == 8:
-            encoded_value = _ONE_LONG.pack(value)
+            encoder = _ONE_LONG
         else:
             raise UnknownTypeLengthException(n_bytes, command)
-
-        self._write_bytes_to_mem(encoded_value * repeat, command)
+        self._write_bytes_to_mem(encoder.pack(value) * repeat, command)
 
     def _write_bytes_to_mem(self, data, command):
         """ Write raw bytes to data memory
@@ -367,17 +352,27 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             raise NoRegionSelectedException(command)
 
         # It must be a real region
-        if self.mem_regions.is_empty(self.current_region) is None:
+        if self._region is None:
             raise RegionNotAllocatedException(self.current_region, command)
 
+        self.__write_blob(data)
+
+    def __write_blob(self, data):
+        """ Does the actual write to the region, enforcing that writes cannot\
+            go outside the region.
+
+        :param data: The data to write
+        :type data: str
+        :raise data_specification.exceptions.NoMoreException:\
+            if the selected region has not enough space to store the data
+        """
         # It must have enough space
-        space_available = self._region.remaining_space
-        space_required = len(data)
-        if space_available < space_required:
+        region = self._region
+        if region.remaining_space < len(data):
             raise NoMoreException(
-                space_available, space_required, self.current_region)
+                region.remaining_space, len(data), self.current_region)
 
         # We can safely write
-        write_ptr = self._region.write_pointer
-        self._region.region_data[write_ptr:write_ptr + len(data)] = data
-        self._region.increment_write_pointer(len(data))
+        write_ptr = region.write_pointer
+        region.region_data[write_ptr:write_ptr + len(data)] = data
+        region.increment_write_pointer(len(data))

@@ -9,4 +9,5 @@ DataSpecification.egg-info
 /SpiNNaker_DataSpecification.egg-info/
 .cache/
 .coverage
+.cache/
 .pytest_cache/

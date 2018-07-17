@@ -1,6 +1,5 @@
 class MemoryRegion(object):
     """ Memory region storage object
-
     """
 
     __slots__ = [
@@ -59,7 +58,7 @@ class MemoryRegion(object):
 
     @property
     def remaining_space(self):
-        """ The amount of unused space in the region
+        """  The amount of unused space in the region
 
         :return: the number of bytes in the region that are not yet written
         :rtype: int

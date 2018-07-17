@@ -15,13 +15,18 @@ class RegionInUseException(DataSpecificationException):
         allocated
     """
 
-    def __init__(self, region):
+    def __init__(self, region, label=None):
         """
         :param region: The region that was already allocated
         :type region: int
+        :param label: What label is known for the region
         """
-        super(RegionInUseException, self).__init__(
-            "Region {0} was already allocated".format(region))
+        if label is None:
+            msg = "Region {0:d} was already allocated".format(region)
+        else:
+            msg = "Region {0:d} ({1:s}) was already allocated".format(
+                region, label)
+        super(RegionInUseException, self).__init__(msg)
 
 
 class StructureInUseException(DataSpecificationException):

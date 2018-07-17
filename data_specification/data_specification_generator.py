@@ -1,6 +1,7 @@
+import decimal
+from enum import Enum, IntEnum
 import logging
 import struct
-import decimal
 import numpy
 from spinn_machine import sdram
 from spinn_storage_handlers.abstract_classes import AbstractDataWriter
@@ -24,13 +25,77 @@ from .enums import (
 logger = logging.getLogger(__name__)
 _ONE_SBYTE = struct.Struct("<b")
 _ONE_WORD = struct.Struct("<I")
-_ONE_SINT = struct.Struct("<i")
+_ONE_SIGNED_INT = struct.Struct("<i")
 _TWO_WORDS = struct.Struct("<II")
+
+
+def _bounds(cmd, name, value, low, high):
+    """ A simple bounds checker.
+    """
+    if value < low or value >= high:
+        raise ParameterOutOfBoundsException(
+            name, value, low, high - 1, cmd.name)
+
+
+def _typebounds(cmd, name, value, valuetype):
+    """ A simple bounds checker that uses the bounds from a type descriptor.
+    """
+    if value < valuetype.min or value > valuetype.max:
+        raise ParameterOutOfBoundsException(
+            name, value, valuetype.min, valuetype.max, cmd.name)
+
+
+class _Field(IntEnum):
+    """ Various shifts for fields used with :py:func:`_binencode`.
+    """
+    LENGTH = 28
+    COMMAND = 20
+    SIGNED = 19
+    USAGE = 16
+    DESTINATION = 12
+    FUNCTION = 11
+    SOURCE_1 = 8
+    EMPTY = 7
+    SHRINK = 6
+    SOURCE_2 = 4
+    IMMEDIATE = 0
+
+
+def _binencode(command, arguments):
+    """ Encodes commands as binary words.
+
+    :param command: The code of the command being encoded.
+    :type command: :py:class:`data_specification.enums.Commands`
+    :param arguments: How to parameterise the command.
+    :type arguments: dict(:py:class:`_Field`,int)
+    :return: the encoded command
+    :rtype: bytearray
+    """
+    cmd_word = command.value << _Field.COMMAND
+    for shift in arguments:
+        if shift < 0 or shift > 31:
+            raise KeyError()
+        val = arguments[shift]
+        if isinstance(val, Enum):
+            val = val.value
+        else:
+            val = int(val)
+        cmd_word |= val << shift
+    return bytearray(_ONE_WORD.pack(cmd_word))
 
 
 def _rescale(data, data_type):
     data_value = decimal.Decimal(str(data)) * data_type.scale
     return int(data_value.to_integral_value())
+
+
+class _MemSlot(object):
+    __slots__ = ["label", "size", "empty"]
+
+    def __init__(self, label, size, empty):
+        self.label = label
+        self.size = size
+        self.empty = empty
 
 
 class DataSpecificationGenerator(object):
@@ -42,40 +107,28 @@ class DataSpecificationGenerator(object):
     __slots__ = [
         # The object to write the specification to
         "spec_writer",
-
         # the writer for the human readable report
         "report_writer",
-
         # ????????
         "txt_indent",
-
         # how many instructions has been executed ?????
         "instruction_counter",
-
         # ???????
-        "mem_slot",
-
+        "mem_slots",
         # ???????
-        "function",
-
+        "function_slots",
         # ???????
-        "struct_slot",
-
+        "struct_slots",
         # ????????
         "rng",
-
         # ????????
         "random_distribution",
-
         # ???????
         "conditionals",
-
         # the current DSG region we're writing to
         "current_region",
-
         # ?????????
         "ongoing_function_definition",
-
         # ????????
         "ongoing_loop"
     ]
@@ -93,6 +146,8 @@ class DataSpecificationGenerator(object):
             written and, if so, where. No report is written if this is None.
         :type report_writer: \
             :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataWriter`
+        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+            If a write to external storage fails
         """
         if not isinstance(spec_writer, AbstractDataWriter):
             raise TypeError("spec_writer must be an AbstractDataWriter")
@@ -104,11 +159,11 @@ class DataSpecificationGenerator(object):
         self.report_writer = report_writer
         self.txt_indent = 0
         self.instruction_counter = 0
-        self.mem_slot = [0] * MAX_MEM_REGIONS
-        self.function = [0] * MAX_CONSTRUCTORS
-        self.struct_slot = [0] * MAX_STRUCT_SLOTS
-        self.rng = [0] * MAX_RNGS
-        self.random_distribution = [0] * MAX_RANDOM_DISTS
+        self.mem_slots = [None] * MAX_MEM_REGIONS
+        self.function_slots = [None] * MAX_CONSTRUCTORS
+        self.struct_slots = [None] * MAX_STRUCT_SLOTS
+        self.rng = [None] * MAX_RNGS
+        self.random_distribution = [None] * MAX_RANDOM_DISTS
         self.conditionals = []
         self.current_region = None
         self.ongoing_function_definition = False
@@ -139,13 +194,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.BREAK.value << 20))
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = encoded_cmd_word
-        cmd_string = "BREAK"
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.BREAK, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.BREAK.name
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def no_operation(self):
         """ Insert command to execute nothing
@@ -157,13 +209,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         """
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.NOP.value << 20))
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = encoded_cmd_word
-        cmd_string = "NOP"
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.NOP, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.NOP.name
+        self.write_command_to_files(cmd_word, cmd_string)
         return
 
     def reserve_memory_region(
@@ -192,50 +241,31 @@ class DataSpecificationGenerator(object):
             If the region requested was out of the allowed range, or that the\
             size was too big to fit in SDRAM
         """
-        if region < 0 or region >= MAX_MEM_REGIONS:
-            logger.error(
-                "Error: Memory region requested ({0:d}) is out of range 0 "
-                "to {1:d}.\n".format(region, MAX_MEM_REGIONS - 1))
-            raise ParameterOutOfBoundsException(
-                "memory region identifier", region, 0,
-                MAX_MEM_REGIONS - 1, Commands.RESERVE.name)
+        _bounds(Commands.RESERVE, "memory region identifier",
+                region, 0, MAX_MEM_REGIONS)
+        _bounds(Commands.RESERVE, "memory size",
+                size, 1, sdram.SDRAM.DEFAULT_SDRAM_BYTES)
+        if self.mem_slots[region] is not None:
+            raise RegionInUseException(region, self.mem_slots[region].label)
 
-        if self.mem_slot[region] != 0:
-            error_string = "Error: Requested memory region ({0:d}) ".format(
-                region)
-            error_string += "is already allocated.\n"
-            logger.error(error_string)
-            raise RegionInUseException(region)
+        self.mem_slots[region] = _MemSlot(label, size, empty)
 
-        if size > sdram.SDRAM.DEFAULT_SDRAM_BYTES:
-            raise ParameterOutOfBoundsException(
-                "memory size", size, 1, sdram.SDRAM.DEFAULT_SDRAM_BYTES,
-                Commands.RESERVE.name)
+        cmd_word = _binencode(Commands.RESERVE, {
+            _Field.LENGTH: LEN2,
+            _Field.USAGE: NO_REGS,
+            _Field.EMPTY: bool(empty),
+            _Field.SHRINK: bool(shrink),
+            _Field.IMMEDIATE: region})
+        encoded_size = _ONE_WORD.pack(size)
 
-        self.mem_slot[region] = [size, label, empty]
-
-        cmd_word = ((LEN2 << 28) |
-                    (Commands.RESERVE.value << 20) |
-                    (NO_REGS << 16) |
-                    (int(bool(empty)) << 7) |
-                    (int(bool(shrink)) << 6) |
-                    region)
-        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, size))
-
+        cmd_string = Commands.RESERVE.name
+        cmd_string += " memRegion={0:d} size={1:d}".format(region, size)
+        if label is not None:
+            cmd_string += " label='{0:s}'".format(label)
         if empty:
-            unfilled_string = "UNFILLED"
-        else:
-            unfilled_string = ""
+            cmd_string += " UNFILLED"
 
-        if label is None:
-            cmd_string = "RESERVE memRegion={0:d} size={1:d} {2:s}".format(
-                region, size, unfilled_string)
-        else:
-            cmd_string = (
-                "RESERVE memRegion={0:d} size={1:d} label='{2:s}' {3:s}"
-                .format(region, size, label, unfilled_string))
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        self.write_command_to_files(cmd_word + encoded_size, cmd_string)
 
     def free_memory_region(self, region):
         """ Insert command to free a previously reserved memory region
@@ -253,25 +283,24 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             If the region requested was out of the allowed range
         """
-        if region < 0 or region >= MAX_MEM_REGIONS:
-            raise ParameterOutOfBoundsException(
-                "memory region identifier", region, 0,
-                MAX_MEM_REGIONS - 1, Commands.RESERVE.name)
-        if self.mem_slot[region] == 0:
+        _bounds(Commands.FREE, "memory region identifier",
+                region, 0, MAX_MEM_REGIONS)
+        if self.mem_slots[region] is None:
             raise NotAllocatedException(
                 "region", region, Commands.FREE.name)
 
-        self.mem_slot[region] = 0
+        label = self.mem_slots[region].label
+        self.mem_slots[region] = None
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.FREE.value << 20) |
-            (NO_REGS << 16) |
-            region)
-        cmd_string = "FREE memRegion={0:d}".format(region)
-
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        self.write_command_to_files(encoded_cmd_word, cmd_string)
+        cmd_word = _binencode(Commands.FREE, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: NO_REGS,
+            _Field.IMMEDIATE: region})
+        cmd_string = Commands.FREE.name
+        cmd_string += " memRegion={0:d}".format(region)
+        if label is not None:
+            cmd_string += " ({0:s})".format(label)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def declare_random_number_generator(self, rng_id, rng_type, seed):
         """ Insert command to declare a random number generator
@@ -298,42 +327,28 @@ class DataSpecificationGenerator(object):
             If the random number generator with the given ID has already been\
             defined
         """
-
-        if rng_id < 0 or rng_id >= MAX_RNGS:
-            raise ParameterOutOfBoundsException(
-                "random number generator ID", rng_id, 0,
-                MAX_RNGS - 1, Commands.DECLARE_RNG.name)
-
+        _bounds(Commands.DECLARE_RNG, "random number generator ID",
+                rng_id, 0, MAX_RNGS)
         if rng_type not in RandomNumberGenerator:
             raise UnknownTypeException(
                 rng_type.value, Commands.DECLARE_RNG.name)
 
-        if self.rng[rng_id] is not 0:
+        if self.rng[rng_id] is not None:
             raise RNGInUseException(rng_id)
-
-        if (seed > DataType.UINT32.max or  # @UndefinedVariable
-                seed < DataType.UINT32.min):  # @UndefinedVariable
-            raise ParameterOutOfBoundsException(
-                "seed", seed, DataType.UINT32.min,  # @UndefinedVariable
-                DataType.UINT32.max,  # @UndefinedVariable
-                Commands.DECLARE_RNG.name)
+        _typebounds(Commands.DECLARE_RNG, "seed", seed, DataType.UINT32)
 
         self.rng[rng_id] = [rng_type, seed]
 
-        cmd_word = (
-            (LEN2 << 28) |
-            (Commands.DECLARE_RNG.value << 20) |
-            (rng_id << 12) |
-            (rng_type.value << 8))
+        cmd_word = _binencode(Commands.DECLARE_RNG, {
+            _Field.LENGTH: LEN2,
+            _Field.DESTINATION: rng_id,
+            _Field.SOURCE_1: rng_type})
+        encoded_seed = _ONE_WORD.pack(seed)
 
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        encoded_seed = bytearray(_ONE_SINT.pack(seed))
-        cmd_word_list = encoded_cmd_word + encoded_seed
-
-        cmd_string = "DECLARE_RNG ID={0:d}, source={1:d}, seed={2:d}".format(
+        cmd_string = Commands.DECLARE_RNG.name
+        cmd_string += " ID={0:d}, source={1:d}, seed={2:d}".format(
             rng_id, rng_type.value, seed)
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        self.write_command_to_files(cmd_word + encoded_seed, cmd_string)
 
     def declare_uniform_random_distribution(
             self, distribution_id, structure_id, rng_id, min_value, max_value):
@@ -368,41 +383,21 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.StructureInUseException: \
             If structure structure_id is already defined
         """
-        if (distribution_id < 0 or
-                distribution_id >= MAX_RANDOM_DISTS):
-            raise ParameterOutOfBoundsException(
-                "distribution ID", distribution_id, 0,
-                MAX_RANDOM_DISTS - 1, Commands.DECLARE_RANDOM_DIST.name)
+        _bounds(Commands.DECLARE_RANDOM_DIST, "distribution ID",
+                distribution_id, 0, MAX_RANDOM_DISTS)
+        _bounds(Commands.DECLARE_RANDOM_DIST, "rng ID",
+                rng_id, 0, MAX_RNGS)
+        _typebounds(Commands.DECLARE_RANDOM_DIST, "min_value",
+                    min_value, DataType.S1615)
+        _typebounds(Commands.DECLARE_RANDOM_DIST, "max_value",
+                    max_value, DataType.S1615)
+        _bounds(Commands.DECLARE_RANDOM_DIST, "structure ID",
+                structure_id, 0, MAX_STRUCT_SLOTS)
 
-        if rng_id < 0 or rng_id >= MAX_RNGS:
-            raise ParameterOutOfBoundsException(
-                "rng", rng_id, 0, MAX_RNGS - 1,
-                Commands.DECLARE_RANDOM_DIST.name)
-
-        if self.rng[rng_id] is 0:
+        if self.rng[rng_id] is None:
             raise NotAllocatedException(
                 "RNG", rng_id, Commands.DECLARE_RANDOM_DIST.name)
-
-        if min_value < DataType.S1615.min:  # @UndefinedVariable
-            raise ParameterOutOfBoundsException(
-                "min_value", min_value,
-                DataType.S1615.min,  # @UndefinedVariable
-                DataType.S1615.max,  # @UndefinedVariable
-                Commands.DECLARE_RANDOM_DIST.name)
-
-        if max_value > DataType.S1615.max:  # @UndefinedVariable
-            raise ParameterOutOfBoundsException(
-                "max_value", max_value,
-                DataType.S1615.min,  # @UndefinedVariable
-                DataType.S1615.max,  # @UndefinedVariable
-                Commands.DECLARE_RANDOM_DIST.name)
-
-        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
-            raise ParameterOutOfBoundsException(
-                "structure ID", structure_id, 0, MAX_STRUCT_SLOTS - 1,
-                Commands.DECLARE_RANDOM_DIST.name)
-
-        if self.random_distribution[distribution_id] is not 0:
+        if self.random_distribution[distribution_id] is not None:
             raise RandomNumberDistributionInUseException(distribution_id)
 
         parameters = [("distType", DataType.UINT32, 0),
@@ -411,22 +406,17 @@ class DataSpecificationGenerator(object):
                       ("param2", DataType.S1615, max_value)]
 
         self.random_distribution[distribution_id] = parameters
-
         self.define_structure(structure_id, parameters)
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.DECLARE_RANDOM_DIST.value << 20) |
-            (distribution_id << 8) |
-            structure_id)
+        cmd_word = _binencode(Commands.DECLARE_RANDOM_DIST, {
+            _Field.LENGTH: LEN1,
+            _Field.SOURCE_1: distribution_id,
+            _Field.IMMEDIATE: structure_id})
 
-        cmd_string = "DECLARE_RANDOM_DIST distribution_id={0:d} " \
-                     "structure_id={1:d}".format(distribution_id, structure_id)
-
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_string = Commands.DECLARE_RANDOM_DIST.name
+        cmd_string += " distribution_id={0:d} structure_id={1:d}".format(
+            distribution_id, structure_id)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def call_random_distribution(self, distribution_id, register_id):
         """ Insert command to get the next random number from a random\
@@ -450,36 +440,24 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.ParameterOutOfBoundsException: \
             If the distribution_id or register_id specified was out of range
         """
-        if register_id < 0 or register_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "register_id", register_id, 0, MAX_REGISTERS - 1,
-                Commands.GET_RANDOM_NUMBER.name)
-
-        if (distribution_id < 0 or
-                distribution_id >= MAX_RANDOM_DISTS):
-            raise ParameterOutOfBoundsException(
-                "distribution_id", distribution_id, 0, MAX_RANDOM_DISTS - 1,
-                Commands.GET_RANDOM_NUMBER.name)
-
-        if self.random_distribution[distribution_id] is 0:
+        _bounds(Commands.GET_RANDOM_NUMBER, "register_id",
+                register_id, 0, MAX_REGISTERS)
+        _bounds(Commands.GET_RANDOM_NUMBER, "distribution_id",
+                distribution_id, 0, MAX_RANDOM_DISTS)
+        if self.random_distribution[distribution_id] is None:
             raise NotAllocatedException(
                 "random number distribution", distribution_id,
                 Commands.GET_RANDOM_NUMBER.name)
 
-        bit_field = 0x4
-
-        cmd_string = "GET_RANDOM_NUMBER distribution={0:d} " \
-                     "dest=reg[{1:d}]".format(distribution_id, register_id)
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.GET_RANDOM_NUMBER.value << 20) |
-            (bit_field << 16) |
-            (register_id << 12) |
-            distribution_id)
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.GET_RANDOM_NUMBER, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: 0x4,
+            _Field.DESTINATION: register_id,
+            _Field.IMMEDIATE: distribution_id})
+        cmd_string = Commands.GET_RANDOM_NUMBER.name
+        cmd_string += " distribution={0:d} dest=reg[{1:d}]".format(
+            distribution_id, register_id)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def define_structure(self, structure_id, parameters):
         """ Insert commands to define a data structure
@@ -512,29 +490,20 @@ class DataSpecificationGenerator(object):
             If one of the data types in the structure is unknown
         """
         # start of struct
-        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
-            raise ParameterOutOfBoundsException(
-                "structure ID", structure_id, 0,
-                MAX_STRUCT_SLOTS - 1, Commands.START_STRUCT.name)
-
-        if not parameters or len(parameters) > MAX_STRUCT_ELEMENTS:
-            raise ParameterOutOfBoundsException(
-                "structure elements", len(parameters), 0, MAX_STRUCT_ELEMENTS,
-                Commands.WRITE_PARAM.name)
-
-        if self.struct_slot[structure_id] != 0:
+        _bounds(Commands.START_STRUCT, "structure ID",
+                structure_id, 0, MAX_STRUCT_SLOTS)
+        _bounds(Commands.START_STRUCT, "structure elements",
+                len(parameters), 1, MAX_STRUCT_ELEMENTS)
+        if self.struct_slots[structure_id] is not None:
             raise StructureInUseException(structure_id)
-        self.struct_slot[structure_id] = parameters
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.START_STRUCT.value << 20) |
-            structure_id)
-
-        cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_string = "START_STRUCT ID={0:d}".format(structure_id)
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        self.struct_slots[structure_id] = parameters
+        cmd_word = _binencode(Commands.START_STRUCT, {
+            _Field.LENGTH: LEN1,
+            _Field.IMMEDIATE: structure_id})
+        cmd_string = Commands.START_STRUCT.name
+        cmd_string += " ID={0:d}".format(structure_id)
+        self.write_command_to_files(cmd_word, cmd_string)
 
         # elements of the struct
         for elem_index, i in enumerate(parameters):
@@ -543,56 +512,45 @@ class DataSpecificationGenerator(object):
                 raise UnknownTypeException(
                     data_type.value, Commands.WRITE_PARAM.name)
 
-            cmd_string = ("STRUCT_ELEM element_id={0:d}, element_type={1:s}"
-                          .format(elem_index, data_type.name))
+            cmd_string = Commands.WRITE_PARAM.name
+            cmd_string += " element_id={0:d}, element_type={1:s}".format(
+                elem_index, data_type.name)
             if value is not None:
-
-                if value < data_type.min or value > data_type.max:
-                    raise ParameterOutOfBoundsException(
-                        "value", value, data_type.min, data_type.max,
-                        Commands.WRITE_PARAM.name)
-
+                _typebounds(Commands.WRITE_PARAM, "value", value, data_type)
                 if data_type.size <= 4:
-                    cmd_word = (
-                        (LEN2 << 28) |
-                        (Commands.STRUCT_ELEM.value << 20) |
-                        data_type.value)
+                    cmd_word = _binencode(Commands.STRUCT_ELEM, {
+                        _Field.LENGTH: LEN2,
+                        _Field.IMMEDIATE: data_type})
                 elif data_type.size == 8:
-                    cmd_word = (
-                        (LEN3 << 28) |
-                        (Commands.STRUCT_ELEM.value << 20) |
-                        data_type.value)
+                    cmd_word = _binencode(Commands.STRUCT_ELEM, {
+                        _Field.LENGTH: LEN3,
+                        _Field.IMMEDIATE: data_type})
                 else:
                     raise InvalidSizeException(
                         data_type.name, data_type.size,
                         Commands.STRUCT_ELEM.name)
 
-                value_encoded = bytearray(struct.pack(
-                    "<{}".format(data_type.struct_encoding),
-                    _rescale(value, data_type)))
-
-                cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word)) + \
-                    value_encoded + bytearray((4 - data_type.size % 4) % 4)
-                cmd_string += ", value={0:d}".format(value)
+                value_bytes = data_type.encode(value)
+                if len(label) == 0:
+                    cmd_string += ", value={0:d}".format(value)
+                else:
+                    cmd_string += ", value={0:f}, label={1:s}".format(
+                        value, label)
+                self.write_command_to_files(cmd_word + value_bytes, cmd_string)
             else:
-                cmd_word = (
-                    (LEN1 << 28) |
-                    (Commands.STRUCT_ELEM.value << 20) |
-                    data_type.value)
-
-                cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word))
-
-            if label != "":
-                cmd_string += ", label={0:s}".format(label)
-            self.write_command_to_files(cmd_word_list, cmd_string)
+                cmd_word = _binencode(Commands.STRUCT_ELEM, {
+                    _Field.LENGTH: LEN1,
+                    _Field.IMMEDIATE: data_type})
+                if len(label):
+                    cmd_string += ", label={0:s}".format(label)
+                self.write_command_to_files(cmd_word, cmd_string)
 
         # end of struct
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.END_STRUCT.value << 20))
-        cmd_word_list = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_string = "END_STRUCT ID={0:d}".format(structure_id)
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.END_STRUCT, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.END_STRUCT.name
+        cmd_string += " ID={0:d}".format(structure_id)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def get_structure_value(
             self, destination_id, structure_id, parameter_index,
@@ -625,60 +583,46 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.NotAllocatedException: \
             If the structure requested has not been declared
         """
-        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
-            raise ParameterOutOfBoundsException(
-                "structure_id", structure_id, 0,
-                MAX_STRUCT_SLOTS - 1, Commands.READ_PARAM.name)
-
-        if destination_id < 0 or destination_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "destination_id", destination_id, 0,
-                MAX_REGISTERS - 1, Commands.READ_PARAM.name)
-
-        if self.struct_slot[structure_id] is 0:
+        _bounds(Commands.READ_PARAM, "structure_id",
+                structure_id, 0, MAX_STRUCT_SLOTS)
+        _bounds(Commands.READ_PARAM, "destination_id",
+                destination_id, 0, MAX_REGISTERS)
+        if self.struct_slots[structure_id] is None:
             raise NotAllocatedException(
-                "structure", structure_id, Commands.READ_PARAM)
+                "structure", structure_id, Commands.READ_PARAM.name)
 
-        cmd_string = "READ_PARAM structure_id={0:d}, ".format(structure_id)
+        cmd_string = Commands.READ_PARAM.name
+        cmd_string += " structure_id={0:d}, ".format(structure_id)
 
         if parameter_index_is_register is True:
-            if parameter_index < 0 or parameter_index >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "parameter_index", parameter_index, 0,
-                    MAX_REGISTERS - 1, Commands.READ_PARAM.name)
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.READ_PARAM.value << 20) |
-                (DEST_AND_SRC1 << 16) |
-                (destination_id << 12) |
-                (parameter_index << 8) |
-                structure_id)
+            _bounds(Commands.READ_PARAM, "parameter_index",
+                    parameter_index, 0, MAX_REGISTERS)
+            cmd_word = _binencode(Commands.READ_PARAM, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: DEST_AND_SRC1,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_1: parameter_index,
+                _Field.IMMEDIATE: structure_id})
             cmd_string += ("element_id_from_register={0:d}, "
                            "destination_register={1:d}".format(
                                parameter_index, destination_id))
         else:
-            if parameter_index < 0 or parameter_index >= MAX_STRUCT_ELEMENTS:
-                raise ParameterOutOfBoundsException(
-                    "parameter_index", parameter_index, 0,
-                    MAX_STRUCT_ELEMENTS - 1, Commands.READ_PARAM.name)
-
-            if len(self.struct_slot[structure_id]) <= parameter_index:
+            _bounds(Commands.READ_PARAM, "parameter_index",
+                    parameter_index, 0, MAX_STRUCT_ELEMENTS)
+            if len(self.struct_slots[structure_id]) <= parameter_index:
                 raise NotAllocatedException(
                     "structure {0:d} parameter".format(structure_id),
-                    parameter_index, Commands.READ_PARAM)
-
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.READ_PARAM.value << 20) |
-                (DEST_ONLY << 16) |
-                (destination_id << 12) |
-                (parameter_index << 4) |
-                structure_id)
+                    parameter_index, Commands.READ_PARAM.name)
+            cmd_word = _binencode(Commands.READ_PARAM, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: DEST_ONLY,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_2: parameter_index,
+                _Field.IMMEDIATE: structure_id})
             cmd_string += ("element_id={0:d}, destination_register={1:d}"
                            .format(parameter_index, destination_id))
 
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        self.write_command_to_files(encoded_cmd_word, cmd_string)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def set_structure_value(self, structure_id, parameter_index, value,
                             data_type, value_is_register=False):
@@ -726,82 +670,49 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.NotAllocatedException: \
             If the structure requested has not been declared
         """
-
-        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
-            raise ParameterOutOfBoundsException(
-                "structure_id", structure_id, 0,
-                MAX_STRUCT_SLOTS - 1, Commands.WRITE_PARAM.name)
-
-        if parameter_index < 0 or parameter_index >= MAX_STRUCT_ELEMENTS:
-            raise ParameterOutOfBoundsException(
-                "parameter_index", parameter_index, 0,
-                MAX_STRUCT_ELEMENTS - 1, Commands.WRITE_PARAM.name)
-
-        if self.struct_slot[structure_id] is 0:
+        _bounds(Commands.WRITE_PARAM, "structure_id",
+                structure_id, 0, MAX_STRUCT_SLOTS)
+        _bounds(Commands.WRITE_PARAM, "parameter_index",
+                parameter_index, 0, MAX_STRUCT_ELEMENTS)
+        if self.struct_slots[structure_id] is None:
             raise NotAllocatedException(
-                "structure", structure_id, Commands.WRITE_PARAM)
-
-        if len(self.struct_slot[structure_id]) <= parameter_index:
+                "structure", structure_id, Commands.WRITE_PARAM.name)
+        if len(self.struct_slots[structure_id]) <= parameter_index:
             raise NotAllocatedException(
-                "structure %d parameter" % structure_id, parameter_index,
-                Commands.WRITE_PARAM.name)
+                "structure {} parameter".format(structure_id),
+                parameter_index, Commands.WRITE_PARAM.name)
 
-        if self.struct_slot[structure_id][parameter_index][1] is not data_type:
+        if self.struct_slots[
+                structure_id][parameter_index][1] is not data_type:
             raise TypeMismatchException(Commands.WRITE_PARAM.name)
 
-        cmd_string = ("WRITE_PARAM structure_id={0:d}, element_id={1:d}, "
-                      .format(structure_id, parameter_index))
+        cmd_string = Commands.WRITE_PARAM.name
+        cmd_string += " structure_id={0:d}, element_id={1:d}, ".format(
+            structure_id, parameter_index)
 
         if value_is_register:
-            if value < 0 or value >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "value", value, 0, MAX_REGISTERS - 1,
-                    Commands.WRITE_PARAM.name)
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.WRITE_PARAM.value << 20) |
-                (SRC1_ONLY << 16) |
-                (structure_id << 12) |
-                (value << 8) |
-                parameter_index)
-            value_encoded = bytearray()
+            _bounds(Commands.WRITE_PARAM, "value", value, 0, MAX_REGISTERS)
+            cmd_word = _binencode(Commands.WRITE_PARAM, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: SRC1_ONLY,
+                _Field.DESTINATION: structure_id,
+                _Field.SOURCE_1: value,
+                _Field.IMMEDIATE: parameter_index})
             cmd_string += "value=reg[{0:d}]".format(value)
+            self.write_command_to_files(cmd_word, cmd_string)
         else:
-            if value < data_type.min or value > data_type.max:
-                raise ParameterOutOfBoundsException(
-                    "value", value, data_type.min, data_type.max,
-                    Commands.WRITE_PARAM.name)
-
+            _typebounds(Commands.WRITE_PARAM, "value", value, data_type)
             if data_type.size > 4 and data_type.size != 8:
                 raise InvalidSizeException(
                     data_type.name, data_type.size, Commands.WRITE_PARAM.name)
-
-            cmd_len = LEN2 if data_type.size <= 4 else LEN3
-
-            cmd_word = (
-                (cmd_len << 28) |
-                (Commands.WRITE_PARAM.value << 20) |
-                (NO_REGS << 16) |
-                (structure_id << 12) |
-                parameter_index)
-
-            encoding_string = "<{0:s}".format(data_type.struct_encoding)
-            value_encoded = bytearray(struct.pack(encoding_string, value))
-
-            if data_type.size == 1:
-                padding = bytearray(3)
-            elif data_type.size == 2:
-                padding = bytearray(2)
-            else:
-                padding = bytearray()
-
-            value_encoded += padding
+            cmd_word = _binencode(Commands.WRITE_PARAM, {
+                _Field.LENGTH: LEN2 if data_type.size <= 4 else LEN3,
+                _Field.USAGE: NO_REGS,
+                _Field.DESTINATION: structure_id,
+                _Field.IMMEDIATE: parameter_index})
+            value_encoded = data_type.encode(value)
             cmd_string += "value={0:d}".format(value)
-
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = encoded_cmd_word + value_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+            self.write_command_to_files(cmd_word + value_encoded, cmd_string)
 
     def write_structure(
             self, structure_id, repeats=1, repeats_is_register=False):
@@ -839,52 +750,31 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.RegionExhaustedException: \
             If the selected region has no more space
         """
-        if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
-            raise ParameterOutOfBoundsException(
-                "structure_id", structure_id, 0,
-                MAX_STRUCT_SLOTS - 1, Commands.WRITE_STRUCT.name)
-
-        if self.struct_slot[structure_id] is 0:
+        _bounds(Commands.WRITE_STRUCT, "structure_id",
+                structure_id, 0, MAX_STRUCT_SLOTS)
+        if self.struct_slots[structure_id] is None:
             raise NotAllocatedException(
                 "structure", structure_id, Commands.WRITE_STRUCT.name)
 
+        cmd_string = Commands.WRITE_STRUCT.name
+        cmd_string += " structure_id={0:d}, ".format(structure_id)
         if repeats_is_register:
-            if repeats < 0 or repeats >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "repeats", repeats, 0, MAX_REGISTERS - 1,
-                    Commands.WRITE_STRUCT.name)
-
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.WRITE_STRUCT.value << 20) |
-                (SRC1_ONLY << 16) |
-                (repeats << 8) |
-                structure_id)
-
-            cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-            cmd_string = "WRITE_STRUCT structure_id={0:d}, " \
-                         "repeats=reg[{1:d}]".format(structure_id, repeats)
-            cmd_word_list = cmd_word_encoded
-
-            self.write_command_to_files(cmd_word_list, cmd_string)
-
+            _bounds(Commands.WRITE_STRUCT, "repeats",
+                    repeats, 0, MAX_REGISTERS)
+            cmd_word = _binencode(Commands.WRITE_STRUCT, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: SRC1_ONLY,
+                _Field.SOURCE_1: repeats,
+                _Field.IMMEDIATE: structure_id})
+            cmd_string += "repeats=reg[{0:d}]".format(repeats)
         else:
-            if repeats < 0 or repeats >= 16:
-                raise ParameterOutOfBoundsException(
-                    "repeats", repeats, 0, 15, Commands.WRITE_STRUCT.name)
-
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.WRITE_STRUCT.value << 20) |
-                (repeats << 8) |
-                structure_id)
-
-            cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-            cmd_string = "WRITE_STRUCT structure_id={0:d}, " \
-                         "repeats={1:d}".format(structure_id, repeats)
-            cmd_word_list = cmd_word_encoded
-
-            self.write_command_to_files(cmd_word_list, cmd_string)
+            _bounds(Commands.WRITE_STRUCT, "repeats", repeats, 0, 16)
+            cmd_word = _binencode(Commands.WRITE_STRUCT, {
+                _Field.LENGTH: LEN1,
+                _Field.SOURCE_1: repeats,
+                _Field.IMMEDIATE: structure_id})
+            cmd_string += "repeats={0:d}".format(repeats)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def start_function(self, function_id, argument_by_value):
         """ Insert command to start a function definition, with up to 5\
@@ -915,23 +805,17 @@ class DataSpecificationGenerator(object):
         """
         if self.ongoing_function_definition:
             raise InvalidCommandException(Commands.START_CONSTRUCTOR.name)
-
-        if len(argument_by_value) > 5:
-            raise ParameterOutOfBoundsException(
-                "number of arguments", len(argument_by_value), 0, 5,
-                Commands.START_CONSTRUCTOR.name)
-
-        if function_id < 0 or function_id >= MAX_CONSTRUCTORS:
-            raise ParameterOutOfBoundsException(
-                "function_id", function_id, 0, MAX_CONSTRUCTORS,
-                Commands.START_CONSTRUCTOR.name)
-
-        if self.function[function_id] != 0:
+        _bounds(Commands.START_CONSTRUCTOR, "number of arguments",
+                len(argument_by_value), 0, 6)
+        _bounds(Commands.START_CONSTRUCTOR, "function_id",
+                function_id, 0, MAX_CONSTRUCTORS)
+        if self.function_slots[function_id] is not None:
             raise FunctionInUseException(function_id)
 
-        self.function[function_id] = argument_by_value
+        self.function_slots[function_id] = argument_by_value
 
-        cmd_string = "START_CONSTRUCTOR ID={0:d} number_of_args={1:d}".format(
+        cmd_string = Commands.START_CONSTRUCTOR.name
+        cmd_string += " ID={0:d} number_of_args={1:d}".format(
             function_id, len(argument_by_value))
 
         self.ongoing_function_definition = True
@@ -945,17 +829,12 @@ class DataSpecificationGenerator(object):
             else:
                 cmd_string += "read-write"
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.START_CONSTRUCTOR.value << 20) |
-            (function_id << 11) |
-            (len(argument_by_value) << 8) |
-            read_only_flags)
-
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string, indent=True)
+        cmd_word = _binencode(Commands.START_CONSTRUCTOR, {
+            _Field.LENGTH: LEN1,
+            _Field.FUNCTION: function_id,
+            _Field.SOURCE_1: len(argument_by_value),
+            _Field.IMMEDIATE: read_only_flags})
+        self.write_command_to_files(cmd_word, cmd_string, indent=True)
 
     def end_function(self):
         """ Insert command to mark the end of a function definition
@@ -965,21 +844,15 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.InvalidCommandException: \
             If there is no function being defined at this point
         """
-
         if not self.ongoing_function_definition:
             raise InvalidCommandException(Commands.END_CONSTRUCTOR.name)
 
         self.ongoing_function_definition = False
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.END_CONSTRUCTOR.value << 20))
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        cmd_string = "END_CONSTRUCT"
-
-        self.write_command_to_files(cmd_word_list, cmd_string, outdent=True)
+        cmd_word = _binencode(Commands.END_CONSTRUCTOR, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.END_CONSTRUCTOR.name
+        self.write_command_to_files(cmd_word, cmd_string, outdent=True)
 
     def call_function(self, function_id, structure_ids):
         """ Insert command to call a function
@@ -1008,35 +881,32 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.DuplicateParameterException: \
             If a function is called with duplicate parameters
         """
-        if function_id < 0 or function_id >= MAX_CONSTRUCTORS:
-            raise ParameterOutOfBoundsException(
-                "function_id", function_id, 0, MAX_CONSTRUCTORS - 1,
-                Commands.CONSTRUCT.name)
-
-        if self.function[function_id] == 0:
+        _bounds(Commands.CONSTRUCT, "function",
+                function_id, 0, MAX_CONSTRUCTORS)
+        if self.function_slots[function_id] is None:
             raise NotAllocatedException(
                 "function", function_id, Commands.CONSTRUCT.name)
-
-        if len(structure_ids) != len(self.function[function_id]):
+        if len(structure_ids) != len(self.function_slots[function_id]):
             raise WrongParameterNumberException(
-                function_id, len(self.function[function_id]), structure_ids)
-
+                function_id, len(self.function_slots[function_id]),
+                structure_ids)
         if len(structure_ids) != len(set(structure_ids)):
             raise DuplicateParameterException(
-                "CONSTRUCT %d" % function_id, structure_ids)
+                "{} {}".format(Commands.CONSTRUCT.name, function_id),
+                structure_ids)
 
-        cmd_string = "CONSTRUCT function_id={0:d}".format(function_id)
+        cmd_string = Commands.CONSTRUCT.name
+        cmd_string += " function_id={0:d}".format(function_id)
 
-        param_word = None
+        param_word_encoded = bytearray()
+        cmd_word_length = LEN1
         if structure_ids:
             param_word = 0
             for i, struct_id in enumerate(structure_ids):
-                if struct_id < 0 or struct_id >= MAX_STRUCT_SLOTS:
-                    raise ParameterOutOfBoundsException(
+                _bounds(Commands.CONSTRUCT,
                         "structure argument {0:d}".format(i),
-                        struct_id, 0, MAX_STRUCT_SLOTS - 1,
-                        Commands.CONSTRUCT.name)
-                if self.struct_slot[struct_id] == 0:
+                        structure_ids[i], 0, MAX_STRUCT_SLOTS)
+                if self.struct_slots[struct_id] is None:
                     raise NotAllocatedException(
                         "structure argument {0:d}".format(i),
                         struct_id, Commands.CONSTRUCT.name)
@@ -1044,21 +914,13 @@ class DataSpecificationGenerator(object):
                 param_word |= struct_id << (6 * i)
                 cmd_string += " arg[{0:d}]=struct[{1:d}]".format(i, struct_id)
 
-        param_word_encoded = bytearray()
-        if param_word is None:
-            cmd_word_length = LEN1
-        else:
             cmd_word_length = LEN2
-            param_word_encoded = bytearray(_ONE_WORD.pack(param_word))
+            param_word_encoded += _ONE_WORD.pack(param_word)
 
-        cmd_word = (
-            (cmd_word_length << 28) |
-            (Commands.CONSTRUCT.value << 20) |
-            (function_id << 8))
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded + param_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.CONSTRUCT, {
+            _Field.LENGTH: cmd_word_length,
+            _Field.SOURCE_1: function_id})
+        self.write_command_to_files(cmd_word + param_word_encoded, cmd_string)
 
     def read_value(self, dest_id, data_type):
         """ Insert command to read a value from the current write pointer,\
@@ -1072,32 +934,20 @@ class DataSpecificationGenerator(object):
         :return: Nothing is returned
         :rtype: None
         """
-
-        cmd_len = LEN1
-        cmd_code = Commands.READ.value
-        cmd_field_usage = DEST_ONLY
-
         if data_type not in DataType:
-            raise UnknownTypeException(data_type.value, Commands.WRITE.name)
+            raise UnknownTypeException(
+                data_type.value, Commands.READ.name)
+        _bounds(Commands.READ, "register", dest_id, 0, MAX_REGISTERS)
 
-        if dest_id < 0 or dest_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "register", dest_id, 0, MAX_REGISTERS - 1,
-                Commands.READ.name)
-
-        cmd_word = (
-            (cmd_len << 28) |
-            (cmd_code << 20) |
-            (cmd_field_usage << 16) |
-            (dest_id << 12) |
-            data_type.size)
-
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-
-        cmd_string = "READ {0:d} bytes in register {1:d}".format(
+        cmd_word = _binencode(Commands.READ, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: DEST_ONLY,
+            _Field.DESTINATION: dest_id,
+            _Field.IMMEDIATE: data_type.size})
+        cmd_string = Commands.READ.name
+        cmd_string += " {0:d} bytes in register {1:d}".format(
             data_type.size, dest_id)
-
-        self.write_command_to_files(encoded_cmd_word, cmd_string)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def create_cmd(self, data, data_type=DataType.UINT32):
         """ Creates command to write a value to the current write pointer,\
@@ -1148,26 +998,22 @@ class DataSpecificationGenerator(object):
             raise InvalidSizeException(
                 data_type.name, data_size, Commands.WRITE.name)
 
-        if data_type.min > data or data_type.max < data:
-            raise ParameterOutOfBoundsException(
-                "data", data, data_type.min, data_type.max,
-                Commands.WRITE.name)
+        _typebounds(Commands.WRITE, "data", data, data_type)
 
         cmd_string = None
         if self.report_writer is not None:
-            cmd_string = "WRITE data={}".format(data)
+            cmd_string = Commands.WRITE.name
+            cmd_string += " data={}".format(data)
 
         repeat_reg_usage = NO_REGS
-        cmd_word = (
-            (cmd_data_len << 28) |
-            (Commands.WRITE.value << 20) |
-            (repeat_reg_usage << 16) | (data_len << 12) | 1)
+        cmd_word = _binencode(Commands.WRITE, {
+            _Field.LENGTH: cmd_data_len,
+            _Field.USAGE: repeat_reg_usage,
+            _Field.DESTINATION: data_len,
+            _Field.IMMEDIATE: 1})
         # 1 is based on parameters = 0, repeats = 1 and parameters |= repeats
 
-        padding = 4 - data_type.size if data_type.size < 4 else 0
-        cmd_word_list = struct.pack(
-            "<I{}{}x".format(data_type.struct_encoding, padding),
-            cmd_word, _rescale(data, data_type))
+        cmd_word_list = cmd_word + data_type.encode(data)
         if self.report_writer is not None:
             cmd_string += ", dataType={0:s}".format(data_type.name)
         return (cmd_word_list, cmd_string)
@@ -1206,8 +1052,7 @@ class DataSpecificationGenerator(object):
             If no region has been selected to write to
         """
         if self.current_region is None:
-            raise NoRegionSelectedException("WRITE")
-
+            raise NoRegionSelectedException(Commands.WRITE.name)
         cmd_word_list, cmd_string = self.create_cmd(data, data_type)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
@@ -1232,7 +1077,7 @@ class DataSpecificationGenerator(object):
             If no region has been selected to write to
         """
         if self.current_region is None:
-            raise NoRegionSelectedException("WRITE")
+            raise NoRegionSelectedException(Commands.WRITE.name)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def write_repeated_value(
@@ -1277,8 +1122,7 @@ class DataSpecificationGenerator(object):
             If no region has been selected to write to
         """
         if self.current_region is None:
-            raise NoRegionSelectedException("WRITE")
-
+            raise NoRegionSelectedException(Commands.WRITE.name)
         if data_type not in DataType:
             raise UnknownTypeException(data_type.value, Commands.WRITE.name)
 
@@ -1300,43 +1144,32 @@ class DataSpecificationGenerator(object):
                 data_type.name, data_size, Commands.WRITE.name)
 
         if repeats_is_register is False:
-            if repeats <= 0 or repeats > 255:
-                raise ParameterOutOfBoundsException(
-                    "repeats", repeats, 0, 255, Commands.WRITE.name)
+            _bounds(Commands.WRITE, "repeats", repeats, 1, 256)
         else:
-            if repeats < 0 or repeats >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "repeats_is_register", repeats_is_register, 0,
-                    MAX_REGISTERS - 1, Commands.WRITE.name)
-
-        if data_type.min > data or data_type.max < data:
-            raise ParameterOutOfBoundsException(
-                "data", data, data_type.min, data_type.max,
-                Commands.WRITE.name)
+            _bounds(Commands.WRITE, "repeats", repeats, 0, MAX_REGISTERS)
+        _typebounds(Commands.WRITE, "data", data, data_type)
 
         parameters = 0
-        cmd_string = "WRITE data={}".format(data)
+        cmd_string = Commands.WRITE.name
+        cmd_string += " data={}".format(data)
 
-        if repeats_is_register is not False:
+        if repeats_is_register:
             repeat_reg_usage = 1
             parameters |= (repeats << 4)
             cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
             repeat_reg_usage = NO_REGS
-            parameters |= repeats
+            parameters |= repeats & 0xFF
             cmd_string += ", repeats={0:d}".format(repeats)
 
-        cmd_word = (
-            (cmd_data_len << 28) |
-            (Commands.WRITE.value << 20) |
-            (repeat_reg_usage << 16) | (data_len << 12) | parameters)
-
-        padding = 4 - data_type.size if data_type.size < 4 else 0
-        cmd_word_list = struct.pack(
-            "<I{}{}x".format(data_type.struct_encoding, padding),
-            cmd_word, _rescale(data, data_type))
+        cmd_word = _binencode(Commands.WRITE, {
+            _Field.LENGTH: cmd_data_len,
+            _Field.USAGE: repeat_reg_usage,
+            _Field.DESTINATION: data_len,
+            _Field.IMMEDIATE: parameters})
+        data_word = data_type.encode(data)
         cmd_string += ", dataType={0:s}".format(data_type.name)
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        self.write_command_to_files(cmd_word + data_word, cmd_string)
 
     def write_value_from_register(
             self, data_register, repeats=1, repeats_is_register=False,
@@ -1381,7 +1214,6 @@ class DataSpecificationGenerator(object):
         if data_type not in DataType:
             raise UnknownTypeException(
                 data_type.value, Commands.WRITE.name)
-
         if self.current_region is None:
             raise NoRegionSelectedException(Commands.WRITE.name)
 
@@ -1399,43 +1231,31 @@ class DataSpecificationGenerator(object):
                 data_type.name, data_size, Commands.WRITE.name)
 
         if repeats_is_register is False:
-            if repeats <= 0 or repeats > 255:
-                raise ParameterOutOfBoundsException(
-                    "repeats", repeats, 0, 255, Commands.WRITE.name)
+            _bounds(Commands.WRITE, "repeats", repeats, 1, 256)
         else:
-            if repeats < 0 or repeats >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "repeats", repeats, 0, MAX_REGISTERS - 1,
-                    Commands.WRITE.name)
+            _bounds(Commands.WRITE, "repeats", repeats, 0, MAX_REGISTERS)
+        _bounds(Commands.WRITE, "data_register",
+                data_register, 0, MAX_REGISTERS)
 
-        if data_register < 0 or data_register >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "data_register", data_register, 0, MAX_REGISTERS - 1,
-                Commands.WRITE.name)
-
-        parameters = 0
-        cmd_string = "WRITE data=reg[{0:d}]".format(data_register)
-
+        cmd_string = Commands.WRITE.name
+        cmd_string += " data=reg[{0:d}]".format(data_register)
         if repeats_is_register:
             reg_usage = SRC1_AND_SRC2
-            parameters |= repeats << 4
+            parameters = repeats << 4
             cmd_string += ", repeats=reg[{0:d}]".format(repeats)
         else:
             reg_usage = SRC1_ONLY
-            parameters |= repeats
+            parameters = repeats & 0xFF
             cmd_string += ", repeats={0:d}".format(repeats)
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.WRITE.value << 20) |
-            (reg_usage << 16) |
-            (cmd_data_len << 12) |
-            (data_register << 8) | parameters)
-
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = encoded_cmd_word
+        cmd_word = _binencode(Commands.WRITE, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: reg_usage,
+            _Field.DESTINATION: cmd_data_len,
+            _Field.SOURCE_1: data_register,
+            _Field.IMMEDIATE: parameters})
         cmd_string += ", dataType={0:s}".format(data_type.name)
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def write_array(self, array_values, data_type=DataType.UINT32):
         """ Insert command to write an array, causing the write pointer\
@@ -1455,27 +1275,23 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.NoRegionSelectedException: \
             If no region has been previously selected
         """
-        cmd_len = LEN2
-
         if data_type.numpy_typename is None:
             raise TypeMismatchException(Commands.WRITE_ARRAY.name)
         if self.current_region is None:
             raise NoRegionSelectedException(Commands.WRITE_ARRAY.name)
-
-        cmd_word = (
-            (cmd_len << 28) |
-            (Commands.WRITE_ARRAY.value << 20) |
-            data_type.size)
 
         data = numpy.array(array_values, dtype=data_type.numpy_typename)
         size = data.size * data_type.size
         if size % 4 != 0:
             raise UnknownTypeLengthException(size, Commands.WRITE_ARRAY.name)
 
-        cmd_string = "WRITE_ARRAY, {0:d} elements\n".format(size // 4)
-
-        cmd_word_list = bytearray(_TWO_WORDS.pack(cmd_word, size // 4))
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.WRITE_ARRAY, {
+            _Field.LENGTH: LEN2,
+            _Field.IMMEDIATE: data_type.size})
+        cmd_string = Commands.WRITE_ARRAY.name
+        cmd_string += " {0:d} elements\n".format(size // 4)
+        arg_word = _ONE_WORD.pack(size // 4)
+        self.write_command_to_files(cmd_word + arg_word, cmd_string)
         self.spec_writer.write(data.tostring())
 
     def switch_write_focus(self, region):
@@ -1496,35 +1312,23 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.RegionUnfilledException: \
             If the selected region should not be filled
         """
-        if region < 0 or region >= MAX_MEM_REGIONS:
-            raise ParameterOutOfBoundsException(
-                "region", region, 0, MAX_MEM_REGIONS - 1,
-                Commands.SWITCH_FOCUS.name)
-
-        if self.mem_slot[region] == 0:
+        _bounds(Commands.SWITCH_FOCUS, "region", region, 0, MAX_MEM_REGIONS)
+        if self.mem_slots[region] is None:
             raise NotAllocatedException(
                 "region", region, Commands.SWITCH_FOCUS.name)
-
-        if self.mem_slot[region][2]:
+        if self.mem_slots[region].empty:
             raise RegionUnfilledException(region, Commands.SWITCH_FOCUS.name)
 
         self.current_region = region
 
-        reg_usage = 0x0
-        parameters = region & 0xF
-        cmd_string = "SWITCH_FOCUS memRegion = {0:d}".format(region)
-
+        cmd_string = Commands.SWITCH_FOCUS.name
+        cmd_string += " memRegion = {0:d}".format(region)
         # Write command to switch focus:
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.SWITCH_FOCUS.value << 20) |
-            (reg_usage << 16) |
-            (parameters << 8))
-
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-
-        cmd_word_string = encoded_cmd_word
-        self.write_command_to_files(cmd_word_string, cmd_string)
+        cmd_word = _binencode(Commands.SWITCH_FOCUS, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: 0x0,
+            _Field.SOURCE_1: region})
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def start_loop(self, counter_register_id, start, end, increment=1,
                    start_is_register=False, end_is_register=False,
@@ -1541,12 +1345,11 @@ class DataSpecificationGenerator(object):
               the number at which to start the loop counter, between 0 and 15
         :type start: int
         :param end:
-            * If end_is_register is False, the number which the loop\
-              counter must reach to stop the loop i.e. the loop will\
-              run while the contents of counter_register < end, >= 0
-            * If end_is_register is True, the ID of the register\
-              containing the number at which to stop the loop,\
-              between 0 and 15
+            * If end_is_register is False, the number which the loop counter\
+              must reach to stop the loop i.e. the loop will run while the\
+              contents of counter_register < end, >= 0
+            * If end_is_register is True, the ID of the register containing\
+              the number at which to stop the loop, between 0 and 15
         :type end: int
         :param increment:
             * If increment_is_register is False, the amount by which to\
@@ -1577,91 +1380,64 @@ class DataSpecificationGenerator(object):
               valid register_id
             * If start_is_register is False and start is not in the\
               allowed range
-            * If end_is_register is False and end is not in the\
+            * If end_is_register is False and end is not in the allowed range
+            * If increment_is_register is False and increment is not in the\
               allowed range
-            * If increment_is_register is False and increment is not\
-              in the allowed range
         """
+        _bounds(Commands.LOOP, "counter_register_id",
+                counter_register_id, 0, MAX_REGISTERS)
+
         bit_field = 0
         length = LEN1
         encoded_values = bytearray()
-        cmd_word = (Commands.LOOP.value << 20)
-        cmd_string = "LOOP"
-
-        if counter_register_id < 0 or counter_register_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "counter_register_id", counter_register_id, 0,
-                MAX_REGISTERS - 1, Commands.LOOP.name)
-        cmd_word |= counter_register_id
+        cmd_string = Commands.LOOP.name
         cmd_string += " counter_register_id=reg[{0:d}],".format(
             counter_register_id)
+        r1 = r2 = r3 = 0
 
         if start_is_register:
-            if start < 0 or start >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "start", start, 0, MAX_REGISTERS - 1, Commands.LOOP.name)
+            _bounds(Commands.LOOP, "start", start, 0, MAX_REGISTERS)
             bit_field |= 0x4
-            cmd_word |= (start << 12)
+            r1 = start
             cmd_string += " start=reg[{0:d}],".format(start)
         else:
-            if (start < DataType.INT32.min or  # @UndefinedVariable
-                    start > DataType.INT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "start", start,
-                    DataType.INT32.min,  # @UndefinedVariable
-                    DataType.INT32.max,  # @UndefinedVariable
-                    Commands.LOOP.name)
+            _typebounds(Commands.LOOP, "start", start, DataType.INT32)
             length += 1
-            encoded_values += bytearray(_ONE_SINT.pack(start))
+            encoded_values += _ONE_SIGNED_INT.pack(start)
             cmd_string += " start={0:d},".format(start)
 
         if end_is_register:
-            if end < 0 or end >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "end", end, 0, MAX_REGISTERS - 1, Commands.LOOP.name)
+            _bounds(Commands.LOOP, "end", end, 0, MAX_REGISTERS)
             bit_field |= 0x2
-            cmd_word |= (end << 8)
+            r2 = end
             cmd_string += " end=reg[{0:d}],".format(end)
         else:
-            if (end < DataType.INT32.min or  # @UndefinedVariable
-                    end > DataType.INT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "end", end,
-                    DataType.INT32.min,  # @UndefinedVariable
-                    DataType.INT32.max,  # @UndefinedVariable
-                    Commands.LOOP.name)
+            _typebounds(Commands.LOOP, "end", end, DataType.INT32)
             length += 1
-            encoded_values += bytearray(_ONE_SINT.pack(end))
+            encoded_values += _ONE_SIGNED_INT.pack(end)
             cmd_string += " end={0:d},".format(end)
 
         if increment_is_register:
-            if increment < 0 or increment >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "increment", increment, 0, MAX_REGISTERS - 1,
-                    Commands.LOOP.name)
+            _bounds(Commands.LOOP, "increment", increment, 0, MAX_REGISTERS)
             bit_field |= 0x1
-            cmd_word |= (increment << 4)
+            r3 = increment
             cmd_string += " increment=reg[{0:d}],".format(increment)
         else:
-            if (increment < DataType.INT32.min or  # @UndefinedVariable
-                    increment > DataType.INT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "increment", increment,
-                    DataType.INT32.min,  # @UndefinedVariable
-                    DataType.INT32.max,  # @UndefinedVariable
-                    Commands.LOOP.name)
+            _typebounds(Commands.LOOP, "increment", increment, DataType.INT32)
             length += 1
-            encoded_values += bytearray(_ONE_SINT.pack(increment))
+            encoded_values += _ONE_SIGNED_INT.pack(increment)
             cmd_string += " increment={0:d},".format(increment)
 
         self.ongoing_loop = True
 
-        cmd_word |= (length << 28)
-        cmd_word |= (bit_field << 16)
-
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = encoded_cmd_word + encoded_values
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.LOOP, {
+            _Field.LENGTH: length,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: r1,   # non-standard usage
+            _Field.SOURCE_1: r2,      # non-standard usage
+            _Field.SOURCE_2: r3,      # non-standard usage
+            _Field.IMMEDIATE: counter_register_id})
+        self.write_command_to_files(cmd_word + encoded_values, cmd_string)
 
     def break_loop(self):
         """ Insert command to break out of a loop before it has completed
@@ -1675,17 +1451,13 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.InvalidCommandException: \
             If there is no loop in operation at this point
         """
-
         if not self.ongoing_loop:
-            raise InvalidCommandException("END_LOOP")
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.BREAK_LOOP.value << 20))
-        cmd_string = "BREAK_LOOP"
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
+            raise InvalidCommandException(Commands.BREAK_LOOP.name)
 
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.BREAK_LOOP, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.BREAK_LOOP.name
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def end_loop(self):
         """ Insert command to indicate that this is the end of the loop.\
@@ -1701,14 +1473,11 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.InvalidCommandException: \
             If there is no loop in operation at this point
         """
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.END_LOOP.value << 20))
-        cmd_string = "END_LOOP"
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.END_LOOP, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.END_LOOP.name
+        self.ongoing_loop = False
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def start_conditional(self, register_id, condition, value,
                           value_is_register=False):
@@ -1743,58 +1512,35 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.UnknownTypeException: \
             If the condition is not a valid condition
         """
-        data_encoded = bytearray()
-        cmd_word = 0
-        cmd_string = ""
-
-        if register_id < 0 or register_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "register_id", register_id, 0, MAX_REGISTERS - 1,
-                Commands.IF.name)
-        if value_is_register:
-            if value < 0 or value >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "value", value, 0, MAX_REGISTERS - 1, Commands.IF.name)
-        else:
-            if (value < DataType.INT32.min or  # @UndefinedVariable
-                    value > DataType.INT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "value", value,
-                    DataType.INT32.min,  # @UndefinedVariable
-                    DataType.INT32.max,  # @UndefinedVariable
-                    Commands.IF.name)
-
+        _bounds(Commands.IF, "register_id", register_id, 0, MAX_REGISTERS)
         if condition not in Condition:
             raise UnknownConditionException(condition, Commands.IF.name)
 
+        data_encoded = bytearray()
+        cmd_string = Commands.IF.name
         if value_is_register:
-            bit_field = 0x3
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.IF.value << 20) |
-                (bit_field << 16) |
-                (register_id << 8) |
-                (value << 4) |
-                condition.value)
-            cmd_string = "IF reg[{0:d}] {1:s} reg[{2:d}]".format(
+            _bounds(Commands.IF, "value", value, 0, MAX_REGISTERS)
+            cmd_word = _binencode(Commands.IF, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: 0x3,
+                _Field.SOURCE_1: register_id,
+                _Field.SOURCE_2: value,
+                _Field.IMMEDIATE: condition})
+            cmd_string += " reg[{0:d}] {1:s} reg[{2:d}]".format(
                 register_id, condition.operator, value)
-
-        elif not value_is_register:
-            bit_field = 0x2
-            cmd_word = (
-                (LEN2 << 28) |
-                (Commands.IF.value << 20) |
-                (bit_field << 16) |
-                (register_id << 8) |
-                condition.value)
-            data_encoded = bytearray(_ONE_SINT.pack(value))
-            cmd_string = "IF reg[{0:d}] {1:s} {2:d}".format(
+        else:
+            _typebounds(Commands.IF, "value", value, DataType.INT32)
+            cmd_word = _binencode(Commands.IF, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: 0x2,
+                _Field.SOURCE_1: register_id,
+                _Field.IMMEDIATE: condition})
+            data_encoded += _ONE_SIGNED_INT.pack(value)
+            cmd_string += " reg[{0:d}] {1:s} {2:d}".format(
                 register_id, condition.operator, value)
 
         self.conditionals.append(False)
-
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded + data_encoded
+        cmd_word_list = cmd_word + data_encoded
         self.write_command_to_files(cmd_word_list, cmd_string, indent=True)
 
     def else_conditional(self):
@@ -1816,19 +1562,14 @@ class DataSpecificationGenerator(object):
 
         if not self.conditionals or \
                 self.conditionals[len(self.conditionals) - 1] is True:
-            raise InvalidCommandException("ELSE")
+            raise InvalidCommandException(Commands.ELSE.name)
 
         self.conditionals[len(self.conditionals) - 1] = True
-
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.ELSE.value << 20))
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-        cmd_string = "ELSE"
-
+        cmd_word = _binencode(Commands.ELSE, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.ELSE.name
         self.write_command_to_files(
-            cmd_word_list, cmd_string, indent=True, outdent=True)
+            cmd_word, cmd_string, indent=True, outdent=True)
 
     def end_conditional(self):
         """ Insert command to mark the end of an if...then...else construct
@@ -1842,20 +1583,14 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.InvalidCommandException: \
             If there is no conditional in operation at this point
         """
-
         if not self.conditionals:
-            raise InvalidCommandException("END_IF")
+            raise InvalidCommandException(Commands.END_IF.name)
 
         self.conditionals.pop()
-
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.END_IF.value << 20))
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-        cmd_string = "END_IF"
-
-        self.write_command_to_files(cmd_word_list, cmd_string, outdent=True)
+        cmd_word = _binencode(Commands.END_IF, {
+            _Field.LENGTH: LEN1})
+        cmd_string = Commands.END_IF.name
+        self.write_command_to_files(cmd_word, cmd_string, outdent=True)
 
     def set_register_value(self, register_id, data, data_is_register=False,
                            data_type=DataType.UINT32):
@@ -1889,67 +1624,36 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.UnknownTypeException: \
             If the data type is not known
         """
-        if register_id < 0 or register_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "register_id", register_id, 0, MAX_REGISTERS - 1,
-                Commands.MV.name)
+        _bounds(Commands.MV, "register_id", register_id, 0, MAX_REGISTERS)
 
         if data_is_register:
-
             # Build command to move between registers:
-            if data < 0 or data >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "data", data, 0, MAX_REGISTERS - 1, Commands.MV.name)
-
+            _bounds(Commands.MV, "data", data, 0, MAX_REGISTERS)
             if data == register_id:
                 raise DuplicateParameterException(
                     Commands.MV.name, [register_id, data])
 
-            dest_reg = register_id
-            src_reg = data
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.MV.value << 20) |
-                (DEST_AND_SRC1 << 16) |
-                (dest_reg << 12) |
-                (src_reg << 8))
-            encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-            cmd_word_list = encoded_cmd_word
-            cmd_string = "reg[{0:d}] = reg[{1:d}]".format(dest_reg, src_reg)
+            cmd_word = _binencode(Commands.MV, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: DEST_AND_SRC1,
+                _Field.DESTINATION: register_id,
+                _Field.SOURCE_1: data})
+            encoded_data = bytearray()
+            cmd_string = "reg[{0:d}] = reg[{1:d}]".format(register_id, data)
         else:
-
             # Build command to assign from an immediate:
             # command has a second word (the immediate)
-            if data_type.min > data or data_type.max < data:
-                raise ParameterOutOfBoundsException(
-                    "data", data, data_type.min, data_type.max,
-                    Commands.MV.name)
+            _typebounds(Commands.MV, "data", data, data_type)
 
-            if data_type.size > 4:
-                length = LEN3
-            else:
-                length = LEN2
-
-            dest_reg = register_id
-            cmd_word = (
-                (length << 28) |
-                (Commands.MV.value << 20) |
-                (DEST_ONLY << 16) |
-                (dest_reg << 12))
-
-            scaled_data = int(data * data_type.scale)
-            encoding_string = "<{0:s}".format(data_type.struct_encoding)
-            encoded_data = bytearray(struct.pack(encoding_string, scaled_data))
-            while len(encoded_data) % 4:
-                encoded_data += bytearray(_ONE_SBYTE.pack(0))
-
-            encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-
-            cmd_word_list = encoded_cmd_word + encoded_data
+            cmd_word = _binencode(Commands.MV, {
+                _Field.LENGTH: LEN3 if data_type.size > 4 else LEN2,
+                _Field.USAGE: DEST_ONLY,
+                _Field.DESTINATION: register_id})
+            encoded_data = data_type.encode(data)
             cmd_string = "reg[{0:d}] = {1:d} (0x{2:X})".format(
-                dest_reg, data, data)
+                register_id, data, data)
 
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        self.write_command_to_files(cmd_word + encoded_data, cmd_string)
 
     def save_write_pointer(self, register_id):
         """ Insert command to save the write pointer to a register
@@ -1967,23 +1671,18 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.NoRegionSelectedException: \
             If no region has been selected
         """
-        if register_id < 0 or register_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "register_id", register_id, 0, MAX_REGISTERS - 1,
-                Commands.GET_WR_PTR.name)
+        _bounds(Commands.GET_WR_PTR, "register_id",
+                register_id, 0, MAX_REGISTERS)
         if self.current_region is None:
             raise NoRegionSelectedException(Commands.GET_WR_PTR.name)
-        bit_field = 0x4
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.GET_WR_PTR.value << 20) |
-            (bit_field << 16) |
-            (register_id << 12))
-        cmd_string = "GET_WR_PTR reg[{0:d}]".format(register_id)
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
 
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.GET_WR_PTR, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: 0x4,
+            _Field.DESTINATION: register_id})
+        cmd_string = Commands.GET_WR_PTR.name
+        cmd_string += " reg[{0:d}]".format(register_id)
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def set_write_pointer(self, address, address_is_register=False,
                           relative_to_current=False):
@@ -2017,60 +1716,36 @@ class DataSpecificationGenerator(object):
         """
         if self.current_region is None:
             raise NoRegionSelectedException(Commands.SET_WR_PTR.name)
-        if relative_to_current:
-            relative = 1
-            relative_string = "RELATIVE"
-        else:
-            relative = 0
-            relative_string = "ABSOLUTE"
+        relative = bool(relative_to_current)
+        relative_string = "RELATIVE" if relative else "ABSOLUTE"
 
         data_encoded = bytearray()
+        cmd_string = Commands.SET_WR_PTR.name
         if address_is_register:
-            if address < 0 or address >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "address", address, 0, MAX_REGISTERS - 1,
-                    Commands.SET_WR_PTR.name)
-            cmd_word = (
-                (LEN1 << 28) |
-                (Commands.SET_WR_PTR.value << 20) |
-                (SRC1_ONLY << 16) |
-                (address << 8) |
-                relative)
-            cmd_string = "SET_WR_PTR reg[{0:d}] {1:s}".format(
-                address, relative_string)
+            _bounds(Commands.SET_WR_PTR, "address", address, 0, MAX_REGISTERS)
+            cmd_word = _binencode(Commands.SET_WR_PTR, {
+                _Field.LENGTH: LEN1,
+                _Field.USAGE: SRC1_ONLY,
+                _Field.SOURCE_1: address,
+                _Field.IMMEDIATE: relative})
+            cmd_string += " reg[{0:d}] {1:s}".format(address, relative_string)
         else:
             if not relative_to_current:
-                if (address < 0 or
-                        address > DataType.UINT32.max):  # @UndefinedVariable
-                    raise ParameterOutOfBoundsException(
-                        "address", address, 0,
-                        DataType.UINT32.max,  # @UndefinedVariable
-                        Commands.SET_WR_PTR.name)
-                else:
-                    data_encoded = bytearray(_ONE_WORD.pack(address))
+                _typebounds(Commands.SET_WR_PTR, "address",
+                            address, DataType.UINT32)
+                data_encoded += _ONE_WORD.pack(address)
             else:
-                if (address < DataType.INT32.min or  # @UndefinedVariable
-                        address > DataType.INT32.max):  # @UndefinedVariable
-                    raise ParameterOutOfBoundsException(
-                        "address", address,
-                        DataType.INT32.min,  # @UndefinedVariable
-                        DataType.INT32.max,  # @UndefinedVariable
-                        Commands.SET_WR_PTR.name)
-                else:
-                    data_encoded = bytearray(_ONE_SINT.pack(address))
+                _typebounds(Commands.SET_WR_PTR, "address",
+                            address, DataType.INT32)
+                data_encoded += _ONE_SIGNED_INT.pack(address)
 
-            cmd_word = (
-                (LEN2 << 28) |
-                (Commands.SET_WR_PTR.value << 20) |
-                (NO_REGS << 16) |
-                relative)
-            cmd_string = "SET_WR_PTR {0:d} {1:s}".format(
-                address, relative_string)
+            cmd_word = _binencode(Commands.SET_WR_PTR, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: NO_REGS,
+                _Field.IMMEDIATE: relative})
+            cmd_string += " {0:d} {1:s}".format(address, relative_string)
 
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded + data_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        self.write_command_to_files(cmd_word + data_encoded, cmd_string)
 
     def align_write_pointer(self, log_block_size,
                             log_block_size_is_register=False,
@@ -2110,51 +1785,41 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.NoRegionSelectedException: \
             If no region has been selected
         """
+        if self.current_region is None:
+            raise NoRegionSelectedException(Commands.ALIGN_WR_PTR.name)
+
         bit_field = 0
         imm_value = 0
         return_register_value = 0
         block_size_reg = 0
-        cmd_string = "ALIGN_WR_PTR"
-
-        if self.current_region is None:
-            raise NoRegionSelectedException(Commands.ALIGN_WR_PTR.name)
+        cmd_string = Commands.ALIGN_WR_PTR.name
 
         if return_register_id is not None:
-            if return_register_id < 0 or return_register_id >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "return_register_id", return_register_id, 0,
-                    MAX_REGISTERS - 1, Commands.ALIGN_WR_PTR.name)
+            _bounds(Commands.ALIGN_WR_PTR, "return_register_id",
+                    return_register_id, 0, MAX_REGISTERS)
             bit_field |= 0x4
             return_register_value = return_register_id
-            cmd_string += " reg[{0:d}] =".format(return_register_value)
+            cmd_string = " reg[{0:d}] =".format(return_register_value)
 
         if log_block_size_is_register:
-            if log_block_size < 0 or log_block_size >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "log_block_size", log_block_size, 0,
-                    MAX_REGISTERS - 1, Commands.ALIGN_WR_PTR.name)
+            _bounds(Commands.ALIGN_WR_PTR, "log_block_size",
+                    log_block_size, 0, MAX_REGISTERS)
             bit_field |= 0x2
             block_size_reg = log_block_size
             cmd_string += " align(reg[{0:d}])".format(block_size_reg)
         else:
-            if log_block_size < 0 or log_block_size > 31:
-                raise ParameterOutOfBoundsException(
-                    "log_block_size", log_block_size, 0, 31,
-                    Commands.ALIGN_WR_PTR.name)
+            _bounds(Commands.ALIGN_WR_PTR, "log_block_size",
+                    log_block_size, 0, 32)
             imm_value = log_block_size
             cmd_string += " align({0:d})".format(imm_value)
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.ALIGN_WR_PTR.value << 20) |
-            (bit_field << 16) |
-            (return_register_value << 12) |
-            (block_size_reg << 8) |
-            imm_value)
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.ALIGN_WR_PTR, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: return_register_value,
+            _Field.SOURCE_1: block_size_reg,
+            _Field.IMMEDIATE: imm_value})
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def call_arithmetic_operation(self, register_id, operand_1, operation,
                                   operand_2, signed,
@@ -2195,96 +1860,71 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.UnknownTypeException: \
             If operation is not a known operation
         """
-        bit_field = 0x4
-        register_op_1 = 0
-        register_op_2 = 0
-        payload = bytearray()
-
-        if register_id < 0 or register_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "register_id", register_id, 0, MAX_REGISTERS - 1,
-                Commands.ARITH_OP.name)
-
-        cmd_string = "ARTIH_OP {0:s} reg[{1:d}] =".format(
-            "SIGNED" if signed else "UNSIGNED", register_id)
-
-        if operand_1_is_register:
-            if operand_1 < 0 or operand_1 >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "operand_1", operand_1, 0, MAX_REGISTERS - 1,
-                    Commands.ARITH_OP.name)
-            bit_field |= 2
-            register_op_1 = operand_1
-            cmd_string += " reg[{0:d}]".format(register_op_1)
-        elif signed:
-            if (operand_1 < DataType.INT32.min or  # @UndefinedVariable
-                    operand_1 > DataType.INT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "operand_1", operand_1,
-                    DataType.INT32.min,  # @UndefinedVariable
-                    DataType.INT32.max,  # @UndefinedVariable
-                    Commands.ARITH_OP.name)
-            payload += bytearray(_ONE_SINT.pack(operand_1))
-            cmd_string += " " + str(operand_1)
-        else:
-            if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
-                    operand_1 > DataType.UINT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "operand_1", operand_1,
-                    DataType.UINT32.min,  # @UndefinedVariable
-                    DataType.UINT32.max,  # @UndefinedVariable
-                    Commands.ARITH_OP.name)
-            payload += bytearray(_ONE_WORD.pack(operand_1))
-            cmd_string += " " + str(operand_1)
-
+        _bounds(Commands.ARITH_OP, "register_id",
+                register_id, 0, MAX_REGISTERS)
         if operation not in ArithmeticOperation:
             raise InvalidOperationException(
                 "arithmetic", operation.value, Commands.ARITH_OP.name)
 
+        cmd_length = 0
+        bit_field = 0x4
+        register_op_1 = 0
+        register_op_2 = 0
+        encoded_operands = bytearray()
+
+        cmd_string = Commands.ARITH_OP.name
+        cmd_string += " {0:s} reg[{1:d}] =".format(
+            "SIGNED" if signed else "UNSIGNED", register_id)
+
+        if operand_1_is_register:
+            _bounds(Commands.ARITH_OP, "operand_1",
+                    operand_1, 0, MAX_REGISTERS)
+            bit_field |= 2
+            register_op_1 = operand_1
+            cmd_string += " reg[{0:d}]".format(register_op_1)
+        elif signed:
+            _typebounds(Commands.ARITH_OP, "operand_1",
+                        operand_1, DataType.INT32)
+            cmd_length += 1
+            encoded_operands += _ONE_SIGNED_INT.pack(operand_1)
+            cmd_string += " {0:d}".format(operand_1)
+        else:
+            _typebounds(Commands.ARITH_OP, "operand_1",
+                        operand_1, DataType.UINT32)
+            cmd_length += 1
+            encoded_operands += _ONE_WORD.pack(operand_1)
+            cmd_string += " {0:d}".format(operand_1)
+
         cmd_string += " " + operation.operator
 
         if operand_2_is_register:
-            if operand_2 < 0 or operand_2 >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "operand_2", operand_2, 0, MAX_REGISTERS - 1,
-                    Commands.ARITH_OP.name)
+            _bounds(Commands.ARITH_OP, "operand_2",
+                    operand_2, 0, MAX_REGISTERS)
             bit_field |= 1
             register_op_2 = operand_2
             cmd_string += " reg[{0:d}]".format(register_op_2)
         elif signed:
-            if (operand_2 < DataType.INT32.min or  # @UndefinedVariable
-                    operand_2 > DataType.INT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "operand_2", operand_2,
-                    DataType.INT32.min,  # @UndefinedVariable
-                    DataType.INT32.max,  # @UndefinedVariable
-                    Commands.ARITH_OP.name)
-            payload += bytearray(_ONE_SINT.pack(operand_2))
-            cmd_string += " " + str(operand_2)
+            _typebounds(Commands.ARITH_OP, "operand_2",
+                        operand_2, DataType.INT32)
+            cmd_length += 1
+            encoded_operands += _ONE_SIGNED_INT.pack(operand_2)
+            cmd_string += " {0:d}".format(operand_2)
         else:
-            if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
-                    operand_2 > DataType.UINT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "operand_2", operand_2,
-                    DataType.UINT32.min,  # @UndefinedVariable
-                    DataType.UINT32.max,  # @UndefinedVariable
-                    Commands.ARITH_OP.name)
-            payload += bytearray(_ONE_WORD.pack(operand_2))
-            cmd_string += " " + str(operand_2)
+            _typebounds(Commands.ARITH_OP, "operand_2",
+                        operand_2, DataType.UINT32)
+            cmd_length += 1
+            encoded_operands += _ONE_WORD.pack(operand_2)
+            cmd_string += " {0:d}".format(operand_2)
 
-        cmd_word = (
-            (len(payload) << 26) |
-            (Commands.ARITH_OP.value << 20) |
-            (int(signed) << 19) |
-            (bit_field << 16) |
-            (register_id << 12) |
-            (register_op_1 << 8) |
-            (register_op_2 << 4) |
-            operation.value)
-
-        self.write_command_to_files(
-            bytearray(_ONE_WORD.pack(cmd_word)) + payload,
-            cmd_string)
+        cmd_word = _binencode(Commands.ARITH_OP, {
+            _Field.LENGTH: cmd_length,
+            _Field.SIGNED: bool(signed),
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: register_id,
+            _Field.SOURCE_1: register_op_1,
+            _Field.SOURCE_2: register_op_2,
+            _Field.IMMEDIATE: operation})
+        self.write_command_to_files(cmd_word + encoded_operands, cmd_string)
 
     def logical_and(self, register_id, operand_1, operand_2,
                     operand_1_is_register=False, operand_2_is_register=False):
@@ -2317,9 +1957,9 @@ class DataSpecificationGenerator(object):
             * If operand_2_is_register is True and operand_2 is not a\
               valid register ID
         """
-        self._call_logic_operation(register_id, operand_1, LogicOperation.AND,
-                                   operand_2, operand_1_is_register,
-                                   operand_2_is_register)
+        self._call_logic_operation(
+            register_id, operand_1, LogicOperation.AND, operand_2,
+            operand_1_is_register, operand_2_is_register)
 
     def logical_or(self, register_id, operand_1, operand_2,
                    operand_1_is_register=False, operand_2_is_register=False):
@@ -2352,9 +1992,9 @@ class DataSpecificationGenerator(object):
             * If operand_2_is_register is True and operand_2 is not a\
               valid register ID
         """
-        self._call_logic_operation(register_id, operand_1, LogicOperation.OR,
-                                   operand_2, operand_1_is_register,
-                                   operand_2_is_register)
+        self._call_logic_operation(
+            register_id, operand_1, LogicOperation.OR, operand_2,
+            operand_1_is_register, operand_2_is_register)
 
     def logical_left_shift(self, register_id, operand_1, operand_2,
                            operand_1_is_register=False,
@@ -2388,10 +2028,9 @@ class DataSpecificationGenerator(object):
             * If operand_2_is_register is True and operand_2 is not a\
               valid register ID
         """
-        self._call_logic_operation(register_id, operand_1,
-                                   LogicOperation.LEFT_SHIFT,
-                                   operand_2, operand_1_is_register,
-                                   operand_2_is_register)
+        self._call_logic_operation(
+            register_id, operand_1, LogicOperation.LEFT_SHIFT, operand_2,
+            operand_1_is_register, operand_2_is_register)
 
     def logical_right_shift(self, register_id, operand_1, operand_2,
                             operand_1_is_register=False,
@@ -2425,14 +2064,13 @@ class DataSpecificationGenerator(object):
             * If operand_2_is_register is True and operand_2 is not a\
               valid register ID
         """
-        self._call_logic_operation(register_id, operand_1,
-                                   LogicOperation.RIGHT_SHIFT,
-                                   operand_2, operand_1_is_register,
-                                   operand_2_is_register)
+        self._call_logic_operation(
+            register_id, operand_1, LogicOperation.RIGHT_SHIFT, operand_2,
+            operand_1_is_register, operand_2_is_register)
 
     def logical_xor(self, register_id, operand_1, operand_2,
                     operand_1_is_register=False, operand_2_is_register=False):
-        """ Insert command to perform a logical xor operation, using
+        """ Insert command to perform a logical xor operation, using\
             the _call_logic_operation.
 
         :param register_id: The ID of the register to store the result in
@@ -2461,13 +2099,12 @@ class DataSpecificationGenerator(object):
             * If operand_2_is_register is True and operand_2 is not a\
               valid register ID
         """
-        self._call_logic_operation(register_id, operand_1,
-                                   LogicOperation.XOR,
-                                   operand_2, operand_1_is_register,
-                                   operand_2_is_register)
+        self._call_logic_operation(
+            register_id, operand_1, LogicOperation.XOR, operand_2,
+            operand_1_is_register, operand_2_is_register)
 
     def logical_not(self, register_id, operand, operand_is_register=False):
-        """ Insert command to perform a logical xor operation, using
+        """ Insert command to perform a logical xor operation, using\
             the _call_logic_operation.
 
         :param register_id: The ID of the register to store the result in
@@ -2487,8 +2124,9 @@ class DataSpecificationGenerator(object):
             * If operand_is_register is True and operand_1 is not a\
               valid register ID
         """
-        self._call_logic_operation(register_id, operand, LogicOperation.NOT,
-                                   0, operand_is_register, False)
+        self._call_logic_operation(
+            register_id, operand, LogicOperation.NOT, 0,
+            operand_is_register, False)
 
     def _call_logic_operation(self, register_id, operand_1, operation,
                               operand_2, operand_1_is_register=False,
@@ -2526,77 +2164,59 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.InvalidOperationException: \
             If operation is not a known operation
         """
-        bit_field = 0x4
-        register_op_1 = 0
-        register_op_2 = 0
-        payload = bytearray()
-
-        if register_id < 0 or register_id >= MAX_REGISTERS:
-            raise ParameterOutOfBoundsException(
-                "register_id", register_id, 0, MAX_REGISTERS - 1,
-                Commands.LOGIC_OP.name)
-
-        cmd_string = "LOGIC_OP reg[{0:d}] =".format(register_id)
-
+        _bounds(Commands.LOGIC_OP, "register_id",
+                register_id, 0, MAX_REGISTERS)
         if operation not in LogicOperation:
             raise InvalidOperationException(
                 "logic", operation.value, Commands.LOGIC_OP.name)
 
+        cmd_length = 0
+        bit_field = 0x4
+        register_op_1 = 0
+        register_op_2 = 0
+        encoded_operands = bytearray()
+
+        cmd_string = Commands.LOGIC_OP.name
+        cmd_string += " reg[{0:d}] =".format(register_id)
         if operation.value == LogicOperation.NOT.value:
             cmd_string += " " + operation.operator
 
         if operand_1_is_register:
-            if operand_1 < 0 or operand_1 >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "operand_1", operand_1, 0, MAX_REGISTERS - 1,
-                    Commands.LOGIC_OP.name)
+            _bounds(Commands.LOGIC_OP, "operand_1",
+                    operand_1, 0, MAX_REGISTERS)
             bit_field |= 2
             register_op_1 = operand_1
             cmd_string += " reg[{0:d}]".format(register_op_1)
         else:
-            if (operand_1 < DataType.UINT32.min or  # @UndefinedVariable
-                    operand_1 > DataType.UINT32.max):  # @UndefinedVariable
-                raise ParameterOutOfBoundsException(
-                    "operand_1", operand_1,
-                    DataType.UINT32.min,  # @UndefinedVariable
-                    DataType.UINT32.max,  # @UndefinedVariable
-                    Commands.LOGIC_OP.name)
-            payload += bytearray(_ONE_WORD.pack(operand_1))
+            cmd_length += 1
+            _typebounds(Commands.LOGIC_OP, "operand_1",
+                        operand_1, DataType.UINT32)
+            encoded_operands += _ONE_WORD.pack(operand_1)
             cmd_string += " " + str(operand_1)
 
         if operation.value != LogicOperation.NOT.value:
             cmd_string += " " + operation.operator
-
             if operand_2_is_register:
-                if operand_2 < 0 or operand_2 >= MAX_REGISTERS:
-                    raise ParameterOutOfBoundsException(
-                        "operand_2", operand_2, 0, MAX_REGISTERS - 1,
-                        Commands.LOGIC_OP.name)
+                _bounds(Commands.LOGIC_OP, "operand_2",
+                        operand_2, 0, MAX_REGISTERS)
                 bit_field |= 1
                 register_op_2 = operand_2
                 cmd_string += " reg[{0:d}]".format(register_op_2)
             else:
-                if (operand_2 < DataType.UINT32.min or  # @UndefinedVariable
-                        operand_2 > DataType.UINT32.max):  # @UndefinedVariable
-                    raise ParameterOutOfBoundsException(
-                        "operand_2", operand_2,
-                        DataType.UINT32.min,  # @UndefinedVariable
-                        DataType.UINT32.max,  # @UndefinedVariable
-                        Commands.LOGIC_OP.name)
-                payload += bytearray(_ONE_WORD.pack(operand_2))
+                cmd_length += 1
+                _typebounds(Commands.LOGIC_OP, "operand_2",
+                            operand_2, DataType.UINT32)
+                encoded_operands += _ONE_WORD.pack(operand_2)
                 cmd_string += " " + str(operand_2)
 
-        cmd_word = (
-            (len(payload) << 26) |
-            (Commands.LOGIC_OP.value << 20) |
-            (bit_field << 16) |
-            (register_id << 12) |
-            (register_op_1 << 8) |
-            (register_op_2 << 4) |
-            operation.value)
-
-        self.write_command_to_files(
-            bytearray(_ONE_WORD.pack(cmd_word)) + payload, cmd_string)
+        cmd_word = _binencode(Commands.LOGIC_OP, {
+            _Field.LENGTH: cmd_length,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: register_id,
+            _Field.SOURCE_1: register_op_1,
+            _Field.SOURCE_2: register_op_2,
+            _Field.IMMEDIATE: operation})
+        self.write_command_to_files(cmd_word + encoded_operands, cmd_string)
 
     def copy_structure(self, source_structure_id, destination_structure_id,
                        source_id_is_register=False,
@@ -2639,69 +2259,52 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.NotAllocatedException: \
             * If no structure with ID source_structure_id has been allocated
         """
-        bit_field = 0
-        cmd_string = "COPY_STRUCT"
-
         if source_structure_id == destination_structure_id and \
                 destination_id_is_register == source_id_is_register:
             raise DuplicateParameterException(
-                "COPY_STRUCT",
+                Commands.COPY_STRUCT.name,
                 [source_structure_id, destination_structure_id])
 
+        bit_field = 0
+        cmd_string = Commands.COPY_STRUCT.name
+
         if source_id_is_register:
-            if source_structure_id < 0 or source_structure_id >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "source_structure_id", source_structure_id, 0,
-                    MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            _bounds(Commands.COPY_STRUCT, "source_structure_id",
+                    source_structure_id, 0, MAX_REGISTERS)
             bit_field |= SRC1_ONLY
-            cmd_string += " source_struct = reg[{0:d}]".format(
+            cmd_string += " source_struct=reg[{0:d}]".format(
                 source_structure_id)
         else:
-            if source_structure_id < 0 \
-                    or source_structure_id >= MAX_STRUCT_SLOTS:
-                raise ParameterOutOfBoundsException(
-                    "source_structure_id", source_structure_id, 0,
-                    MAX_STRUCT_SLOTS - 1, Commands.COPY_STRUCT.name)
-            if self.struct_slot[source_structure_id] == 0:
+            _bounds(Commands.COPY_STRUCT, "source_structure_id",
+                    source_structure_id, 0, MAX_STRUCT_SLOTS)
+            if self.struct_slots[source_structure_id] is None:
                 raise NotAllocatedException(
-                    "struct", source_structure_id, "COPY_STRUCT")
-            cmd_string += " source_struct = {0:d}".format(source_structure_id)
+                    "struct", source_structure_id, Commands.COPY_STRUCT.name)
+            cmd_string += " source_struct={0:d}".format(source_structure_id)
 
         if destination_id_is_register:
-            if destination_structure_id < 0 \
-                    or destination_structure_id >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "destination_structure_id", destination_structure_id,
-                    0, MAX_REGISTERS - 1, Commands.COPY_STRUCT.name)
+            _bounds(Commands.COPY_STRUCT, "destination_structure_id",
+                    destination_structure_id, 0, MAX_REGISTERS)
             bit_field |= DEST_ONLY
-            cmd_string += " destination_struct = reg[{0:d}]".format(
+            cmd_string += " destination_struct=reg[{0:d}]".format(
                 destination_structure_id)
         else:
-            if destination_structure_id < 0 \
-                    or destination_structure_id >= MAX_STRUCT_SLOTS:
-                raise ParameterOutOfBoundsException(
-                    "destination_structure_id", destination_structure_id,
-                    0, MAX_STRUCT_SLOTS - 1,
-                    Commands.COPY_STRUCT.name)
-            cmd_string += " destination_struct = {0:d}".format(
+            _bounds(Commands.COPY_STRUCT, "destination_structure_id",
+                    destination_structure_id, 0, MAX_STRUCT_SLOTS)
+            cmd_string += " destination_struct={0:d}".format(
                 destination_structure_id)
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.COPY_STRUCT.value << 20) |
-            (bit_field << 16) |
-            (destination_structure_id << 12) |
-            (source_structure_id << 8))
+        cmd_word = _binencode(Commands.COPY_STRUCT, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: bit_field,
+            _Field.DESTINATION: destination_structure_id,
+            _Field.SOURCE_1: source_structure_id})
+        self.write_command_to_files(cmd_word, cmd_string)
 
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-        self.write_command_to_files(cmd_word_list, cmd_string)
-
-    def copy_structure_parameter(self, source_structure_id,
-                                 source_parameter_index,
-                                 destination_id,
-                                 destination_parameter_index=None,
-                                 destination_is_register=False):
+    def copy_structure_parameter(
+            self, source_structure_id, source_parameter_index,
+            destination_id, destination_parameter_index=None,
+            destination_is_register=False):
         """ Insert command to copy the value of a parameter from one\
             structure to another.
 
@@ -2737,108 +2340,79 @@ class DataSpecificationGenerator(object):
             * If no structure with ID destination_id has been allocated
             * If no structure with ID source_structure_id has been allocated
         """
-        if source_structure_id < 0 or source_structure_id >= MAX_STRUCT_SLOTS:
-            raise ParameterOutOfBoundsException(
-                "source_structure_id", source_structure_id, 0,
-                MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
-
-        if source_parameter_index < 0 \
-                or source_parameter_index >= MAX_STRUCT_ELEMENTS:
-            raise ParameterOutOfBoundsException(
-                "source_parameter_index", source_parameter_index, 0,
-                MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
-
-        if self.struct_slot[source_structure_id] == 0:
+        _bounds(Commands.COPY_PARAM, "source_structure_id",
+                source_structure_id, 0, MAX_STRUCT_SLOTS)
+        _bounds(Commands.COPY_PARAM, "source_parameter_index",
+                source_parameter_index, 0, MAX_STRUCT_ELEMENTS)
+        if self.struct_slots[source_structure_id] is None:
             raise NotAllocatedException(
-                "structure", source_structure_id, "COPY_PARAM")
-
-        if (len(self.struct_slot[source_structure_id]) <=
+                "structure", source_structure_id, Commands.COPY_PARAM.name)
+        if (len(self.struct_slots[source_structure_id]) <=
                 source_parameter_index):
             raise NotAllocatedException(
-                "parameter", source_parameter_index, "COPY_PARAM")
+                "parameter", source_parameter_index, Commands.COPY_PARAM.name)
 
+        cmd_string = Commands.COPY_PARAM.name
         if not destination_is_register:
-            if (destination_parameter_index < 0 or
-                    destination_parameter_index >= MAX_STRUCT_ELEMENTS):
-                raise ParameterOutOfBoundsException(
-                    "destination_parameter_index", destination_parameter_index,
-                    0, MAX_STRUCT_ELEMENTS - 1, Commands.COPY_PARAM.name)
-
-            if destination_id < 0 or destination_id >= MAX_STRUCT_SLOTS:
-                raise ParameterOutOfBoundsException(
-                    "destination_structure_id", destination_id, 0,
-                    MAX_STRUCT_SLOTS - 1, Commands.COPY_PARAM.name)
-
-            if self.struct_slot[destination_id] == 0:
+            _bounds(Commands.COPY_PARAM, "destination_parameter_index",
+                    destination_parameter_index, 0, MAX_STRUCT_ELEMENTS)
+            _bounds(Commands.COPY_PARAM, "destination_structure_id",
+                    destination_id, 0, MAX_STRUCT_SLOTS)
+            if self.struct_slots[destination_id] is None:
                 raise NotAllocatedException(
-                    "structure", destination_id, "COPY_PARAM")
-
-            if (len(self.struct_slot[source_structure_id]) <=
+                    "structure", destination_id, Commands.COPY_PARAM.name)
+            if (len(self.struct_slots[source_structure_id]) <=
                     source_parameter_index):
                 raise NotAllocatedException(
-                    "parameter", destination_parameter_index, "COPY_PARAM")
-
-            if (len(self.struct_slot[destination_id]) <=
+                    "parameter", destination_parameter_index,
+                    Commands.COPY_PARAM.name)
+            if (len(self.struct_slots[destination_id]) <=
                     destination_parameter_index):
                 raise NotAllocatedException(
-                    "parameter", destination_parameter_index, "COPY_PARAM")
-
-            if (self.struct_slot[source_structure_id]
+                    "parameter", destination_parameter_index,
+                    Commands.COPY_PARAM.name)
+            if (self.struct_slots[source_structure_id]
                     [source_parameter_index][1] !=
-                    self.struct_slot[destination_id]
+                    self.struct_slots[destination_id]
                     [destination_parameter_index][1]):
-                raise TypeMismatchException(
-                    "COPY_PARAM")
-
+                raise TypeMismatchException(Commands.COPY_PARAM.name)
             if (source_structure_id == destination_id and
                     destination_parameter_index == source_parameter_index):
                 raise DuplicateParameterException(
-                    "COPY_PARAM", [source_structure_id,
-                                   source_parameter_index,
-                                   destination_id,
-                                   destination_parameter_index])
+                    Commands.COPY_PARAM.name, [
+                        source_structure_id, source_parameter_index,
+                        destination_id, destination_parameter_index])
 
-            cmd_word_1 = (
-                (LEN2 << 28) |
-                (Commands.COPY_PARAM.value << 20) |
-                (NO_REGS << 16) |
-                (destination_id << 12) |
-                (source_structure_id << 8))
-            cmd_word_2 = ((destination_parameter_index << 8) |
+            cmd_word_1 = _binencode(Commands.COPY_PARAM, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: NO_REGS,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_1: source_structure_id})
+            param_word = ((destination_parameter_index << 8) |
                           source_parameter_index)
-
-            cmd_string = (
-                "COPY_PARAM source_structure_id = {0:d}, "
-                "source_parameter_id = {1:d}, "
+            cmd_string += (
+                " source_structure_id = {0:d}, source_parameter_id = {1:d}, "
                 "destination_structure_id = {2:d}, "
                 "destination_parameter_id = {3:d}".format(
                     source_structure_id, source_parameter_index,
                     destination_id, destination_parameter_index))
         else:
-            if destination_id < 0 or destination_id >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "destination_register_id", destination_id, 0,
-                    MAX_REGISTERS - 1, Commands.COPY_PARAM.name)
+            _bounds(Commands.COPY_PARAM, "destination_register_id",
+                    destination_id, 0, MAX_REGISTERS)
 
-            cmd_word_1 = (
-                (LEN2 << 28) |
-                (Commands.COPY_PARAM.value << 20) |
-                (DEST_ONLY << 16) |
-                (destination_id << 12) |
-                (source_structure_id << 8))
-            cmd_word_2 = source_parameter_index
+            cmd_word_1 = _binencode(Commands.COPY_PARAM, {
+                _Field.LENGTH: LEN2,
+                _Field.USAGE: DEST_ONLY,
+                _Field.DESTINATION: destination_id,
+                _Field.SOURCE_1: source_structure_id})
+            param_word = source_parameter_index
+            cmd_string += (
+                " source_structure_id = {0:d}, source_parameter_id = {1:d}, "
+                "destination_register_id = {2:d}".format(
+                    source_structure_id, source_parameter_index,
+                    destination_id))
 
-            cmd_string = "WRITE_PARAM source_structure_id = {0:d}, " \
-                         "source_parameter_id = {1:d}, " \
-                         "destination_register_id = {2:d}"\
-                .format(source_structure_id,
-                        source_parameter_index, destination_id)
-
-        cmd_word_1_encoded = bytearray(_ONE_WORD.pack(cmd_word_1))
-        cmd_word_2_encoded = bytearray(_ONE_WORD.pack(cmd_word_2))
-
-        cmd_word_list = cmd_word_1_encoded + cmd_word_2_encoded
-
+        cmd_word_list = cmd_word_1 + _ONE_WORD.pack(param_word)
         self.write_command_to_files(cmd_word_list, cmd_string)
 
     def print_value(self, value, value_is_register=False,
@@ -2870,50 +2444,34 @@ class DataSpecificationGenerator(object):
         :raise data_specification.exceptions.UnknownTypeException: \
             * If data_type is not a valid data type
         """
-        cmd_word_length = LEN1
         source_register_id = 0
         bit_field = 0
         data_encoded = bytearray()
+        cmd_string = Commands.PRINT_VAL.name
 
         if value_is_register:
-            if value < 0 or value >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "value", value, 0, MAX_REGISTERS - 1,
-                    Commands.PRINT_VAL.name)
+            _bounds(Commands.PRINT_VAL, "value", value, 0, MAX_REGISTERS)
+            cmd_word_length = LEN1
             bit_field |= 2
             source_register_id = value
-            cmd_string = "PRINT_VAL reg[{0:d}]".format(source_register_id)
+            cmd_string += " reg[{0:d}]".format(source_register_id)
         else:
-            if value < data_type.min or value > data_type.max:
-                raise ParameterOutOfBoundsException(
-                    "value", value, data_type.min, data_type.max,
-                    Commands.PRINT_VAL.name)
-            if data_type.size <= 4:
-                cmd_word_length = LEN2
-            else:
-                cmd_word_length = LEN3
-            data_encoding_string = "<{0:s}".format(data_type.struct_encoding)
-            data_encoded = bytearray(struct.pack(data_encoding_string, value))
-            while len(data_encoded) % 4:
-                data_encoded += bytearray(_ONE_SBYTE.pack(0))
-            cmd_string = "PRINT_VAL {0:d}".format(value)
+            _typebounds(Commands.PRINT_VAL, "value", value, data_type)
+            cmd_word_length = LEN2 if data_type.size <= 4 else LEN3
+            data_encoded += data_type.encode(value)
+            cmd_string += " {0:d}".format(value)
 
-        cmd_word = (
-            (cmd_word_length << 28) |
-            (Commands.PRINT_VAL.value << 20) |
-            (bit_field << 16) |
-            (source_register_id << 8) |
-            data_type.value)
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-
-        cmd_word_list = cmd_word_encoded + data_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.PRINT_VAL, {
+            _Field.LENGTH: cmd_word_length,
+            _Field.USAGE: bit_field,
+            _Field.SOURCE_1: source_register_id,
+            _Field.IMMEDIATE: data_type})
+        self.write_command_to_files(cmd_word + data_encoded, cmd_string)
 
     def print_text(self, text, encoding="ASCII"):
         """ Insert command to print some text (for debugging)
 
-        :param text: The text to write (max 12 characters)
+        :param text: The text to write (max 12 *bytes* once encoded)
         :type text: str
         :param encoding: \
             The character encoding to use for the string. Defaults to ASCII.
@@ -2926,9 +2484,7 @@ class DataSpecificationGenerator(object):
         """
         text_encoded = bytearray(text.encode(encoding=encoding))
         text_len = len(text_encoded)
-        if text_len > 12:
-            raise ParameterOutOfBoundsException(
-                "len(text)", text_len, 1, 12, Commands.PRINT_TXT.name)
+        _bounds(Commands.PRINT_TXT, "len(text)", text_len, 1, 13)
 
         if text_len <= 4:
             cmd_word_len = LEN2
@@ -2939,18 +2495,14 @@ class DataSpecificationGenerator(object):
 
         # add final padding to the encoded text
         if text_len % 4 is not 0:
-            text_encoded += bytearray(4 - (text_len % 4))
+            text_encoded += bytearray(4 - text_len % 4)
 
-        cmd_string = "PRINT_TXT \"{0:s}\"".format(text)
-
-        cmd_word = (
-            (cmd_word_len << 28) |
-            (Commands.PRINT_TXT.value << 20) |
-            (text_len - 1))
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded + text_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_string = Commands.PRINT_TXT.name
+        cmd_string += " \"{0:s}\"".format(text)
+        cmd_word = _binencode(Commands.PRINT_TXT, {
+            _Field.LENGTH: cmd_word_len,
+            _Field.IMMEDIATE: text_len - 1})
+        self.write_command_to_files(cmd_word + text_encoded, cmd_string)
 
     def print_struct(self, structure_id, structure_id_is_register=False):
         """ Insert command to print out a structure (for debugging)
@@ -2977,42 +2529,30 @@ class DataSpecificationGenerator(object):
             If structure_id_is_register is False and structure_id is the ID\
             of a structure that has not been allocated
         """
-        struct_register = 0
-        bit_field = 0
-        cmd_string = "PRINT_STRUCT"
-
+        cmd_string = Commands.PRINT_STRUCT.name
         if structure_id_is_register:
-            if structure_id < 0 or structure_id >= MAX_REGISTERS:
-                raise ParameterOutOfBoundsException(
-                    "structure_id", structure_id, 0,
-                    MAX_REGISTERS - 1, Commands.PRINT_STRUCT.name)
+            _bounds(Commands.PRINT_STRUCT, "structure_id",
+                    structure_id, 0, MAX_REGISTERS)
             struct_register = structure_id
             structure_id = 0
             bit_field = 0x2
             cmd_string += " struct(reg[{0:d}])".format(struct_register)
         else:
-            if structure_id < 0 or structure_id >= MAX_STRUCT_SLOTS:
-                raise ParameterOutOfBoundsException(
-                    "structure_id", structure_id, 0,
-                    MAX_STRUCT_SLOTS - 1, Commands.PRINT_STRUCT.name)
-
-            if self.struct_slot[structure_id] == 0:
+            _bounds(Commands.PRINT_STRUCT, "structure_id",
+                    structure_id, 0, MAX_STRUCT_SLOTS)
+            if self.struct_slots[structure_id] is None:
                 raise NotAllocatedException(
-                    "structure", structure_id, "PRINT_STRUCT")
-
+                    "structure", structure_id, Commands.PRINT_STRUCT.name)
+            struct_register = 0
+            bit_field = 0
             cmd_string += " struct({0:d})".format(structure_id)
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.PRINT_STRUCT.value << 20) |
-            (bit_field << 16) |
-            (struct_register << 8) |
-            structure_id)
-
-        cmd_word_encoded = bytearray(_ONE_WORD.pack(cmd_word))
-        cmd_word_list = cmd_word_encoded
-
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.PRINT_STRUCT, {
+            _Field.LENGTH: LEN1,
+            _Field.USAGE: bit_field,
+            _Field.SOURCE_1: struct_register,
+            _Field.IMMEDIATE: structure_id})
+        self.write_command_to_files(cmd_word, cmd_string)
 
     def end_specification(self, close_writer=True):
         """ Insert a command to indicate that the specification has finished\
@@ -3030,15 +2570,11 @@ class DataSpecificationGenerator(object):
         """
         self.comment("\nEnd of specification:")
 
-        cmd_word = (
-            (LEN1 << 28) |
-            (Commands.END_SPEC.value << 20))
-        encoded_cmd_word = bytearray(_ONE_WORD.pack(cmd_word))
-        parameter = -1
-        encoded_parameter = _ONE_SINT.pack(parameter)
-        cmd_word_list = encoded_cmd_word + encoded_parameter
-        cmd_string = "END_SPEC"
-        self.write_command_to_files(cmd_word_list, cmd_string)
+        cmd_word = _binencode(Commands.END_SPEC, {
+            _Field.LENGTH: LEN1})
+        encoded_parameter = _ONE_SIGNED_INT.pack(-1)
+        cmd_string = Commands.END_SPEC.name
+        self.write_command_to_files(cmd_word + encoded_parameter, cmd_string)
 
         if close_writer:
             self.spec_writer.close()
@@ -3084,13 +2620,12 @@ class DataSpecificationGenerator(object):
             if outdent is True:
                 self.txt_indent = min(self.txt_indent - 1, 0)
             indent_string = "   " * self.txt_indent
-            if no_instruction_number is True:
-                formatted_cmd_string = "{0:s}{1:s}\n".format(
+            if no_instruction_number:
+                formatted_cmd_string = "{}{}\n".format(
                     indent_string, cmd_string)
             else:
-                pc = "%8.8X" % self.instruction_counter
-                formatted_cmd_string = "{}. {}{}\n".format(
-                    pc, indent_string, cmd_string)
+                formatted_cmd_string = "{:08X}. {}{}\n".format(
+                    self.instruction_counter, indent_string, cmd_string)
                 self.instruction_counter += len(cmd_word_list)
             self.report_writer.write(formatted_cmd_string.encode("UTF-8"))
             if indent is True:
@@ -3102,4 +2637,4 @@ class DataSpecificationGenerator(object):
         """ A list of sizes of each region that has been reserved. Note that\
             the list will include 0s for each non-reserved region.
         """
-        return [0 if slot == 0 else slot[0] for slot in self.mem_slot]
+        return [0 if slot is None else slot.size for slot in self.mem_slots]

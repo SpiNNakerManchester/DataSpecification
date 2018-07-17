@@ -3,7 +3,7 @@ from .exceptions import (
 
 
 class MemoryRegionCollection(object):
-    """Collection of memory regions.
+    """ Collection of memory regions.
     """
 
     __slots__ = [
@@ -27,14 +27,14 @@ class MemoryRegionCollection(object):
 
     def __getitem__(self, key):
         """
-        :rtype: :py:class`~data_specification.MemoryRegion`
+        :rtype: :py:class:`~data_specification.MemoryRegion`
         """
         return self._regions[key]
 
     def __setitem__(self, key, value):
         """
         :type key: int
-        :type value: :py:class`~data_specification.MemoryRegion`
+        :type value: :py:class:`~data_specification.MemoryRegion`
         """
         if key < 0 or key >= len(self._regions):
             raise NoRegionSelectedException(
@@ -46,14 +46,14 @@ class MemoryRegionCollection(object):
 
     def __iter__(self):
         """
-        :rtype: iterable(:py:class`~data_specification.MemoryRegion`)
+        :rtype: iterable(:py:class:`~data_specification.MemoryRegion`)
         """
         return iter(self._regions)
 
     @property
     def regions(self):
         """
-        :rtype: iterable(:py:class`~data_specification.MemoryRegion`)
+        :rtype: iterable(:py:class:`~data_specification.MemoryRegion`)
         """
         for r in self._regions:
             yield r

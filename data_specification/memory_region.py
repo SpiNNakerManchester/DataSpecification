@@ -9,7 +9,7 @@ class MemoryRegion(object):
         # flag that states if the region is filled or not
         "_unfilled",
 
-        # the amount of memory allocated to this dsg
+        # the amount of memory allocated to this DSG
         "_allocated_size",
 
         # the region address map????
@@ -58,8 +58,7 @@ class MemoryRegion(object):
 
     @property
     def remaining_space(self):
-        """ The maximum number of bytes that can be added to the region \
-            starting at the current write location
+        """  The amount of unused space in the region
 
         :return: the number of bytes in the region that are not yet written
         :rtype: int
@@ -69,7 +68,7 @@ class MemoryRegion(object):
 
     @property
     def unfilled(self):
-        """ Whether the region is unfilled
+        """ Whether the region is filled
 
         :return: True if the region needs to be filled when written
         :rtype: bool

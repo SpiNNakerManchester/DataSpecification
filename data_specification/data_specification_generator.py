@@ -125,7 +125,7 @@ class DataSpecificationGenerator(object):
         "random_distribution",
         # ???????
         "conditionals",
-        # the current dsg region we're writing to
+        # the current DSG region we're writing to
         "current_region",
         # ?????????
         "ongoing_function_definition",

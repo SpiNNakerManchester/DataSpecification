@@ -18,7 +18,7 @@ OBJECTS = data_specification_executor.o data_specification_stack.o struct.o c_ma
 CFLAGS += -DPRODUCTION_CODE
 
 # The spinnaker_tools standard makefile
-include $(SPINN_DIRS)/make/Makefile.common
+include $(SPINN_DIRS)/make/spinnaker_tools.mk
 
 $(shell mkdir build)
 all: $(APP_OUTPUT_DIR)$(APP).aplx

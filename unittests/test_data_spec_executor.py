@@ -5,6 +5,7 @@ from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification.enums import DataType
 from data_specification import (
     DataSpecificationExecutor, DataSpecificationGenerator, constants)
+from data_specification.exceptions import NoMoreException
 
 
 class TestDataSpecExecutor(unittest.TestCase):
@@ -120,6 +121,18 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertEqual(r.region_data, bytearray(
             "A321" "B321" "D321" "G321" "K321" "\0\0\0\0" "abcd" "pppp"
             "}\0\0\0" "\0\0\0\0" "\0\0\0\0".encode("ISO 8859-1")))
+
+    def test_overwrite(self):
+        temp_spec = mktemp()
+        spec = DataSpecificationGenerator(FileDataWriter(temp_spec))
+        spec.reserve_memory_region(0, 4)
+        spec.switch_write_focus(0)
+        spec.write_value(1)
+        spec.write_value(2)
+        spec.end_specification()
+
+        executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
+        self.assertRaises(NoMoreException, executor.execute)
 
 
 if __name__ == '__main__':

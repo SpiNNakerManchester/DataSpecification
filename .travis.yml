@@ -26,7 +26,7 @@ matrix:
             - sourceline: 'ppa:cutter-testing-framework/ppa'
           packages:
             - vera++
-            - cutter-testing-framework-bin
+            - cutter-testing-framework
 cache: pip
 
 

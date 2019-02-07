@@ -1,15 +1,34 @@
 language: python
-python:
-  - 2.7
-  - 3.6
-dist: trusty
+matrix:
+  include:
+    - python: 2.7
+      dist: trusty
+      sudo: false
+      addons:
+        apt:
+          packages:
+            - vera++
+            - cutter-testing-framework-bin
+    - python: 3.6
+      dist: trusty
+      sudo: false
+      addons:
+        apt:
+          packages:
+            - vera++
+            - cutter-testing-framework-bin
+    - python: 3.7
+      dist: xenial
+      sudo: true
+      addons:
+        apt:
+          sources:
+            - sourceline: 'ppa:cutter-testing-framework/ppa'
+          packages:
+            - vera++
+            - cutter-testing-framework
 cache: pip
 
-addons:
-  apt:
-    packages:
-      - vera++
-      - cutter-testing-framework-bin
 
 before_install:
   # Work around ludicrous Travis bug

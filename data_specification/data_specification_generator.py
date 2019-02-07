@@ -2494,7 +2494,7 @@ class DataSpecificationGenerator(object):
             cmd_word_len = LEN4
 
         # add final padding to the encoded text
-        if text_len % 4 is not 0:
+        if text_len % 4 != 0:
             text_encoded += bytearray(4 - text_len % 4)
 
         cmd_string = Commands.PRINT_TXT.name

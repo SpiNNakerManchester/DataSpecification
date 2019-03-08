@@ -76,6 +76,41 @@ def get_data_spec_and_file_writer_filename(
 
     # check if text reports are needed and if so initialise the report
     # writer to send down to DSG
+    report_writer = get_report_writer(
+        processor_chip_x, processor_chip_y, processor_id,
+        hostname, report_directory="TEMP", write_text_specs=False)
+
+    # build the file writer for the spec
+    spec = DataSpecificationGenerator(data_writer, report_writer)
+
+    return data_writer.filename, spec
+
+
+def get_report_writer(
+        processor_chip_x, processor_chip_y, processor_id,
+        hostname, report_directory="TEMP", write_text_specs=False):
+    """ check if text reports are needed and if so initialise the report
+        writer to send down to DSG
+
+    :param processor_chip_x: x-coordinate of the chip
+    :type processor_chip_x: int
+    :param processor_chip_y: y-coordinate of the chip
+    :type processor_chip_y: int
+    :param processor_id: The processor ID
+    :type processor_id: int
+    :param hostname: The hostname of the SpiNNaker machine
+    :type hostname: str
+    :param report_directory: the directory for the reports folder
+    :type report_directory: file path
+    :param write_text_specs:\
+        True if a textual version of the specification should be written
+    :type write_text_specs: bool
+    :return: the report_writer_object or None if not reporting
+    """
+    # pylint: disable=too-many-arguments
+
+    # check if text reports are needed and if so initialise the report
+    # writer to send down to DSG
     report_writer = None
     if write_text_specs:
         if report_directory == "TEMP":
@@ -86,7 +121,4 @@ def get_data_spec_and_file_writer_filename(
             os.path.join(new_report_directory, _RPT_TMPL.format(
                 hostname, processor_chip_x, processor_chip_y, processor_id)))
 
-    # build the file writer for the spec
-    spec = DataSpecificationGenerator(data_writer, report_writer)
-
-    return data_writer.filename, spec
+    return report_writer

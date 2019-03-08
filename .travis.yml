@@ -30,16 +30,16 @@ before_install:
   - support/gitclone.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
   - export SPINN_DIRS=$PWD/spinnaker_tools CFLAGS=-fdiagnostics-color
 
-before_install:
-  # Initialise builds against spinnaker_tools
-  - make -C $SPINN_DIRS
-
 install:
   - pip install -r requirements-test.txt
   - pip install python-coveralls 'coverage>=4.4'
   - python ./setup.py install
   # C build, emulation mode for testing
   - make -C c_data_specification -f test.mk build-test
+
+before_script:
+  # Initialise builds against spinnaker_tools
+  - make -C $SPINN_DIRS
 
 script:
   # Tests

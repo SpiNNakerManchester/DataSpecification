@@ -26,21 +26,28 @@ before_install:
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git
+  # C dependencies
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
+  - export SPINN_DIRS=$PWD/spinnaker_tools CFLAGS=-fdiagnostics-color
+
+before_install:
+  # Initialise builds against spinnaker_tools
+  - make -C $SPINN_DIRS
 
 install:
   - pip install -r requirements-test.txt
   - pip install python-coveralls 'coverage>=4.4'
   - python ./setup.py install
-  # C build checks
-  
+  # C build, emulation mode for testing
   - make -C c_data_specification -f test.mk build-test
-  # TODO: ensure that the C data spec also builds with the embedded compiler
 
 script:
   # Tests
   - py.test unittests --cov data_specification
   - py.test integration_tests --cov data_specification --cov-append
   - make -C c_data_specification -f test.mk check
+  # C build checks
+  - make -C c_data_specification clean all
   # Code quality check
   - flake8 data_specification
   - flake8 unittests integration_tests

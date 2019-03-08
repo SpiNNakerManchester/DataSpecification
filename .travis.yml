@@ -1,34 +1,25 @@
 language: python
+dist: xenial
 matrix:
   include:
     - python: 2.7
-      dist: trusty
       sudo: false
-      addons:
-        apt:
-          packages:
-            - vera++
-            - cutter-testing-framework-bin
     - python: 3.6
-      dist: trusty
       sudo: false
-      addons:
-        apt:
-          packages:
-            - vera++
-            - cutter-testing-framework-bin
     - python: 3.7
-      dist: xenial
       sudo: true
       addons:
         apt:
           sources:
             - sourceline: 'ppa:cutter-testing-framework/ppa'
-          packages:
-            - vera++
-            - cutter-testing-framework
+addons:
+  apt:
+    packages:
+      - vera++
+      - cutter-testing-framework
+      - gcc-arm-none-eabi
+      - libnewlib-arm-none-eabi
 cache: pip
-
 
 before_install:
   # Work around ludicrous Travis bug
@@ -46,6 +37,7 @@ install:
   - pip install python-coveralls 'coverage>=4.4'
   - python ./setup.py install
   # C build checks
+  
   - make -C c_data_specification -f test.mk build-test
   # TODO: ensure that the C data spec also builds with the embedded compiler
 

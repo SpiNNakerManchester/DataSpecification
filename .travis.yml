@@ -28,6 +28,7 @@ before_install:
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git
   # C dependencies
   - support/gitclone.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/spinn_common.git
   - export SPINN_DIRS=$PWD/spinnaker_tools CFLAGS=-fdiagnostics-color
 
 install:
@@ -40,6 +41,7 @@ install:
 before_script:
   # Initialise builds against spinnaker_tools
   - make -C $SPINN_DIRS
+  - make -C spinn_common install
 
 script:
   # Tests

@@ -43,7 +43,7 @@ typedef uint32_t* address_t;
 
 #else // !EMULATE
 #include <spin1_api.h>
-#include <debug.h>
+#include <assert.h>
 #include <spinnaker.h>
 #include <data_specification.h>
 #endif // EMULATE

@@ -244,7 +244,7 @@ class DataSpecificationGenerator(object):
         _bounds(Commands.RESERVE, "memory region identifier",
                 region, 0, MAX_MEM_REGIONS)
         _bounds(Commands.RESERVE, "memory size",
-                size, 1, sdram.SDRAM.DEFAULT_SDRAM_BYTES)
+                size, 1, sdram.SDRAM.max_sdram_found)
         if self.mem_slots[region] is not None:
             raise RegionInUseException(region, self.mem_slots[region].label)
 

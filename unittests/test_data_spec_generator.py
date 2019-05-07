@@ -77,7 +77,7 @@ class TestDataSpecGeneration(unittest.TestCase):
 
     def test_reserve_memory_region(self):
         # Create a sdram just to set max chip size
-        SDRAM(1000)
+        SDRAM(100000)
         self.dsg.reserve_memory_region(1, 0x111)
         self.dsg.reserve_memory_region(2, 0x1122)
         self.dsg.reserve_memory_region(3, 0x1122, empty=True)
@@ -1419,7 +1419,7 @@ class TestDataSpecGeneration(unittest.TestCase):
 
     def test_write_value_from_register(self):
         # Create a sdram just to set max chip size
-        SDRAM(1000)
+        SDRAM(10000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_value_from_register(0)
 

@@ -35,10 +35,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         SDRAM.max_sdram_found = 0
 
     def tearDown(self):
-        #os.remove(self.spec_file)
-        #os.remove(self.report_file)
-        #os.rmdir(self.temp_dir)
-        pass
+        os.remove(self.spec_file)
+        os.remove(self.report_file)
+        os.rmdir(self.temp_dir)
 
     def get_next_word(self, count=1):
         self.spec_writer._file_container._flush()

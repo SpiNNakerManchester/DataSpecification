@@ -32,6 +32,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.report_reader = FileIO(self.report_file)
         self.dsg = DataSpecificationGenerator(self.spec_writer,
                                               self.report_writer)
+        SDRAM.max_sdram_found = 0
 
     def tearDown(self):
         os.remove(self.spec_file)
@@ -873,6 +874,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05000200)
 
     def test_save_write_pointer(self):
+        SDRAM(1000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.save_write_pointer(0)
 
@@ -1126,6 +1128,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x04420F0A)
 
     def test_write_array_working_subset(self):
+        SDRAM(1000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_array([0, 1, 2, 3], DataType.UINT32)
 

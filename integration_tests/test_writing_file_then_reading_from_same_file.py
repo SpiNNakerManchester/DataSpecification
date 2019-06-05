@@ -23,11 +23,11 @@ class MyTestCase(unittest.TestCase):
         self.writer.write(bytearray([1]))
         self.writer.close()
         with open(myfile, "rb") as f:
-            self.assertEqual(f.read(1), b'\x01')
-            self.assertEqual(f.read(1), b'')
+            self.assertEquals(f.read(1), b'\x01')
+            self.assertEquals(f.read(1), b'')
         self.reader = FileDataReader(myfile)
         stream = self.reader.read(1)
-        self.assertEqual(stream, b'\x01')
+        self.assertEquals(stream, b'\x01')
 
     def test_readinto_one_byte(self):
         myfile = self._file('txt_one_byte')
@@ -35,13 +35,13 @@ class MyTestCase(unittest.TestCase):
         self.writer.write(bytearray([5]))
         self.writer.close()
         with open(myfile, "rb") as f:
-            self.assertEqual(f.read(1), b'\x05')
-            self.assertEqual(f.read(1), b'')
+            self.assertEquals(f.read(1), b'\x05')
+            self.assertEquals(f.read(1), b'')
         self.reader = FileDataReader(myfile)
         ba = bytearray(1)
         self.reader.readinto(ba)
-        self.assertEqual(len(ba), 1)
-        self.assertEqual(ba[0], 5)
+        self.assertEquals(len(ba), 1)
+        self.assertEquals(ba[0], 5)
 
     def test_read_five_bytes(self):
         myfile = self._file('txt_5_bytes')
@@ -49,16 +49,16 @@ class MyTestCase(unittest.TestCase):
         self.writer.write(bytearray([1, 2, 3, 4, 5]))
         self.writer.close()
         with open(myfile, "rb") as f:
-            self.assertEqual(f.read(1), b'\x01')
-            self.assertEqual(f.read(1), b'\x02')
-            self.assertEqual(f.read(1), b'\x03')
-            self.assertEqual(f.read(1), b'\x04')
-            self.assertEqual(f.read(1), b'\x05')
-            self.assertEqual(f.read(1), b'')
+            self.assertEquals(f.read(1), b'\x01')
+            self.assertEquals(f.read(1), b'\x02')
+            self.assertEquals(f.read(1), b'\x03')
+            self.assertEquals(f.read(1), b'\x04')
+            self.assertEquals(f.read(1), b'\x05')
+            self.assertEquals(f.read(1), b'')
         self.reader = FileDataReader(myfile)
         stream = self.reader.read(5)
-        self.assertEqual(len(stream), 5)
-        self.assertEqual(stream, b'\x01\x02\x03\x04\x05')
+        self.assertEquals(len(stream), 5)
+        self.assertEquals(stream, b'\x01\x02\x03\x04\x05')
 
     def test_read_from_empty_file(self):
         myfile = self._file('txt_empty')
@@ -66,10 +66,10 @@ class MyTestCase(unittest.TestCase):
         self.writer.write(bytearray())
         self.writer.close()
         with open(myfile, "rb") as f:
-            self.assertEqual(f.read(1), b'')
+            self.assertEquals(f.read(1), b'')
         self.reader = FileDataReader(myfile)
         stream = self.reader.read(1)
-        self.assertEqual(len(stream), 0)
+        self.assertEquals(len(stream), 0)
 
     def test_read_truncate(self):
         myfile = self._file('txt_one_byte_from_multiple_bytes')
@@ -77,15 +77,15 @@ class MyTestCase(unittest.TestCase):
         self.writer.write(bytearray([0xF0, 0xA4, 0xAD, 0xA2]))
         self.writer.close()
         with open(myfile, "rb") as f:
-            self.assertEqual(f.read(1), b'\xf0')
-            self.assertEqual(f.read(1), b'\xA4')
-            self.assertEqual(f.read(1), b'\xAD')
-            self.assertEqual(f.read(1), b'\xA2')
-            self.assertEqual(f.read(1), b'')
+            self.assertEquals(f.read(1), b'\xf0')
+            self.assertEquals(f.read(1), b'\xA4')
+            self.assertEquals(f.read(1), b'\xAD')
+            self.assertEquals(f.read(1), b'\xA2')
+            self.assertEquals(f.read(1), b'')
         self.reader = FileDataReader(myfile)
         stream = self.reader.read(2)
-        self.assertEqual(len(stream), 2)
-        self.assertEqual(stream, b'\xf0\xa4')
+        self.assertEquals(len(stream), 2)
+        self.assertEquals(stream, b'\xf0\xa4')
 
 
 if __name__ == '__main__':

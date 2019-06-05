@@ -16,17 +16,17 @@ class Test(unittest.TestCase):
             split('.')
         data_specification_parts = data_specification.__version__.split('.')
 
-        self.assertEqual(spinn_utilities_parts[0],
+        self.assertEquals(spinn_utilities_parts[0],
                          data_specification_parts[0])
         self.assertLessEqual(spinn_utilities_parts[1],
                              data_specification_parts[1])
 
-        self.assertEqual(spinn_machine_parts[0],
+        self.assertEquals(spinn_machine_parts[0],
                          data_specification_parts[0])
         self.assertLessEqual(spinn_machine_parts[1],
                              data_specification_parts[1])
 
-        self.assertEqual(spinn_storage_handlers_parts[0],
+        self.assertEquals(spinn_storage_handlers_parts[0],
                          data_specification_parts[0])
         self.assertLessEqual(spinn_storage_handlers_parts[1],
                              data_specification_parts[1])

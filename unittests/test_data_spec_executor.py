@@ -39,7 +39,7 @@ class TestDataSpecExecutor(unittest.TestCase):
 
         # Test the size
         header_and_table_size = (constants.MAX_MEM_REGIONS + 2) * 4
-        self.assertEqual(
+        self.assertEquals(
             executor.get_constructed_data_size(),
             header_and_table_size + 100 + 200 + 4)
 
@@ -49,37 +49,37 @@ class TestDataSpecExecutor(unittest.TestCase):
 
         # Test region 0
         region_0 = executor.get_region(0)
-        self.assertEqual(region_0.allocated_size, 100)
-        self.assertEqual(region_0.max_write_pointer, 24)
+        self.assertEquals(region_0.allocated_size, 100)
+        self.assertEquals(region_0.max_write_pointer, 24)
         self.assertFalse(region_0.unfilled)
-        self.assertEqual(
+        self.assertEquals(
             region_0.region_data[:region_0.max_write_pointer],
             struct.pack("<IIIIII", 0, 1, 2, 0, 0, 4))
 
         # Test region 1
         region_1 = executor.get_region(1)
-        self.assertEqual(region_1.allocated_size, 200)
+        self.assertEquals(region_1.allocated_size, 200)
         self.assertTrue(region_1.unfilled)
 
         # Test region 2
         region_2 = executor.get_region(2)
-        self.assertEqual(region_2.allocated_size, 4)
-        self.assertEqual(region_2.region_data, struct.pack("<I", 10))
+        self.assertEquals(region_2.allocated_size, 4)
+        self.assertEquals(region_2.region_data, struct.pack("<I", 10))
 
         # Test the pointer table
         table = executor.get_pointer_table(0)
-        self.assertEqual(len(table), constants.MAX_MEM_REGIONS)
-        self.assertEqual(table[0], header_and_table_size)
-        self.assertEqual(table[1], header_and_table_size + 100)
-        self.assertEqual(table[2], header_and_table_size + 300)
+        self.assertEquals(len(table), constants.MAX_MEM_REGIONS)
+        self.assertEquals(table[0], header_and_table_size)
+        self.assertEquals(table[1], header_and_table_size + 100)
+        self.assertEquals(table[2], header_and_table_size + 300)
         for region in range(3, constants.MAX_MEM_REGIONS):
-            self.assertEqual(table[region], 0)
+            self.assertEquals(table[region], 0)
 
         # Test the header
         header = executor.get_header()
-        self.assertEqual(len(header), 2)
-        self.assertEqual(header[0], constants.APPDATA_MAGIC_NUM)
-        self.assertEqual(header[1], constants.DSE_VERSION)
+        self.assertEquals(len(header), 2)
+        self.assertEquals(header[0], constants.APPDATA_MAGIC_NUM)
+        self.assertEquals(header[1], constants.DSE_VERSION)
 
     def test_trivial_spec(self):
         temp_spec = mktemp()
@@ -120,10 +120,10 @@ class TestDataSpecExecutor(unittest.TestCase):
         executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
         executor.execute()
         r = executor.get_region(0)
-        self.assertEqual(r.allocated_size, 44)
-        self.assertEqual(r.max_write_pointer, 40)
+        self.assertEquals(r.allocated_size, 44)
+        self.assertEquals(r.max_write_pointer, 40)
         self.assertFalse(r.unfilled)
-        self.assertEqual(r.region_data, bytearray(
+        self.assertEquals(r.region_data, bytearray(
             "A321" "B321" "D321" "G321" "K321" "\0\0\0\0" "abcd" "pppp"
             "}\0\0\0" "\0\0\0\0" "\0\0\0\0".encode("ISO 8859-1")))
 

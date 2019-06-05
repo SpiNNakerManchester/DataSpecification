@@ -52,29 +52,29 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.spec_reader.read(4 * words)
 
     def test_new_data_spec_generator(self):
-        self.assertEqual(self.dsg.spec_writer, self.spec_writer)
-        self.assertEqual(self.dsg.report_writer, self.report_writer)
-        self.assertEqual(self.dsg.instruction_counter, 0)
-        self.assertEqual(self.dsg.mem_slots,
+        self.assertEquals(self.dsg.spec_writer, self.spec_writer)
+        self.assertEquals(self.dsg.report_writer, self.report_writer)
+        self.assertEquals(self.dsg.instruction_counter, 0)
+        self.assertEquals(self.dsg.mem_slots,
                          constants.MAX_MEM_REGIONS * [None])
-        self.assertEqual(self.dsg.function_slots,
+        self.assertEquals(self.dsg.function_slots,
                          constants.MAX_CONSTRUCTORS * [None])
-        self.assertEqual(self.dsg.struct_slots,
+        self.assertEquals(self.dsg.struct_slots,
                          constants.MAX_STRUCT_SLOTS * [None])
 
     def test_define_break(self):
         self.dsg.define_break()
         # BREAK added more words
-        self.assertEqual(self.get_next_word(), 0x00000000)
+        self.assertEquals(self.get_next_word(), 0x00000000)
         # NOP wrong command word
-        self.assertEqual(self.spec_reader.read(1), b"")
+        self.assertEquals(self.spec_reader.read(1), b"")
 
     def test_no_operation(self):
         self.dsg.no_operation()
         # NOP added more words
-        self.assertEqual(self.get_next_word(), 0x00100000)
+        self.assertEquals(self.get_next_word(), 0x00100000)
         # RESERVE wrong command word for memory region 1
-        self.assertEqual(self.spec_reader.read(1), b"")
+        self.assertEquals(self.spec_reader.read(1), b"")
 
     def test_reserve_memory_region(self):
         # Create a sdram just to set max chip size
@@ -92,29 +92,29 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.reserve_memory_region(1, 0x100)
 
         # RESERVE for memory region 1
-        self.assertEqual(self.get_next_word(2), [0x10200041, 0x111])
+        self.assertEquals(self.get_next_word(2), [0x10200041, 0x111])
         # RESERVE for memory region 2
-        self.assertEqual(self.get_next_word(2), [0x10200042, 0x1122])
+        self.assertEquals(self.get_next_word(2), [0x10200042, 0x1122])
         # RESERVE for memory region 3
-        self.assertEqual(self.get_next_word(2), [0x102000C3, 0x1122])
+        self.assertEquals(self.get_next_word(2), [0x102000C3, 0x1122])
         # RESERVE for memory region 4
-        self.assertEqual(self.get_next_word(2), [0x10200044, 0x3344])
+        self.assertEquals(self.get_next_word(2), [0x10200044, 0x3344])
         # Memory region 1 DSG data wrong
-        self.assertEqual(self.dsg.mem_slots[1].size, 0x111)
+        self.assertEquals(self.dsg.mem_slots[1].size, 0x111)
         self.assertIsNone(self.dsg.mem_slots[1].label)
-        self.assertEqual(self.dsg.mem_slots[1].empty, False)
+        self.assertEquals(self.dsg.mem_slots[1].empty, False)
         # Memory region 2 DSG data wrong
-        self.assertEqual(self.dsg.mem_slots[2].size, 0x1122)
+        self.assertEquals(self.dsg.mem_slots[2].size, 0x1122)
         self.assertIsNone(self.dsg.mem_slots[2].label)
-        self.assertEqual(self.dsg.mem_slots[2].empty, False)
+        self.assertEquals(self.dsg.mem_slots[2].empty, False)
         # Memory region 3 DSG data wrong
-        self.assertEqual(self.dsg.mem_slots[3].size, 0x1122)
+        self.assertEquals(self.dsg.mem_slots[3].size, 0x1122)
         self.assertIsNone(self.dsg.mem_slots[3].label)
-        self.assertEqual(self.dsg.mem_slots[3].empty, True)
+        self.assertEquals(self.dsg.mem_slots[3].empty, True)
         # FREE wrong command word
-        self.assertEqual(self.dsg.mem_slots[4].size, 0x3344)
-        self.assertEqual(self.dsg.mem_slots[4].label, "test")
-        self.assertEqual(self.dsg.mem_slots[4].empty, False)
+        self.assertEquals(self.dsg.mem_slots[4].size, 0x3344)
+        self.assertEquals(self.dsg.mem_slots[4].label, "test")
+        self.assertEquals(self.dsg.mem_slots[4].empty, False)
 
     def test_free_memory_region(self):
         # Create a sdram just to set max chip size
@@ -125,7 +125,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.skip_words(2)
         # FREE not cleared mem slot entry
         # START_STRUCT
-        self.assertEqual(self.get_next_word(), 0x00300001)
+        self.assertEquals(self.get_next_word(), 0x00300001)
 
         with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.free_memory_region(-1)
@@ -155,17 +155,17 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
 
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(), 0x01000000)
-        self.assertEqual(self.get_next_word(2), [0x11100000, 0x000000AB])
-        self.assertEqual(self.get_next_word(), 0x01200000)
-        self.assertEqual(self.get_next_word(), 0x01000001)
-        self.assertEqual(self.get_next_word(2), [0x11100000, 0x000000AB])
-        self.assertEqual(self.get_next_word(2), [0x11100002, 0x12345679])
-        self.assertEqual(self.get_next_word(), 0x01100005)
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(), 0x01000000)
+        self.assertEquals(self.get_next_word(2), [0x11100000, 0x000000AB])
+        self.assertEquals(self.get_next_word(), 0x01200000)
+        self.assertEquals(self.get_next_word(), 0x01000001)
+        self.assertEquals(self.get_next_word(2), [0x11100000, 0x000000AB])
+        self.assertEquals(self.get_next_word(2), [0x11100002, 0x12345679])
+        self.assertEquals(self.get_next_word(), 0x01100005)
+        self.assertEquals(self.get_next_word(3),
                          [0x21100003, 0x90ABCDEF, 0x12345678])
         # Call addition signed and unsigned
-        self.assertEqual(self.get_next_word(), 0x01200000)
+        self.assertEquals(self.get_next_word(), 0x01200000)
 
     def test_call_arithmetic_operation(self):
         self.dsg.call_arithmetic_operation(2, 0x12, ArithmeticOperation.ADD,
@@ -236,19 +236,19 @@ class TestDataSpecGeneration(unittest.TestCase):
                                                2, 1, False)
 
         # ARITH_OP
-        self.assertEqual(self.get_next_word(3), [0x26742000, 0x12, 0x34])
-        self.assertEqual(self.get_next_word(3), [0x267C2000, 0x1234, 0x5678])
-        self.assertEqual(self.get_next_word(3), [0x26743001, 0x1234, 0x3456])
-        self.assertEqual(self.get_next_word(3), [0x267C3001, 0x1234, 0x3456])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3), [0x26742000, 0x12, 0x34])
+        self.assertEquals(self.get_next_word(3), [0x267C2000, 0x1234, 0x5678])
+        self.assertEquals(self.get_next_word(3), [0x26743001, 0x1234, 0x3456])
+        self.assertEquals(self.get_next_word(3), [0x267C3001, 0x1234, 0x3456])
+        self.assertEquals(self.get_next_word(3),
                          [0x26743002, 0x12345678, 0x3456])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x267C3002, 0x1234, 0x3456ABCD])
-        self.assertEqual(self.get_next_word(2), [0x16763100, 0x3456])
-        self.assertEqual(self.get_next_word(2), [0x16753020, 0x1])
-        self.assertEqual(self.get_next_word(), 0x06773340)
-        self.assertEqual(self.get_next_word(), 0x06773342)
-        self.assertEqual(self.get_next_word(), 0x067F3342)
+        self.assertEquals(self.get_next_word(2), [0x16763100, 0x3456])
+        self.assertEquals(self.get_next_word(2), [0x16753020, 0x1])
+        self.assertEquals(self.get_next_word(), 0x06773340)
+        self.assertEquals(self.get_next_word(), 0x06773342)
+        self.assertEquals(self.get_next_word(), 0x067F3342)
 
     def test_align_write_pointer(self):
 
@@ -288,11 +288,11 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # WRITE_POINTER
-        self.assertEqual(self.get_next_word(), 0x06500001)
-        self.assertEqual(self.get_next_word(), 0x0650001F)
-        self.assertEqual(self.get_next_word(), 0x06520500)
-        self.assertEqual(self.get_next_word(), 0x06542001)
-        self.assertEqual(self.get_next_word(), 0x06563500)
+        self.assertEquals(self.get_next_word(), 0x06500001)
+        self.assertEquals(self.get_next_word(), 0x0650001F)
+        self.assertEquals(self.get_next_word(), 0x06520500)
+        self.assertEquals(self.get_next_word(), 0x06542001)
+        self.assertEquals(self.get_next_word(), 0x06563500)
 
     def test_break_loop(self):
         with self.assertRaises(InvalidCommandException):
@@ -303,7 +303,7 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(2)
         # BREAK_LOOP
-        self.assertEqual(self.get_next_word(), 0x05200000)
+        self.assertEquals(self.get_next_word(), 0x05200000)
 
     def test_call_function(self):
         self.dsg.start_function(0, [])
@@ -346,9 +346,9 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(16)
         # CONSTRUCT
-        self.assertEqual(self.get_next_word(), 0x04000000)
-        self.assertEqual(self.get_next_word(), 0x14000100)
-        self.assertEqual(self.get_next_word(), 0x00002040)
+        self.assertEquals(self.get_next_word(), 0x04000000)
+        self.assertEquals(self.get_next_word(), 0x14000100)
+        self.assertEquals(self.get_next_word(), 0x00002040)
 
     def test_start_function(self):
         self.dsg.start_function(0, [])
@@ -376,9 +376,9 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.end_function()
 
         # START_CONSTRUCTOR
-        self.assertEqual(self.get_next_word(), 0x02000000)
+        self.assertEquals(self.get_next_word(), 0x02000000)
         self.skip_words(2)
-        self.assertEqual(self.get_next_word(), 0x02000B03)
+        self.assertEquals(self.get_next_word(), 0x02000B03)
         self.skip_words(2)
 
     def test_end_function(self):
@@ -390,7 +390,7 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(1)
         # END_CONSTRUCTOR
-        self.assertEqual(self.get_next_word(), 0x02500000)
+        self.assertEquals(self.get_next_word(), 0x02500000)
 
     def test_logical_and(self):
         self.dsg.logical_and(0, 0x12, 0x34, False, False)
@@ -419,14 +419,14 @@ class TestDataSpecGeneration(unittest.TestCase):
                                  False, True)
 
         # Logical AND
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26840003, 0x00000012, 0x00000034])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26841003, 0x12345678, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16863203, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16854053, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x06874353)
-        self.assertEqual(self.get_next_word(), 0x06873333)
+        self.assertEquals(self.get_next_word(2), [0x16863203, 0xABCDEF14])
+        self.assertEquals(self.get_next_word(2), [0x16854053, 0x12345678])
+        self.assertEquals(self.get_next_word(), 0x06874353)
+        self.assertEquals(self.get_next_word(), 0x06873333)
 
     def test_logical_or(self):
         self.dsg.logical_or(0, 0x12, 0x34, False, False)
@@ -455,14 +455,14 @@ class TestDataSpecGeneration(unittest.TestCase):
                                 False, True)
 
         # Logical OR
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26840002, 0x00000012, 0x00000034])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26841002, 0x12345678, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16863202, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16854052, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x06874352)
-        self.assertEqual(self.get_next_word(), 0x06873332)
+        self.assertEquals(self.get_next_word(2), [0x16863202, 0xABCDEF14])
+        self.assertEquals(self.get_next_word(2), [0x16854052, 0x12345678])
+        self.assertEquals(self.get_next_word(), 0x06874352)
+        self.assertEquals(self.get_next_word(), 0x06873332)
 
     def test_logical_xor(self):
         self.dsg.logical_xor(0, 0x12, 0x34, False, False)
@@ -491,14 +491,14 @@ class TestDataSpecGeneration(unittest.TestCase):
                                  False, True)
 
         # Logical XOR
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26840004, 0x00000012, 0x00000034])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26841004, 0x12345678, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16863204, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16854054, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x06874354)
-        self.assertEqual(self.get_next_word(), 0x06873334)
+        self.assertEquals(self.get_next_word(2), [0x16863204, 0xABCDEF14])
+        self.assertEquals(self.get_next_word(2), [0x16854054, 0x12345678])
+        self.assertEquals(self.get_next_word(), 0x06874354)
+        self.assertEquals(self.get_next_word(), 0x06873334)
 
     def test_logical_left_shift(self):
         self.dsg.logical_left_shift(0, 0x12, 0x34, False, False)
@@ -527,14 +527,14 @@ class TestDataSpecGeneration(unittest.TestCase):
                                         False, True)
 
         # Logical LEFT_SHIFT
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26840000, 0x00000012, 0x00000034])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26841000, 0x12345678, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16863200, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16854050, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x06874350)
-        self.assertEqual(self.get_next_word(), 0x06873330)
+        self.assertEquals(self.get_next_word(2), [0x16863200, 0xABCDEF14])
+        self.assertEquals(self.get_next_word(2), [0x16854050, 0x12345678])
+        self.assertEquals(self.get_next_word(), 0x06874350)
+        self.assertEquals(self.get_next_word(), 0x06873330)
 
     def test_logical_not(self):
         self.dsg.logical_not(1, 0x12345678, False)
@@ -551,8 +551,8 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.logical_not(1, constants.MAX_REGISTERS, True)
 
         # Logical NOT
-        self.assertEqual(self.get_next_word(2), [0x16841005, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x06863205)
+        self.assertEquals(self.get_next_word(2), [0x16841005, 0x12345678])
+        self.assertEquals(self.get_next_word(), 0x06863205)
 
     def test_logical_right_shift(self):
         self.dsg.logical_right_shift(0, 0x12, 0x34, False, False)
@@ -581,22 +581,22 @@ class TestDataSpecGeneration(unittest.TestCase):
                                          False, True)
 
         # Logical RIGHT_SHIFT
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26840001, 0x00000012, 0x00000034])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x26841001, 0x12345678, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16863201, 0xABCDEF14])
-        self.assertEqual(self.get_next_word(2), [0x16854051, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x06874351)
-        self.assertEqual(self.get_next_word(), 0x06873331)
+        self.assertEquals(self.get_next_word(2), [0x16863201, 0xABCDEF14])
+        self.assertEquals(self.get_next_word(2), [0x16854051, 0x12345678])
+        self.assertEquals(self.get_next_word(), 0x06874351)
+        self.assertEquals(self.get_next_word(), 0x06873331)
 
     def test_comment(self):
         self.dsg.comment("test")
 
         # Comment generated data specification
         self.report_writer._file_container._flush()
-        self.assertEqual(self.spec_writer.tell(), 0)
-        self.assertEqual(self.report_reader.read(), b"test\n")
+        self.assertEquals(self.spec_writer.tell(), 0)
+        self.assertEquals(self.report_reader.read(), b"test\n")
 
     def test_copy_structure(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -634,11 +634,11 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(11)
         # COPY_STRUCT
-        self.assertEqual(self.get_next_word(), 0x07002000)
-        self.assertEqual(self.get_next_word(), 0x07003100)
-        self.assertEqual(self.get_next_word(), 0x07024100)
-        self.assertEqual(self.get_next_word(), 0x07043000)
-        self.assertEqual(self.get_next_word(), 0x07064300)
+        self.assertEquals(self.get_next_word(), 0x07002000)
+        self.assertEquals(self.get_next_word(), 0x07003100)
+        self.assertEquals(self.get_next_word(), 0x07024100)
+        self.assertEquals(self.get_next_word(), 0x07043000)
+        self.assertEquals(self.get_next_word(), 0x07064300)
 
     def test_copy_structure_parameter(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB),
@@ -703,12 +703,12 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(13)
         # COPY_PARAM
-        self.assertEqual(self.get_next_word(2), [0x17101000, 0x00000000])
-        self.assertEqual(self.get_next_word(2), [0x17140000, 0x00000000])
-        self.assertEqual(self.get_next_word(2), [0x17101000, 0x00000201])
-        self.assertEqual(self.get_next_word(2), [0x17142000, 0x00000001])
-        self.assertEqual(self.get_next_word(2), [0x17143100, 0x00000000])
-        self.assertEqual(self.get_next_word(2), [0x17142100, 0x00000002])
+        self.assertEquals(self.get_next_word(2), [0x17101000, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x17140000, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x17101000, 0x00000201])
+        self.assertEquals(self.get_next_word(2), [0x17142000, 0x00000001])
+        self.assertEquals(self.get_next_word(2), [0x17143100, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x17142100, 0x00000002])
 
     def test_start_loop(self):
         self.dsg.start_loop(0, 1, 2)
@@ -742,28 +742,28 @@ class TestDataSpecGeneration(unittest.TestCase):
                                 True)
 
         # LOOP
-        self.assertEqual(self.get_next_word(4), [0x35100000, 1, 2, 1])
-        self.assertEqual(self.get_next_word(4),
+        self.assertEquals(self.get_next_word(4), [0x35100000, 1, 2, 1])
+        self.assertEquals(self.get_next_word(4),
                          [0x35100002, 0x02345678, 0x0ABBCCDD, 0x00000001])
-        self.assertEqual(self.get_next_word(4), [0x35100000, 1, 2, 5])
-        self.assertEqual(self.get_next_word(4),
+        self.assertEquals(self.get_next_word(4), [0x35100000, 1, 2, 5])
+        self.assertEquals(self.get_next_word(4),
                          [0x35100001, 0x02345678, 0x0ABBCCDD, 0x01111111])
-        self.assertEqual(self.get_next_word(4),
+        self.assertEquals(self.get_next_word(4),
                          [0x35100000, 0x0000000A, 0x00000002, 0xFFFFFFFF])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x25142001, 0x00000003, 0x00000004])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x25120301, 0x00000005, 0x00000004])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x25110052, 0x00000002, 0x00000003])
-        self.assertEqual(self.get_next_word(), 0x05172341)
-        self.assertEqual(self.get_next_word(4), [0x35100005, 1, 1, 1])
-        self.assertEqual(self.get_next_word(), 0x05171111)
+        self.assertEquals(self.get_next_word(), 0x05172341)
+        self.assertEquals(self.get_next_word(4), [0x35100005, 1, 1, 1])
+        self.assertEquals(self.get_next_word(), 0x05171111)
 
     def test_end_loop(self):
         self.dsg.end_loop()
         # END_LOOP
-        self.assertEqual(self.get_next_word(), 0x05300000)
+        self.assertEquals(self.get_next_word(), 0x05300000)
 
     def test_start_conditional(self):
         self.dsg.start_conditional(0, Condition.EQUAL, 0, False)
@@ -791,16 +791,16 @@ class TestDataSpecGeneration(unittest.TestCase):
                                        constants.MAX_REGISTERS, True)
 
         # IF
-        self.assertEqual(self.get_next_word(2), [0x15520000, 0x00000000])
-        self.assertEqual(self.get_next_word(2), [0x15520200, 0x00000001])
-        self.assertEqual(self.get_next_word(2), [0x15520301, 0x00000001])
-        self.assertEqual(self.get_next_word(2), [0x15520402, 0x00000003])
-        self.assertEqual(self.get_next_word(2), [0x15520403, 0x00000003])
-        self.assertEqual(self.get_next_word(2), [0x15520404, 0x00000005])
-        self.assertEqual(self.get_next_word(2), [0x15520205, 0x00000005])
-        self.assertEqual(self.get_next_word(), 0x05530010)
-        self.assertEqual(self.get_next_word(), 0x05530433)
-        self.assertEqual(self.get_next_word(), 0x05530255)
+        self.assertEquals(self.get_next_word(2), [0x15520000, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x15520200, 0x00000001])
+        self.assertEquals(self.get_next_word(2), [0x15520301, 0x00000001])
+        self.assertEquals(self.get_next_word(2), [0x15520402, 0x00000003])
+        self.assertEquals(self.get_next_word(2), [0x15520403, 0x00000003])
+        self.assertEquals(self.get_next_word(2), [0x15520404, 0x00000005])
+        self.assertEquals(self.get_next_word(2), [0x15520205, 0x00000005])
+        self.assertEquals(self.get_next_word(), 0x05530010)
+        self.assertEquals(self.get_next_word(), 0x05530433)
+        self.assertEquals(self.get_next_word(), 0x05530255)
 
     def test_else_conditional(self):
         with self.assertRaises(InvalidCommandException):
@@ -820,9 +820,9 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(1)
         # ELSE
-        self.assertEqual(self.get_next_word(), 0x05600000)
+        self.assertEquals(self.get_next_word(), 0x05600000)
         self.skip_words(2)
-        self.assertEqual(self.get_next_word(), 0x05600000)
+        self.assertEquals(self.get_next_word(), 0x05600000)
 
     def test_end_conditional(self):
         # Create a sdram just to set max chip size
@@ -845,9 +845,9 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(1)
         # END_IF
-        self.assertEqual(self.get_next_word(), 0x05700000)
+        self.assertEquals(self.get_next_word(), 0x05700000)
         self.skip_words(3)
-        self.assertEqual(self.get_next_word(), 0x05700000)
+        self.assertEquals(self.get_next_word(), 0x05700000)
 
     def test_switch_write_focus(self):
         # Create a sdram just to set max chip size
@@ -870,8 +870,8 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(6)
         # SWITCH_FOCUS
-        self.assertEqual(self.get_next_word(), 0x05000000)
-        self.assertEqual(self.get_next_word(), 0x05000200)
+        self.assertEquals(self.get_next_word(), 0x05000000)
+        self.assertEquals(self.get_next_word(), 0x05000200)
 
     def test_save_write_pointer(self):
         SDRAM(1000)
@@ -894,8 +894,8 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # GET_WR_PTR
-        self.assertEqual(self.get_next_word(), 0x06340000)
-        self.assertEqual(self.get_next_word(), 0x06345000)
+        self.assertEquals(self.get_next_word(), 0x06340000)
+        self.assertEquals(self.get_next_word(), 0x06345000)
 
     def test_print_struct(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -921,10 +921,10 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(11)
         # PRINT_STRUCT
-        self.assertEqual(self.get_next_word(), 0x08200000)
-        self.assertEqual(self.get_next_word(), 0x08200001)
-        self.assertEqual(self.get_next_word(), 0x08220200)
-        self.assertEqual(self.get_next_word(), 0x08220300)
+        self.assertEquals(self.get_next_word(), 0x08200000)
+        self.assertEquals(self.get_next_word(), 0x08200001)
+        self.assertEquals(self.get_next_word(), 0x08220200)
+        self.assertEquals(self.get_next_word(), 0x08220300)
 
     def test_print_text(self):
         self.dsg.print_text("t")
@@ -937,12 +937,12 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.print_text("test123456789")
 
         # PRINT_TEXT
-        self.assertEqual(self.get_next_word(2), [0x18100000, 0x00000074])
-        self.assertEqual(self.get_next_word(2), [0x18100001, 0x00006574])
-        self.assertEqual(self.get_next_word(2), [0x18100003, 0x74736574])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(2), [0x18100000, 0x00000074])
+        self.assertEquals(self.get_next_word(2), [0x18100001, 0x00006574])
+        self.assertEquals(self.get_next_word(2), [0x18100003, 0x74736574])
+        self.assertEquals(self.get_next_word(3),
                          [0x28100007, 0x74736574, 0x34333231])
-        self.assertEqual(self.get_next_word(4),
+        self.assertEquals(self.get_next_word(4),
                          [0x3810000B, 0x74736574, 0x34333231, 0x38373635])
 
     def test_print_value(self):
@@ -965,13 +965,13 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.print_value(0x12345678, False, DataType.INT16)
 
         # PRINT_VAL
-        self.assertEqual(self.get_next_word(2), [0x18000000, 0x00000078])
-        self.assertEqual(self.get_next_word(2), [0x18000002, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x08020002)
-        self.assertEqual(self.get_next_word(), 0x08020202)
-        self.assertEqual(self.get_next_word(), 0x08020206)
-        self.assertEqual(self.get_next_word(), 0x08020207)
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(2), [0x18000000, 0x00000078])
+        self.assertEquals(self.get_next_word(2), [0x18000002, 0x12345678])
+        self.assertEquals(self.get_next_word(), 0x08020002)
+        self.assertEquals(self.get_next_word(), 0x08020202)
+        self.assertEquals(self.get_next_word(), 0x08020206)
+        self.assertEquals(self.get_next_word(), 0x08020207)
+        self.assertEquals(self.get_next_word(3),
                          [0x28000003, 0x90ABCDEF, 0x12345678])
 
     def test_set_register_value(self):
@@ -997,14 +997,14 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.set_register_value(0, 0, True)
 
         # MV
-        self.assertEqual(self.get_next_word(2), [0x16040000, 0x00000000])
-        self.assertEqual(self.get_next_word(2), [0x16041000, 0x12345678])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(2), [0x16040000, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x16041000, 0x12345678])
+        self.assertEquals(self.get_next_word(3),
                          [0x26042000, 0x90ABCDEF, 0x12345678])
-        self.assertEqual(self.get_next_word(2), [0x16042000, 0x01234567])
-        self.assertEqual(self.get_next_word(2), [0x16043000, 0x00000067])
-        self.assertEqual(self.get_next_word(), 0x06063200)
-        self.assertEqual(self.get_next_word(), 0x06063200)
+        self.assertEquals(self.get_next_word(2), [0x16042000, 0x01234567])
+        self.assertEquals(self.get_next_word(2), [0x16043000, 0x00000067])
+        self.assertEquals(self.get_next_word(), 0x06063200)
+        self.assertEquals(self.get_next_word(), 0x06063200)
 
     def test_set_write_pointer(self):
         # Create a sdram just to set max chip size
@@ -1032,12 +1032,12 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # SET_WR_PTR
-        self.assertEqual(self.get_next_word(2), [0x16400000, 0x12345678])
-        self.assertEqual(self.get_next_word(2), [0x16400000, 0x00000078])
-        self.assertEqual(self.get_next_word(2), [0x16400001, 0x00000012])
-        self.assertEqual(self.get_next_word(2), [0x16400001, 0xFFFFFFF4])
-        self.assertEqual(self.get_next_word(), 0x06420101)
-        self.assertEqual(self.get_next_word(), 0x06420300)
+        self.assertEquals(self.get_next_word(2), [0x16400000, 0x12345678])
+        self.assertEquals(self.get_next_word(2), [0x16400000, 0x00000078])
+        self.assertEquals(self.get_next_word(2), [0x16400001, 0x00000012])
+        self.assertEquals(self.get_next_word(2), [0x16400001, 0xFFFFFFF4])
+        self.assertEquals(self.get_next_word(), 0x06420101)
+        self.assertEquals(self.get_next_word(), 0x06420300)
 
     def test_write_value(self):
         # Create a sdram just to set max chip size
@@ -1072,18 +1072,18 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # WRITE
-        self.assertEqual(self.get_next_word(2), [0x14202001, 0x00000000])
-        self.assertEqual(self.get_next_word(2), [0x14202001, 0x00000012])
-        self.assertEqual(self.get_next_word(2), [0x14202001, 0x12345678])
-        self.assertEqual(self.get_next_word(2), [0x14202002, 0x12345678])
-        self.assertEqual(self.get_next_word(2), [0x1420200C, 0x00000012])
-        self.assertEqual(self.get_next_word(2), [0x142000FF, 0x00000012])
-        self.assertEqual(self.get_next_word(2), [0x14201005, 0x00000012])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(2), [0x14202001, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x14202001, 0x00000012])
+        self.assertEquals(self.get_next_word(2), [0x14202001, 0x12345678])
+        self.assertEquals(self.get_next_word(2), [0x14202002, 0x12345678])
+        self.assertEquals(self.get_next_word(2), [0x1420200C, 0x00000012])
+        self.assertEquals(self.get_next_word(2), [0x142000FF, 0x00000012])
+        self.assertEquals(self.get_next_word(2), [0x14201005, 0x00000012])
+        self.assertEquals(self.get_next_word(3),
                          [0x24203005, 0x90ABCDEF, 0x12345678])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x24213050, 0x90ABCDEF, 0x12345678])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(3),
                          [0x24213020, 0x00000123, 0x00000000])
 
     def test_write_structure(self):
@@ -1120,12 +1120,12 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(15)
         # WRITE_STRUCT
-        self.assertEqual(self.get_next_word(), 0x04400100)
-        self.assertEqual(self.get_next_word(), 0x04400200)
-        self.assertEqual(self.get_next_word(), 0x04420500)
-        self.assertEqual(self.get_next_word(), 0x04420501)
-        self.assertEqual(self.get_next_word(), 0x04400F0A)
-        self.assertEqual(self.get_next_word(), 0x04420F0A)
+        self.assertEquals(self.get_next_word(), 0x04400100)
+        self.assertEquals(self.get_next_word(), 0x04400200)
+        self.assertEquals(self.get_next_word(), 0x04420500)
+        self.assertEquals(self.get_next_word(), 0x04420501)
+        self.assertEquals(self.get_next_word(), 0x04400F0A)
+        self.assertEquals(self.get_next_word(), 0x04420F0A)
 
     def test_write_array_working_subset(self):
         SDRAM(1000)
@@ -1140,8 +1140,8 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # WRITE_ARRAY
-        self.assertEqual(self.get_next_word(2), [0x14300004, 0])
-        self.assertEqual(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
+        self.assertEquals(self.get_next_word(2), [0x14300004, 0])
+        self.assertEquals(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
 
     @unittest.skip("buggy")
     def test_write_array(self):
@@ -1161,14 +1161,14 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # WRITE_ARRAY
-        self.assertEqual(self.get_next_word(2), [0x14300001, 0])
-        self.assertEqual(self.get_next_word(3), [0x14300001, 4, 0x03020100])
-        self.assertEqual(self.get_next_word(4),
+        self.assertEquals(self.get_next_word(2), [0x14300001, 0])
+        self.assertEquals(self.get_next_word(3), [0x14300001, 4, 0x03020100])
+        self.assertEquals(self.get_next_word(4),
                          [0x14300002, 4, 0x00010000, 0x00030002])
-        self.assertEqual(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
-        self.assertEqual(self.get_next_word(5),
+        self.assertEquals(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
+        self.assertEquals(self.get_next_word(5),
                          [0x14300002, 5, 0x00010000, 0x00030002, 0x00000004])
-        self.assertEqual(self.get_next_word(4),
+        self.assertEquals(self.get_next_word(4),
                          [0x14300001, 5, 0x03020100, 0x00000004])
 
     def test_set_structure_value(self):
@@ -1211,20 +1211,20 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(16)
         # WRITE_PARAM
-        self.assertEqual(self.get_next_word(2), [0x17200000, 0x00000012])
-        self.assertEqual(self.get_next_word(2), [0x17201002, 0x00001234])
-        self.assertEqual(self.get_next_word(2), [0x17201001, 0x12345678])
-        self.assertEqual(self.get_next_word(3),
+        self.assertEquals(self.get_next_word(2), [0x17200000, 0x00000012])
+        self.assertEquals(self.get_next_word(2), [0x17201002, 0x00001234])
+        self.assertEquals(self.get_next_word(2), [0x17201001, 0x12345678])
+        self.assertEquals(self.get_next_word(3),
                          [0x2720A001, 0x90ABCDEF, 0x12345678])
-        self.assertEqual(self.get_next_word(), 0x07221200)
-        self.assertEqual(self.get_next_word(), 0x07221301)
-        self.assertEqual(self.get_next_word(), 0x0722A501)
+        self.assertEquals(self.get_next_word(), 0x07221200)
+        self.assertEquals(self.get_next_word(), 0x07221301)
+        self.assertEquals(self.get_next_word(), 0x0722A501)
 
     def test_end_specification(self):
         self.dsg.end_specification(False)
 
         # END_SPEC
-        self.assertEqual(self.get_next_word(), 0x0FF00000)
+        self.assertEquals(self.get_next_word(), 0x0FF00000)
 
         self.dsg.end_specification()
         with self.assertRaises(ValueError):
@@ -1254,8 +1254,8 @@ class TestDataSpecGeneration(unittest.TestCase):
                 2, RandomNumberGenerator.MERSENNE_TWISTER, -1)
 
         # DECLARE_RNG
-        self.assertEqual(self.get_next_word(2), [0x10500000, 0x12345678])
-        self.assertEqual(self.get_next_word(2), [0x10503000, 0x00000012])
+        self.assertEquals(self.get_next_word(2), [0x10500000, 0x12345678])
+        self.assertEquals(self.get_next_word(2), [0x10503000, 0x00000012])
 
     def test_declare_uniform_random_distribution(self):
         self.dsg.declare_random_number_generator(
@@ -1292,35 +1292,35 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.declare_uniform_random_distribution(0, 1, 3, 100, 200)
 
         # DECLARE_RNG
-        self.assertEqual(self.get_next_word(2), [0x10503000, 0x12345678])
+        self.assertEquals(self.get_next_word(2), [0x10503000, 0x12345678])
         # START_STRUCT
-        self.assertEqual(self.get_next_word(), 0x01000000)
+        self.assertEquals(self.get_next_word(), 0x01000000)
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x11100002, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x11100002, 0x00000000])
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x11100002, 0x00000003])
+        self.assertEquals(self.get_next_word(2), [0x11100002, 0x00000003])
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x1110000C, 0x00050000])
+        self.assertEquals(self.get_next_word(2), [0x1110000C, 0x00050000])
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x1110000C, 0x00320000])
+        self.assertEquals(self.get_next_word(2), [0x1110000C, 0x00320000])
         # END_STRUCT
-        self.assertEqual(self.get_next_word(), 0x01200000)
+        self.assertEquals(self.get_next_word(), 0x01200000)
         # DECLARE_RANDOM_DIST
-        self.assertEqual(self.get_next_word(), 0x00600000)
+        self.assertEquals(self.get_next_word(), 0x00600000)
         # START_STRUCT
-        self.assertEqual(self.get_next_word(), 0x01000004)
+        self.assertEquals(self.get_next_word(), 0x01000004)
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x11100002, 0x00000000])
+        self.assertEquals(self.get_next_word(2), [0x11100002, 0x00000000])
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x11100002, 0x00000003])
+        self.assertEquals(self.get_next_word(2), [0x11100002, 0x00000003])
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x1110000C, 0x00190000])
+        self.assertEquals(self.get_next_word(2), [0x1110000C, 0x00190000])
         # STRUCT_ELEM
-        self.assertEqual(self.get_next_word(2), [0x1110000C, 0x00640000])
+        self.assertEquals(self.get_next_word(2), [0x1110000C, 0x00640000])
         # END_STRUCT
-        self.assertEqual(self.get_next_word(), 0x01200000)
+        self.assertEquals(self.get_next_word(), 0x01200000)
         # DECLARE_RANDOM_DIST
-        self.assertEqual(self.get_next_word(), 0x00600204)
+        self.assertEquals(self.get_next_word(), 0x00600204)
 
     def test_call_random_distribution(self):
         self.dsg.declare_random_number_generator(
@@ -1344,8 +1344,8 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(13)
         # GET_RANDOM_NUMBER
-        self.assertEqual(self.get_next_word(), 0x00741003)
-        self.assertEqual(self.get_next_word(), 0x00745003)
+        self.assertEquals(self.get_next_word(), 0x00741003)
+        self.assertEquals(self.get_next_word(), 0x00745003)
 
     def test_get_structure_value(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -1389,13 +1389,13 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(14)
         # READ_PARAM
-        self.assertEqual(self.get_next_word(), 0x07340000)
-        self.assertEqual(self.get_next_word(), 0x07343000)
-        self.assertEqual(self.get_next_word(), 0x07342011)
-        self.assertEqual(self.get_next_word(), 0x07343031)
-        self.assertEqual(self.get_next_word(), 0x07363301)
-        self.assertEqual(self.get_next_word(), 0x07363000)
-        self.assertEqual(self.get_next_word(), 0x07363500)
+        self.assertEquals(self.get_next_word(), 0x07340000)
+        self.assertEquals(self.get_next_word(), 0x07343000)
+        self.assertEquals(self.get_next_word(), 0x07342011)
+        self.assertEquals(self.get_next_word(), 0x07343031)
+        self.assertEquals(self.get_next_word(), 0x07363301)
+        self.assertEquals(self.get_next_word(), 0x07363000)
+        self.assertEquals(self.get_next_word(), 0x07363500)
 
     def test_read_value(self):
         self.dsg.read_value(0, DataType.UINT32)
@@ -1412,13 +1412,13 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.read_value(constants.MAX_REGISTERS, DataType.UINT32)
 
         # READ
-        self.assertEqual(self.get_next_word(), 0x04140004)
-        self.assertEqual(self.get_next_word(), 0x04141008)
-        self.assertEqual(self.get_next_word(), 0x04142004)
-        self.assertEqual(self.get_next_word(), 0x04143008)
-        self.assertEqual(self.get_next_word(), 0x04144001)
-        self.assertEqual(self.get_next_word(), 0x04145001)
-        self.assertEqual(self.get_next_word(), 0x04146002)
+        self.assertEquals(self.get_next_word(), 0x04140004)
+        self.assertEquals(self.get_next_word(), 0x04141008)
+        self.assertEquals(self.get_next_word(), 0x04142004)
+        self.assertEquals(self.get_next_word(), 0x04143008)
+        self.assertEquals(self.get_next_word(), 0x04144001)
+        self.assertEquals(self.get_next_word(), 0x04145001)
+        self.assertEquals(self.get_next_word(), 0x04146002)
 
     def test_write_value_from_register(self):
         # Create a sdram just to set max chip size
@@ -1456,16 +1456,16 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # WRITE
-        self.assertEqual(self.get_next_word(), 0x04222001)
-        self.assertEqual(self.get_next_word(), 0x04222301)
-        self.assertEqual(self.get_next_word(), 0x04222302)
-        self.assertEqual(self.get_next_word(), 0x0422030A)
-        self.assertEqual(self.get_next_word(), 0x042223FF)
-        self.assertEqual(self.get_next_word(), 0x04232000)
-        self.assertEqual(self.get_next_word(), 0x042322A0)
-        self.assertEqual(self.get_next_word(), 0x04232530)
-        self.assertEqual(self.get_next_word(), 0x04230530)
-        self.assertEqual(self.get_next_word(), 0x04231530)
+        self.assertEquals(self.get_next_word(), 0x04222001)
+        self.assertEquals(self.get_next_word(), 0x04222301)
+        self.assertEquals(self.get_next_word(), 0x04222302)
+        self.assertEquals(self.get_next_word(), 0x0422030A)
+        self.assertEquals(self.get_next_word(), 0x042223FF)
+        self.assertEquals(self.get_next_word(), 0x04232000)
+        self.assertEquals(self.get_next_word(), 0x042322A0)
+        self.assertEquals(self.get_next_word(), 0x04232530)
+        self.assertEquals(self.get_next_word(), 0x04230530)
+        self.assertEquals(self.get_next_word(), 0x04231530)
 
 
 if __name__ == '__main__':

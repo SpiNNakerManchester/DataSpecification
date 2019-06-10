@@ -147,7 +147,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
                 "region size", size, 1, self.memory_space, "RESERVE")
 
         self.mem_regions[region] = MemoryRegion(
-            memory_pointer=0, unfilled=unfilled, size=size)
+            unfilled=unfilled, size=size)
         self.space_allocated += size
 
     def execute_write(self, cmd):

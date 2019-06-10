@@ -3,8 +3,6 @@ class MemoryRegion(object):
     """
 
     __slots__ = [
-        # the write pointer position
-        "_mem_pointer",
 
         # flag that states if the region is filled or not
         "_unfilled",
@@ -22,29 +20,17 @@ class MemoryRegion(object):
         "_max_write_pointer"
     ]
 
-    def __init__(self, memory_pointer, unfilled, size):
+    def __init__(self, unfilled, size):
         """
-        :param memory_pointer: the write pointer position
         :param unfilled: if the region needs to be filled when written
         :rtype: None
         :raise None: this method does not raise any known exception
         """
-        self._mem_pointer = memory_pointer
         self._unfilled = unfilled
         self._allocated_size = size
         self._region_data = bytearray(size)
         self._write_pointer = 0
         self._max_write_pointer = 0
-
-    @property
-    def memory_pointer(self):
-        """ The memory write pointer
-
-        :return: the memory pointer of the region
-        :rtype: int
-        :raise None: this method does not raise any known exception
-        """
-        return self._mem_pointer
 
     @property
     def allocated_size(self):
@@ -58,19 +44,20 @@ class MemoryRegion(object):
 
     @property
     def remaining_space(self):
-        """  The amount of unused space in the region
+        """ The space between the current write pointer and the end of the/
+            region
 
-        :return: the number of bytes in the region that are not yet written
+        :return: the number of bytes in the region that can be written
         :rtype: int
         :raise None: this method does not raise any known exception
         """
-        return self._allocated_size - self._mem_pointer
+        return self._allocated_size - self._write_pointer
 
     @property
     def unfilled(self):
-        """ Whether the region is filled
+        """ Whether the region is marked as not fillable
 
-        :return: True if the region needs to be filled when written
+        :return: True if the region will not contain any data at write time
         :rtype: bool
         :raise None: this method does not raise any known exception
         """

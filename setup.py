@@ -44,5 +44,7 @@ setup(
                       'SpiNNStorageHandlers >= 1!4.0.1, < 1!5.0.0',
                       'SpiNNMachine >= 1!4.0.1, < 1!5.0.0',
                       'six',
-                      'enum34']
+                      'enum34'],
+    maintainer="SpiNNakerTeam",
+    maintainer_email="spinnakerusers@googlegroups.com"
 )

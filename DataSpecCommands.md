@@ -1,6 +1,7 @@
 PACMAN103 – Data Structure Generator Encodings
 ==============================================
 Author: Simon Davidson
+<br>
 Version: 2.0
 
 Command List
@@ -65,15 +66,15 @@ In the version 2.0 command structure, each command is one or more 32-bit words. 
 
 The **command length** field is used to indicate how many 32-bit words are required for this command:
 
-0b00 = 1 32-bit command word
-0b01 = 2 words (command word + single data word)
-0b10 = 3 words (command word + two data words)
+0b00 = 1 32-bit command word<br>
+0b01 = 2 words (command word + single data word)<br>
+0b10 = 3 words (command word + two data words)<br>
 0b11 = 4 words (command word + three data words)
 
 **Field usage** bits indicate which of the three register fields are actually used by the command. These are one-hot encoded, and are ORed together:
 
-0b100 = Destination register
-0b010 = Source 1 register
+0b100 = Destination register<br>
+0b010 = Source 1 register<br>
 0b001 = source 2 register
 
 The **command code** is an 8-bit field that follows table 1. The three register fields encoded a 4-bit register number.
@@ -353,11 +354,11 @@ If parameters are required, the second word has the following format, consisting
 
 | Bit Range | Field Name | Value |
 |-----------|------------|-------|
-| 28:24 | `ARG4` | Any valid struct_ID, 0→15 |
-| 22:18 | `ARG3` | Any valid struct_ID, 0→15 |
-| 16:12 | `ARG2` | Any valid struct_ID, 0→15 |
-| 10:6 | `ARG1` | Any valid struct_ID, 0→15 |
-| 4:0 | `ARG0` | Any valid struct_ID, 0→15 |
+| 28:24 | `ARG4` | Any valid struct ID, 0→15 |
+| 22:18 | `ARG3` | Any valid struct ID, 0→15 |
+| 16:12 | `ARG2` | Any valid struct ID, 0→15 |
+| 10:6 | `ARG1` | Any valid struct ID, 0→15 |
+| 4:0 | `ARG0` | Any valid struct ID, 0→15 |
 
 Inside the constructor, any reference to a structure will use copies of these structures, indexed using the arg number (0→4) given here. Whether or not the values in each of these structures can be modified inside the constructor is defined in the `READ_ONLY` bit mask in the constructor definition.
 

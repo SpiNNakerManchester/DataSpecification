@@ -77,8 +77,9 @@ The **command length** field is used to indicate how many 32-bit words are requi
 0b001 = source 2 register
 
 The **command code** is an 8-bit field that follows table 1. The three register fields encoded a 4-bit register number.
+
 Note that when a particular register field is not used, the bits can be re-used for some command-specific purpose (see the descriptions of the individual commands for details).
- 
+
 2:	Table of Data Types
 -----------------------
 Currently, a 5-bit encoding is used for all data types. The encoding is as follows:
@@ -109,7 +110,7 @@ Currently, a 5-bit encoding is used for all data types. The encoding is as follo
 | s063 | Signed 0.63 fixed point | 0x17 |
 
 **Table 2: Valid data types (5-bit encoding)**
- 
+
 Detailed Command Structure
 ==========================
 1	Command code 0x00: `BREAK`
@@ -183,11 +184,11 @@ This command creates a random distribution that is used to generate random param
 This information is passed to the command using a parameter list with the following format:
 
 ```
-{
-	uint32 distType; 	// 0 = uniform, others = RESERVED
-	s1615 param1; 	// For uniform distribution, the min value of the random number
-	s1615 param2; 	// For uniform distribution, the max value of the random number
-	uint32 rngId 		// The index (identifier) for the previously defined RNG
+typedef struct {
+	uint32 distType;  // 0 = uniform, others = RESERVED
+	s1615 param1;     // For uniform distribution, the min value of the random number
+	s1615 param2;     // For uniform distribution, the max value of the random number
+	uint32 rngId;     // The index (identifier) for the previously defined RNG
 } randDistParams
 ```
 
@@ -283,18 +284,18 @@ The first command word has the following format:
 | 29:28 | `LENGTH` | 0b01 | Two command words |
 | 27:20 | `CMD_CODE` | 0x1B | Command to assign a bit field in the packed parameter |
 | 18:16 | `FIELD_USE` | 0b000 | No registers specified |
-| 15:8 | `DEST_MSB` | 0->255 | Most significant bit of the bit field to be modified |
-| 7:0 | `DEST_LSB` | 0->255 | Least significant bit of the bit field to be modified |
+| 15:8 | `DEST_MSB` | 0→255 | Most significant bit of the bit field to be modified |
+| 7:0 | `DEST_LSB` | 0→255 | Least significant bit of the bit field to be modified |
 
 The second command word has the following format:
 
 | Bit Range | Field Name | Value | Notes |
 |-----------|------------|-------|-------|
 | 29:28 | `ZEROES` | 0b00 | Zeroes |
-| 27:20 | `SRC_START_BIT` | 0->255 | LSB of the start of the bit field as it appears in the source parameter |
+| 27:20 | `SRC_START_BIT` | 0→255 | LSB of the start of the bit field as it appears in the source parameter |
 | 18:16 | `FIELD_USE` | 0b000 or 0b010 | Optional use of `SRC1` to provide a register value instead of a struct parameter |
-| 11:8 | `SRC_REG` | 0->15 | Optional register value used to provide source bit pattern, only if `FIELD_USE` bit 1 is set. |
-| 15:10 | `SRC_PARAM` | 0->31 | ID of the parameter to provide the source value, used if `FIELD_USE` bit 1 is clear |
+| 11:8 | `SRC_REG` | 0→15 | Optional register value used to provide source bit pattern, only if `FIELD_USE` bit 1 is set. |
+| 15:10 | `SRC_PARAM` | 0→31 | ID of the parameter to provide the source value, used if `FIELD_USE` bit 1 is clear |
 | 9 | `SRC_STRUCT` | 0 = src0 structure,<br>1 = src1 structure | Choose between two supplied structures for source values, used if `FIELD_USE` bit 1 is clear |
 
 13	Command Code 0x1C: `END_PACKSPEC`
@@ -319,7 +320,7 @@ A constructor is assigned a slot number that is referenced when it is invoked (u
 | 27:20 | `CMD_CODE` | 0x20 | Command to define a `CONSTRUCTOR` |
 | 18:16 | `FIELD_USE` | 0b000 | No registers specified |
 | 15:11 | `CONSTRUCTOR_ID` | Any 5-bit number (up to 32 constructors allowed) | Identifier for the constructor |
-| 10:8 | `ARG_COUNT` | 0->5 | Indicates number of structures passed into the constructor as arguments. |
+| 10:8 | `ARG_COUNT` | 0→5 | Indicates number of structures passed into the constructor as arguments. |
 | 4:0 | `READ_ONLY` | 5-bit bit-mask | For each argument, indicates if it is passed as read-only to the constructor. |
 
 The constructor ID is stored in a table so that it can be called later using a `CONSTRUCTOR` command. Up to five arguments (in the form of previously defined structures) may be passed into the constructor. There is no type-checking so the constructor will assume that a correctly formatted structure has been provided.
@@ -352,13 +353,13 @@ If parameters are required, the second word has the following format, consisting
 
 | Bit Range | Field Name | Value |
 |-----------|------------|-------|
-| 28:24 | `ARG4` | Any valid struct_ID, 0->15 |
-| 22:18 | `ARG3` | Any valid struct_ID, 0->15 |
-| 16:12 | `ARG2` | Any valid struct_ID, 0->15 |
-| 10:6 | `ARG1` | Any valid struct_ID, 0->15 |
-| 4:0 | `ARG0` | Any valid struct_ID, 0->15 |
+| 28:24 | `ARG4` | Any valid struct_ID, 0→15 |
+| 22:18 | `ARG3` | Any valid struct_ID, 0→15 |
+| 16:12 | `ARG2` | Any valid struct_ID, 0→15 |
+| 10:6 | `ARG1` | Any valid struct_ID, 0→15 |
+| 4:0 | `ARG0` | Any valid struct_ID, 0→15 |
 
-Inside the constructor, any reference to a structure will use copies of these structures, indexed using the arg number (0->4) given here. Whether or not the values in each of these structures can be modified inside the constructor is defined in the `READ_ONLY` bit mask in the constructor definition.
+Inside the constructor, any reference to a structure will use copies of these structures, indexed using the arg number (0→4) given here. Whether or not the values in each of these structures can be modified inside the constructor is defined in the `READ_ONLY` bit mask in the constructor definition.
 
 17	Command code 0x41: `READ`
 ----------------------------
@@ -381,9 +382,9 @@ Writes one or more data values (either immediate values or the contents of a reg
 | 27:20 | `CMD_CODE` | 0x42 | Indicates that we are executing a write immediate command |
 | 18:16 | `FIELD_USE` | 0b000 or 0b010 or 0b011 | Either additional data word(s) or src1_reg provides data. Src2 (if used) provides the number of repeats |
 | 13:12 | `DATA_LEN` | 0b00 = 8-bit<br>0b01 = 16-bit<br>0b10 = 32-bit<br>0b11 = 64-bit | Length of the data item to write (the exact format of the data is ignored by this command) |
-| 11:8 | `SRC1_REG` | Any (0->15) | Register providing the value (if `FIELD_USE` == 0b010, indicating register use) |
+| 11:8 | `SRC1_REG` | Any (0→15) | Register providing the value (if `FIELD_USE` == 0b010, indicating register use) |
 | 7:4 | `SRC2_REG` | Any | Num repeats |
-| 7:0 | `NUM_COPIES` | 0->255 | How many copies of the data item to be written |
+| 7:0 | `NUM_COPIES` | 0→255 | How many copies of the data item to be written |
 
 A register value always has priority over an immediate. The number of repeats is limited to an immediate value of 255. A register can contain any 32-bit number.
 
@@ -410,7 +411,7 @@ Writes one or more previously assigned structures to the currently open memory r
 | 27:20 | `CMD_CODE` | 0x44 | Indicates that we are executing a write structure command |
 | 18:16 | `FIELD_USE` | 0b000 or 0b010 | Zero or one register specified (bits 11:8) |
 | 11:8 | `REG_COPIES` | 0→15 | Register specifies how many copies of the data item to be written (if `FIELD_USE` is 0b010) |
-| 11:8 | `IMM_COPIES` | 0->15 | Immediate indicating how many copies to be written (if `FIELD_USE` is 0b000) |
+| 11:8 | `IMM_COPIES` | 0→15 | Immediate indicating how many copies to be written (if `FIELD_USE` is 0b000) |
 | 3:0 | `SRC_STRUCT` | 0→15 | Immediate to specify the structure to use. |
 
 21	Command code 0x45: `BLOCK_COPY`
@@ -424,7 +425,7 @@ This command performs a memory copy from one region to another. For flexibility,
 | 18:16 | `FIELD_USE` | 0b111 | Destination plus two sources specified |
 | 15:12 | `REG_DEST` | 0→15 | Register specifies the target address for the start of the block copy |
 | 11:8 | `REG_SIZE` | 0→15 | Register specifies how many bytes are being transferred (if `FIELD_USE` bit 1 is set) |
-| 11:8 | `IMM_SIZE` | 0->15 | Immediate value of how many bytes to transfer (if `FIELD_USE` is clear) |
+| 11:8 | `IMM_SIZE` | 0→15 | Immediate value of how many bytes to transfer (if `FIELD_USE` is clear) |
 | 7:4 | `REG_SRC` | 0→15 | Register specifies the source address for the start of block copy |
 
 22	Command code 0x50: `SWITCH_FOCUS`
@@ -436,7 +437,7 @@ Change the focus of future writes to the specified memory region. Each region re
 | 29:28 | `LENGTH` | 0b00 | Single command word |
 | 27:20 | `CMD_CODE` | 0x50 | Indicates that we are executing a switch_focus command |
 | 18:16 | `FIELD_USE` | 0b010 or 0b000 | Can optionally place the new region number in a register (src1 field) or an immediate |
-| 11:8 | `SRC1_REG` | 0->15 | Register holding memory region ID |
+| 11:8 | `SRC1_REG` | 0→15 | Register holding memory region ID |
 | 11:8 | `MEM_SLOT_ID` | Any up to max (0→15) | Indicates which memory region to switch to, used when `FIELD_USE` is 0b000. |
 
 23	Command code 0x51: `LOOP`
@@ -484,9 +485,9 @@ This command loads performs a check on a register (or registers), changing the f
 | 29:28 | `LENGTH` | 0b00 or 0b01 | Single command word with optional immediate data value |
 | 27:20 | `CMD_CODE` | 0x55 | Indicates a condition check instruction (`IF`) |
 | 18:16 | `FIELD_USE` | 0b010 or 0b011  | One or two registers specified |
-| 11:8 | `SRC1_REG` | 0->15 | Source 1 register (if `FIELD_USE` bit 1 is set) |
-| 7:4 | `SRC2_REG` | 0->15 | Source 2 register (if `FIELD_USE` bit 0 is set) |
-| 3:0 | `CONDITION` | 0->15 (see table below) | Specifies the condition to check for. |
+| 11:8 | `SRC1_REG` | 0→15 | Source 1 register (if `FIELD_USE` bit 1 is set) |
+| 7:4 | `SRC2_REG` | 0→15 | Source 2 register (if `FIELD_USE` bit 0 is set) |
+| 3:0 | `CONDITION` | 0→15 (see table below) | Specifies the condition to check for. |
 
 Currently, only 32-bit, signed comparisons can be made. The supported 4-bit conditions are as follows:
 
@@ -511,8 +512,8 @@ This command loads a value into a register, either from an immediate value or an
 | 29:28 | `LENGTH` | 0b00 or 0b01 | Single command word with optional immediate data value |
 | 27:20 | `CMD_CODE` | 0x60 | Indicates a register-to-register or immediate-to-register move command |
 | 18:16 | `FIELD_USE` | 0b110 or 0b100  | One or two registers specified |
-| 15:12 | `DEST_REG_ID` | 0->15 | Destination register |
-| 11:8 | `SRC_REG_ID` | 0->15 | Source register (if `FIELD_USE` bit 1 is set) |
+| 15:12 | `DEST_REG_ID` | 0→15 | Destination register |
+| 11:8 | `SRC_REG_ID` | 0→15 | Source register (if `FIELD_USE` bit 1 is set) |
 
 If the `FIELD_USE` value is 0b100 then the value to load is given in a separate 32-bit word.
 
@@ -525,7 +526,7 @@ Loads a register with the current value of the write pointer (byte aligned). Thi
 | 29:28 | `LENGTH` | 0b00 | Single command word |
 | 27:20 | `CMD_CODE` | 0x63 | Indicates a get-write-pointer command |
 | 18:16 | `FIELD_USE` | 0b100 | Destination register specified |
-| 15:12 | `DEST_REG` | 0->15 | Target internal register |
+| 15:12 | `DEST_REG` | 0→15 | Target internal register |
 
 29	Command Code 0x64: `SET_WR_PTR`
 ----------------------------
@@ -536,7 +537,7 @@ Sets the current write pointer to the value given in the register or immediate v
 | 29:28 | `LENGTH` | 0b00 or 0b01 | Single command word + optional 32-bit immediate |
 | 27:20 | `CMD_CODE` | 0x64 | Indicates a set-write-pointer command |
 | 18:16 | `FIELD_USE` | 0b010 or 0b000 | Either single source register or none |
-| 11:8 | `SRC1_REG` | 0->15 | Source register if FIELD_USE bit 1 is set |
+| 11:8 | `SRC1_REG` | 0→15 | Source register if FIELD_USE bit 1 is set |
 | 0 | `REL_ADDR` | 1 = Relative address<br>0 = Absolute address |
 
 If a register is not specified, the following 32-bit word is used to provide the new pointer value.
@@ -550,10 +551,10 @@ Writes a block of zeroes to pad out the current region from the current write po
 | 29:28 | `LENGTH` | 0b00 | Single command word |
 | 27:20 | `CMD_CODE` | 0x65 | Indicates an align-write-pointer command |
 | 18:16 | `FIELD_USE` | 0b?00 or 0b?10 | Optional dest register to return new pointer, plus optional register with block size (in bits) |
-| 15:12 | `DEST_REG` | 0->15 | Register to return the new write pointer (only valid if `FIELD_USE` bit 2 is set) |
-| 11:8 | `BLOCK_SZ_REG` | 0->15 | Register supplying the size of the block boundary (if `FIELD_USE` bit 1 is set) |
-| 4:0 | `BLOCK_SZ_IMM` | 0->31 | Immediate value of block boundary, in bits (used if `FIELD_USE` bit 1 is clear) |
- 
+| 15:12 | `DEST_REG` | 0→15 | Register to return the new write pointer (only valid if `FIELD_USE` bit 2 is set) |
+| 11:8 | `BLOCK_SZ_REG` | 0→15 | Register supplying the size of the block boundary (if `FIELD_USE` bit 1 is set) |
+| 4:0 | `BLOCK_SZ_IMM` | 0→31 | Immediate value of block boundary, in bits (used if `FIELD_USE` bit 1 is clear) |
+
 31	Command Code 0x67: `ARITH_OP`
 ----------------------------
 Performs one of a number of arithmetic operations, returning the result in a register. The sources can be either registers or immediates. Currently, operands are always taken as 32-bit values, though the operation can be selected as signed or unsigned.
@@ -564,9 +565,9 @@ Performs one of a number of arithmetic operations, returning the result in a reg
 | 27:20 | `CMD_CODE` | 0x67 | Indicates an arithmetic operation command |
 | 19 | `SIGNED` | 0 = unsigned, 1 = signed | Selects whether the operation will be unsigned or signed |
 | 18:16 | `FIELD_USE` | 0b1xy where x=0 or 1, y=0 or 1 | Dest always a register. Sources can be register or immediate. |
-| 15:12 | `DEST_REG` | 0->15 | Register id for result |
-| 11:8 | `SRC1_REG` | 0->15 | Register ID for source 1, used if `FIELD_USE` bit 1 is set |
-| 7:4 | `SRC2_REG` | 0->15 | Register Id for source 2, used if `FIELD_USE` bit 0 is set |
+| 15:12 | `DEST_REG` | 0→15 | Register id for result |
+| 11:8 | `SRC1_REG` | 0→15 | Register ID for source 1, used if `FIELD_USE` bit 1 is set |
+| 7:4 | `SRC2_REG` | 0→15 | Register Id for source 2, used if `FIELD_USE` bit 0 is set |
 | 3:0 | `OP_SELECT` | 0b0 = `ADD`<br>0b1 = `SUB`<br>0b2 = `MUL`<br>Others reserved | Selects the operation to perform, 32-bit signed quantities are assumed |
 
 Since source 1 and source 2 can each be either a register number or an immediate, the length of the command can be extended to two or three words to add these extra parameters. When both are provided, source 1 is given first.
@@ -580,16 +581,16 @@ Performs one of a number of logical operations, returning the result in a regist
 | 29:28 | `LENGTH` | 0b00 or 0b01 or 0b10 | Single command word + one or two optional source parameters |
 | 27:20 | `CMD_CODE` | 0x68 | Indicates a logical operation command |
 | 18:16 | `FIELD_USE` | 0b1xy where x=0 or 1, y=0 or 1 | Dest always a register. Sources can be register or immediate |
-| 15:12 | `DEST_REG` | 0->15 | Register id for result |
-| 11:8 | `SRC1_REG` | 0->15 | Register ID for source 1, used if `FIELD_USE` bit 1 is set |
-| 7:4 | `SRC2_REG` | 0->15 | Register ID for source 2, used if `FIELD_USE` bit 0 is set |
+| 15:12 | `DEST_REG` | 0→15 | Register id for result |
+| 11:8 | `SRC1_REG` | 0→15 | Register ID for source 1, used if `FIELD_USE` bit 1 is set |
+| 7:4 | `SRC2_REG` | 0→15 | Register ID for source 2, used if `FIELD_USE` bit 0 is set |
 | 3:0 | `OP_SELECT` | 0b0= `LSL` src1 by src2<br>0x1 = `LSR` src1 by src2<br>0x2 = src1 `OR` src2<br>0x3 = src1 `AND` src2<br>0x4 = src1 `XOR` src2<br>0x5 = `NOT` src1 | Selects the operation to perform |
 
 Since source 1 and source 2 can each be either a register number or an immediate, the length of the command can be extended to two or three words to add these extra parameters. When both are provided, source 1 is given first.
 
 33	Command code 0x6A: `REFORMAT`
 ----------------------------
-_Xxx TODO xxx_
+_Xxx TODO xxx_<br>
 Do this when we have clarity on what formatting options are required.
 
 34	Command Code 0x70: `COPY_STRUCT`
@@ -602,10 +603,10 @@ The source and target structure IDs can be passed either as immediate or given i
 | 29:28 | `LENGTH` | 0b00 | Single command word |
 | 27:20 | `CMD_CODE` | 0x70 | Indicates a command to copy one structure into another |
 | 18:16 | `FIELD_USE` | 0b000 (could set bit 1 or bit 2) | No registers are required, but could be used to provide the structure number for source or destination. |
-| 15:12 | `DEST_STRUCT_REG` | 0->15 | Optional register to specify the destination struct ID (used if `FIELD_USE` bit 2 is set) |
-| 15:12 | `DEST_STRUCT_ID` | 0->15 | Optional register to specify the destination struct ID (used if `FIELD_USE` bit 2 is clear) |
-| 11:8 | `SRC_STRUCT_REG` | 0->15 | Optional register used to specify the source struct ID (used if `FIELD_USE` bit 1 is set) |
-| 11:8 | `SRC_STRUCT_ID` | 0->15 | Optional register used to specify the source struct ID (used if `FIELD_USE` bit 1 is clear) |
+| 15:12 | `DEST_STRUCT_REG` | 0→15 | Optional register to specify the destination struct ID (used if `FIELD_USE` bit 2 is set) |
+| 15:12 | `DEST_STRUCT_ID` | 0→15 | Optional register to specify the destination struct ID (used if `FIELD_USE` bit 2 is clear) |
+| 11:8 | `SRC_STRUCT_REG` | 0→15 | Optional register used to specify the source struct ID (used if `FIELD_USE` bit 1 is set) |
+| 11:8 | `SRC_STRUCT_ID` | 0→15 | Optional register used to specify the source struct ID (used if `FIELD_USE` bit 1 is clear) |
 
 35	Command Code 0x71: `COPY_PARAM`
 ----------------------------
@@ -618,15 +619,15 @@ The command word has the following syntax:
 | 29:28 | `LENGTH` | 0b01 | Two command words |
 | 27:20 | `CMD_CODE` | 0x71 | Indicates a command to copy a parameter value from one structure into another |
 | 18:16 | `FIELD_USE` | 0b000 | No registers are permitted |
-| 15:12 | `DEST_STRUCT_ID` | 0->15 | Specifies the destination structure ID |
-| 11:8 | `SRC_STRUCT_ID` | 0->15 | Specifies the source structure ID |
+| 15:12 | `DEST_STRUCT_ID` | 0→15 | Specifies the destination structure ID |
+| 11:8 | `SRC_STRUCT_ID` | 0→15 | Specifies the source structure ID |
 
 The second command word has the following syntax:
 
 | Bit Range | Field Name | Value | Notes |
 |-----------|------------|-------|-------|
-| 15:8 | `DEST_PARAM_ID` | 0->255 | Specifies the parameter to be written in the destination structure |
-| 7:0 | `SRC_PARAM_ID` | 0->255 | Specifies the parameter to be copied from the source structure |
+| 15:8 | `DEST_PARAM_ID` | 0→255 | Specifies the parameter to be written in the destination structure |
+| 7:0 | `SRC_PARAM_ID` | 0→255 | Specifies the parameter to be copied from the source structure |
 
 36	Command Code 0x72: `WRITE_PARAM`
 ----------------------------
@@ -637,8 +638,8 @@ Assigns a value to one parameter of a given parameter list.
 | 29:28 | `LENGTH` | 0b00 or 0b01 | Single command word + optional parameter value |
 | 27:20 | `CMD_CODE` | 0x72 | Indicates assignment to a parameter |
 | 18:16 | `FIELD_USE` | 0b000 or 0b010 | Optional register for source 1 |
-| 15:12 | `STRUCT_ID` | 0->15 | ID of the structure in which the parameter is to be changed |
-| 11:8 | `VAL_REG` | 0->15 | Register holding the new value (used if `FIELD_USE` bit 1 is set) |
+| 15:12 | `STRUCT_ID` | 0→15 | ID of the structure in which the parameter is to be changed |
+| 11:8 | `VAL_REG` | 0→15 | Register holding the new value (used if `FIELD_USE` bit 1 is set) |
 | 7:0 | `PARAM_ID` | 0→255 | Element index within the structure |
 
 If `FIELD_USE` is 0b000, then the length field is 0b01 and a following 32-bit word is used to provide the value.
@@ -654,11 +655,11 @@ This command assigns a value to a field within one parameter of a structure. It 
 | 29:28 | `LENGTH` | 0b01 | Two command words |
 | 27:20 | `CMD_CODE` | 0x74 | Indicates assignment to a parameter |
 | 18:16 | `FIELD_USE` | 0b1xx = data value in a register<br>0bx1x = register holds source struct ID<br>0bxx1 = register holds source param ID | Different sources of the value: either register or structure parameter. In the latter case, the choice of a particular structure or parameter can be given in a register. |
-| 15:12 | `DATA_REG` | 0->15 | Register holding data value to be used |
-| 11:8 | `SRC_STRUCT_ID` | 0->15 | Id of a parameter structure that will provide the data value |
-| 11:8 | `SRC_STRUCT_REG` | 0->15 | Register index for structure that holds the data value (used if `FIELD_USE` is 0bx1x) |
-| 7:0 | `SRC_PARAM_ID` | 0->255 | Index of the parameter within the source structure that provides the data value |
-| 7:4 | `SRC_PARAM_REG` | 0->255 | Register that is holding the index of the parameter within the source structure that provides the data value (used if `FIELD_USE` is 0bxx1) |
+| 15:12 | `DATA_REG` | 0→15 | Register holding data value to be used |
+| 11:8 | `SRC_STRUCT_ID` | 0→15 | Id of a parameter structure that will provide the data value |
+| 11:8 | `SRC_STRUCT_REG` | 0→15 | Register index for structure that holds the data value (used if `FIELD_USE` is 0bx1x) |
+| 7:0 | `SRC_PARAM_ID` | 0→255 | Index of the parameter within the source structure that provides the data value |
+| 7:4 | `SRC_PARAM_REG` | 0→255 | Register that is holding the index of the parameter within the source structure that provides the data value (used if `FIELD_USE` is 0bxx1) |
 
 If a data register is provided as a source, any information about source structures is ignored.
 
@@ -666,11 +667,11 @@ The second command word gives the Id of the destination structure to be written 
 
 | Bit Range | Field Name | Value | Notes |
 |-----------|------------|-------|-------|
-| 31:26 | `INSERTION_LEN` | 0->32 | Number of bits to inserts from the data word. Overspills are dropped without error |
-| 24:20 | `INSERTION_LSB` | 0->31 | Bit position in target where LSB of new data is to be placed |
+| 31:26 | `INSERTION_LEN` | 0→32 | Number of bits to inserts from the data word. Overspills are dropped without error |
+| 24:20 | `INSERTION_LSB` | 0→31 | Bit position in target where LSB of new data is to be placed |
 | 18:16 | `FIELD_USE` | 0b000 | No registers specified |
-| 11:8 | `DEST_STRUCT_ID` | 0->15 | ID of the target structure |
-| 7:0 | `DEST_PARAM_ID` | 0->15 | ID of the target parameter |
+| 11:8 | `DEST_STRUCT_ID` | 0→15 | ID of the target structure |
+| 7:0 | `DEST_PARAM_ID` | 0→15 | ID of the target parameter |
 
 A block of bits from the source data is copies to the bit range in the destination. If the number of inserted bits overruns the end of the word, the extra bits are dropped without flagging an error.
 
@@ -683,8 +684,8 @@ This command is used to copy a parameter from a structure to a register. It is t
 | 29:28 | `LENGTH` | 0b00 | Single command word |
 | 27:20 | `CMD_CODE` | 0x73 | Indicates a `READ_PARAM` command |
 | 18:16 | `FIELD_USE` | 0b100 | Destination register |
-| 15:12 | `DEST_REG` | 0->15 | ID of the destination register |
-| 3:0 | `STRUCT_ID` | 0->15 | Immediate value of ID of the structure to be printed (used if no register specified) |
+| 15:12 | `DEST_REG` | 0→15 | ID of the destination register |
+| 3:0 | `STRUCT_ID` | 0→15 | Immediate value of ID of the structure to be printed (used if no register specified) |
 
 39	Command Code 0x80: `PRINT_VAL`
 ----------------------------
@@ -697,7 +698,7 @@ The data is printed as 32-bit unsigned integers. For data words of 64-bit, two 3
 | 29:28 | `LENGTH` | 0b00 or 0b01 or 0b10 | Singe command word or with data value (32-bit or 64-bit) |
 | 27:20 | `CMD_CODE` | 0x80 | Indicates the print register command |
 | 18:16 | `FIELD_USE` | 0b000 or 0b010 | Zero or one registers specified |
-| 11:8 | `SRC1_REG` | 0->15 | The register whose value is to be printed |
+| 11:8 | `SRC1_REG` | 0→15 | The register whose value is to be printed |
 
 40	Command Code 0x81: `PRINT_TXT`
 ----------------------------
@@ -705,10 +706,10 @@ Prints a series of 8-bit ASCII characters to the screen, given in immediate data
 
 | Bit Range | Field Name | Value | Notes |
 |-----------|------------|-------|-------|
-| 29:28 | `LENGTH` | 0b01, 0b10 or 0b11 |  Command word plus 1->3 data words |
+| 29:28 | `LENGTH` | 0b01, 0b10 or 0b11 |  Command word plus 1→3 data words |
 | 27:20 | `CMD_CODE` | 0x81 | Indicates that we’re printing text |
 | 18:16 | `FIELD_USE` | 0b000 | No registers specified |
-| 3:0 | `NUM_CHARS` | 0->11 | Number of characters to print minus one (from 1 to 12 characters) |
+| 3:0 | `NUM_CHARS` | 0→11 | Number of characters to print minus one (from 1 to 12 characters) |
 
 41	Command Code 0x82: `PRINT_STRUCT`
 ----------------------------
@@ -719,7 +720,7 @@ This is typically a debug aid. It prints the contents of one structure to the sc
 | 29:28 | `LENGTH` | 0b00 | Command word |
 | 27:20 | `CMD_CODE` | 0x82 | Indicates that we’re printing the contents of a structure |
 | 18:16 | `FIELD_USE` | 0b000  | Zero registers specified |
-| 3:0 | `STRUCT_ID` | 0->15 | Immediate value of ID of the structure to be printed (used if no register specified) |
+| 3:0 | `STRUCT_ID` | 0→15 | Immediate value of ID of the structure to be printed (used if no register specified) |
 
 The print format shows the Structure index, then one line per entry in the structure, with fields representing the entries index, size (in bytes) and current value.
 

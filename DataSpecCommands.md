@@ -8,50 +8,50 @@ Command List
 
 |Command Byte| Name | Notes | Implemented In DSG Lib? | Implemented In Spec Exec? | Implemented in Java Fast Data In? |
 |------------|------|-------|-------------------------|---------------------------|-----------------------------------|
-|0x00| `BREAK` | Halts spec execution with an error | Y | Y | |
-|0x01| `NOP` | No operation. Can be used as filler | Y | Y | Y |
-|0x02| `RESERVE` | Reserves a block of memory ready for filling | Y | Y| Y |
+|0x00| `BREAK` | Halts spec execution with an error | ✅ | ✅ | ✅ |
+|0x01| `NOP` | No operation. Can be used as filler | ✅ | ✅ | ✅ |
+|0x02| `RESERVE` | Reserves a block of memory ready for filling | ✅ | ✅ | ✅ |
 |0x03| `FREE` | Releases previously reserved memory | | | |
-|0x05| `DECLARE_RNG` | Declares a new random number generator | Y | Y | |
-|0x06| `DECLARE_RANDOM_DIST` | Declares a new random distribution | Y | Y | |
-|0x07| `GET_RANDOM_NUMBER` | Returns a random number drawn from the given distribution | Y | Y | |
-|0x10| `START_STRUCT` | Begins declaration of new structure | Y | Y | |
-|0x11| `STRUCT_ELEM` | Declare single element in a structure | Y | Y | |
-|0x12| `END_STRUCT` | Ends declaration of new structure | Y | Y | |
+|0x05| `DECLARE_RNG` | Declares a new random number generator | ✅ | ✅ | |
+|0x06| `DECLARE_RANDOM_DIST` | Declares a new random distribution | ✅ | ✅ | |
+|0x07| `GET_RANDOM_NUMBER` | Returns a random number drawn from the given distribution | ✅ | ✅ | |
+|0x10| `START_STRUCT` | Begins declaration of new structure | ✅ | ✅ | |
+|0x11| `STRUCT_ELEM` | Declare single element in a structure | ✅ | ✅ | |
+|0x12| `END_STRUCT` | Ends declaration of new structure | ✅ | ✅ | |
 |0x1A| `START_PACKSPEC` | Begins definition of a Packing Specification | | | |
 |0x1B| `PACK_PARAM` | Writes one bit field inside a single parameter from a bit field of a source parameter | | | |
 |0x1C| `END_PACKSPEC` | Ends definition of a Packing Specification | | | |
-|0x20| `START_CONSTRUCTOR` | Begins definition of a function to write data structures to memory | Y | Y | |
-|0x25| `END_CONSTRUCTOR` | Ends definition of the write function | Y | Y | |
-|0x40| `CONSTRUCT` | Invokes a constructor to build a data structure | Y | Y| |
-|0x41| `READ` | Read a value from a memory region to a register | Y | Y | |
-|0x42| `WRITE` | Perform a simple write or block write operation | Y | Y | |
-|0x43| `WRITE_ARRAY` | Perform a write array operation | Y | Y | |
-|0x44| `WRITE_STRUCT` | Performs a write from a predefined structure | Y | Y | |
+|0x20| `START_CONSTRUCTOR` | Begins definition of a function to write data structures to memory | ✅ | ✅ | |
+|0x25| `END_CONSTRUCTOR` | Ends definition of the write function | ✅ | ✅ | |
+|0x40| `CONSTRUCT` | Invokes a constructor to build a data structure | ✅ | ✅ | |
+|0x41| `READ` | Read a value from a memory region to a register | ✅ | ✅ | |
+|0x42| `WRITE` | Perform a simple write or block write operation | ✅ | ✅ | ✅ |
+|0x43| `WRITE_ARRAY` | Perform a write array operation | ✅ | ✅ | ✅ |
+|0x44| `WRITE_STRUCT` | Performs a write from a predefined structure | ✅ | ✅ | |
 |0x45| `BLOCK_COPY` | Copies a block of data from one area to another | | | |
-|0x50| `SWITCH_FOCUS` | Swap between different reserved memory regions to work on several at the same time | Y | Y | Y |
-|0x51| `LOOP` | Set-up a loop | Y | Y | |
-|0x52| `BREAK_LOOP` | Early exit from a loop | Y | Y | |
-|0x53| `END_LOOP` | End of loop | Y | Y | |
-|0x55| `IF` | Perform a condition and execute the following instructions only if the condition is True | Y | Y | |
-|0x56| `ELSE` | Else clause for associated IF statement | Y | Y | |
-|0x57| `END_IF` | Close block of instructions begun with the IF instruction | Y | Y | |
-|0x60| `MV` | Place a value in a register, from an immediate or another register | Y | Y | |
-|0x63| `GET_WR_PTR` | Copy current write address to a register | Y | Y | |
-|0x64| `SET_WR_PTR` | Move the write pointer to a new location, either relative to the start of this reserved memory area or relative to the current write pointer | Y | Y | |
-|0x65| `ALIGN_WR_PTR` | Moves the write pointer so that it points to the next block with a given address granularity | Y | Y | |
-|0x67| `ARITH_OP` | Perform arithmetic operation with operand 2 coming from a register | Y | Y | |
-|0x68| `LOGIC_OP` | Perform logical operation with operand 2 coming from a register | Y | Y | |
+|0x50| `SWITCH_FOCUS` | Swap between different reserved memory regions to work on several at the same time | ✅ | ✅ | ✅ |
+|0x51| `LOOP` | Set-up a loop | ✅ | ✅ | |
+|0x52| `BREAK_LOOP` | Early exit from a loop | ✅ | ✅ | |
+|0x53| `END_LOOP` | End of loop | ✅ | ✅ | |
+|0x55| `IF` | Perform a condition and execute the following instructions only if the condition is True | ✅ | ✅ | |
+|0x56| `ELSE` | Else clause for associated IF statement | ✅ | ✅ | |
+|0x57| `END_IF` | Close block of instructions begun with the IF instruction | ✅ | ✅ | |
+|0x60| `MV` | Place a value in a register, from an immediate or another register | ✅ | ✅ | ✅ |
+|0x63| `GET_WR_PTR` | Copy current write address to a register | ✅ | ✅ | |
+|0x64| `SET_WR_PTR` | Move the write pointer to a new location, either relative to the start of this reserved memory area or relative to the current write pointer | ✅ | ✅ | ✅ |
+|0x65| `ALIGN_WR_PTR` | Moves the write pointer so that it points to the next block with a given address granularity | ✅ | ✅ | |
+|0x67| `ARITH_OP` | Perform arithmetic operation with operand 2 coming from a register | ✅ | ✅ | |
+|0x68| `LOGIC_OP` | Perform logical operation with operand 2 coming from a register | ✅ | ✅ | |
 |0x6A| `REFORMAT` | Reformats a value in an internal register | | | |
-|0x70| `COPY_STRUCT` | Create an identical copy of a structure | Y | Y | |
-|0x71| `COPY_PARAM` | Copy a parameter from one structure to another | Y | Y | |
+|0x70| `COPY_STRUCT` | Create an identical copy of a structure | ✅ | ✅ | |
+|0x71| `COPY_PARAM` | Copy a parameter from one structure to another | ✅ | ✅ | |
 |0x72| `WRITE_PARAM` | Modify a single parameter in a structure using an immediate value or register-held value | | | |
-|0x73| `READ_PARAM` | Copy a structure parameter in a register | Y | Y| |
-|0x74| `WRITE_PARAM_COMPONENT` | Modify a single parameter in a structure | Y | Y | |
-|0x80| `PRINT_VAL` | Output the value of a register to the screen | Y | Y | |
+|0x73| `READ_PARAM` | Copy a structure parameter in a register | ✅ | ✅ | |
+|0x74| `WRITE_PARAM_COMPONENT` | Modify a single parameter in a structure | ✅ | ✅ | |
+|0x80| `PRINT_VAL` | Output the value of a register to the screen | ✅ | ✅ | |
 |0x81| `PRINT_TXT` | Print a text string to the screen | | | |
-|0x82| `PRINT_STRUCT` | Prints the current state of one structure to the screen | Y | Y | |
-|0xFF| `END_SPEC` | Cleanly ends the parsing of the Data Spec | Y | Y | Y |
+|0x82| `PRINT_STRUCT` | Prints the current state of one structure to the screen | ✅ | ✅ | |
+|0xFF| `END_SPEC` | Cleanly ends the parsing of the Data Spec | ✅ | ✅ | ✅ |
 
 <small>**Table 1: Data Spec Commands (opcodes)**</small>
 

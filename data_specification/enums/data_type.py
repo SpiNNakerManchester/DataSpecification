@@ -45,6 +45,8 @@ class DataType(Enum):
              False,
              int,
              np.uint8,
+             'u',
+             1,
              "8-bit unsigned integer")
     UINT16 = (1,
               2,
@@ -55,6 +57,8 @@ class DataType(Enum):
               False,
               int,
               np.uint16,
+              'u',
+              2,
               "16-bit unsigned integer")
     UINT32 = (2,
               4,
@@ -65,6 +69,8 @@ class DataType(Enum):
               False,
               int,
               np.uint32,
+              'u',
+              4,
               "32-bit unsigned integer")
     UINT64 = (3,
               8,
@@ -75,6 +81,8 @@ class DataType(Enum):
               False,
               int,
               np.uint64,
+              'u',
+              8,
               "64-bit unsigned integer")
     INT8 = (4,
             1,
@@ -85,6 +93,8 @@ class DataType(Enum):
             False,
             int,
             np.int8,
+            'i',
+            1,
             "8-bit signed integer")
     INT16 = (5,
              2,
@@ -95,6 +105,8 @@ class DataType(Enum):
              False,
              int,
              np.int16,
+             'i',
+             2,
              "16-bit signed integer")
     INT32 = (6,
              4,
@@ -105,6 +117,8 @@ class DataType(Enum):
              False,
              int,
              np.int32,
+             'i',
+             4,
              "32-bit signed integer")
     INT64 = (7,
              8,
@@ -115,6 +129,8 @@ class DataType(Enum):
              False,
              int,
              np.int64,
+             "i",
+             8,
              "64-bit signed integer")
     U88 = (8,
            2,
@@ -123,6 +139,8 @@ class DataType(Enum):
            decimal.Decimal("256"),
            "H",
            True,
+           None,
+           None,
            None,
            None,
            "8.8 unsigned fixed point number")
@@ -135,6 +153,8 @@ class DataType(Enum):
              True,
              None,
              None,
+             None,
+             None,
              "16.16 unsigned fixed point number")
     U3232 = (10,
              8,
@@ -143,6 +163,8 @@ class DataType(Enum):
              decimal.Decimal("4294967296"),
              "Q",
              True,
+             None,
+             None,
              None,
              None,
              "32.32 unsigned fixed point number")  # rounding problem for max
@@ -155,6 +177,8 @@ class DataType(Enum):
            True,
            None,
            None,
+           None,
+           None,
            "8.7 signed fixed point number")
     S1615 = (12,
              4,
@@ -163,6 +187,8 @@ class DataType(Enum):
              decimal.Decimal("32768"),
              "i",
              True,
+             None,
+             None,
              None,
              None,
              "16.15 signed fixed point number")
@@ -175,6 +201,8 @@ class DataType(Enum):
              True,
              None,
              None,
+             None,
+             None,
              "32.31 signed fixed point number")  # rounding problem for max
     FLOAT_32 = (14,
                 4,
@@ -185,6 +213,8 @@ class DataType(Enum):
                 False,
                 float,
                 np.float32,
+                "f",
+                4,
                 "32-bit floating point number")
     FLOAT_64 = (15,
                 8,
@@ -195,6 +225,8 @@ class DataType(Enum):
                 False,
                 float,
                 np.float64,
+                "f",
+                8,
                 "64-bit floating point number")
     U08 = (16,
            1,
@@ -203,6 +235,8 @@ class DataType(Enum):
            decimal.Decimal("256"),
            "B",
            True,
+           None,
+           None,
            None,
            None,
            "0.8 unsigned fixed point number")
@@ -215,6 +249,8 @@ class DataType(Enum):
             True,
             None,
             None,
+            None,
+            None,
             "0.16 unsigned fixed point number")
     U032 = (18,
             4,
@@ -223,6 +259,8 @@ class DataType(Enum):
             decimal.Decimal("4294967296"),
             "I",
             True,
+            None,
+            None,
             None,
             None,
             "0.32 unsigned fixed point number")
@@ -236,6 +274,8 @@ class DataType(Enum):
             True,
             None,
             None,
+            None,
+            None,
             "0.64 unsigned fixed point number")  # rounding problem for max
     S07 = (20,
            1,
@@ -244,6 +284,8 @@ class DataType(Enum):
            decimal.Decimal("128"),
            "b",
            True,
+           None,
+           None,
            None,
            None,
            "0.7 signed fixed point number")
@@ -256,6 +298,8 @@ class DataType(Enum):
             True,
             None,
             None,
+            None,
+            None,
             "0.15 signed fixed point number")
     S031 = (22,
             4,
@@ -264,6 +308,8 @@ class DataType(Enum):
             decimal.Decimal("2147483648"),
             "i",
             True,
+            None,
+            None,
             None,
             None,
             "0.32 signed fixed point number")
@@ -277,10 +323,13 @@ class DataType(Enum):
             True,
             None,
             None,
+            None,
+            None,
             "0.63 signed fixed point number")  # rounding problem for max
 
     def __new__(cls, value, size, min_val, max_val, scale, struct_encoding,
-                apply_scale, force_cast, numpy_typename, doc=""):
+                apply_scale, force_cast, numpy_typename, numpy_decoding,
+                nump_decoding_size, doc=""):
         # pylint: disable=protected-access, too-many-arguments
         obj = object.__new__(cls)
         obj._value_ = value
@@ -291,6 +340,8 @@ class DataType(Enum):
         obj.scale = scale
         obj.struct_encoding = struct_encoding
         obj.numpy_typename = numpy_typename
+        obj.numpy_decoding = numpy_decoding
+        obj.numpy_decoding_size = nump_decoding_size
         obj._apply_scale = apply_scale
         obj._force_cast = force_cast
         if size == 1:
@@ -301,7 +352,8 @@ class DataType(Enum):
         return obj
 
     def __init__(self, value, size, min_val, max_val, scale, struct_encoding,
-                 apply_scale, force_cast, numpy_typename, doc=""):
+                 apply_scale, force_cast, numpy_typename, numpy_decoding,
+                 nump_decoding_size, doc=""):
         # pylint: disable=too-many-arguments
         self._value_ = value
         self.__doc__ = doc
@@ -311,6 +363,8 @@ class DataType(Enum):
         self.scale = scale
         self.struct_encoding = struct_encoding
         self.numpy_typename = numpy_typename
+        self.numpy_decoding = numpy_decoding
+        self.numpy_decoding_size = nump_decoding_size
         self._apply_scale = apply_scale
         self._force_cast = force_cast
         if size == 1:
@@ -327,3 +381,11 @@ class DataType(Enum):
         elif self._force_cast is not None:
             value = self._force_cast(value)
         return self._struct.pack(value)
+
+    def decode_array(self, values):
+        """ Decodes the SpiNNaker byte array into iterable of this type.
+        :param values: the bytes to decode into this given data type
+        :rtype: numpy array
+        """
+        return np.asarray(values, dtype="uint8").view(dtype="<{}{}".format(
+            self.numpy_decoding, self.numpy_decoding_size))

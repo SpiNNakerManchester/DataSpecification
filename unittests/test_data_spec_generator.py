@@ -64,6 +64,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         return words
 
     def skip_words(self, words):
+        self.spec_writer.flush()
         self.spec_reader.read(4 * words)
 
     def test_new_data_spec_generator(self):

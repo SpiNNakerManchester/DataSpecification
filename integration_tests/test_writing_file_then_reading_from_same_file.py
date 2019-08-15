@@ -22,6 +22,7 @@ from spinn_storage_handlers import FileDataReader, FileDataWriter
 class MyTestCase(unittest.TestCase):
     def setUp(self):
         self.reader = None
+        self.writer = None
         self._dir = os.path.dirname(inspect.getfile(self.__class__))
 
     def _file(self, filename):

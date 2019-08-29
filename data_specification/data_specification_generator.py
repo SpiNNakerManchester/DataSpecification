@@ -1305,6 +1305,7 @@ class DataSpecificationGenerator(object):
             _Field.IMMEDIATE: data_type.size})
         cmd_string = Commands.WRITE_ARRAY.name
         cmd_string += " {0:d} elements\n".format(size // 4)
+        cmd_string += str(list(array_values))
         arg_word = _ONE_WORD.pack(size // 4)
         self.write_command_to_files(cmd_word + arg_word, cmd_string)
         self.spec_writer.write(data.tostring())

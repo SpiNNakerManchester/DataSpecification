@@ -331,4 +331,4 @@ class DataType(Enum):
     def encode(self, value):
         """ Encode the Python value for SpiNNaker according to this type.
         """
-        return self._struct.pack(self._encode_as_int(value))
+        return self._struct.pack(self.encode_as_int(value))

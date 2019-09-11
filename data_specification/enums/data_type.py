@@ -319,11 +319,16 @@ class DataType(Enum):
             struct_encoding += "xx"
         self._struct = struct.Struct("<" + struct_encoding)
 
+    def encode_as_int(self, value):
+        """ Returns the value as an integer, according to this type.
+        """
+        if self._apply_scale:
+            return int(decimal.Decimal(str(value)) * self.scale)
+        if self._force_cast is not None:
+            return self._force_cast(value)
+        return value
+
     def encode(self, value):
         """ Encode the Python value for SpiNNaker according to this type.
         """
-        if self._apply_scale:
-            value = int(decimal.Decimal(str(value)) * self.scale)
-        elif self._force_cast is not None:
-            value = self._force_cast(value)
-        return self._struct.pack(value)
+        return self._struct.pack(self._encode_as_int(value))

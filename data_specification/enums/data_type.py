@@ -323,7 +323,7 @@ class DataType(Enum):
         """ Returns the value as an integer, according to this type.
         """
         if self._apply_scale:
-            return int(decimal.Decimal(str(value)) * self.scale)
+            return int(round(decimal.Decimal(str(value)) * self.scale))
         if self._force_cast is not None:
             return self._force_cast(value)
         return value

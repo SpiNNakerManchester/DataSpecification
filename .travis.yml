@@ -46,10 +46,8 @@ install:
 script:
   # Tests
   - py.test unittests --cov data_specification
-  - py.test integration_tests --cov data_specification --cov-append
   # Code quality check
   - flake8 data_specification
-  - flake8 unittests integration_tests
   - support/rat.sh run
   # Build check
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html

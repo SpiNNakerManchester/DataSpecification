@@ -55,7 +55,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         os.rmdir(self.temp_dir)
 
     def get_next_word(self, count=1):
-        self.spec_writer._file_container._flush()
+        self.spec_writer.flush()
         if count < 2:
             return struct.unpack("<I", self.spec_reader.read(4))[0]
         words = list()
@@ -64,6 +64,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         return words
 
     def skip_words(self, words):
+        self.spec_writer.flush()
         self.spec_reader.read(4 * words)
 
     def test_new_data_spec_generator(self):
@@ -609,7 +610,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.comment("test")
 
         # Comment generated data specification
-        self.report_writer._file_container._flush()
+        self.report_writer.flush()
         self.assertEqual(self.spec_writer.tell(), 0)
         self.assertEqual(self.report_reader.read(), b"test\n")
 

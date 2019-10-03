@@ -33,7 +33,11 @@ class DataType(Enum):
             SpiNNaker's binary format.
         The eighth value is the corresponding numpy type (or None to inhibit\
             direct conversion via numpy, scaled conversion still supported);
-        The ninth value is the text description of the type.
+        The ninth value is the numpy convert param needed for decoding from\
+            bytes.
+        The tenth value is the number of bytes this data type takes up for\
+            decoding into numpy. 
+        The eleventh value is the text description of the type.
     """
     # pylint: disable=no-member
     UINT8 = (0,

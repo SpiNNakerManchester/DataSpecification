@@ -29,14 +29,13 @@ class AbstractExecutorFunctions(object):
         raise UnimplementedDSECommandError("BREAK")
 
     def execute_nop(self, cmd):
-        """ This command executes no operation
+        """ This command executes no operation.
 
         :param cmd: the command which triggered the function call
         :type cmd: int
         :return: No value returned
         :rtype: None
         """
-        pass
 
     def execute_reserve(self, cmd):  # pragma: no cover
         raise UnimplementedDSECommandError("RESERVE")

@@ -36,7 +36,7 @@ class DataType(Enum):
         The ninth value is the numpy convert param needed for decoding from\
             bytes.
         The tenth value is the number of bytes this data type takes up for\
-            decoding into numpy. 
+            decoding into numpy.
         The eleventh value is the text description of the type.
     """
     # pylint: disable=no-member

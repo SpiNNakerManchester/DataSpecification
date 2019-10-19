@@ -35,7 +35,6 @@ class DataType(Enum):
             direct conversion via numpy, scaled conversion still supported);
         The ninth value is the text description of the type.
     """
-    # pylint: disable=no-member
     UINT8 = (0,
              1,
              decimal.Decimal("0"),
@@ -285,12 +284,12 @@ class DataType(Enum):
         obj = object.__new__(cls)
         obj._value_ = value
         obj.__doc__ = doc
-        obj.size = size
-        obj.min = min_val
-        obj.max = max_val
-        obj.scale = scale
-        obj.struct_encoding = struct_encoding
-        obj.numpy_typename = numpy_typename
+        obj._size = size
+        obj._min = min_val
+        obj._max = max_val
+        obj._scale = scale
+        obj._struct_encoding = struct_encoding
+        obj._numpy_typename = numpy_typename
         obj._apply_scale = apply_scale
         obj._force_cast = force_cast
         if size == 1:
@@ -300,24 +299,29 @@ class DataType(Enum):
         obj._struct = struct.Struct("<" + struct_encoding)
         return obj
 
-    def __init__(self, value, size, min_val, max_val, scale, struct_encoding,
-                 apply_scale, force_cast, numpy_typename, doc=""):
-        # pylint: disable=too-many-arguments
-        self._value_ = value
-        self.__doc__ = doc
-        self.size = size
-        self.min = min_val
-        self.max = max_val
-        self.scale = scale
-        self.struct_encoding = struct_encoding
-        self.numpy_typename = numpy_typename
-        self._apply_scale = apply_scale
-        self._force_cast = force_cast
-        if size == 1:
-            struct_encoding += "xxx"
-        elif size == 2:
-            struct_encoding += "xx"
-        self._struct = struct.Struct("<" + struct_encoding)
+    @property
+    def size(self):
+        return self._size
+
+    @property
+    def min(self):
+        return self._min
+
+    @property
+    def max(self):
+        return self._max
+
+    @property
+    def scale(self):
+        return self._scale
+
+    @property
+    def struct_encoding(self):
+        return self._struct_encoding
+
+    @property
+    def numpy_typename(self):
+        return self._numpy_typename
 
     def encode_as_int(self, value):
         """ Returns the value as an integer, according to this type.

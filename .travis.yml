@@ -40,7 +40,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install python-coveralls 'coverage>=4.4'
+  - pip install pylint python-coveralls 'coverage>=4.4'
   - python ./setup.py install
 
 script:
@@ -48,6 +48,7 @@ script:
   - py.test unittests --cov data_specification
   # Code quality check
   - flake8 data_specification
+  - ( pylint --output-format=colorized --disable=R,C data_specification; exit $(($? & 35)) )
   - support/rat.sh run
   # Build check
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html

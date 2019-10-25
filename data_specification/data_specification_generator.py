@@ -1666,8 +1666,8 @@ class DataSpecificationGenerator(object):
                 _Field.USAGE: DEST_ONLY,
                 _Field.DESTINATION: register_id})
             encoded_data = data_type.encode(data)
-            cmd_string = "reg[{0:d}] = {1:d} (0x{2:X})".format(
-                register_id, data, data)
+            cmd_string = "reg[{0:d}] = {1:d} (0x{1:X})".format(
+                register_id, data)
 
         self.write_command_to_files(cmd_word + encoded_data, cmd_string)
 

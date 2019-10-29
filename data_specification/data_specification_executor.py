@@ -32,7 +32,7 @@ _ONE_WORD = struct.Struct("<I")
 
 class DataSpecificationExecutor(object):
     """ Used to execute a SpiNNaker data specification language file to\
-        produce a memory image
+        produce a memory image.
     """
 
     __slots__ = [
@@ -56,7 +56,9 @@ class DataSpecificationExecutor(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
+        #: The object to read the specification to execute.
         self.spec_reader = spec_reader
+        #: The executor functions themselves.
         self.dsef = DataSpecificationExecutorFunctions(
             self.spec_reader, memory_space)
 
@@ -83,9 +85,9 @@ class DataSpecificationExecutor(object):
             If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
-        :raise data_specification.exceptions.DataSpecificationException:\
+        :raise DataSpecificationException:\
             If there is an error when executing the specification
-        :raise data_specification.exceptions.TablePointerOutOfMemory:\
+        :raise TablePointerOutOfMemoryException:\
             If the table pointer generated as data header exceeds the size of\
             the available memory
         """
@@ -101,25 +103,28 @@ class DataSpecificationExecutor(object):
             index += 4
 
     def get_region(self, region_id):
-        """ Get a region with a given ID
+        """ Get a region with a given ID.
 
         :param region_id: The ID of the region to get
         :type region_id: int
         :return: The region, or None if the region was not allocated
-        :rtype: :py:class:`MemoryRegion`
+        :rtype: MemoryRegion
         """
         return self.dsef.mem_regions[region_id]
 
     def get_header(self):
-        """ Get the header of the data as a numpy array
+        """ Get the header of the data as a numpy array.
+
+        :rtype: numpy.ndarray
         """
         return numpy.array([APPDATA_MAGIC_NUM, DSE_VERSION], dtype="<u4")
 
     def get_pointer_table(self, start_address):
-        """ Get the pointer table as a numpy array
+        """ Get the pointer table as a numpy array.
 
         :param start_address: The base address of the data to be written
-        :rtype: numpy.array
+        :type start_address: int
+        :rtype: numpy.ndarray
         """
         pointer_table = numpy.zeros(MAX_MEM_REGIONS, dtype="<u4")
         pointer_table_size = MAX_MEM_REGIONS * 4

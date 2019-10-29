@@ -15,6 +15,7 @@ Data Specification
 ==================
 
 .. automodule:: data_specification
+   :special-members:
 
 Contents
 --------
@@ -22,7 +23,7 @@ Contents
 .. toctree::
    :maxdepth: 4
 
-   data_specification
+   modules
 
 
 Indices and tables

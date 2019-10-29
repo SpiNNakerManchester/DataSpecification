@@ -364,4 +364,7 @@ for f in os.listdir("."):
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
 # exclude data_specification/data_spec_sender until it is nuked!
-apidoc.main([None, '-o', ".", "../../data_specification"])
+apidoc.main([None, '-o', ".", "../../data_specification",
+             # Exclusions
+             "../../data_specification/[dm]*.py",
+             "../../data_specification/enums/[a-z]*.py"])

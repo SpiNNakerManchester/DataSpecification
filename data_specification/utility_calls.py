@@ -41,6 +41,7 @@ def _mkdir(directory):
 
 def get_region_base_address_offset(app_data_base_address, region):
     """ Find the address of the of a given region for the DSG
+
     :param app_data_base_address: base address for the core
     :param region: the region ID we're looking for
     """
@@ -57,7 +58,8 @@ def get_data_spec_and_file_writer_filename(
         processor_chip_x, processor_chip_y, processor_id,
         hostname, report_directory="TEMP", write_text_specs=False,
         application_run_time_report_folder="TEMP"):
-    """ Encapsulates the creation of the DSG writer and the file paths
+    """ Encapsulates the creation of the DSG writer and the file paths.
+
     :param processor_chip_x: x-coordinate of the chip
     :type processor_chip_x: int
     :param processor_chip_y: y-coordinate of the chip
@@ -103,8 +105,9 @@ def get_data_spec_and_file_writer_filename(
 def get_report_writer(
         processor_chip_x, processor_chip_y, processor_id,
         hostname, report_directory="TEMP", write_text_specs=False):
-    """ check if text reports are needed and if so initialise the report
-        writer to send down to DSG
+    """ Check if text reports are needed, and if so initialise the report\
+        writer to send down to DSG.
+
     :param processor_chip_x: x-coordinate of the chip
     :type processor_chip_x: int
     :param processor_chip_y: y-coordinate of the chip

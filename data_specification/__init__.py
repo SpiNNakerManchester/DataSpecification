@@ -17,11 +17,11 @@
     instructions.
 
 The main part of this package is the \
-:py:class:`data_specification.DataSpecificationGenerator` \
+:py:class:`DataSpecificationGenerator` \
 class. This is used to generate a "Data Specification", which can then be \
 executed to produce a memory image.  This package also handles this function \
 if required, through the \
-:py:class:`data_specification.DataSpecificationExecutor` class.
+:py:class:`DataSpecificationExecutor` class.
 
 Functional Requirements
 =======================
@@ -52,12 +52,12 @@ Use Cases
 
 There are a number of use-cases of this library:
 
-  * :py:class:`~data_specification.DataSpecificationGenerator` \
+  * :py:class:`DataSpecificationGenerator` \
     is used to create a compressed memory image which can be expanded later, \
     to reduce the amount of data that needs to be transferred over a slow \
     connection.
 
-  * :py:class:`~data_specification.DataSpecificationExecutor` \
+  * :py:class:`DataSpecificationExecutor` \
     is used to execute a previously generated specification at the receiving \
     end of a slow connection.
 """

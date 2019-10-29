@@ -119,7 +119,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.ExecuteBreakInstruction:\
+        :raise ExecuteBreakInstruction:\
             Raises the exception to break the execution of the DSE
         """
         raise ExecuteBreakInstruction(
@@ -132,9 +132,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.DataSpecificationSyntaxError:\
+        :raise DataSpecificationSyntaxError:\
             If there is an error in the command syntax
-        :raise data_specification.exceptions.ParameterOutOfBoundsException: \
+        :raise ParameterOutOfBoundsException: \
             If the requested size of the region is beyond the available\
             memory space
         """
@@ -174,7 +174,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.DataSpecificationSyntaxError:\
+        :raise DataSpecificationSyntaxError:\
             If there is an error in the command syntax
         """
         self.__unpack_cmd(cmd)
@@ -224,7 +224,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.RegionUnfilledException: \
+        :raise RegionUnfilledException: \
             If the focus is being switched to a region of memory which has\
             been declared to be kept unfilled
         """
@@ -247,7 +247,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type cmd: int
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.DataSpecificationSyntaxError: \
+        :raise DataSpecificationSyntaxError: \
             If the destination register is not correctly specified; the\
             destination must be a register and the appropriate bit needs to\
             be set in the specification
@@ -295,7 +295,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type cmd: int
         :return: END_SPEC_EXECUTOR
         :rtype: int
-        :raise data_specification.exceptions.DataSpecificationSyntaxError:\
+        :raise DataSpecificationSyntaxError:\
             If command END_SPEC != -1
         """
         value = _ONE_SIGNED_INT.unpack(self.spec_reader.read(4))[0]
@@ -321,14 +321,14 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type command: str
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.NoRegionSelectedException: \
+        :raise NoRegionSelectedException: \
             if there is no memory region selected for the write operation
-        :raise data_specification.exceptions.RegionNotAllocatedException: \
+        :raise RegionNotAllocatedException: \
             if the selected region has not been allocated memory space
-        :raise data_specification.exceptions.NoMoreException:\
+        :raise NoMoreException:\
             if the selected region has not enough available memory to \
             store the required data
-        :raise data_specification.exceptions.UnknownTypeLengthException: \
+        :raise UnknownTypeLengthException: \
             if the data type size is not 1, 2, 4, or 8 bytes
         """
         if n_bytes == 1:
@@ -354,11 +354,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :type command: str
         :return: No value returned
         :rtype: None
-        :raise data_specification.exceptions.NoRegionSelectedException: \
+        :raise NoRegionSelectedException: \
             if there is no memory region selected for the write operation
-        :raise data_specification.exceptions.RegionNotAllocatedException: \
+        :raise RegionNotAllocatedException: \
             if the selected region has not been allocated memory space
-        :raise data_specification.exceptions.NoMoreException:\
+        :raise NoMoreException:\
             if the selected region has not enough available memory to \
             store the required data
         """
@@ -378,7 +378,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         :param data: The data to write
         :type data: str
-        :raise data_specification.exceptions.NoMoreException:\
+        :raise NoMoreException:\
             if the selected region has not enough space to store the data
         """
         # It must have enough space

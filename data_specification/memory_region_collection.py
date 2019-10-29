@@ -42,14 +42,14 @@ class MemoryRegionCollection(object):
 
     def __getitem__(self, key):
         """
-        :rtype: :py:class:`~data_specification.MemoryRegion`
+        :rtype: MemoryRegion
         """
         return self._regions[key]
 
     def __setitem__(self, key, value):
         """
         :type key: int
-        :type value: :py:class:`~data_specification.MemoryRegion`
+        :type value: MemoryRegion
         """
         if key < 0 or key >= len(self._regions):
             raise NoRegionSelectedException(
@@ -61,14 +61,14 @@ class MemoryRegionCollection(object):
 
     def __iter__(self):
         """
-        :rtype: iterable(:py:class:`~data_specification.MemoryRegion`)
+        :rtype: iterable(MemoryRegion)
         """
         return iter(self._regions)
 
     @property
     def regions(self):
         """
-        :rtype: iterable(:py:class:`~data_specification.MemoryRegion`)
+        :rtype: iterable(MemoryRegion)
         """
         for r in self._regions:
             yield r
@@ -98,12 +98,13 @@ class MemoryRegionCollection(object):
             needs to be written (optimisation to stop large data files).
 
         :param region: the region ID to which the test is being ran on
+        :type region: int
         :return: a boolean stating if the region needs to be written
         :rtype: bool
         :raise NoRegionSelectedException: \
             when the ID is beyond the expected region range
         """
-        if region >= len(self._regions):
+        if region < 0 or region >= len(self._regions):
             raise NoRegionSelectedException(
                 "the region ID requested is beyond the supported number of"
                 "available region IDs")

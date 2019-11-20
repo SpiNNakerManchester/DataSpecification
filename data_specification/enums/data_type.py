@@ -31,9 +31,10 @@ class DataType(Enum):
             encodings to convert the data in binary format;
         The seventh value is whether to apply the scaling when converting to\
             SpiNNaker's binary format.
-        The eighth value is the corresponding numpy type (or None to inhibit\
+        The eighth value is the type to force cast to, or None if not required
+        The ninth value is the corresponding numpy type (or None to inhibit\
             direct conversion via numpy, scaled conversion still supported);
-        The ninth value is the text description of the type.
+        The tenth value is the text description of the type.
     """
     UINT8 = (0,
              1,
@@ -203,7 +204,7 @@ class DataType(Enum):
            "B",
            True,
            None,
-           None,
+           np.uint16,
            "0.8 unsigned fixed point number")
     U016 = (17,
             2,
@@ -213,7 +214,7 @@ class DataType(Enum):
             "H",
             True,
             None,
-            None,
+            np.uint16,
             "0.16 unsigned fixed point number")
     U032 = (18,
             4,
@@ -223,7 +224,7 @@ class DataType(Enum):
             "I",
             True,
             None,
-            None,
+            np.uint32,
             "0.32 unsigned fixed point number")
     U064 = (19,
             8,
@@ -234,7 +235,7 @@ class DataType(Enum):
             "Q",
             True,
             None,
-            None,
+            np.uint64,
             "0.64 unsigned fixed point number")  # rounding problem for max
     S07 = (20,
            1,
@@ -244,7 +245,7 @@ class DataType(Enum):
            "b",
            True,
            None,
-           None,
+           np.int8,
            "0.7 signed fixed point number")
     S015 = (21,
             2,
@@ -254,7 +255,7 @@ class DataType(Enum):
             "h",
             True,
             None,
-            None,
+            np.int16,
             "0.15 signed fixed point number")
     S031 = (22,
             4,
@@ -264,7 +265,7 @@ class DataType(Enum):
             "i",
             True,
             None,
-            None,
+            np.int32,
             "0.32 signed fixed point number")
     S063 = (23,
             8,
@@ -275,7 +276,7 @@ class DataType(Enum):
             "q",
             True,
             None,
-            None,
+            np.int64,
             "0.63 signed fixed point number")  # rounding problem for max
 
     def __new__(cls, value, size, min_val, max_val, scale, struct_encoding,
@@ -343,5 +344,8 @@ class DataType(Enum):
         :param values: the bytes to decode into this given data type
         :rtype: numpy array
         """
-        return np.asarray(values, dtype="uint8").view(
+        array = np.asarray(values, dtype="uint8").view(
             dtype=self.numpy_typename)
+        if self._apply_scale:
+            return array / float(self.scale)
+        return array

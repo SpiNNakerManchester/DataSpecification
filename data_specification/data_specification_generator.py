@@ -1302,6 +1302,7 @@ class DataSpecificationGenerator(object):
 
         data = numpy.array(array_values, dtype=data_type.numpy_typename)
         size = data.size * data_type.size
+
         if size % 4 != 0:
             raise UnknownTypeLengthException(size, Commands.WRITE_ARRAY.name)
 

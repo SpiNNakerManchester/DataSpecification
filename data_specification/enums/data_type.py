@@ -124,7 +124,7 @@ class DataType(Enum):
            "H",
            True,
            None,
-           None,
+           np.uint16,
            "8.8 unsigned fixed point number")
     U1616 = (9,
              4,
@@ -134,7 +134,7 @@ class DataType(Enum):
              "I",
              True,
              None,
-             None,
+             np.uint32,
              "16.16 unsigned fixed point number")
     U3232 = (10,
              8,
@@ -144,7 +144,7 @@ class DataType(Enum):
              "Q",
              True,
              None,
-             None,
+             np.uint64,
              "32.32 unsigned fixed point number")  # rounding problem for max
     S87 = (11,
            2,
@@ -154,7 +154,7 @@ class DataType(Enum):
            "h",
            True,
            None,
-           None,
+           np.int16,
            "8.7 signed fixed point number")
     S1615 = (12,
              4,
@@ -164,7 +164,7 @@ class DataType(Enum):
              "i",
              True,
              None,
-             None,
+             np.int32,
              "16.15 signed fixed point number")
     S3231 = (13,
              8,
@@ -174,7 +174,7 @@ class DataType(Enum):
              "q",
              True,
              None,
-             None,
+             np.int64,
              "32.31 signed fixed point number")  # rounding problem for max
     FLOAT_32 = (14,
                 4,

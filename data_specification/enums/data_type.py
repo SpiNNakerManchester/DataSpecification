@@ -344,7 +344,33 @@ class DataType(Enum):
         """
         return np.round(self.encode_as_int(value)).astype(self.struct_encoding)
 
+    def encode_as_numpy_int_array(self, array):
+        """ Returns the numpy array as an integer numpy array, according to \
+            this type.
+
+        :param array:
+        :type array: numpy.ndarray
+        :rtype array: numpy.ndarray
+        """
+        if self._apply_scale:
+            # pylint: disable=assignment-from-no-return
+            where = np.logical_or(array < self._min, self._max < array)
+            if any(where):
+                raise ValueError(
+                    "value {:f} cannot be converted to {:s}: out of range"
+                    .format(array[where][0], self.__doc__))
+            return np.round(array * float(self._scale)).astype("uint32")
+        if self._force_cast is not None:
+            return np.array([self._force_cast(x) for x in array]).astype(
+                "uint32")
+        return np.array(array)
+
     def encode(self, value):
         """ Encode the Python value for SpiNNaker according to this type.
         """
         return self._struct.pack(self.encode_as_int(value))
+
+    def decode_numpy_array(self, array):
+        """ Decode the numpy array of SpiNNaker values according to this type.
+        """
+        return array / float(self._scale)

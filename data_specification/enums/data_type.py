@@ -327,10 +327,22 @@ class DataType(Enum):
         """ Returns the value as an integer, according to this type.
         """
         if self._apply_scale:
-            return int(round(decimal.Decimal(str(value)) * self.scale))
+            if not (self._min <= value <= self._max):
+                raise ValueError(
+                    "value {:f} cannot be converted to {:s}: out of range"
+                    .format(value, self.__doc__))
+            return int(round(decimal.Decimal(str(value)) * self._scale))
         if self._force_cast is not None:
             return self._force_cast(value)
         return value
+
+    def encode_as_numpy_int(self, value):
+        """ Returns the value as a numpy integer, according to this type.
+
+        .. note:
+            Only works with integer and fixed point data types.
+        """
+        return np.round(self.encode_as_int(value)).astype(self.struct_encoding)
 
     def encode(self, value):
         """ Encode the Python value for SpiNNaker according to this type.

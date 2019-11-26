@@ -355,7 +355,7 @@ class DataType(Enum):
         if self._apply_scale:
             # pylint: disable=assignment-from-no-return
             where = np.logical_or(array < self._min, self._max < array)
-            if any(where):
+            if where.any():
                 raise ValueError(
                     "value {:f} cannot be converted to {:s}: out of range"
                     .format(array[where][0], self.__doc__))

@@ -37,7 +37,7 @@ class DataSpecificationExecutor(object):
 
     __slots__ = [
         # The object to read the specification language file
-        "spec_reader",
+        "_spec_reader",
 
         # The executer functions
         "dsef"
@@ -48,7 +48,7 @@ class DataSpecificationExecutor(object):
         :param spec_reader: \
             The object to read the specification language file from
         :type spec_reader:\
-            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataReader`
+            ~spinn_storage_handlers.abstract_classes.AbstractDataReader
         :param memory_space: memory available on the destination architecture
         :type memory_space: int
         :raise spinn_storage_handlers.exceptions.DataReadException:\
@@ -57,10 +57,10 @@ class DataSpecificationExecutor(object):
             If a write to external storage fails
         """
         #: The object to read the specification to execute.
-        self.spec_reader = spec_reader
+        self._spec_reader = spec_reader
         #: The executor functions themselves.
         self.dsef = DataSpecificationExecutorFunctions(
-            self.spec_reader, memory_space)
+            self._spec_reader, memory_space)
 
     def __operation_func(self, cmd, index):
         """ Decode the command and select an implementation of the command.
@@ -75,10 +75,10 @@ class DataSpecificationExecutor(object):
                          cmd, index, exc_info=True)
             raise_from(DataSpecificationException(
                 "Invalid command 0x{0:X} while reading file {1:s}".format(
-                    cmd, self.spec_reader.filename)), e)
+                    cmd, self._spec_reader.filename)), e)
 
     def execute(self):
-        """ Executes the specification
+        """ Executes the specification.
 
         :return: Nothing
         :raise spinn_storage_handlers.exceptions.DataReadException:\
@@ -92,14 +92,14 @@ class DataSpecificationExecutor(object):
             the available memory
         """
         index = 0
-        instruction_spec = self.spec_reader.read(4)
+        instruction_spec = self._spec_reader.read(4)
         while instruction_spec:
             # process the received command
             cmd = _ONE_WORD.unpack(instruction_spec)[0]
             operation_fn = self.__operation_func(cmd, index)
             if operation_fn(cmd) == END_SPEC_EXECUTOR:
                 break
-            instruction_spec = self.spec_reader.read(4)
+            instruction_spec = self._spec_reader.read(4)
             index += 4
 
     def get_region(self, region_id):
@@ -108,9 +108,17 @@ class DataSpecificationExecutor(object):
         :param region_id: The ID of the region to get
         :type region_id: int
         :return: The region, or None if the region was not allocated
-        :rtype: MemoryRegion
+        :rtype: MemoryRegion or None
         """
         return self.dsef.mem_regions[region_id]
+
+    @property
+    def mem_regions(self):
+        """ An enumeration of the mapping from region ID to region holder.
+
+        :rtype: iterable(tuple(int, MemoryRegion or None))
+        """
+        return enumerate(self.dsef.mem_regions)
 
     def get_header(self):
         """ Get the header of the data as a numpy array.
@@ -130,7 +138,7 @@ class DataSpecificationExecutor(object):
         pointer_table_size = MAX_MEM_REGIONS * 4
         next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
-        for i, region in enumerate(self.dsef.mem_regions):
+        for i, region in self.mem_regions:
             if region is not None:
                 pointer_table[i] = next_free_offset + start_address
                 next_free_offset += region.allocated_size
@@ -139,11 +147,11 @@ class DataSpecificationExecutor(object):
         return pointer_table
 
     def get_constructed_data_size(self):
-        """ Return the size of the data that will be written to memory
+        """ Return the size of the data that will be written to memory.
 
         :return: size of the data that will be written to memory
         :rtype: int
         """
         return APP_PTR_TABLE_BYTE_SIZE + sum(
             region.allocated_size
-            for region in self.dsef.mem_regions if region is not None)
+            for _, region in self.mem_regions if region is not None)

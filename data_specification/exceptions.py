@@ -36,6 +36,7 @@ class RegionInUseException(DataSpecificationException):
         :param region: The region that was already allocated
         :type region: int
         :param label: What label is known for the region
+        :type label: str or None
         """
         if label is None:
             msg = "Region {0:d} was already allocated".format(region)
@@ -255,6 +256,7 @@ class WrongParameterNumberException(DataSpecificationException):
         :type parameters: list
         :param no_of_parameters_required: \
             The number of parameters required by the function
+        :type no_of_parameters_required: int
         """
         super(WrongParameterNumberException, self).__init__(
             "Function {0} that requires {1} parameters has been called "
@@ -296,7 +298,7 @@ class TypeMismatchException(DataSpecificationException):
     def __init__(self, command):
         """
         :param command: The command that generated the exception
-        :type command: int
+        :type command: str
         """
         super(TypeMismatchException, self).__init__(
             "A type mismatch has occurred during command {0}".format(
@@ -421,7 +423,7 @@ class ExecuteBreakInstruction(DataSpecificationException):
             at the time of breakpoint
         :type address: int
         :param filename: file being parsed
-        :param filename: str
+        :type filename: str
         """
         super(ExecuteBreakInstruction, self).__init__(
             "Executing BREAK instruction at address {0} of file {1}"
@@ -463,10 +465,10 @@ class RegionNotAllocatedException(DataSpecificationException):
 
     def __init__(self, region, command):
         """
-        :param region:
-        :type region:
-        :param command:
-        :type command:
+        :param region: The ID of the region that was not allocated.
+        :type region: int
+        :param command: The name of the command that was being handled.
+        :type command: str
         """
         super(RegionNotAllocatedException, self).__init__(
             "Region {0} has not been allocated during execution of "

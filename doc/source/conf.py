@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
+
 # data_allocation documentation build configuration file, created by
 # sphinx-quickstart on Tue Jun 17 08:56:46 2014.
 #
@@ -48,15 +48,17 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
+    'sphinx.ext.intersphinx'
 ]
 
-intersphinx_mapping = {'spinn_machine':
-                       ('http://spinnmachine.readthedocs.org/en/latest/',
-                           None),
-                       'spinn_storage_handlers':
-                           ('http://spinnmachine.readthedocs.io/en/latest/',
-                            None)
-                       }
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3.6', None),
+    'numpy': ("https://docs.scipy.org/doc/numpy/", None),
+    'spinn_machine': (
+        'https://spinnmachine.readthedocs.io/en/latest/', None),
+    'spinn_storage_handlers': (
+        'https://spinnstoragehandlers.readthedocs.io/en/latest/', None),
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -72,7 +74,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'DataSpecification'
-copyright = u'2014-2017'
+copyright = u'2014-2019'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -292,7 +294,7 @@ texinfo_documents = [
 epub_title = u'DataSpecification'
 epub_author = u''
 epub_publisher = u''
-epub_copyright = u'2014-2017'
+epub_copyright = u'2014-2019'
 
 # The basename for the epub file. It defaults to the project name.
 # epub_basename = u'data_allocation'
@@ -363,8 +365,8 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-# exclude data_specification/data_spec_sender until it is nuked!
 apidoc.main([None, '-o', ".", "../../data_specification",
              # Exclusions
              "../../data_specification/[dm]*.py",
+             "../../data_specification/spi/a*.py",
              "../../data_specification/enums/[a-z]*.py"])

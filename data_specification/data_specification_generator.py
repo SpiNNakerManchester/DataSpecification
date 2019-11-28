@@ -99,11 +99,16 @@ def _binencode(command, arguments):
 
 
 class _MemSlot(object):
+    """ Metadata for a memory region.
+    """
     __slots__ = ["label", "size", "empty"]
 
     def __init__(self, label, size, empty):
+        #: Optional label for the region; str or None
         self.label = label
+        #: The size of the region; int
         self.size = size
+        #: Whether the region is to be left empty; bool
         self.empty = empty
 
 
@@ -116,32 +121,30 @@ class DataSpecificationGenerator(object):
     __slots__ = [
         "spec_writer",
         "report_writer",
-        "txt_indent",
+        "_txt_indent",
         "instruction_counter",
         "mem_slots",
-        "function_slots",
-        "struct_slots",
-        "rng",
-        "random_distribution",
-        "conditionals",
+        "_function_slots",
+        "_struct_slots",
+        "_rng",
+        "_random_distribution",
+        "_conditionals",
         "current_region",
-        "ongoing_function_definition",
-        "ongoing_loop"
+        "_ongoing_function_definition",
+        "_ongoing_loop"
     ]
-
-    MAGIC_NUMBER = 0xAD130AD6
-    VERSION = 1
 
     def __init__(self, spec_writer, report_writer=None):
         """
         :param spec_writer: The object to write the specification to
         :type spec_writer: \
-            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataWriter`
+            ~spinn_storage_handlers.abstract_classes.AbstractDataWriter
         :param report_writer: \
             Determines if a text version of the specification is to be\
             written and, if so, where. No report is written if this is None.
         :type report_writer: \
-            :py:class:`~spinn_storage_handlers.abstract_classes.AbstractDataWriter`
+            ~spinn_storage_handlers.abstract_classes.AbstractDataWriter \
+            or None
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
             If a write to external storage fails
         """
@@ -156,27 +159,27 @@ class DataSpecificationGenerator(object):
         #: the writer for the human readable report
         self.report_writer = report_writer
         #: current indentation for the report writer
-        self.txt_indent = 0
+        self._txt_indent = 0
         #: instruction counter, for the report writer only
         self.instruction_counter = 0
-        #: the memory regions
+        #: the memory regions; list(
         self.mem_slots = [None] * MAX_MEM_REGIONS
         #: the functions
-        self.function_slots = [None] * MAX_CONSTRUCTORS
+        self._function_slots = [None] * MAX_CONSTRUCTORS
         #: the structure definitions
-        self.struct_slots = [None] * MAX_STRUCT_SLOTS
+        self._struct_slots = [None] * MAX_STRUCT_SLOTS
         #: the random number generators
-        self.rng = [None] * MAX_RNGS
+        self._rng = [None] * MAX_RNGS
         #: the random distributions
-        self.random_distribution = [None] * MAX_RANDOM_DISTS
-        #: stack of conditionals, used for 'else' tracking
-        self.conditionals = []
+        self._random_distribution = [None] * MAX_RANDOM_DISTS
+        #: stack of _conditionals, used for 'else' tracking
+        self._conditionals = []
         #: the current DSG region we're writing to
         self.current_region = None
         #: whether there is a currently-being-made function definition
-        self.ongoing_function_definition = False
+        self._ongoing_function_definition = False
         #: whether there is a currently executing loop
-        self.ongoing_loop = False
+        self._ongoing_loop = False
 
     def comment(self, comment):
         """ Write a comment to the text version of the specification.\
@@ -230,10 +233,10 @@ class DataSpecificationGenerator(object):
 
         :param region: The number of the region to reserve, from 0 to 15
         :type region: int
-        :param size: The size to reserve for the region in bytes
+        :param size: The size to reserve for the region, in bytes
         :type size: int
         :param label: An optional label for the region
-        :type label: str
+        :type label: str or None
         :param empty: Specifies if the region will be left empty
         :type empty: bool
         :param shrink: Specifies if the region will be compressed
@@ -245,10 +248,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise RegionInUseException: \
-            If the region was already reserved
+            If the ``region`` was already reserved
         :raise ParameterOutOfBoundsException: \
-            If the region requested was out of the allowed range, or that the\
-            size was too big to fit in SDRAM
+            If the ``region`` requested was out of the allowed range, or\
+            the ``size`` was too big to fit in SDRAM
         """
         _bounds(Commands.RESERVE, "memory region identifier",
                 region, 0, MAX_MEM_REGIONS)
@@ -290,7 +293,7 @@ class DataSpecificationGenerator(object):
         :raise NotAllocatedException: \
             If the region was not reserved
         :raise ParameterOutOfBoundsException: \
-            If the region requested was out of the allowed range
+            If the ``region`` requested was out of the allowed range
         """
         _bounds(Commands.FREE, "memory region identifier",
                 region, 0, MAX_MEM_REGIONS)
@@ -328,10 +331,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise UnknownTypeException: \
-            If the rng_type is not one of the allowed values
+            If the ``rng_type`` is not one of the allowed values
         :raise ParameterOutOfBoundsException:
-            * If the seed is too big or too small
-            * If the rng_id is not in the allowed range
+            * If the ``seed`` is too big or too small
+            * If the ``rng_id`` is not in the allowed range
         :raise RNGInUseException: \
             If the random number generator with the given ID has already been\
             defined
@@ -342,11 +345,11 @@ class DataSpecificationGenerator(object):
             raise UnknownTypeException(
                 rng_type.value, Commands.DECLARE_RNG.name)
 
-        if self.rng[rng_id] is not None:
+        if self._rng[rng_id] is not None:
             raise RNGInUseException(rng_id)
         _typebounds(Commands.DECLARE_RNG, "seed", seed, DataType.UINT32)
 
-        self.rng[rng_id] = [rng_type, seed]
+        self._rng[rng_id] = [rng_type, seed]
 
         cmd_word = _binencode(Commands.DECLARE_RNG, {
             _Field.LENGTH: LEN2,
@@ -364,7 +367,7 @@ class DataSpecificationGenerator(object):
         """ Insert commands to declare a uniform random distribution
 
         :param distribution_id: ID of the distribution being set up
-        :param distribution_id: int
+        :type distribution_id: int
         :param structure_id: ID of an empty structure slot to fill with the\
             uniform random distribution data
         :type structure_id: int
@@ -386,11 +389,12 @@ class DataSpecificationGenerator(object):
         :raise NoMoreException: \
             If there is no more space for a new random distribution
         :raise NotAllocatedException: \
-            If the requested rng_id has not been allocated
+            If the requested ``rng_id`` has not been allocated
         :raise ParameterOutOfBoundsException: \
-            If rng_id, structure_id, min_value or max_value is out of range
+            If ``rng_id``, ``structure_id``, ``min_value`` or ``max_value`` is\
+            out of range
         :raise StructureInUseException: \
-            If structure structure_id is already defined
+            If structure ``structure_id`` is already defined
         """
         _bounds(Commands.DECLARE_RANDOM_DIST, "distribution ID",
                 distribution_id, 0, MAX_RANDOM_DISTS)
@@ -403,10 +407,10 @@ class DataSpecificationGenerator(object):
         _bounds(Commands.DECLARE_RANDOM_DIST, "structure ID",
                 structure_id, 0, MAX_STRUCT_SLOTS)
 
-        if self.rng[rng_id] is None:
+        if self._rng[rng_id] is None:
             raise NotAllocatedException(
                 "RNG", rng_id, Commands.DECLARE_RANDOM_DIST.name)
-        if self.random_distribution[distribution_id] is not None:
+        if self._random_distribution[distribution_id] is not None:
             raise RandomNumberDistributionInUseException(distribution_id)
 
         parameters = [("distType", DataType.UINT32, 0),
@@ -414,7 +418,7 @@ class DataSpecificationGenerator(object):
                       ("param1", DataType.S1615, min_value),
                       ("param2", DataType.S1615, max_value)]
 
-        self.random_distribution[distribution_id] = parameters
+        self._random_distribution[distribution_id] = parameters
         self.define_structure(structure_id, parameters)
 
         cmd_word = _binencode(Commands.DECLARE_RANDOM_DIST, {
@@ -447,13 +451,14 @@ class DataSpecificationGenerator(object):
         :raise NotAllocatedException: \
             If the random distribution ID was not previously declared
         :raise ParameterOutOfBoundsException: \
-            If the distribution_id or register_id specified was out of range
+            If the ``distribution_id`` or ``register_id`` specified was out\
+            of range
         """
         _bounds(Commands.GET_RANDOM_NUMBER, "register_id",
                 register_id, 0, MAX_REGISTERS)
         _bounds(Commands.GET_RANDOM_NUMBER, "distribution_id",
                 distribution_id, 0, MAX_RANDOM_DISTS)
-        if self.random_distribution[distribution_id] is None:
+        if self._random_distribution[distribution_id] is None:
             raise NotAllocatedException(
                 "random number distribution", distribution_id,
                 Commands.GET_RANDOM_NUMBER.name)
@@ -471,8 +476,8 @@ class DataSpecificationGenerator(object):
     def define_structure(self, structure_id, parameters):
         """ Insert commands to define a data structure
 
-        :param structure_id: the ID of the structure to create,\
-            between 0 and 15
+        :param structure_id: \
+            the ID of the structure to create, between 0 and 15
         :type structure_id: int
         :param parameters: A list of between 1 and 255 tuples of \
             `(label, data_type, value)` where:
@@ -493,9 +498,10 @@ class DataSpecificationGenerator(object):
         :raise ParameterOutOfBoundsException:
             * If there are an incorrect number of parameters
             * If the size of one of the tuples is incorrect
-            * If one of the values to be assigned has an integer data_type \
+            * If one of the values to be assigned has an integer ``data_type``\
               but has a fractional part
-            * If one of the values to be assigned would overflow its data_type
+            * If one of the values to be assigned would overflow its\
+              ``data_type``
         :raise UnknownTypeException: \
             If one of the data types in the structure is unknown
         """
@@ -504,10 +510,10 @@ class DataSpecificationGenerator(object):
                 structure_id, 0, MAX_STRUCT_SLOTS)
         _bounds(Commands.START_STRUCT, "structure elements",
                 len(parameters), 1, MAX_STRUCT_ELEMENTS)
-        if self.struct_slots[structure_id] is not None:
+        if self._struct_slots[structure_id] is not None:
             raise StructureInUseException(structure_id)
 
-        self.struct_slots[structure_id] = parameters
+        self._struct_slots[structure_id] = parameters
         cmd_word = _binencode(Commands.START_STRUCT, {
             _Field.LENGTH: LEN1,
             _Field.IMMEDIATE: structure_id})
@@ -575,7 +581,8 @@ class DataSpecificationGenerator(object):
         :param parameter_index: The ID of the parameter/element to copy
         :type parameter_index: int
         :param parameter_index_is_register: \
-            True if the index of the structure is contained in a register
+            True if ``parameter_index`` is a register ID containing the ID of\
+            the parameter/element to copy
         :type parameter_index_is_register: bool
         :return: Nothing is returned
         :rtype: None
@@ -584,12 +591,12 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If structure_id is not in the allowed range
-            * If parameter_index is larger than the number of parameters\
-            declared in the original structure
-            * If destination_id is not the ID of a valid register
-            * If parameter_index_is_register is True and parameter_index is\
-            not a valid register ID
+            * If ``structure_id`` is not in the allowed range
+            * If ``parameter_index`` is larger than the number of parameters\
+              declared in the original structure
+            * If ``destination_id`` is not the ID of a valid register
+            * If ``parameter_index_is_register`` is True and \
+              ``parameter_index`` is not a valid register ID
         :raise NotAllocatedException: \
             If the structure requested has not been declared
         """
@@ -597,7 +604,7 @@ class DataSpecificationGenerator(object):
                 structure_id, 0, MAX_STRUCT_SLOTS)
         _bounds(Commands.READ_PARAM, "destination_id",
                 destination_id, 0, MAX_REGISTERS)
-        if self.struct_slots[structure_id] is None:
+        if self._struct_slots[structure_id] is None:
             raise NotAllocatedException(
                 "structure", structure_id, Commands.READ_PARAM.name)
 
@@ -619,7 +626,7 @@ class DataSpecificationGenerator(object):
         else:
             _bounds(Commands.READ_PARAM, "parameter_index",
                     parameter_index, 0, MAX_STRUCT_ELEMENTS)
-            if len(self.struct_slots[structure_id]) <= parameter_index:
+            if len(self._struct_slots[structure_id]) <= parameter_index:
                 raise NotAllocatedException(
                     "structure {0:d} parameter".format(structure_id),
                     parameter_index, Commands.READ_PARAM.name)
@@ -649,14 +656,14 @@ class DataSpecificationGenerator(object):
             structure
         :type parameter_index: int
         :param value:
-            * If value_is_register is False, the value to assign at the\
-              selected position as a float
-            * If value_is_register is True, the ID of the register containing\
-              the value to assign to the position, between 0 and 15
+            * If ``value_is_register`` is False, the value to assign at the\
+              selected position as a float or int
+            * If ``value_is_register`` is True, the ID of the register\
+              containing the value to assign to the position, between 0 and 15
         :type value: float
         :param data_type: type of the data to be stored in the structure.\
-            If parameter value_is_register is set to true, this variable is\
-            disregarded
+            If parameter ``value_is_register`` is set to true, this variable\
+            is disregarded
         :type data_type: DataType
         :param value_is_register: Identifies if value identifies a register
         :type value_is_register: bool
@@ -667,16 +674,16 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If structure_id is not in the allowed range
-            * If parameter_index is larger than the number of parameters\
+            * If ``structure_id`` is not in the allowed range
+            * If ``parameter_index`` is larger than the number of parameters\
               declared in the original structure
-            * If value_is_register is False, and the data type of the\
-              structure value is an integer, and the value has a fractional\
+            * If ``value_is_register`` is False, and the data type of the\
+              structure value is an integer, and ``value`` has a fractional\
               part
-            * If value_is_register is False, and value would overflow the\
-              position in the structure
-            * If value_is_register is True, and value is not a valid register\
-              ID
+            * If ``value_is_register`` is False, and ``value`` would overflow\
+              the position in the structure
+            * If ``value_is_register`` is True, and ``value`` is not a valid\
+              register ID
         :raise NotAllocatedException: \
             If the structure requested has not been declared
         """
@@ -684,15 +691,15 @@ class DataSpecificationGenerator(object):
                 structure_id, 0, MAX_STRUCT_SLOTS)
         _bounds(Commands.WRITE_PARAM, "parameter_index",
                 parameter_index, 0, MAX_STRUCT_ELEMENTS)
-        if self.struct_slots[structure_id] is None:
+        if self._struct_slots[structure_id] is None:
             raise NotAllocatedException(
                 "structure", structure_id, Commands.WRITE_PARAM.name)
-        if len(self.struct_slots[structure_id]) <= parameter_index:
+        if len(self._struct_slots[structure_id]) <= parameter_index:
             raise NotAllocatedException(
                 "structure {} parameter".format(structure_id),
                 parameter_index, Commands.WRITE_PARAM.name)
 
-        if self.struct_slots[
+        if self._struct_slots[
                 structure_id][parameter_index][1] is not data_type:
             raise TypeMismatchException(Commands.WRITE_PARAM.name)
 
@@ -737,12 +744,13 @@ class DataSpecificationGenerator(object):
               argument, between 0 and 5
         :type structure_id: int
         :param repeats:
-            * If repeats_is_register is True, the ID of the register\
+            * If ``repeats_is_register`` is True, the ID of the register\
               containing the number of repeats, between 0 and 15
-            * If repeats_is_register is False, the number of repeats to write,\
-              between 0 and 255
+            * If ``repeats_is_register`` is False, the number of repeats to\
+              write, between 0 and 255
         :type repeats: int
-        :param repeats_is_register: Identifies if repeats identifies a register
+        :param repeats_is_register: \
+            Identifies if ``repeats`` identifies a register
         :type repeats_is_register: bool
         :return: No value returned
         :rtype: None
@@ -751,10 +759,11 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If repeats_is_register is False and structure_id is not\
-              a valid ID
-            * If repeats_is_register is True and structure_id
-            * If the number of repeats is out of range
+            * If ``structure_id`` is not a valid structure ID
+            * If ``repeats_is_register`` is False and ``repeats`` is not\
+              in range
+            * If ``repeats_is_register`` is True and ``repeats`` is not\
+              a valid register ID
         :raise NoRegionSelectedException: \
             If no region has been  selected to write to
         :raise RegionExhaustedException: \
@@ -762,7 +771,7 @@ class DataSpecificationGenerator(object):
         """
         _bounds(Commands.WRITE_STRUCT, "structure_id",
                 structure_id, 0, MAX_STRUCT_SLOTS)
-        if self.struct_slots[structure_id] is None:
+        if self._struct_slots[structure_id] is None:
             raise NotAllocatedException(
                 "structure", structure_id, Commands.WRITE_STRUCT.name)
 
@@ -803,7 +812,7 @@ class DataSpecificationGenerator(object):
             or by value (i.e., changes made within the function are lost when\
             the function exits. The number of arguments is determined by the\
             length of this list.
-        :type argument_by_value: list of bool
+        :type argument_by_value: list(bool)
         :return: The ID of the function, between 0 and 31
         :rtype: int
         :raise ParameterOutOfBoundsException: \
@@ -813,22 +822,22 @@ class DataSpecificationGenerator(object):
         :raise FunctionInUseException: \
             If the function is already defined
         """
-        if self.ongoing_function_definition:
+        if self._ongoing_function_definition:
             raise InvalidCommandException(Commands.START_CONSTRUCTOR.name)
         _bounds(Commands.START_CONSTRUCTOR, "number of arguments",
                 len(argument_by_value), 0, 6)
         _bounds(Commands.START_CONSTRUCTOR, "function_id",
                 function_id, 0, MAX_CONSTRUCTORS)
-        if self.function_slots[function_id] is not None:
+        if self._function_slots[function_id] is not None:
             raise FunctionInUseException(function_id)
 
-        self.function_slots[function_id] = argument_by_value
+        self._function_slots[function_id] = argument_by_value
 
         cmd_string = Commands.START_CONSTRUCTOR.name
         cmd_string += " ID={0:d} number_of_args={1:d}".format(
             function_id, len(argument_by_value))
 
-        self.ongoing_function_definition = True
+        self._ongoing_function_definition = True
 
         read_only_flags = 0
         for i, abv in enumerate(argument_by_value):
@@ -854,10 +863,10 @@ class DataSpecificationGenerator(object):
         :raise InvalidCommandException: \
             If there is no function being defined at this point
         """
-        if not self.ongoing_function_definition:
+        if not self._ongoing_function_definition:
             raise InvalidCommandException(Commands.END_CONSTRUCTOR.name)
 
-        self.ongoing_function_definition = False
+        self._ongoing_function_definition = False
 
         cmd_word = _binencode(Commands.END_CONSTRUCTOR, {
             _Field.LENGTH: LEN1})
@@ -870,7 +879,7 @@ class DataSpecificationGenerator(object):
         :param function_id: \
             The ID of a previously defined function, between 0 and 31
         :type function_id: int
-        :param structure_ids: A list of structure_ids that will be passed into\
+        :param structure_ids: A list of structure IDs that will be passed into\
             the function, each between 0 and 15
         :type structure_ids: list(int)
         :return: Nothing is returned
@@ -885,7 +894,7 @@ class DataSpecificationGenerator(object):
         :raise NotAllocatedException: \
             * If a function has not been defined with the given ID
             * If no structure has been defined with one of the IDs in\
-              structure_ids
+              ``structure_ids``
         :raise WrongParameterNumberException: \
             If a function is called with a wrong number of parameters
         :raise DuplicateParameterException: \
@@ -893,12 +902,12 @@ class DataSpecificationGenerator(object):
         """
         _bounds(Commands.CONSTRUCT, "function",
                 function_id, 0, MAX_CONSTRUCTORS)
-        if self.function_slots[function_id] is None:
+        if self._function_slots[function_id] is None:
             raise NotAllocatedException(
                 "function", function_id, Commands.CONSTRUCT.name)
-        if len(structure_ids) != len(self.function_slots[function_id]):
+        if len(structure_ids) != len(self._function_slots[function_id]):
             raise WrongParameterNumberException(
-                function_id, len(self.function_slots[function_id]),
+                function_id, len(self._function_slots[function_id]),
                 structure_ids)
         if len(structure_ids) != len(set(structure_ids)):
             raise DuplicateParameterException(
@@ -916,7 +925,7 @@ class DataSpecificationGenerator(object):
                 _bounds(Commands.CONSTRUCT,
                         "structure argument {0:d}".format(i),
                         structure_ids[i], 0, MAX_STRUCT_SLOTS)
-                if self.struct_slots[struct_id] is None:
+                if self._struct_slots[struct_id] is None:
                     raise NotAllocatedException(
                         "structure argument {0:d}".format(i),
                         struct_id, Commands.CONSTRUCT.name)
@@ -971,18 +980,17 @@ class DataSpecificationGenerator(object):
 
         :param data: the data to write.
         :type data: int or float
-        :param data_type: the type to convert data to
+        :param data_type: the type to convert ``data`` to
         :type data_type: DataType
-        :return: cmd_word_list; binary data to be added to the\
-            binary data specification file, and
-            cmd_string; string describing the command to be added to the\
-            report for the data specification file
+        :return: ``cmd_word_list`` (binary data to be added to the\
+            binary data specification file), and\
+            ``cmd_string`` (string describing the command to be added to the\
+            report for the data specification file)
         :rtype: tuple(bytearray, str)
         :raise ParameterOutOfBoundsException: \
-            * If repeats_register is None, and repeats is out of range
-            * If repeats_register is not a valid register ID
-            * If data_type is an integer type, and data has a fractional part
-            * If data would overflow the data type
+            * If ``data_type`` is an integer type, and ``data`` has a\
+              fractional part
+            * If ``data`` would overflow the data type
         :raise UnknownTypeException: \
             If the data type is not known
         :raise InvalidSizeException: \
@@ -1029,19 +1037,19 @@ class DataSpecificationGenerator(object):
         return (cmd_word_list, cmd_string)
 
     def write_value(self, data, data_type=DataType.UINT32):
-        """ Insert command to write a value one or more times to the current\
+        """ Insert command to write a value (once) to the current\
             write pointer, causing the write pointer to move on by the number\
             of bytes required to represent the data type. The data is passed\
             as a parameter to this function
 
         .. note::
-            This method used to have two extra parameters repeats and\
-            repeats_is_register. They have been removed here. If you need\
-            them, use write_repeated_value
+            This method used to have two extra parameters ``repeats`` and\
+            ``repeats_is_register``. They have been removed here. If you need\
+            them, use :meth:`write_repeated_value`
 
         :param data: the data to write as a float.
         :type data: float
-        :param data_type: the type to convert data to
+        :param data_type: the type to convert ``data`` to
         :type data_type: DataType
         :return: Nothing is returned
         :rtype: None
@@ -1050,10 +1058,9 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If repeats_register is None, and repeats is out of range
-            * If repeats_register is not a valid register ID
-            * If data_type is an integer type, and data has a fractional part
-            * If data would overflow the data type
+            * If ``data_type`` is an integer type, and ``data`` has a\
+              fractional part
+            * If ``data`` would overflow the data type
         :raise UnknownTypeException: \
             If the data type is not known
         :raise InvalidSizeException: \
@@ -1099,16 +1106,16 @@ class DataSpecificationGenerator(object):
             as a parameter to this function
 
         :param data: the data to write as a float.
-        :type data: float
+        :type data: float or int
         :param repeats:
-            * If repeats_is_register is False, this parameter identifies the\
-              number of times to repeat the data, between 1 and 255\
+            * If ``repeats_is_register`` is False, this parameter identifies\
+              the number of times to repeat the data, between 1 and 255\
               (default 1)
-            * If repeats_is_register is True, this parameter identifies the\
-              register that contains the number of repeats.
+            * If ``repeats_is_register`` is True, this parameter identifies\
+              the register that contains the number of repeats.
         :type repeats: int
         :param repeats_is_register: \
-            Indicates if the parameter repeats identifies the register\
+            Indicates if the parameter ``repeats`` identifies the register\
             containing the number of repeats of the value to write
         :type repeats_is_register: bool
         :param data_type: the type to convert data to
@@ -1120,10 +1127,13 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If repeats_register is None, and repeats is out of range
-            * If repeats_register is not a valid register ID
-            * If data_type is an integer type, and data has a fractional part
-            * If data would overflow the data type
+            * If ``repeats_is_register`` is False, and ``repeats`` is out of\
+              range
+            * If ``repeats_is_register`` is True, and ``repeats`` is not a\
+              valid register ID
+            * If ``data_type`` is an integer type, and ``data`` has a\
+              fractional part
+            * If ``data`` would overflow the data type
         :raise UnknownTypeException: \
             If the data type is not known
         :raise InvalidSizeException: \
@@ -1193,11 +1203,11 @@ class DataSpecificationGenerator(object):
             Identifies the register in which the data is stored.
         :type data_register: int
         :param repeats:
-            * If repeats_register is None, this parameter identifies the\
-              number of times to repeat the data, between 1 and 255\
+            * If ``repeats_is_register`` is None, this parameter identifies\
+              the number of times to repeat the data, between 1 and 255\
               (default 1)
-            * If repeats_register is not None (i.e. has an integer value), the\
-              content of this parameter is disregarded
+            * If ``repeats_is_register`` is not None (i.e. has an integer\
+              value), the content of this parameter is disregarded
         :type repeats: int
         :param repeats_is_register: Identifies the register containing the\
             number of repeats of the value to write
@@ -1211,9 +1221,11 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If repeats_register is None, and repeats is out of range
-            * If repeats_register is not a valid register ID
-            * If data_register is not a valid register ID
+            * If ``repeats_is_register`` is False, and ``repeats`` is out of\
+              range
+            * If ``repeats_is_register`` is True, and ``repeats`` is not a\
+              valid register ID
+            * If ``data_register`` is not a valid register ID
         :raise UnknownTypeException: \
             If the data type is not known
         :raise NoRegionSelectedException: \
@@ -1272,7 +1284,7 @@ class DataSpecificationGenerator(object):
             to move on by (data type size * the array size), in bytes.
 
         :param array_values: An array of words to be written
-        :type array_values: list of unsigned int
+        :type array_values: list(int) or list(float) or numpy.ndarray
         :param data_type: Type of data contained in the array
         :type data_type: DataType
         :return: The position of the write pointer within the current region,\
@@ -1349,30 +1361,32 @@ class DataSpecificationGenerator(object):
             counter, between 0 and 15
         :type counter_register_id: int
         :param start:
-            * If start_is_register is False, the number at which to start the\
-              loop counter, >= 0
-            * If start_is_register is True, the ID of the register containing\
-              the number at which to start the loop counter, between 0 and 15
+            * If ``start_is_register`` is False, the number at which to start\
+              the loop counter, >= 0
+            * If ``start_is_register`` is True, the ID of the register\
+              containing the number at which to start the loop counter,\
+              between 0 and 15
         :type start: int
         :param end:
-            * If end_is_register is False, the number which the loop counter\
-              must reach to stop the loop i.e. the loop will run while the\
-              contents of counter_register < end, >= 0
-            * If end_is_register is True, the ID of the register containing\
-              the number at which to stop the loop, between 0 and 15
+            * If ``end_is_register`` is False, the number which the loop\
+              counter must reach to stop the loop i.e. the loop will run while\
+              the contents of ``counter_register`` < ``end``, >= 0
+            * If ``end_is_register`` is True, the ID of the register\
+              containing the number at which to stop the loop, between 0 and 15
         :type end: int
         :param increment:
-            * If increment_is_register is False, the amount by which to\
+            * If ``increment_is_register`` is False, the amount by which to\
               increment the loop counter on each run of the loop, >= 0
-            * If increment_is_register is True, the ID of the register\
+            * If ``increment_is_register`` is True, the ID of the register\
               containing the amount by which to increment the loop counter on\
               each run of the loop, between 0 and 15
         :type increment: int
-        :param start_is_register: Indicates if start is a register ID
+        :param start_is_register: Indicates if ``start`` is a register ID
         :type start_is_register: bool
-        :param end_is_register: Indicates if end is a register ID
+        :param end_is_register: Indicates if ``end`` is a register ID
         :type end_is_register: bool
-        :param increment_is_register: Indicates if increment is a register ID
+        :param increment_is_register: \
+            Indicates if ``increment`` is a register ID
         :type increment_is_register: bool
         :return: Nothing is returned
         :rtype: None
@@ -1381,18 +1395,19 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If counter_register_id is not a valid register ID
-            * If start_is_register is True and increment is not a valid\
-              register_id
-            * If end_is_register is True and increment is not a valid\
-              register_id
-            * If increment_is_register is True, and increment is not a\
-              valid register_id
-            * If start_is_register is False and start is not in the\
+            * If ``counter_register_id`` is not a valid register ID
+            * If ``start_is_register`` is True and ``start`` is not a valid\
+              register ID
+            * If ``end_is_register`` is True and ``end`` is not a valid\
+              register ID
+            * If ``increment_is_register`` is True, and ``increment`` is not a\
+              valid register ID
+            * If ``start_is_register is False and ``start`` is not in the\
               allowed range
-            * If end_is_register is False and end is not in the allowed range
-            * If increment_is_register is False and increment is not in the\
-              allowed range
+            * If ``end_is_register is False and ``end`` is not in the allowed\
+              range
+            * If ``increment_is_register`` is False and ``increment`` is not\
+              in the allowed range
         """
         _bounds(Commands.LOOP, "counter_register_id",
                 counter_register_id, 0, MAX_REGISTERS)
@@ -1438,7 +1453,7 @@ class DataSpecificationGenerator(object):
             encoded_values += _ONE_SIGNED_INT.pack(increment)
             cmd_string += " increment={0:d},".format(increment)
 
-        self.ongoing_loop = True
+        self._ongoing_loop = True
 
         cmd_word = _binencode(Commands.LOOP, {
             _Field.LENGTH: length,
@@ -1461,7 +1476,7 @@ class DataSpecificationGenerator(object):
         :raise InvalidCommandException: \
             If there is no loop in operation at this point
         """
-        if not self.ongoing_loop:
+        if not self._ongoing_loop:
             raise InvalidCommandException(Commands.BREAK_LOOP.name)
 
         cmd_word = _binencode(Commands.BREAK_LOOP, {
@@ -1486,7 +1501,7 @@ class DataSpecificationGenerator(object):
         cmd_word = _binencode(Commands.END_LOOP, {
             _Field.LENGTH: LEN1})
         cmd_string = Commands.END_LOOP.name
-        self.ongoing_loop = False
+        self._ongoing_loop = False
         self.write_command_to_files(cmd_word, cmd_string)
 
     def start_conditional(self, register_id, condition, value,
@@ -1502,12 +1517,12 @@ class DataSpecificationGenerator(object):
             The condition which must be true to execute the following commands
         :type condition: Condition
         :param value:
-            * If value_is_register is False, the value to compare to the\
+            * If ``value_is_register`` is False, the value to compare to the\
               value in the register
-            * If value_is_register is True, the ID of the register containing\
-              the value to compare, between 0 and 15
+            * If ``value_is_register`` is True, the ID of the register\
+              containing the value to compare, between 0 and 15
         :type value: int
-        :param value_is_register: Indicates if value is a register ID
+        :param value_is_register: Indicates if ``value`` is a register ID
         :type value_is_register: bool
         :return: Nothing is returned
         :rtype: None
@@ -1516,11 +1531,11 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If the register_id is not a valid register ID
-            * if value_is_register is True and value is not a valid\
+            * If ``register_id`` is not a valid register ID
+            * if ``value_is_register`` is True and ``value`` is not a valid\
               register ID
         :raise UnknownTypeException: \
-            If the condition is not a valid condition
+            If ``condition`` is not a valid condition
         """
         _bounds(Commands.IF, "register_id", register_id, 0, MAX_REGISTERS)
         if condition not in Condition:
@@ -1549,7 +1564,7 @@ class DataSpecificationGenerator(object):
             cmd_string += " reg[{0:d}] {1:s} {2:d}".format(
                 register_id, condition.operator, value)
 
-        self.conditionals.append(False)
+        self._conditionals.append(False)
         cmd_word_list = cmd_word + data_encoded
         self.write_command_to_files(cmd_word_list, cmd_string, indent=True)
 
@@ -1570,11 +1585,11 @@ class DataSpecificationGenerator(object):
             If there is no conditional in operation at this point
         """
 
-        if not self.conditionals or \
-                self.conditionals[len(self.conditionals) - 1] is True:
+        if not self._conditionals or \
+                self._conditionals[len(self._conditionals) - 1] is True:
             raise InvalidCommandException(Commands.ELSE.name)
 
-        self.conditionals[len(self.conditionals) - 1] = True
+        self._conditionals[len(self._conditionals) - 1] = True
         cmd_word = _binencode(Commands.ELSE, {
             _Field.LENGTH: LEN1})
         cmd_string = Commands.ELSE.name
@@ -1593,10 +1608,10 @@ class DataSpecificationGenerator(object):
         :raise InvalidCommandException: \
             If there is no conditional in operation at this point
         """
-        if not self.conditionals:
+        if not self._conditionals:
             raise InvalidCommandException(Commands.END_IF.name)
 
-        self.conditionals.pop()
+        self._conditionals.pop()
         cmd_word = _binencode(Commands.END_IF, {
             _Field.LENGTH: LEN1})
         cmd_string = Commands.END_IF.name
@@ -1609,11 +1624,11 @@ class DataSpecificationGenerator(object):
         :param register_id: The ID of the register to assign, between 0 and 15
         :type register_id: int
         :param data:
-            * If data_is_register is True, the register ID containing\
+            * If ``data_is_register`` is True, the register ID containing\
               the data to set, between 0 and 15
-            * If data_is_register is False, the data as a float
-        :type data: float
-        :param data_is_register: Indicates if data is a register ID
+            * If ``data_is_register`` is False, the data as a float
+        :type data: int or float
+        :param data_is_register: Indicates if ``data`` is a register ID
         :type data_is_register: bool
         :param data_type: The type of the data to be assigned
         :type data_type: DataType
@@ -1624,13 +1639,13 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If register_id is not a valid register_id
-            * If data_is_register is True, and data is not a valid\
+            * If ``register_id`` is not a valid register ID
+            * If ``data_is_register`` is True, and ``data`` is not a valid\
               register ID
-            * If data_is_register is False, data_type is an integer type and\
-              data has a fractional part
-            * If data_is_register if False, and data would overflow the\
-              data type
+            * If ``data_is_register`` is False, ``data_type`` is an integer\
+              type and ``data`` has a fractional part
+            * If ``data_is_register`` if False, and ``data`` would overflow\
+              the data type
         :raise UnknownTypeException: \
             If the data type is not known
         """
@@ -1677,7 +1692,7 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            If the register_id is not a valid register ID
+            If the ``register_id`` is not a valid register ID
         :raise NoRegionSelectedException: \
             If no region has been selected
         """
@@ -1700,17 +1715,19 @@ class DataSpecificationGenerator(object):
             current region
 
         :param address:
-            * If address_is_register is True, the ID of the register\
+            * If ``address_is_register`` is True, the ID of the register\
               containing the address to move to
-            * If address_is_register is False, the address to move the\
+            * If ``address_is_register`` is False, the address to move the\
               write pointer to
         :type address: int
         :param address_is_register: \
-            Indicates if the the address is a register ID
+            Indicates if ``address`` is a register ID
         :type address_is_register: bool
         :param relative_to_current: \
-            Indicates if the address is to be added to the current address,\
-            or used as an absolute address from the start of the current region
+            Indicates if ``address`` (or the value read from that register\
+            when ``address_is_register`` is True) is to be added to the\
+            current address, or used as an absolute address from the start\
+            of the current region
         :type relative_to_current: bool
         :return: Nothing is returned
         :rtype: None
@@ -1719,8 +1736,8 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            If the address_is_register is True and address is not a valid\
-            register ID
+            If the ``address_is_register`` is True and ``address`` is not a\
+            valid register ID
         :raise NoRegionSelectedException: \
             If no region has been selected
         """
@@ -1764,16 +1781,16 @@ class DataSpecificationGenerator(object):
             block size in bytes.  Zeros are inserted in the intervening space
 
         :param log_block_size:
-            * If log_block_size_is_register is False, log to base 2 of\
+            * If ``log_block_size_is_register`` is False, log to base 2 of\
               the block size (e.g. The write pointer will be moved so\
               that it is a multiple of 2\\ :sup:`log_block_size`), between\
               0 and 32
-            * If log_block_size_is_register is True, the ID of the\
+            * If ``log_block_size_is_register`` is True, the ID of the\
               register containing log to the base 2 of the block size,\
               between 0 and 15
         :type log_block_size: int
         :param log_block_size_is_register: \
-            Indicates if log_block_size is a register ID
+            Indicates if ``log_block_size`` is a register ID
         :type log_block_size_is_register: bool
         :param return_register_id: The ID of a register where the write\
             pointer will be written to once it has been updated, between\
@@ -1786,10 +1803,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If log_block_size_is_register is False, and\
-              log_block_size is not within the allowed range
-            * If log_block_size_is_register is True and log_block_size\
-              is not a valid register ID
+            * If ``log_block_size_is_register`` is False, and\
+              ``log_block_size`` is not within the allowed range
+            * If ``log_block_size_is_register`` is True and \
+              ``log_block_size`` is not a valid register ID
         :raise RegionOutOfBoundsException: \
             If the move of the pointer would put it outside of the\
             current region
@@ -1842,31 +1859,34 @@ class DataSpecificationGenerator(object):
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand_1:
-            * If operand_1_is_register is True, the ID of a register where\
+            * If ``operand_1_is_register`` is True, the ID of a register where\
               the first operand can be found, between 0 and 15
-            * If operand_1_is_register is False, a 32-bit value
+            * If ``operand_1_is_register`` is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
         :type operation: ArithmeticOperation
         :param operand_2:
-            * If operand_2_is_register is True, the ID of a register where\
+            * If ``operand_2_is_register`` is True, the ID of a register where\
               the second operand can be found, between 0 and 15
-            * If operand_2_is_register is False, a 32-bit value
+            * If ``operand_2_is_register`` is False, a 32-bit value
         :type operand_2: int
         :param signed: Indicates if the values should be considered signed
         :type signed: bool
-        :param operand_1_is_register: Indicates if operand_1 is a register ID
+        :param operand_1_is_register: \
+            Indicates if ``operand_1`` is a register ID
         :type operand_1_is_register: bool
-        :param operand_2_is_register: Indicates if operand_2 is a register ID
+        :param operand_2_is_register: \
+            Indicates if ``operand_2`` is a register ID
         :type operand_2_is_register: bool
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_1_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_1_is_register`` is True and ``operand_1`` is not a\
               valid register ID
-            * If operand_2_is_register is True and operand_2 is not a\
+            * If ``operand_2_is_register`` is True and ``operand_2`` is not a\
               valid register ID
         :raise UnknownTypeException: \
             If operation is not a known operation
@@ -1939,33 +1959,35 @@ class DataSpecificationGenerator(object):
 
     def logical_and(self, register_id, operand_1, operand_2,
                     operand_1_is_register=False, operand_2_is_register=False):
-        """ Insert command to perform a logical AND operation, using the\
-             _call_logic_operation.
+        """ Insert command to perform a logical AND operation.
 
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand_1:
-            * If operand_1_is_register is True, the ID of a register\
+            * If ``operand_1_is_register`` is True, the ID of a register\
               where the first operand can be found, between 0 and 15
-            * If operand_1_is_register is False, a 32-bit value
+            * If ``operand_1_is_register`` is False, a 32-bit value
         :type operand_1: int
         :param operand_2:
-            * If operand_2_is_register is True, the ID of a register\
+            * If ``operand_2_is_register`` is True, the ID of a register\
               where the second operand can be found. between 0 and 15
-            * If operand_2_is_register is False, a 32-bit value
+            * If ``operand_2_is_register`` is False, a 32-bit value
         :type operand_2: int
-        :param operand_1_is_register: Indicates if operand_1 is a register ID
+        :param operand_1_is_register: \
+            Indicates if ``operand_1`` is a register ID
         :type operand_1_is_register: bool
-        :param operand_2_is_register: Indicates if operand_2 is a register ID
+        :param operand_2_is_register: \
+            Indicates if ``operand_2`` is a register ID
         :type operand_2_is_register: bool
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_1_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_1_is_register`` is True and ``operand_1`` is not a\
               valid register ID
-            * If operand_2_is_register is True and operand_2 is not a\
+            * If ``operand_2_is_register`` is True and ``operand_2`` is not a\
               valid register ID
         """
         self._call_logic_operation(
@@ -1974,33 +1996,35 @@ class DataSpecificationGenerator(object):
 
     def logical_or(self, register_id, operand_1, operand_2,
                    operand_1_is_register=False, operand_2_is_register=False):
-        """ Insert command to perform a logical OR operation, using the\
-            _call_logic_operation.
+        """ Insert command to perform a logical OR operation.
 
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand_1:
-            * If operand_1_is_register is True, the ID of a register\
+            * If ``operand_1_is_register`` is True, the ID of a register\
               where the first operand can be found, between 0 and 15
-            * If operand_1_is_register is False, a 32-bit value
+            * If ``operand_1_is_register`` is False, a 32-bit value
         :type operand_1: int
         :param operand_2:
-            * If operand_2_is_register is True, the ID of a register\
+            * If ``operand_2_is_register`` is True, the ID of a register\
               where the second operand can be found. between 0 and 15
-            * If operand_2_is_register is False, a 32-bit value
+            * If ``operand_2_is_register`` is False, a 32-bit value
         :type operand_2: int
-        :param operand_1_is_register: Indicates if operand_1 is a register ID
+        :param operand_1_is_register: \
+            Indicates if ``operand_1`` is a register ID
         :type operand_1_is_register: bool
-        :param operand_2_is_register: Indicates if operand_2 is a register ID
+        :param operand_2_is_register: \
+            Indicates if ``operand_2`` is a register ID
         :type operand_2_is_register: bool
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_1_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_1_is_register`` is True and ``operand_1`` is not a\
               valid register ID
-            * If operand_2_is_register is True and operand_2 is not a\
+            * If ``operand_2_is_register`` is True and ``operand_2`` is not a\
               valid register ID
         """
         self._call_logic_operation(
@@ -2010,33 +2034,35 @@ class DataSpecificationGenerator(object):
     def logical_left_shift(self, register_id, operand_1, operand_2,
                            operand_1_is_register=False,
                            operand_2_is_register=False):
-        """ Insert command to perform a logical left shift operation, using\
-            the _call_logic_operation.
+        """ Insert command to perform a logical left shift operation.
 
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand_1:
-            * If operand_1_is_register is True, the ID of a register\
+            * If ``operand_1_is_register`` is True, the ID of a register\
               where the first operand can be found, between 0 and 15
-            * If operand_1_is_register is False, a 32-bit value
+            * If ``operand_1_is_register`` is False, a 32-bit value
         :type operand_1: int
         :param operand_2:
-            * If operand_2_is_register is True, the ID of a register\
+            * If ``operand_2_is_register`` is True, the ID of a register\
               where the second operand can be found. between 0 and 15
-            * If operand_2_is_register is False, a 32-bit value
+            * If ``operand_2_is_register`` is False, a 32-bit value
         :type operand_2: int
-        :param operand_1_is_register: Indicates if operand_1 is a register ID
+        :param operand_1_is_register: \
+            Indicates if ``operand_1`` is a register ID
         :type operand_1_is_register: bool
-        :param operand_2_is_register: Indicates if operand_2 is a register ID
+        :param operand_2_is_register: \
+            Indicates if ``operand_2`` is a register ID
         :type operand_2_is_register: bool
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_1_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_1_is_register`` is True and ``operand_1`` is not a\
               valid register ID
-            * If operand_2_is_register is True and operand_2 is not a\
+            * If ``operand_2_is_register`` is True and ``operand_2`` is not a\
               valid register ID
         """
         self._call_logic_operation(
@@ -2046,33 +2072,35 @@ class DataSpecificationGenerator(object):
     def logical_right_shift(self, register_id, operand_1, operand_2,
                             operand_1_is_register=False,
                             operand_2_is_register=False):
-        """ Insert command to perform a logical right shift operation, using\
-            the _call_logic_operation.
+        """ Insert command to perform a logical right shift operation.
 
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand_1:
-            * If operand_1_is_register is True, the ID of a register\
+            * If ``operand_1_is_register`` is True, the ID of a register\
               where the first operand can be found, between 0 and 15
-            * If operand_1_is_register is False, a 32-bit value
+            * If ``operand_1_is_register`` is False, a 32-bit value
         :type operand_1: int
         :param operand_2:
-            * If operand_2_is_register is True, the ID of a register\
+            * If ``operand_2_is_register`` is True, the ID of a register\
               where the second operand can be found. between 0 and 15
-            * If operand_2_is_register is False, a 32-bit value
+            * If ``operand_2_is_register`` is False, a 32-bit value
         :type operand_2: int
-        :param operand_1_is_register: Indicates if operand_1 is a register ID
+        :param operand_1_is_register: \
+            Indicates if ``operand_1`` is a register ID
         :type operand_1_is_register: bool
-        :param operand_2_is_register: Indicates if operand_2 is a register ID
+        :param operand_2_is_register: \
+            Indicates if ``operand_2`` is a register ID
         :type operand_2_is_register: bool
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_1_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_1_is_register`` is True and ``operand_1`` is not a\
               valid register ID
-            * If operand_2_is_register is True and operand_2 is not a\
+            * If ``operand_2_is_register`` is True and ``operand_2`` is not a\
               valid register ID
         """
         self._call_logic_operation(
@@ -2081,33 +2109,35 @@ class DataSpecificationGenerator(object):
 
     def logical_xor(self, register_id, operand_1, operand_2,
                     operand_1_is_register=False, operand_2_is_register=False):
-        """ Insert command to perform a logical xor operation, using\
-            the _call_logic_operation.
+        """ Insert command to perform a logical xor operation.
 
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand_1:
-            * If operand_1_is_register is True, the ID of a register\
+            * If ``operand_1_is_register`` is True, the ID of a register\
               where the first operand can be found, between 0 and 15
-            * If operand_1_is_register is False, a 32-bit value
+            * If ``operand_1_is_register`` is False, a 32-bit value
         :type operand_1: int
         :param operand_2:
-            * If operand_2_is_register is True, the ID of a register\
+            * If ``operand_2_is_register`` is True, the ID of a register\
               where the second operand can be found. between 0 and 15
-            * If operand_2_is_register is False, a 32-bit value
+            * If ``operand_2_is_register`` is False, a 32-bit value
         :type operand_2: int
-        :param operand_1_is_register: Indicates if operand_1 is a register ID
+        :param operand_1_is_register: \
+            Indicates if ``operand_1`` is a register ID
         :type operand_1_is_register: bool
-        :param operand_2_is_register: Indicates if operand_2 is a register ID
+        :param operand_2_is_register: \
+            Indicates if ``operand_2`` is a register ID
         :type operand_2_is_register: bool
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_1_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_1_is_register`` is True and ``operand_1`` is not a\
               valid register ID
-            * If operand_2_is_register is True and operand_2 is not a\
+            * If ``operand_2_is_register`` is True and ``operand_2`` is not a\
               valid register ID
         """
         self._call_logic_operation(
@@ -2115,24 +2145,24 @@ class DataSpecificationGenerator(object):
             operand_1_is_register, operand_2_is_register)
 
     def logical_not(self, register_id, operand, operand_is_register=False):
-        """ Insert command to perform a logical xor operation, using\
-            the _call_logic_operation.
+        """ Insert command to perform a logical not operation.
 
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand:
-            * If operand_is_register is True, the ID of a register where the\
-              first operand can be found, between 0 and 15
-            * If operand_is_register is False, a 32-bit value
+            * If ``operand_is_register`` is True, the ID of a register where\
+              the first operand can be found, between 0 and 15
+            * If ``operand_is_register`` is False, a 32-bit value
         :type operand: int
-        :param operand_is_register: Indicates if operand_1 is a register ID
+        :param operand_is_register: Indicates if ``operand`` is a register ID
         :type operand_is_register: bool
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_is_register`` is True and ``operand`` is not a\
               valid register ID
         """
         self._call_logic_operation(
@@ -2148,16 +2178,16 @@ class DataSpecificationGenerator(object):
         :param register_id: The ID of the register to store the result in
         :type register_id: int
         :param operand_1:
-            * If operand_1_is_register is True, the ID of a register\
+            * If ``operand_1_is_register`` is True, the ID of a register\
               where the first operand can be found, between 0 and 15
-            * If operand_1_is_register is False, a 32-bit value
+            * If ``operand_1_is_register`` is False, a 32-bit value
         :type operand_1: int
         :param operation: The operation to perform
         :type operation: LogicOperation
         :param operand_2:
-            * If operand_2_is_register is True, the ID of a register\
+            * If ``operand_2_is_register`` is True, the ID of a register\
               where the second operand can be found. between 0 and 15
-            * If operand_2_is_register is False, a 32-bit value
+            * If ``operand_2_is_register`` is False, a 32-bit value
         :type operand_2: int
         :param operand_1_is_register: Indicates if operand_1 is a register ID
         :type operand_1_is_register: bool
@@ -2168,9 +2198,10 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If operand_1_is_register is True and operand_1 is not a\
+            * If ``register_id`` is not a valid register ID
+            * If ``operand_1_is_register`` is True and ``operand_1`` is not a\
               valid register ID
-            * If operand_2_is_register is True and operand_2 is not a\
+            * If ``operand_2_is_register`` is True and ``operand_2`` is not a\
               valid register ID
         :raise InvalidOperationException: \
             If operation is not a known operation
@@ -2236,21 +2267,21 @@ class DataSpecificationGenerator(object):
             structure
 
         :param source_structure_id:
-            * If source_id_is_register is True, the ID of the register\
+            * If ``source_id_is_register`` is True, the ID of the register\
               holding the source structure ID, between 0 and 15
             * Otherwise, the ID of the source structure, between 0 and 15
         :type source_structure_id: int
         :param destination_structure_id:
-            * If destination_id_is_register is True, the ID of the register\
-              holding the destination structure ID, between 0 and 15
-            * If destination_id_is_register is False, the ID of the\
+            * If ``destination_id_is_register`` is True, the ID of the\
+              register holding the destination structure ID, between 0 and 15
+            * If ``destination_id_is_register`` is False, the ID of the\
               destination structure, between 0 and 15
         :type destination_structure_id: int
         :param source_id_is_register: \
-            Indicates if source_structure_id is a register ID
+            Indicates if ``source_structure_id`` is a register ID
         :type source_id_is_register: bool
         :param destination_id_is_register: \
-            Indicates if destination_structure_id is a register ID
+            Indicates if ``destination_structure_id`` is a register ID
         :type destination_id_is_register: bool
         :return: The ID of the copied structure, between 0 and 15
         :rtype: int
@@ -2259,16 +2290,17 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If source_id_is_register is True and source_structure_id\
-              is not a valid register ID
-            * If destination_id_is_register is True and\
-              destination_structure_id is not a valid register ID
-            * If source_id_is_register is False and source_structure_id\
-              is not a valid structure ID
-            * If destination_id_is_register is False and\
-              destination_structure_id is not a valid structure ID
+            * If ``source_id_is_register`` is True and\
+              ``source_structure_id`` is not a valid register ID
+            * If ``destination_id_is_register`` is True and\
+              ``destination_structure_id`` is not a valid register ID
+            * If ``source_id_is_register`` is False and\
+              ``source_structure_id`` is not a valid structure ID
+            * If ``destination_id_is_register`` is False and\
+              ``destination_structure_id`` is not a valid structure ID
         :raise NotAllocatedException: \
-            * If no structure with ID source_structure_id has been allocated
+            * If no structure with ID ``source_structure_id`` has been\
+              allocated
         """
         if source_structure_id == destination_structure_id and \
                 destination_id_is_register == source_id_is_register:
@@ -2288,7 +2320,7 @@ class DataSpecificationGenerator(object):
         else:
             _bounds(Commands.COPY_STRUCT, "source_structure_id",
                     source_structure_id, 0, MAX_STRUCT_SLOTS)
-            if self.struct_slots[source_structure_id] is None:
+            if self._struct_slots[source_structure_id] is None:
                 raise NotAllocatedException(
                     "struct", source_structure_id, Commands.COPY_STRUCT.name)
             cmd_string += " source_struct={0:d}".format(source_structure_id)
@@ -2341,24 +2373,25 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If source_structure_id is not a valid structure ID
-            * If destination_id is not a valid structure ID
-            * If source_parameter_index is not a valid parameter index\
+            * If ``source_structure_id`` is not a valid structure ID
+            * If ``destination_id`` is not a valid structure ID
+            * If ``source_parameter_index`` is not a valid parameter index\
               in the source structure
-            * If destination_parameter_index is not a valid parameter\
+            * If ``destination_parameter_index`` is not a valid parameter\
               index in the destination structure
         :raise NotAllocatedException: \
-            * If no structure with ID destination_id has been allocated
-            * If no structure with ID source_structure_id has been allocated
+            * If no structure with ID ``destination_id`` has been allocated
+            * If no structure with ID ``source_structure_id`` has been\
+              allocated
         """
         _bounds(Commands.COPY_PARAM, "source_structure_id",
                 source_structure_id, 0, MAX_STRUCT_SLOTS)
         _bounds(Commands.COPY_PARAM, "source_parameter_index",
                 source_parameter_index, 0, MAX_STRUCT_ELEMENTS)
-        if self.struct_slots[source_structure_id] is None:
+        if self._struct_slots[source_structure_id] is None:
             raise NotAllocatedException(
                 "structure", source_structure_id, Commands.COPY_PARAM.name)
-        if (len(self.struct_slots[source_structure_id]) <=
+        if (len(self._struct_slots[source_structure_id]) <=
                 source_parameter_index):
             raise NotAllocatedException(
                 "parameter", source_parameter_index, Commands.COPY_PARAM.name)
@@ -2369,22 +2402,22 @@ class DataSpecificationGenerator(object):
                     destination_parameter_index, 0, MAX_STRUCT_ELEMENTS)
             _bounds(Commands.COPY_PARAM, "destination_structure_id",
                     destination_id, 0, MAX_STRUCT_SLOTS)
-            if self.struct_slots[destination_id] is None:
+            if self._struct_slots[destination_id] is None:
                 raise NotAllocatedException(
                     "structure", destination_id, Commands.COPY_PARAM.name)
-            if (len(self.struct_slots[source_structure_id]) <=
+            if (len(self._struct_slots[source_structure_id]) <=
                     source_parameter_index):
                 raise NotAllocatedException(
                     "parameter", destination_parameter_index,
                     Commands.COPY_PARAM.name)
-            if (len(self.struct_slots[destination_id]) <=
+            if (len(self._struct_slots[destination_id]) <=
                     destination_parameter_index):
                 raise NotAllocatedException(
                     "parameter", destination_parameter_index,
                     Commands.COPY_PARAM.name)
-            if (self.struct_slots[source_structure_id]
+            if (self._struct_slots[source_structure_id]
                     [source_parameter_index][1] !=
-                    self.struct_slots[destination_id]
+                    self._struct_slots[destination_id]
                     [destination_parameter_index][1]):
                 raise TypeMismatchException(Commands.COPY_PARAM.name)
             if (source_structure_id == destination_id and
@@ -2431,11 +2464,11 @@ class DataSpecificationGenerator(object):
         """ Insert command to print out a value (for debugging)
 
         :param value:
-            * If value_is_register is True, the ID of the register containing\
-              the value to print
-            * If value_is_register is False, the value to print as a float
-        :type value: float
-        :param value_is_register: Indicates if the value is a register
+            * If ``value_is_register`` is True, the ID of the register\
+              containing the value to print
+            * If ``value_is_register`` is False, the value to print as a float
+        :type value: float or int
+        :param value_is_register: Indicates if ``value`` is a register
         :type value_is_register: bool
         :param data_type: The type of the data to be printed
         :type data_type: DataType
@@ -2446,14 +2479,14 @@ class DataSpecificationGenerator(object):
         :raise spinn_storage_handlers.exceptions.DataWriteException: \
             If a write to external storage fails
         :raise ParameterOutOfBoundsException: \
-            * If value_is_register is True and value is not a valid\
+            * If ``value_is_register`` is True and ``value`` is not a valid\
               register ID
-            * If value_is_register is False, the data_type is an integer type\
-              and value has a fractional part
-            * If value_is_register is False and the value would overflow the\
-              data type
+            * If ``value_is_register`` is False, the ``data_type`` is an\
+              integer type and ``value`` has a fractional part
+            * If ``value_is_register`` is False and the ``value`` would\
+              overflow the data type
         :raise UnknownTypeException: \
-            * If data_type is not a valid data type
+            * If ``data_type`` is not a valid data type
         """
         source_register_id = 0
         bit_field = 0
@@ -2486,6 +2519,7 @@ class DataSpecificationGenerator(object):
         :type text: str
         :param encoding: \
             The character encoding to use for the string. Defaults to ASCII.
+        :type encoding: str
         :return: Nothing is returned
         :rtype: None
         :raise DataUndefinedWriterException: \
@@ -2519,26 +2553,26 @@ class DataSpecificationGenerator(object):
         """ Insert command to print out a structure (for debugging)
 
         :param structure_id:
-            * If structure_id_is_register is True, the ID of the register\
+            * If ``structure_id_is_register`` is True, the ID of the register\
               containing the ID of the structure to print, between 0 and 15
-            * If structure_id_is_register is False, the ID of the structure\
-              to print, between 0 and 15
+            * If ``structure_id_is_register`` is False, the ID of the\
+              structure to print, between 0 and 15
         :type structure_id: int
         :param structure_id_is_register: \
-            Indicates if the structure_id is a register
+            Indicates if the ``structure_id`` is a register
         :type structure_id_is_register: bool
         :return: Nothing is returned
         :rtype: None
         :raise DataUndefinedWriterException: \
             If the binary specification file writer has not been initialised
         :raise ParameterOutOfBoundsException: \
-            * If structure_id_is_register is True and structure_id is not a\
-              valid register ID
-            * If structure_id_is_register is False and structure_id is not a\
-              valid structure ID
+            * If ``structure_id_is_register`` is True and ``structure_id`` is\
+              not a valid register ID
+            * If ``structure_id_is_register`` is False and ``structure_id`` \
+              is not a valid structure ID
         :raise NotAllocatedException: \
-            If structure_id_is_register is False and structure_id is the ID\
-            of a structure that has not been allocated
+            If ``structure_id_is_register`` is False and ``structure_id`` is\
+            the ID of a structure that has not been allocated
         """
         cmd_string = Commands.PRINT_STRUCT.name
         if structure_id_is_register:
@@ -2551,7 +2585,7 @@ class DataSpecificationGenerator(object):
         else:
             _bounds(Commands.PRINT_STRUCT, "structure_id",
                     structure_id, 0, MAX_STRUCT_SLOTS)
-            if self.struct_slots[structure_id] is None:
+            if self._struct_slots[structure_id] is None:
                 raise NotAllocatedException(
                     "structure", structure_id, Commands.PRINT_STRUCT.name)
             struct_register = 0
@@ -2597,9 +2631,9 @@ class DataSpecificationGenerator(object):
         """ Writes the binary command to the binary output file and, if the\
             user has requested a text output for debug purposes, also write\
             the text version to the text file.\
-            Setting the optional parameter 'indent' to True causes subsequent\
-            commands to be indented by two spaces relative to this one.\
-            Similarly, setting 'outdent' to True, reverses this spacing.
+            Setting the optional parameter ``indent`` to True causes\
+            subsequent commands to be indented by two spaces relative to this\
+            one. Similarly, setting ``outdent`` to True, reverses this spacing.
 
         :param cmd_word_list: list of binary words to be added to the binary\
             data specification file
@@ -2613,7 +2647,7 @@ class DataSpecificationGenerator(object):
         :type outdent: bool
         :param no_instruction_number: if each report line should include also\
             the address of the command in the file
-        :param no_instruction_number: bool
+        :type no_instruction_number: bool
         :return: Nothing is returned
         :rtype: None
         :raise DataUndefinedWriterException: \
@@ -2629,8 +2663,8 @@ class DataSpecificationGenerator(object):
 
         if self.report_writer is not None:
             if outdent is True:
-                self.txt_indent = min(self.txt_indent - 1, 0)
-            indent_string = "   " * self.txt_indent
+                self._txt_indent = min(self._txt_indent - 1, 0)
+            indent_string = "   " * self._txt_indent
             if no_instruction_number:
                 formatted_cmd_string = "{}{}\n".format(
                     indent_string, cmd_string)
@@ -2640,7 +2674,7 @@ class DataSpecificationGenerator(object):
                 self.instruction_counter += len(cmd_word_list)
             self.report_writer.write(formatted_cmd_string.encode("UTF-8"))
             if indent is True:
-                self.txt_indent += 1
+                self._txt_indent += 1
         return
 
     @property

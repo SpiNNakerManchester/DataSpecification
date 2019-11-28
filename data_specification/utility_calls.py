@@ -43,7 +43,9 @@ def get_region_base_address_offset(app_data_base_address, region):
     """ Find the address of the of a given region for the DSG
 
     :param app_data_base_address: base address for the core
+    :type app_data_base_address: int
     :param region: the region ID we're looking for
+    :type region: int
     """
     return (app_data_base_address +
             APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
@@ -69,7 +71,7 @@ def get_data_spec_and_file_writer_filename(
     :param hostname: The hostname of the SpiNNaker machine
     :type hostname: str
     :param report_directory: the directory for the reports folder
-    :type report_directory: file path
+    :type report_directory: str
     :param write_text_specs:\
         True if a textual version of the specification should be written
     :type write_text_specs: bool
@@ -78,8 +80,7 @@ def get_data_spec_and_file_writer_filename(
         then a temporary directory is used.
     :type application_run_time_report_folder: str
     :return: the filename of the data writer and the data specification object
-    :rtype: tuple(str, \
-        :py:class:`~data_specification.DataSpecificationGenerator`)
+    :rtype: tuple(str, DataSpecificationGenerator)
     """
     # pylint: disable=too-many-arguments
     if application_run_time_report_folder == "TEMP":
@@ -117,11 +118,12 @@ def get_report_writer(
     :param hostname: The hostname of the SpiNNaker machine
     :type hostname: str
     :param report_directory: the directory for the reports folder
-    :type report_directory: file path
+    :type report_directory: str
     :param write_text_specs:\
         True if a textual version of the specification should be written
     :type write_text_specs: bool
     :return: the report_writer_object or None if not reporting
+    :rtype: ~spinn_storage_handlers.FileDataWriter or None
     """
     # pylint: disable=too-many-arguments
 

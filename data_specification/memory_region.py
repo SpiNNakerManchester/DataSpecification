@@ -28,19 +28,19 @@ class MemoryRegion(object):
 
     def __init__(self, unfilled, size):
         """
-        :param unfilled: if the region needs to be filled when written
+        :param unfilled: if the region should not be written to by the data\
+            specification (i.e., because the vertex uses it as a working data\
+            region or an output region)
         :type unfilled: bool
         :param size: the size of the region, in bytes
         :type size: int
-        :rtype: None
-        :raise None: this method does not raise any known exception
         """
         #: flag that states if the region is filled or not
         self._unfilled = unfilled
         #: the amount of memory allocated to this DSG
         self._allocated_size = size
-        #: the region buffer
-        self._region_data = bytearray(size)
+        #: the region buffer, or None for unfilled regions
+        self._region_data = None if unfilled else bytearray(size)
         #: the position in the memory where the writing is currently occurring
         self._write_pointer = 0
         #: the max point where if written over, it will cause an error
@@ -57,7 +57,7 @@ class MemoryRegion(object):
     @property
     def remaining_space(self):
         """ The space between the current write pointer and the end of the\
-            region, which is the number of bytes remaning in the region that\
+            region, which is the number of bytes remaining in the region that\
             can be written.
 
         :rtype: int
@@ -79,7 +79,9 @@ class MemoryRegion(object):
 
         :rtype: bytearray
         """
-        return self._region_data
+        return (
+            bytearray(self._allocated_size) if self._unfilled
+            else self._region_data)
 
     @property
     def write_pointer(self):

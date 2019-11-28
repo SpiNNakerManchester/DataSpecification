@@ -27,9 +27,8 @@ class MemoryRegionCollection(object):
     ]
 
     def __init__(self, n_regions):
-        """ Create a new MemoryRegionCollection with the given number of\
-            regions.
-
+        """
+        :param n_regions: The number of regions in the collection.
         :type n_regions: int
         """
         self._regions = [None] * n_regions
@@ -67,7 +66,8 @@ class MemoryRegionCollection(object):
 
     @property
     def regions(self):
-        """
+        """ The regions in the collection.
+
         :rtype: iterable(MemoryRegion)
         """
         for r in self._regions:
@@ -75,12 +75,16 @@ class MemoryRegionCollection(object):
 
     def is_empty(self, region):
         """
+        :param region: The ID of the region
+        :type region: int
         :rtype: bool
         """
         return self._regions[region] is None
 
     def is_unfilled(self, region):
         """
+        :param region: The ID of the region
+        :type region: int
         :rtype: bool
         """
         if self.is_empty(region):
@@ -88,7 +92,8 @@ class MemoryRegionCollection(object):
         return self._regions[region].unfilled
 
     def count_used_regions(self):
-        """
+        """ The number of regions in the collection that are used.
+
         :rtype: int
         """
         return sum(r is not None for r in self._regions)
@@ -99,7 +104,7 @@ class MemoryRegionCollection(object):
 
         :param region: the region ID to which the test is being ran on
         :type region: int
-        :return: a boolean stating if the region needs to be written
+        :return: whether the region needs to be written
         :rtype: bool
         :raise NoRegionSelectedException: \
             when the ID is beyond the expected region range

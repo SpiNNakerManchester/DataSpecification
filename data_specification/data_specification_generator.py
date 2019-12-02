@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 from enum import Enum, IntEnum
 import logging
 import struct
@@ -97,11 +96,6 @@ def _binencode(command, arguments):
             val = int(val)
         cmd_word |= val << shift
     return bytearray(_ONE_WORD.pack(cmd_word))
-
-
-def _rescale(data, data_type):
-    data_value = decimal.Decimal(str(data)) * data_type.scale
-    return int(data_value.to_integral_value())
 
 
 class _MemSlot(object):

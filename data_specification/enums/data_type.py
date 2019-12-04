@@ -325,6 +325,10 @@ class DataType(Enum):
 
     def encode_as_int(self, value):
         """ Returns the value as an integer, according to this type.
+
+        :param value:
+        :type value: float or int
+        :rtype: int
         """
         if self._apply_scale:
             if not (self._min <= value <= self._max):
@@ -341,6 +345,10 @@ class DataType(Enum):
 
         .. note:
             Only works with integer and fixed point data types.
+
+        :param value:
+        :type value: float or int
+        :rtype: ~numpy.uint32
         """
         return np.round(self.encode_as_int(value)).astype(self.struct_encoding)
 
@@ -348,9 +356,8 @@ class DataType(Enum):
         """ Returns the numpy array as an integer numpy array, according to \
             this type.
 
-        :param array:
-        :type array: numpy.ndarray
-        :rtype array: numpy.ndarray
+        :param ~numpy.ndarray array:
+        :rtype array: ~numpy.ndarray
         """
         if self._apply_scale:
             # pylint: disable=assignment-from-no-return
@@ -367,10 +374,17 @@ class DataType(Enum):
 
     def encode(self, value):
         """ Encode the Python value for SpiNNaker according to this type.
+
+        :param value:
+        :type value: float or int
+        :rtype: bytes
         """
         return self._struct.pack(self.encode_as_int(value))
 
     def decode_numpy_array(self, array):
         """ Decode the numpy array of SpiNNaker values according to this type.
+
+        :param ~numpy.ndarray(~numpy.uint32) array:
+        :rtype: ~numpy.ndarray(~numpy.uint32 or ~numpy.float64)
         """
         return array / float(self._scale)

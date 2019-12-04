@@ -49,8 +49,8 @@ class DataSpecificationExecutor(object):
             The object to read the specification language file from
         :type spec_reader:\
             ~spinn_storage_handlers.abstract_classes.AbstractDataReader
-        :param memory_space: memory available on the destination architecture
-        :type memory_space: int
+        :param int memory_space: \
+            memory available on the destination architecture
         :raise spinn_storage_handlers.exceptions.DataReadException:\
             If a read from external storage fails
         :raise spinn_storage_handlers.exceptions.DataWriteException:\
@@ -107,8 +107,7 @@ class DataSpecificationExecutor(object):
     def get_region(self, region_id):
         """ Get a region with a given ID.
 
-        :param region_id: The ID of the region to get
-        :type region_id: int
+        :param int region_id: The ID of the region to get
         :return: The region, or None if the region was not allocated
         :rtype: MemoryRegion or None
         """
@@ -132,8 +131,7 @@ class DataSpecificationExecutor(object):
     def get_pointer_table(self, start_address):
         """ Get the pointer table as a numpy array.
 
-        :param start_address: The base address of the data to be written
-        :type start_address: int
+        :param int start_address: The base address of the data to be written
         :rtype: numpy.ndarray
         """
         pointer_table = numpy.zeros(MAX_MEM_REGIONS, dtype="<u4")

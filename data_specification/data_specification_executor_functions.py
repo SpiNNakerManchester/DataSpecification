@@ -39,11 +39,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     """
 
     __slots__ = [
-        "spec_reader",
-        "memory_space",
-        "space_allocated",
-        "current_region",
-        "registers",
+        "_spec_reader",
+        "_memory_space",
+        "_space_allocated",
+        "_current_region",
+        "_registers",
         "mem_regions",
 
         # Decodings of the current command
@@ -60,22 +60,21 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             The object to read the specification language file from
         :type spec_reader:\
             ~spinn_storage_handlers.abstract_classes.AbstractDataReader
-        :param memory_space: \
-            Memory space available for the data to be generated
-        :type memory_space: int
+        :param int memory_space: \
+            Memory space available for the data to be generated *per region*
         """
         #: Where we are reading the data spec from
-        self.spec_reader = spec_reader
+        self._spec_reader = spec_reader
         #: How much space do we have available? Maximum *PER REGION*
-        self.memory_space = memory_space
+        self._memory_space = memory_space
 
         #: How much space has been allocated
-        self.space_allocated = 0
+        self._space_allocated = 0
         #: What is the current region that we're writing to
-        self.current_region = None
+        self._current_region = None
 
         #: The model registers, a list of 16 ints
-        self.registers = [0] * MAX_REGISTERS
+        self._registers = [0] * MAX_REGISTERS
         #: The collection of memory regions that can be written to
         self.mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
 
@@ -96,10 +95,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         """ Routine to unpack the command read from the data spec file. The\
             parameters of the command are stored in the class data.
 
-        :param cmd: The command read form the data spec file
-        :type cmd: int
-        :return: No value returned
-        :rtype: None
+        :param int cmd: The command read form the data spec file
         """
         self.__cmd_size = (cmd >> 28) & 0x3
         self.__opcode = (cmd >> 20) & 0xFF
@@ -113,9 +109,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     @property
     def _region(self):
-        if self.current_region is None:
+        if self._current_region is None:
             return None
-        return self.mem_regions[self.current_region]
+        return self.mem_regions[self._current_region]
 
     @overrides(AbstractExecutorFunctions.execute_break)
     def execute_break(self, cmd):
@@ -124,7 +120,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             Raises the exception to break the execution of the DSE
         """
         raise ExecuteBreakInstruction(
-            self.spec_reader.tell(), self.spec_reader.filename)
+            self._spec_reader.tell(), self._spec_reader.filename)
 
     @overrides(AbstractExecutorFunctions.execute_reserve)
     def execute_reserve(self, cmd):
@@ -148,17 +144,17 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if not self.mem_regions.is_empty(region):
             raise RegionInUseException(region)
 
-        size = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
+        size = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
-        if not (0 < size <= self.memory_space):
+        if not (0 < size <= self._memory_space):
             raise ParameterOutOfBoundsException(
-                "region size", size, 1, self.memory_space, "RESERVE")
+                "region size", size, 1, self._memory_space, "RESERVE")
 
         self.mem_regions[region] = MemoryRegion(
             unfilled=unfilled, size=size)
-        self.space_allocated += size
+        self._space_allocated += size
 
     @overrides(AbstractExecutorFunctions.execute_write)
     def execute_write(self, cmd):
@@ -176,7 +172,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__unpack_cmd(cmd)
 
         if self.__src2_reg is not None:
-            n_repeats = self.registers[self.__src2_reg]
+            n_repeats = self._registers[self.__src2_reg]
         else:
             n_repeats = cmd & 0xFF
 
@@ -184,11 +180,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         data_len = 1 << self.__data_len
 
         if self.__src1_reg is not None:
-            value = self.registers[self.__src1_reg]
+            value = self._registers[self.__src1_reg]
         elif self.__cmd_size == LEN2 and data_len != 8:
-            value = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
+            value = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
         elif self.__cmd_size == LEN3 and data_len == 8:
-            value = _ONE_LONG.unpack(self.spec_reader.read(8))[0]
+            value = _ONE_LONG.unpack(self._spec_reader.read(8))[0]
         else:
             raise DataSpecificationSyntaxError(
                 "Command {0:s} requires a value as an argument, but the "
@@ -211,8 +207,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             If the selected region has not enough available memory to \
             store the required data
         """
-        length = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
-        value_encoded = self.spec_reader.read(4 * length)
+        length = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
+        value_encoded = self._spec_reader.read(4 * length)
         self._write_bytes_to_mem(value_encoded, "WRITE_ARRAY")
 
     @overrides(AbstractExecutorFunctions.execute_switch_focus)
@@ -225,13 +221,13 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__unpack_cmd(cmd)
 
         if self.__src1_reg is not None:
-            region = self.registers[self.__src1_reg]
+            region = self._registers[self.__src1_reg]
         else:
             region = (cmd >> 8) & 0xF
 
         if self.mem_regions.is_empty(region):
             raise RegionUnfilledException(region, "SWITCH_FOCUS")
-        self.current_region = region
+        self._current_region = region
 
     @overrides(AbstractExecutorFunctions.execute_mv)
     def execute_mv(self, cmd):
@@ -241,10 +237,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
                 "Destination register not correctly specified")
 
         if self.__src1_reg is not None:
-            self.registers[self.__dest_reg] = self.registers[self.__src1_reg]
+            self._registers[self.__dest_reg] = self._registers[self.__src1_reg]
         else:
-            self.registers[self.__dest_reg] = \
-                _ONE_WORD.unpack(self.spec_reader.read(4))[0]
+            self._registers[self.__dest_reg] = \
+                _ONE_WORD.unpack(self._spec_reader.read(4))[0]
 
     @overrides(AbstractExecutorFunctions.execute_set_wr_ptr)
     def execute_set_wr_ptr(self, cmd):
@@ -255,10 +251,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__unpack_cmd(cmd)
         if self.__src1_reg is not None:
             # the data is a register
-            future_address = self.registers[self.__src1_reg]
+            future_address = self._registers[self.__src1_reg]
         else:
             # the data is a raw address
-            future_address = _ONE_WORD.unpack(self.spec_reader.read(4))[0]
+            future_address = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
 
         # check that the address is relative or absolute
         if cmd & 0x1 == 1:
@@ -278,7 +274,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     @overrides(AbstractExecutorFunctions.execute_end_spec)
     def execute_end_spec(self, cmd):  # @UnusedVariable
-        value = _ONE_SIGNED_INT.unpack(self.spec_reader.read(4))[0]
+        value = _ONE_SIGNED_INT.unpack(self._spec_reader.read(4))[0]
         if value != -1:
             raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
@@ -291,16 +287,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
             The selected memory region needs to be already allocated
 
-        :param value: the value to be written in the data memory region
-        :type value: int
-        :param n_bytes: number of bytes that represent the value
-        :type n_bytes: int
-        :param repeat: the number of times the value is to be repeated
-        :type repeat: int
-        :param command: the command which is being executed
-        :type command: str
-        :return: No value returned
-        :rtype: None
+        :param int value: the value to be written in the data memory region
+        :param int n_bytes: number of bytes that represent the value
+        :param int repeat: the number of times the value is to be repeated
+        :param str command: the command which is being executed
         :raise NoRegionSelectedException: \
             If there is no memory region selected for the write operation
         :raise RegionNotAllocatedException: \
@@ -329,11 +319,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             The selected memory region needs to be already allocated
 
         :param data: the value to be written in the data memory region
-        :type data: str
-        :param command: the command which is being executed
-        :type command: str
-        :return: No value returned
-        :rtype: None
+        :type data: bytes or bytearray
+        :param str command: the command which is being executed
         :raise NoRegionSelectedException: \
             If there is no memory region selected for the write operation
         :raise RegionNotAllocatedException: \
@@ -343,12 +330,12 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             store the required data
         """
         # A region must've been selected
-        if self.current_region is None:
+        if self._current_region is None:
             raise NoRegionSelectedException(command)
 
         # It must be a real region
         if self._region is None:
-            raise RegionNotAllocatedException(self.current_region, command)
+            raise RegionNotAllocatedException(self._current_region, command)
 
         self.__write_blob(data)
 
@@ -357,7 +344,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             go outside the region.
 
         :param data: The data to write
-        :type data: str
+        :type data: bytes or bytearray
         :raise NoMoreException:\
             if the selected region has not enough space to store the data
         """
@@ -365,7 +352,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         region = self._region
         if region.remaining_space < len(data):
             raise NoMoreException(
-                region.remaining_space, len(data), self.current_region)
+                region.remaining_space, len(data), self._current_region)
 
         # We can safely write
         write_ptr = region.write_pointer

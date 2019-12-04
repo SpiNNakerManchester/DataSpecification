@@ -61,6 +61,8 @@ class DataSpecificationExecutor(object):
         #: The executor functions themselves.
         self.dsef = DataSpecificationExecutorFunctions(
             self._spec_reader, memory_space)
+        # TODO: make the dsef field a private detail of the executor
+        # Currently accessed directly from FEC to get memory regions...
 
     def __operation_func(self, cmd, index):
         """ Decode the command and select an implementation of the command.

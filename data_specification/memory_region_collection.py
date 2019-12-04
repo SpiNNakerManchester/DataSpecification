@@ -28,8 +28,7 @@ class MemoryRegionCollection(object):
 
     def __init__(self, n_regions):
         """
-        :param n_regions: The number of regions in the collection.
-        :type n_regions: int
+        :param int n_regions: The number of regions in the collection.
         """
         self._regions = [None] * n_regions
 
@@ -47,8 +46,8 @@ class MemoryRegionCollection(object):
 
     def __setitem__(self, key, value):
         """
-        :type key: int
-        :type value: MemoryRegion
+        :param int key:
+        :param MemoryRegion value:
         """
         if key < 0 or key >= len(self._regions):
             raise NoRegionSelectedException(
@@ -75,16 +74,14 @@ class MemoryRegionCollection(object):
 
     def is_empty(self, region):
         """
-        :param region: The ID of the region
-        :type region: int
+        :param int region: The ID of the region
         :rtype: bool
         """
         return self._regions[region] is None
 
     def is_unfilled(self, region):
         """
-        :param region: The ID of the region
-        :type region: int
+        :param int region: The ID of the region
         :rtype: bool
         """
         if self.is_empty(region):
@@ -102,8 +99,7 @@ class MemoryRegionCollection(object):
         """ Helper method which determines if a unfilled region actually \
             needs to be written (optimisation to stop large data files).
 
-        :param region: the region ID to which the test is being ran on
-        :type region: int
+        :param int region: the region ID to which the test is being ran on
         :return: whether the region needs to be written
         :rtype: bool
         :raise NoRegionSelectedException: \

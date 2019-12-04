@@ -28,12 +28,10 @@ class MemoryRegion(object):
 
     def __init__(self, unfilled, size):
         """
-        :param unfilled: if the region should not be written to by the data\
-            specification (i.e., because the vertex uses it as a working data\
-            region or an output region)
-        :type unfilled: bool
-        :param size: the size of the region, in bytes
-        :type size: int
+        :param bool unfilled: if the region should not be written to by the\
+            data specification (i.e., because the vertex uses it as a working\
+            data region or an output region)
+        :param int size: the size of the region, in bytes
         """
         #: flag that states if the region is filled or not
         self._unfilled = unfilled
@@ -108,8 +106,7 @@ class MemoryRegion(object):
     def increment_write_pointer(self, n_bytes):
         """ Advance the write pointer.
 
-        :param n_bytes: The number of bytes to advance the pointer by.
-        :type n_bytes: int
+        :param int n_bytes: The number of bytes to advance the pointer by.
         """
         self._write_pointer += n_bytes
         self._max_write_pointer = max((

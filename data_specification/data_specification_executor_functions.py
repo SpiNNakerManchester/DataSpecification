@@ -44,7 +44,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "_space_allocated",
         "_current_region",
         "_registers",
-        "mem_regions",
+        "_mem_regions",
 
         # Decodings of the current command
         "__cmd_size",
@@ -76,7 +76,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         #: The model registers, a list of 16 ints
         self._registers = [0] * MAX_REGISTERS
         #: The collection of memory regions that can be written to
-        self.mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
+        self._mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
 
         #: Decoded from command: size in words
         self.__cmd_size = None
@@ -90,6 +90,14 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__src2_reg = None
         #: Decoded from command: data length
         self.__data_len = None
+
+    @property
+    def mem_regions(self):
+        """ The collection of memory regions that can be written to.
+
+        :rtype: MemoryRegionCollection
+        """
+        return self._mem_regions
 
     def __unpack_cmd(self, cmd):
         """ Routine to unpack the command read from the data spec file. The\
@@ -111,7 +119,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     def _region(self):
         if self._current_region is None:
             return None
-        return self.mem_regions[self._current_region]
+        return self._mem_regions[self._current_region]
 
     @overrides(AbstractExecutorFunctions.execute_break)
     def execute_break(self, cmd):
@@ -141,7 +149,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         unfilled = (cmd >> 7) & 0x1 == 0x1
 
-        if not self.mem_regions.is_empty(region):
+        if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
 
         size = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
@@ -152,7 +160,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             raise ParameterOutOfBoundsException(
                 "region size", size, 1, self._memory_space, "RESERVE")
 
-        self.mem_regions[region] = MemoryRegion(
+        self._mem_regions[region] = MemoryRegion(
             unfilled=unfilled, size=size)
         self._space_allocated += size
 
@@ -225,7 +233,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         else:
             region = (cmd >> 8) & 0xF
 
-        if self.mem_regions.is_empty(region):
+        if self._mem_regions.is_empty(region):
             raise RegionUnfilledException(region, "SWITCH_FOCUS")
         self._current_region = region
 

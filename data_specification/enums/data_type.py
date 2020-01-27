@@ -20,21 +20,23 @@ import numpy as np
 
 
 class DataType(Enum):
-    """ Supported data types
-        The first value is an identifier for the enum class;
-        The second value is the size in bytes of the type;
-        The third value is the minimum possible value for the type;
-        The fourth value is the maximum possible value for the type;
-        The fifth value is the scale of the input value to convert it in\
-            integer;
-        The sixth value is the pattern to use following the struct package\
-            encodings to convert the data in binary format;
-        The seventh value is whether to apply the scaling when converting to\
-            SpiNNaker's binary format.
-        The eighth value is the corresponding numpy type (or None to inhibit\
-            direct conversion via numpy, scaled conversion still supported);
-        The ninth value is the text description of the type.
+    """ Supported data types.
+    Internally, these are actually tuples.
+
+    #. an identifier for the enum class;
+    #. the size in bytes of the type;
+    #. the minimum possible value for the type;
+    #. the maximum possible value for the type;
+    #. the scale of the input value to convert it in integer;
+    #. the pattern to use following the struct package encodings to convert
+       the data in binary format;
+    #. is whether to apply the scaling when converting to SpiNNaker's binary
+       format.
+    #. the corresponding numpy type (or None to inhibit direct conversion via
+       numpy, scaled conversion still supported);
+    #. the text description of the type.
     """
+    #: 8-bit unsigned integer
     UINT8 = (0,
              1,
              decimal.Decimal("0"),
@@ -45,6 +47,7 @@ class DataType(Enum):
              int,
              np.uint8,
              "8-bit unsigned integer")
+    #: 16-bit unsigned integer
     UINT16 = (1,
               2,
               decimal.Decimal("0"),
@@ -55,6 +58,7 @@ class DataType(Enum):
               int,
               np.uint16,
               "16-bit unsigned integer")
+    #: 32-bit unsigned integer
     UINT32 = (2,
               4,
               decimal.Decimal("0"),
@@ -65,6 +69,7 @@ class DataType(Enum):
               int,
               np.uint32,
               "32-bit unsigned integer")
+    #: 64-bit unsigned integer
     UINT64 = (3,
               8,
               decimal.Decimal("0"),
@@ -75,6 +80,7 @@ class DataType(Enum):
               int,
               np.uint64,
               "64-bit unsigned integer")
+    #: 8-bit signed integer
     INT8 = (4,
             1,
             decimal.Decimal("-128"),
@@ -85,6 +91,7 @@ class DataType(Enum):
             int,
             np.int8,
             "8-bit signed integer")
+    #: 16-bit signed integer
     INT16 = (5,
              2,
              decimal.Decimal("-32768"),
@@ -95,6 +102,7 @@ class DataType(Enum):
              int,
              np.int16,
              "16-bit signed integer")
+    #: 32-bit signed integer
     INT32 = (6,
              4,
              decimal.Decimal("-2147483648"),
@@ -105,6 +113,7 @@ class DataType(Enum):
              int,
              np.int32,
              "32-bit signed integer")
+    #: 64-bit signed integer
     INT64 = (7,
              8,
              decimal.Decimal("-9223372036854775808"),
@@ -115,6 +124,7 @@ class DataType(Enum):
              int,
              np.int64,
              "64-bit signed integer")
+    #: 8.8 unsigned fixed point number
     U88 = (8,
            2,
            decimal.Decimal("0"),
@@ -125,6 +135,7 @@ class DataType(Enum):
            None,
            None,
            "8.8 unsigned fixed point number")
+    #: 16.16 unsigned fixed point number
     U1616 = (9,
              4,
              decimal.Decimal("0"),
@@ -135,6 +146,7 @@ class DataType(Enum):
              None,
              None,
              "16.16 unsigned fixed point number")
+    #: 32.32 unsigned fixed point number
     U3232 = (10,
              8,
              decimal.Decimal("0"),
@@ -145,6 +157,7 @@ class DataType(Enum):
              None,
              None,
              "32.32 unsigned fixed point number")  # rounding problem for max
+    #: 8.7 signed fixed point number
     S87 = (11,
            2,
            decimal.Decimal("-256"),
@@ -155,6 +168,7 @@ class DataType(Enum):
            None,
            None,
            "8.7 signed fixed point number")
+    #: 16.15 signed fixed point number
     S1615 = (12,
              4,
              decimal.Decimal("-65536"),
@@ -165,6 +179,7 @@ class DataType(Enum):
              None,
              None,
              "16.15 signed fixed point number")
+    #: 32.31 signed fixed point number
     S3231 = (13,
              8,
              decimal.Decimal("-4294967296"),
@@ -175,6 +190,7 @@ class DataType(Enum):
              None,
              None,
              "32.31 signed fixed point number")  # rounding problem for max
+    #: 32-bit floating point number
     FLOAT_32 = (14,
                 4,
                 decimal.Decimal("-3.4028234e38"),
@@ -185,6 +201,7 @@ class DataType(Enum):
                 float,
                 np.float32,
                 "32-bit floating point number")
+    #: 64-bit floating point number
     FLOAT_64 = (15,
                 8,
                 decimal.Decimal("-1.7976931348623157e+308"),
@@ -195,6 +212,7 @@ class DataType(Enum):
                 float,
                 np.float64,
                 "64-bit floating point number")
+    #: 0.8 unsigned fixed point number
     U08 = (16,
            1,
            decimal.Decimal("0"),
@@ -205,6 +223,7 @@ class DataType(Enum):
            None,
            None,
            "0.8 unsigned fixed point number")
+    #: 0.16 unsigned fixed point number
     U016 = (17,
             2,
             decimal.Decimal("0"),
@@ -215,6 +234,7 @@ class DataType(Enum):
             None,
             None,
             "0.16 unsigned fixed point number")
+    #: 0.32 unsigned fixed point number
     U032 = (18,
             4,
             decimal.Decimal("0"),
@@ -225,6 +245,7 @@ class DataType(Enum):
             None,
             None,
             "0.32 unsigned fixed point number")
+    #: 0.64 unsigned fixed point number
     U064 = (19,
             8,
             decimal.Decimal("0"),
@@ -236,6 +257,7 @@ class DataType(Enum):
             None,
             None,
             "0.64 unsigned fixed point number")  # rounding problem for max
+    #: 0.7 signed fixed point number
     S07 = (20,
            1,
            decimal.Decimal("-1"),
@@ -246,6 +268,7 @@ class DataType(Enum):
            None,
            None,
            "0.7 signed fixed point number")
+    #: 0.15 signed fixed point number
     S015 = (21,
             2,
             decimal.Decimal("-1"),
@@ -256,6 +279,7 @@ class DataType(Enum):
             None,
             None,
             "0.15 signed fixed point number")
+    #: 0.32 signed fixed point number
     S031 = (22,
             4,
             decimal.Decimal("-1"),
@@ -266,6 +290,7 @@ class DataType(Enum):
             None,
             None,
             "0.32 signed fixed point number")
+    #: 0.63 signed fixed point number
     S063 = (23,
             8,
             decimal.Decimal("-1"),
@@ -301,26 +326,38 @@ class DataType(Enum):
 
     @property
     def size(self):
+        """ The size in bytes of the type.
+        """
         return self._size
 
     @property
     def min(self):
+        """ The minimum possible value for the type.
+        """
         return self._min
 
     @property
     def max(self):
+        """ The maximum possible value for the type.
+        """
         return self._max
 
     @property
     def scale(self):
+        """ The scale of the input value to convert it in integer.
+        """
         return self._scale
 
     @property
     def struct_encoding(self):
+        """ The encoding string used for struct. Scaling may also be required.
+        """
         return self._struct_encoding
 
     @property
     def numpy_typename(self):
+        """ The corresponding numpy type, if one exists.
+        """
         return self._numpy_typename
 
     def encode_as_int(self, value):

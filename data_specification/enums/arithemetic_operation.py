@@ -20,8 +20,11 @@ class ArithmeticOperation(Enum):
     """ Arithmetic Operations
     """
 
+    #: Addition operation
     ADD = (0, "+", "Perform addition")
+    #: Subtraction operation
     SUBTRACT = (1, "-", "Perform subtraction")
+    #: Multiplication operation
     MULTIPLY = (2, "*", "Perform multiplication")
 
     def __new__(cls, value, operator, doc=""):

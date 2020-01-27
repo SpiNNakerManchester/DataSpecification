@@ -18,35 +18,47 @@
 """
 
 # MAGIC Numbers:
-# Data spec magic number
+#: Data spec magic number.
 DSG_MAGIC_NUM = 0x5B7CA17E
 
-# Application data magic number
+#: Application data magic number.
 APPDATA_MAGIC_NUM = 0xAD130AD6
 
-# Version of the file produced by the DSE
+#: Version of the file produced by the DSE.
 DSE_VERSION = 0x00010000
 
 # DSG Arrays and tables sizes:
+#: Maximum number of registers in DSG virtual machine.
 MAX_REGISTERS = 16
+#: Maximum number of memory regions in DSG virtual machine.
 MAX_MEM_REGIONS = 16
+#: Maximum number of structure slots in DSG virtual machine.
 MAX_STRUCT_SLOTS = 16
+#: Maximum number of structure elements in DSG virtual machine.
 MAX_STRUCT_ELEMENTS = 255
+#: Maximum number of packing specification slots in DSG virtual machine.
 MAX_PACKSPEC_SLOTS = 16
+#: Maximum number of functions in DSG virtual machine.
 MAX_CONSTRUCTORS = 16
+#: Maximum number of parameter lists in DSG virtual machine.
 MAX_PARAM_LISTS = 16
+#: Maximum number of random number generators in DSG virtual machine.
 MAX_RNGS = 16
+#: Maximum number of random distributions in DSG virtual machine.
 MAX_RANDOM_DISTS = 16
 
+#: Size of header of data spec pointer table produced by DSE, in bytes.
 APP_PTR_TABLE_HEADER_BYTE_SIZE = 8
+#: Size of data spec pointer table produced by DSE, in bytes.
 APP_PTR_TABLE_BYTE_SIZE = APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4
 
-# Constants used by DSG command encoding:
+# Constants used by DSG command encoding; not relevant outside
 LEN1 = 0
 LEN2 = 1
 LEN3 = 2
 LEN4 = 3
 
+# Yes, this is naming for bit patterns
 NO_REGS = 0
 DEST_ONLY = 4
 SRC1_ONLY = 2

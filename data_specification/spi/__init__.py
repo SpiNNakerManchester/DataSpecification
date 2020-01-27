@@ -13,23 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from enum import Enum
+"""
+The interface used by implementations of the executor.
+"""
 
+from .abstract_executor_functions import AbstractExecutorFunctions
 
-class RandomNumberGenerator(Enum):
-    """ Random number generator types
-    """
-
-    #: The well-known Mersenne Twister PRNG
-    MERSENNE_TWISTER = (0, "The well-known Mersenne Twister PRNG")
-
-    def __new__(cls, value, doc=""):
-        # pylint: disable=protected-access
-        obj = object.__new__(cls)
-        obj._value_ = value
-        obj.__doc__ = doc
-        return obj
-
-    def __init__(self, value, doc=""):
-        self._value_ = value
-        self.__doc__ = doc
+__all__ = ["AbstractExecutorFunctions"]

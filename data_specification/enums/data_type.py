@@ -35,6 +35,11 @@ class DataType(Enum):
     #. the corresponding numpy type (or None to inhibit direct conversion via
        numpy, scaled conversion still supported);
     #. the text description of the type.
+
+    .. note::
+        Some types (notably 64-bit fixed-point and floating-point types) are
+        not recommended for use on SpiNNaker due to complications with
+        representability and lack of hardware/library support.
     """
     #: 8-bit unsigned integer
     UINT8 = (0,
@@ -147,6 +152,7 @@ class DataType(Enum):
              None,
              "16.16 unsigned fixed point number")
     #: 32.32 unsigned fixed point number
+    #: (use *not* recommended: representability)
     U3232 = (10,
              8,
              decimal.Decimal("0"),
@@ -180,6 +186,7 @@ class DataType(Enum):
              None,
              "16.15 signed fixed point number")
     #: 32.31 signed fixed point number
+    #: (use *not* recommended: representability)
     S3231 = (13,
              8,
              decimal.Decimal("-4294967296"),
@@ -202,6 +209,7 @@ class DataType(Enum):
                 np.float32,
                 "32-bit floating point number")
     #: 64-bit floating point number
+    #: (use *not* recommended: hardware/library support inadequate)
     FLOAT_64 = (15,
                 8,
                 decimal.Decimal("-1.7976931348623157e+308"),
@@ -246,6 +254,7 @@ class DataType(Enum):
             None,
             "0.32 unsigned fixed point number")
     #: 0.64 unsigned fixed point number
+    #: (use *not* recommended: representability)
     U064 = (19,
             8,
             decimal.Decimal("0"),
@@ -291,6 +300,7 @@ class DataType(Enum):
             None,
             "0.32 signed fixed point number")
     #: 0.63 signed fixed point number
+    #: (use *not* recommended: representability)
     S063 = (23,
             8,
             decimal.Decimal("-1"),
@@ -327,30 +337,40 @@ class DataType(Enum):
     @property
     def size(self):
         """ The size in bytes of the type.
+
+        :rtype: int
         """
         return self._size
 
     @property
     def min(self):
         """ The minimum possible value for the type.
+
+        :rtype: ~decimal.Decimal
         """
         return self._min
 
     @property
     def max(self):
         """ The maximum possible value for the type.
+
+        :rtype: ~decimal.Decimal
         """
         return self._max
 
     @property
     def scale(self):
         """ The scale of the input value to convert it in integer.
+
+        :rtype: ~decimal.Decimal
         """
         return self._scale
 
     @property
     def struct_encoding(self):
         """ The encoding string used for struct. Scaling may also be required.
+
+        :rtype: str
         """
         return self._struct_encoding
 
@@ -394,7 +414,7 @@ class DataType(Enum):
             this type.
 
         :param ~numpy.ndarray array:
-        :rtype array: ~numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
         if self._apply_scale:
             # pylint: disable=assignment-from-no-return

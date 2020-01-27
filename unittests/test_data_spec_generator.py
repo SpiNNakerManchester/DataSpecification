@@ -116,15 +116,15 @@ class TestDataSpecGeneration(unittest.TestCase):
         # RESERVE for memory region 4
         self.assertEqual(self.get_next_word(2), [0x10200044, 0x3344])
         # Memory region 1 DSG data wrong
-        self.assertEqual(self.dsg._mem_slots[1].size, 0x111)
+        self.assertEqual(self.dsg._mem_slots[1].size, 0x114)
         self.assertIsNone(self.dsg._mem_slots[1].label)
         self.assertEqual(self.dsg._mem_slots[1].empty, False)
         # Memory region 2 DSG data wrong
-        self.assertEqual(self.dsg._mem_slots[2].size, 0x1122)
+        self.assertEqual(self.dsg._mem_slots[2].size, 0x1124)
         self.assertIsNone(self.dsg._mem_slots[2].label)
         self.assertEqual(self.dsg._mem_slots[2].empty, False)
         # Memory region 3 DSG data wrong
-        self.assertEqual(self.dsg._mem_slots[3].size, 0x1122)
+        self.assertEqual(self.dsg._mem_slots[3].size, 0x1124)
         self.assertIsNone(self.dsg._mem_slots[3].label)
         self.assertEqual(self.dsg._mem_slots[3].empty, True)
         # FREE wrong command word
@@ -777,7 +777,13 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05171111)
 
     def test_end_loop(self):
+        # Must not end a loop if one isn't started
+        with self.assertRaises(InvalidCommandException):
+            self.dsg.end_loop()
+        self.dsg.start_loop(0, 1, 2)
         self.dsg.end_loop()
+        # START_LOOP with extra 3 argument words (ignored for testing)
+        self.get_next_word(4)
         # END_LOOP
         self.assertEqual(self.get_next_word(), 0x05300000)
 

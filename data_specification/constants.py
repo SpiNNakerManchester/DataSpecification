@@ -68,3 +68,6 @@ ALL_REGS = 7
 
 # return values from functions of the data spec executor
 END_SPEC_EXECUTOR = -1
+
+# conversion from words to bytes
+BYTES_PER_WORD = 4

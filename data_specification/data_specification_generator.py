@@ -22,7 +22,8 @@ from spinn_storage_handlers.abstract_classes import AbstractDataWriter
 from .constants import (
     MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,
     MAX_RNGS, MAX_STRUCT_ELEMENTS, MAX_STRUCT_SLOTS, LEN1, LEN2, LEN3, LEN4,
-    NO_REGS, DEST_AND_SRC1, DEST_ONLY, SRC1_ONLY, SRC1_AND_SRC2)
+    NO_REGS, DEST_AND_SRC1, DEST_ONLY, SRC1_ONLY, SRC1_AND_SRC2,
+    BYTES_PER_WORD)
 from .exceptions import (
     DataUndefinedWriterException, DuplicateParameterException,
     FunctionInUseException, InvalidCommandException,
@@ -107,6 +108,9 @@ class _MemSlot(object):
     def __init__(self, label, size, empty):
         #: Optional label for the region; str or None
         self.label = label
+        # round size to a number of words
+        if size % BYTES_PER_WORD != 0:
+            size = size + (BYTES_PER_WORD - (size % BYTES_PER_WORD))
         #: The size of the region; int
         self.size = size
         #: Whether the region is to be left empty; bool
@@ -1201,6 +1205,7 @@ class DataSpecificationGenerator(object):
 
         data = numpy.array(array_values, dtype=data_type.numpy_typename)
         size = data.size * data_type.size
+
         if size % 4 != 0:
             raise UnknownTypeLengthException(size, Commands.WRITE_ARRAY.name)
 

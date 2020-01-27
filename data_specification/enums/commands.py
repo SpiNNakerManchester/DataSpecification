@@ -21,12 +21,15 @@ from data_specification.data_specification_executor_functions import (
 class Commands(Enum):
     """ Set of opcodes for the spec executor"""
 
+    #: Halts spec execution with an error.
     BREAK = (
         0x00, DataSpecificationExecutorFunctions.execute_break,
         "Halts spec execution with an error")
+    #: No operation. Can be used as a filler.
     NOP = (
         0x01, DataSpecificationExecutorFunctions.execute_nop,
         "No operation. Can be used as a filler")
+    #: Reserves a block of memory ready for filling.
     RESERVE = (
         0x02, DataSpecificationExecutorFunctions.execute_reserve,
         "Reserves a block of memory ready for filling")
@@ -63,9 +66,11 @@ class Commands(Enum):
     READ = (
         0x41, DataSpecificationExecutorFunctions.execute_read,
         "Performs a simple read  operation")
+    #: Performs a simple write or block write operation.
     WRITE = (
         0x42, DataSpecificationExecutorFunctions.execute_write,
         "Performs a simple write or block write operation")
+    #: Performs a write from an array.
     WRITE_ARRAY = (
         0x43, DataSpecificationExecutorFunctions.execute_write_array,
         "Performs a write from an array")
@@ -75,6 +80,8 @@ class Commands(Enum):
     BLOCK_COPY = (
         0x45, DataSpecificationExecutorFunctions.execute_block_copy,
         "Copies a block of data from one area to another")
+    #: Swap between different reserved memory regions to work on several at
+    #: the same time.
     SWITCH_FOCUS = (
         0x50, DataSpecificationExecutorFunctions.execute_switch_focus,
         "Swap between different reserved memory regions to work on several at"
@@ -98,12 +105,16 @@ class Commands(Enum):
     END_IF = (
         0x57, DataSpecificationExecutorFunctions.execute_end_if,
         "Close block of instructions begun with the IF instruction")
+    #: Place a value in a register, from an immediate or another register.
     MV = (
         0x60, DataSpecificationExecutorFunctions.execute_mv,
         "Place a value in a register, from an immediate or another register")
     GET_WR_PTR = (
         0x63, DataSpecificationExecutorFunctions.execute_get_wr_ptr,
         "Copy current write address to a register")
+    #: Move the write pointer to a new location, either relative to the
+    #: start of this reserved memory area or relative to the current
+    #: write pointer.
     SET_WR_PTR = (
         0x64, DataSpecificationExecutorFunctions.execute_set_wr_ptr,
         "Move the write pointer to a new location, either relative to the"

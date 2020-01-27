@@ -19,11 +19,17 @@ from enum import Enum
 class LogicOperation(Enum):
     """ Logic Operations
     """
+    #: Shift left (with zero extension)
     LEFT_SHIFT = (0, "LSL", "Shift left")
+    #: Shift right (with zero extension)
     RIGHT_SHIFT = (1, "LSR", "Shift right")
+    #: Logical OR
     OR = (2, "OR", "Logical OR")
+    #: Logical AND
     AND = (3, "AND", "Logical AND")
+    #: Logical XOR
     XOR = (4, "XOR", "Logical XOR")
+    #: Logical NOT (single argument)
     NOT = (5, "NOT", "Logical NOT")
 
     def __new__(cls, value, operator, doc=""):

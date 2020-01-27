@@ -45,15 +45,15 @@ class DataSpecificationExecutor(object):
 
     def __init__(self, spec_reader, memory_space):
         """
-        :param spec_reader: \
+        :param spec_reader:
             The object to read the specification language file from
-        :type spec_reader:\
+        :type spec_reader:
             ~spinn_storage_handlers.abstract_classes.AbstractDataReader
-        :param int memory_space: \
+        :param int memory_space:
             memory available on the destination architecture
-        :raise spinn_storage_handlers.exceptions.DataReadException:\
+        :raise spinn_storage_handlers.exceptions.DataReadException:
             If a read from external storage fails
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:
             If a write to external storage fails
         """
         #: The object to read the specification to execute.
@@ -80,17 +80,18 @@ class DataSpecificationExecutor(object):
                     cmd, self._spec_reader.filename)), e)
 
     def execute(self):
-        """ Executes the specification.
+        """ Executes the specification. This will result in a configuration \
+            of memory regions being done.
 
-        :return: Nothing
-        :raise spinn_storage_handlers.exceptions.DataReadException:\
+        :rtype: None
+        :raise spinn_storage_handlers.exceptions.DataReadException:
             If a read from external storage fails
-        :raise spinn_storage_handlers.exceptions.DataWriteException:\
+        :raise spinn_storage_handlers.exceptions.DataWriteException:
             If a write to external storage fails
-        :raise DataSpecificationException:\
+        :raise DataSpecificationException:
             If there is an error when executing the specification
-        :raise TablePointerOutOfMemoryException:\
-            If the table pointer generated as data header exceeds the size of\
+        :raise TablePointerOutOfMemoryException:
+            If the table pointer generated as data header exceeds the size of
             the available memory
         """
         index = 0

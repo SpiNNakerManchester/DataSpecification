@@ -94,9 +94,9 @@ class RegionExhaustedException(DataSpecificationException):
     def __init__(self, region, region_size, allocated_size, command):
         """
         :param int region: The region that was being written to
-        :param int region_size: The originally requested size of the region\
+        :param int region_size: The originally requested size of the region
             that has run out of space, in bytes
-        :param int allocated_size: The amount of the originally requested\
+        :param int allocated_size: The amount of the originally requested
             space that has already been allocated, in bytes
         :param str command: The command being executed
         """
@@ -114,8 +114,8 @@ class RegionOutOfBoundsException(DataSpecificationException):
     def __init__(self, region, region_size, requested_offset, command):
         """
         :param int region: The region that was being offset into
-        :param int region_size: The originally requested size of the region in\
-            question, in bytes
+        :param int region_size:
+            The originally requested size of the region in question, in bytes
         :param int requested_offset: The offset being requested, in bytes
         :param str command: The command being executed
         """
@@ -229,7 +229,7 @@ class WrongParameterNumberException(DataSpecificationException):
         """
         :param int function_id: The ID of the function
         :param list parameters: The parameters used in the function call
-        :param int no_of_parameters_required: \
+        :param int no_of_parameters_required:
             The number of parameters required by the function
         """
         super(WrongParameterNumberException, self).__init__(

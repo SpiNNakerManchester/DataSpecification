@@ -56,11 +56,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     def __init__(self, spec_reader, memory_space):
         """
-        :param spec_reader: \
+        :param spec_reader:
             The object to read the specification language file from
-        :type spec_reader:\
+        :type spec_reader:
             ~spinn_storage_handlers.abstract_classes.AbstractDataReader
-        :param int memory_space: \
+        :param int memory_space:
             Memory space available for the data to be generated *per region*
         """
         #: Where we are reading the data spec from
@@ -124,7 +124,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     @overrides(AbstractExecutorFunctions.execute_break)
     def execute_break(self, cmd):
         """
-        :raise ExecuteBreakInstruction:\
+        :raise ExecuteBreakInstruction:
             Raises the exception to break the execution of the DSE
         """
         raise ExecuteBreakInstruction(
@@ -133,7 +133,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     @overrides(AbstractExecutorFunctions.execute_reserve)
     def execute_reserve(self, cmd):
         """
-        :raise ParameterOutOfBoundsException: \
+        :raise ParameterOutOfBoundsException:
             If the requested size of the region is beyond the available\
             memory space
         """
@@ -167,14 +167,14 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     @overrides(AbstractExecutorFunctions.execute_write)
     def execute_write(self, cmd):
         """
-        :raise NoRegionSelectedException: \
+        :raise NoRegionSelectedException:
             If there is no memory region selected for the write operation
-        :raise RegionNotAllocatedException: \
+        :raise RegionNotAllocatedException:
             If the selected region has not been allocated memory space
-        :raise NoMoreException:\
-            If the selected region has not enough available memory to \
-            store the required data
-        :raise UnknownTypeLengthException: \
+        :raise NoMoreException:
+            If the selected region has not enough available memory to store
+            the required data
+        :raise UnknownTypeLengthException:
             If the data type size is not 1, 2, 4, or 8 bytes
         """
         self.__unpack_cmd(cmd)
@@ -207,13 +207,13 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     @overrides(AbstractExecutorFunctions.execute_write_array)
     def execute_write_array(self, cmd):  # @UnusedVariable
         """
-        :raise NoRegionSelectedException: \
+        :raise NoRegionSelectedException:
             If there is no memory region selected for the write operation
-        :raise RegionNotAllocatedException: \
+        :raise RegionNotAllocatedException:
             If the selected region has not been allocated memory space
-        :raise NoMoreException:\
-            If the selected region has not enough available memory to \
-            store the required data
+        :raise NoMoreException:
+            If the selected region has not enough available memory to store
+            the required data
         """
         length = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
         value_encoded = self._spec_reader.read(4 * length)
@@ -222,8 +222,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     @overrides(AbstractExecutorFunctions.execute_switch_focus)
     def execute_switch_focus(self, cmd):
         """
-        :raise RegionUnfilledException: \
-            If the focus is being switched to a region of memory which has\
+        :raise RegionUnfilledException:
+            If the focus is being switched to a region of memory which has
             been declared to be kept unfilled
         """
         self.__unpack_cmd(cmd)
@@ -253,7 +253,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     @overrides(AbstractExecutorFunctions.execute_set_wr_ptr)
     def execute_set_wr_ptr(self, cmd):
         """
-        :raise NoRegionSelectedException: \
+        :raise NoRegionSelectedException:
             If there is no memory region selected for the set-ptr operation
         """
         self.__unpack_cmd(cmd)
@@ -299,14 +299,14 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :param int n_bytes: number of bytes that represent the value
         :param int repeat: the number of times the value is to be repeated
         :param str command: the command which is being executed
-        :raise NoRegionSelectedException: \
+        :raise NoRegionSelectedException:
             If there is no memory region selected for the write operation
-        :raise RegionNotAllocatedException: \
+        :raise RegionNotAllocatedException:
             If the selected region has not been allocated memory space
-        :raise NoMoreException:\
-            f the selected region has not enough available memory to \
+        :raise NoMoreException:
+            f the selected region has not enough available memory to
             store the required data
-        :raise UnknownTypeLengthException: \
+        :raise UnknownTypeLengthException:
             If the data type size is not 1, 2, 4, or 8 bytes
         """
         if n_bytes == 1:
@@ -329,13 +329,13 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :param data: the value to be written in the data memory region
         :type data: bytes or bytearray
         :param str command: the command which is being executed
-        :raise NoRegionSelectedException: \
+        :raise NoRegionSelectedException:
             If there is no memory region selected for the write operation
-        :raise RegionNotAllocatedException: \
+        :raise RegionNotAllocatedException:
             If the selected region has not been allocated memory space
-        :raise NoMoreException:\
-            If the selected region has not enough available memory to \
-            store the required data
+        :raise NoMoreException:
+            If the selected region has not enough available memory to store
+            the required data
         """
         # A region must've been selected
         if self._current_region is None:
@@ -353,7 +353,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         :param data: The data to write
         :type data: bytes or bytearray
-        :raise NoMoreException:\
+        :raise NoMoreException:
             if the selected region has not enough space to store the data
         """
         # It must have enough space

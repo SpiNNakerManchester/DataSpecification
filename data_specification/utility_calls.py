@@ -72,10 +72,10 @@ def get_data_spec_and_file_writer_filename(
     :param int processor_id: The processor ID
     :param str hostname: The hostname of the SpiNNaker machine
     :param str report_directory: the directory for the reports folder
-    :param bool write_text_specs:\
+    :param bool write_text_specs:
         True if a textual version of the specification should be written
-    :param str application_run_time_report_folder:\
-        The folder to contain the resulting specification files; if 'TEMP'\
+    :param str application_run_time_report_folder:
+        The folder to contain the resulting specification files; if 'TEMP'
         then a temporary directory is used.
     :return: the filename of the data writer and the data specification object
     :rtype: tuple(str, DataSpecificationGenerator)
@@ -112,7 +112,7 @@ def get_report_writer(
     :param int processor_id: The processor ID
     :param str hostname: The hostname of the SpiNNaker machine
     :param str report_directory: the directory for the reports folder
-    :param bool write_text_specs:\
+    :param bool write_text_specs:
         True if a textual version of the specification should be written
     :return: the report_writer_object, or None if not reporting
     :rtype: ~spinn_storage_handlers.FileDataWriter or None

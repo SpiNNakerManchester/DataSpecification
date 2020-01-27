@@ -28,8 +28,8 @@ class MemoryRegion(object):
 
     def __init__(self, unfilled, size):
         """
-        :param bool unfilled: if the region should not be written to by the\
-            data specification (i.e., because the vertex uses it as a working\
+        :param bool unfilled: if the region should not be written to by the
+            data specification (i.e., because the vertex uses it as a working
             data region or an output region)
         :param int size: the size of the region, in bytes
         """

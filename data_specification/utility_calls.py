@@ -41,7 +41,7 @@ def _mkdir(directory):
         try:
             if not os.path.exists(directory):
                 os.mkdir(directory)
-        except OSError:
+        except OSError:  # pragma: no cover
             # Assume an external race beat us
             pass
 

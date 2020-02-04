@@ -68,14 +68,14 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.spec_reader.read(4 * words)
 
     def test_new_data_spec_generator(self):
-        self.assertEqual(self.dsg.spec_writer, self.spec_writer)
-        self.assertEqual(self.dsg.report_writer, self.report_writer)
-        self.assertEqual(self.dsg.instruction_counter, 0)
-        self.assertEqual(self.dsg.mem_slots,
+        self.assertEqual(self.dsg._spec_writer, self.spec_writer)
+        self.assertEqual(self.dsg._report_writer, self.report_writer)
+        self.assertEqual(self.dsg._instruction_counter, 0)
+        self.assertEqual(self.dsg._mem_slots,
                          constants.MAX_MEM_REGIONS * [None])
-        self.assertEqual(self.dsg.function_slots,
+        self.assertEqual(self.dsg._function_slots,
                          constants.MAX_CONSTRUCTORS * [None])
-        self.assertEqual(self.dsg.struct_slots,
+        self.assertEqual(self.dsg._struct_slots,
                          constants.MAX_STRUCT_SLOTS * [None])
 
     def test_define_break(self):
@@ -116,21 +116,21 @@ class TestDataSpecGeneration(unittest.TestCase):
         # RESERVE for memory region 4
         self.assertEqual(self.get_next_word(2), [0x10200044, 0x3344])
         # Memory region 1 DSG data wrong
-        self.assertEqual(self.dsg.mem_slots[1].size, 0x111)
-        self.assertIsNone(self.dsg.mem_slots[1].label)
-        self.assertEqual(self.dsg.mem_slots[1].empty, False)
+        self.assertEqual(self.dsg._mem_slots[1].size, 0x114)
+        self.assertIsNone(self.dsg._mem_slots[1].label)
+        self.assertEqual(self.dsg._mem_slots[1].empty, False)
         # Memory region 2 DSG data wrong
-        self.assertEqual(self.dsg.mem_slots[2].size, 0x1122)
-        self.assertIsNone(self.dsg.mem_slots[2].label)
-        self.assertEqual(self.dsg.mem_slots[2].empty, False)
+        self.assertEqual(self.dsg._mem_slots[2].size, 0x1124)
+        self.assertIsNone(self.dsg._mem_slots[2].label)
+        self.assertEqual(self.dsg._mem_slots[2].empty, False)
         # Memory region 3 DSG data wrong
-        self.assertEqual(self.dsg.mem_slots[3].size, 0x1122)
-        self.assertIsNone(self.dsg.mem_slots[3].label)
-        self.assertEqual(self.dsg.mem_slots[3].empty, True)
+        self.assertEqual(self.dsg._mem_slots[3].size, 0x1124)
+        self.assertIsNone(self.dsg._mem_slots[3].label)
+        self.assertEqual(self.dsg._mem_slots[3].empty, True)
         # FREE wrong command word
-        self.assertEqual(self.dsg.mem_slots[4].size, 0x3344)
-        self.assertEqual(self.dsg.mem_slots[4].label, "test")
-        self.assertEqual(self.dsg.mem_slots[4].empty, False)
+        self.assertEqual(self.dsg._mem_slots[4].size, 0x3344)
+        self.assertEqual(self.dsg._mem_slots[4].label, "test")
+        self.assertEqual(self.dsg._mem_slots[4].empty, False)
 
     def test_free_memory_region(self):
         # Create a sdram just to set max chip size
@@ -151,7 +151,7 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.free_memory_region(2)
         with self.assertRaises(NotAllocatedException):
             self.dsg.free_memory_region(1)
-        self.assertIsNone(self.dsg.mem_slots[1])
+        self.assertIsNone(self.dsg._mem_slots[1])
 
     def test_define_structure(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])
@@ -777,7 +777,13 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05171111)
 
     def test_end_loop(self):
+        # Must not end a loop if one isn't started
+        with self.assertRaises(InvalidCommandException):
+            self.dsg.end_loop()
+        self.dsg.start_loop(0, 1, 2)
         self.dsg.end_loop()
+        # START_LOOP with extra 3 argument words (ignored for testing)
+        self.get_next_word(4)
         # END_LOOP
         self.assertEqual(self.get_next_word(), 0x05300000)
 

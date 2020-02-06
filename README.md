@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/SpiNNakerManchester/DataSpecification.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/DataSpecification)
+[![Documentation Status](https://readthedocs.org/projects/dataspecification/badge/?version=latest)](https://dataspecification.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/DataSpecification/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/DataSpecification?branch=master)
 
 This package provides utilities for specifying binary data algorithmically,
@@ -7,7 +8,7 @@ and executing the specifications to produce the data.
 Requirements
 ============
 In addition to a standard Python installation, this package depends on:
- 
+
  - six
  - enum34
  - SpiNNStorageHandlers

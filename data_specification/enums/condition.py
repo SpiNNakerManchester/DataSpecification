@@ -20,21 +20,27 @@ class Condition(Enum):
     """ Comparison Operations
     """
 
+    #: Compare the operands for equality
     EQUAL = (
         0, "==",
         "Compare the operands for equality")
+    #: Compare the operands for inequality
     NOT_EQUAL = (
         1, "!=",
         "Compare the operands for inequality")
+    #: True if the first operand is <= the second
     LESS_THAN_OR_EQUAL = (
         2, "<=",
         "True if the first operand is <= the second")
+    #: True if the first operand is <  the second
     LESS_THAN = (
         3, "<",
         "True if the first operand is <  the second")
+    #: True if the first operand is >= the second
     GREATER_THAN_OR_EQUAL = (
         4, ">=",
         "True if the first operand is >= the second")
+    #: True if the first operand is >  the second
     GREATER_THAN = (
         5, ">",
         "True if the first operand is >  the second")

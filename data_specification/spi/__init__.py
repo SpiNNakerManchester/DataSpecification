@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
--r requirements.txt
-flake8
-coverage >= 4.4, < 5.0
-# pytest will be brought in by pytest-cov
-pytest-cov
-sphinx==1.5.3
+"""
+The interface used by implementations of the executor.
+"""
+
+from .abstract_executor_functions import AbstractExecutorFunctions
+
+__all__ = ["AbstractExecutorFunctions"]

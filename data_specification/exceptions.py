@@ -33,9 +33,9 @@ class RegionInUseException(DataSpecificationException):
 
     def __init__(self, region, label=None):
         """
-        :param region: The region that was already allocated
-        :type region: int
+        :param int region: The region that was already allocated
         :param label: What label is known for the region
+        :type label: str or None
         """
         if label is None:
             msg = "Region {0:d} was already allocated".format(region)
@@ -52,8 +52,7 @@ class StructureInUseException(DataSpecificationException):
 
     def __init__(self, structure):
         """
-        :param structure: The structure that was already allocated
-        :type structure: int
+        :param int structure: The structure that was already allocated
         """
         super(StructureInUseException, self).__init__(
             "Structure {0} was already allocated".format(structure))
@@ -66,10 +65,8 @@ class RegionUnfilledException(DataSpecificationException):
 
     def __init__(self, region, command):
         """
-        :param region: The region that was requested as unfilled
-        :type region: int
-        :param command: The command being executed
-        :type command: str
+        :param int region: The region that was requested as unfilled
+        :param str command: The command being executed
         """
         super(RegionUnfilledException, self).__init__(
             "Region {0} was requested unfilled, but command {1} "
@@ -82,8 +79,7 @@ class NoRegionSelectedException(DataSpecificationException):
 
     def __init__(self, command):
         """
-        :param command: The command being executed
-        :type command: str
+        :param str command: The command being executed
         """
         super(NoRegionSelectedException, self).__init__(
             "Command {0} tries to operate on an unspecified memory region"
@@ -97,16 +93,12 @@ class RegionExhaustedException(DataSpecificationException):
 
     def __init__(self, region, region_size, allocated_size, command):
         """
-        :param region: The region that was being written to
-        :type region: int
-        :param region_size: The originally requested size of the region that\
-            has run out of space, in bytes
-        :type region_size: int
-        :param allocated_size: The amount of the originally requested space\
-            that has already been allocated, in bytes
-        :type allocated_size: int
-        :param command: The command being executed
-        :type command: str
+        :param int region: The region that was being written to
+        :param int region_size: The originally requested size of the region
+            that has run out of space, in bytes
+        :param int allocated_size: The amount of the originally requested
+            space that has already been allocated, in bytes
+        :param str command: The command being executed
         """
         super(RegionExhaustedException, self).__init__(
             "Region {0} with size {1} ran out of allocated memory "
@@ -121,15 +113,11 @@ class RegionOutOfBoundsException(DataSpecificationException):
 
     def __init__(self, region, region_size, requested_offset, command):
         """
-        :param region: The region that was being offset into
-        :type region: int
-        :param region_size: The originally requested size of the region in\
-            question, in bytes
-        :type region_size: int
-        :param requested_offset: The offset being requested, in bytes
-        :type requested_offset: int
-        :param command: The command being executed
-        :type command: str
+        :param int region: The region that was being offset into
+        :param int region_size:
+            The originally requested size of the region in question, in bytes
+        :param int requested_offset: The offset being requested, in bytes
+        :param str command: The command being executed
         """
         super(RegionOutOfBoundsException, self).__init__(
             "Requesting offset {0} into region {1} with size {2} "
@@ -144,16 +132,14 @@ class ParameterOutOfBoundsException(DataSpecificationException):
 
     def __init__(self, parameter, value, range_min, range_max, command):
         """
-        :param parameter: The parameter that is out of bounds
-        :type parameter: str
+        :param str parameter: The parameter that is out of bounds
         :param value: The value specified
-        :type value: float
+        :type value: float or int
         :param range_min: The minimum allowed value
-        :type range_min: float
+        :type range_min: float or int
         :param range_max: The maximum allowed value
-        :type range_max: float
-        :param command: The command being executed
-        :type command: str
+        :type range_max: float or int
+        :param str command: The command being executed
         """
         # pylint: disable=too-many-arguments
         super(ParameterOutOfBoundsException, self).__init__(
@@ -169,12 +155,9 @@ class NotAllocatedException(DataSpecificationException):
 
     def __init__(self, item_type, item_id, command):
         """
-        :param item_type: The type of the item being used
-        :type item_type: str
-        :param item_id: The ID of the item being used
-        :type item_id: int
-        :param command: The command being executed
-        :type command: str
+        :param str item_type: The type of the item being used
+        :param int item_id: The ID of the item being used
+        :param str command: The command being executed
         """
         super(NotAllocatedException, self).__init__(
             "Using unallocated item with type {0} and ID {1} during "
@@ -188,10 +171,8 @@ class NoMoreException(DataSpecificationException):
 
     def __init__(self, space_available, space_required, region):
         """
-        :param space_available: The space available in the region
-        :type space_available: int
-        :param space_required: The space requested by the write command
-        :type space_required: int
+        :param int space_available: The space available in the region
+        :param int space_required: The space requested by the write command
         """
         super(NoMoreException, self).__init__(
             "Space unavailable to write all the elements requested by the "
@@ -206,8 +187,7 @@ class FunctionInUseException(DataSpecificationException):
 
     def __init__(self, function_id):
         """
-        :param function_id: The ID of the function
-        :type function_id: int
+        :param int function_id: The ID of the function
         """
         super(FunctionInUseException, self).__init__(
             "Function {0} is already defined".format(function_id))
@@ -220,8 +200,7 @@ class RNGInUseException(DataSpecificationException):
 
     def __init__(self, rng_id):
         """
-        :param rng_id: The ID of the rng
-        :type rng_id: int
+        :param int rng_id: The ID of the rng
         """
         super(RNGInUseException, self).__init__(
             "Random number generator {0} is already defined".format(rng_id))
@@ -234,8 +213,7 @@ class RandomNumberDistributionInUseException(DataSpecificationException):
 
     def __init__(self, rng_id):
         """
-        :param rng_id: The ID of the random number distribution
-        :type rng_id: int
+        :param int rng_id: The ID of the random number distribution
         """
         super(RandomNumberDistributionInUseException, self).__init__(
             "Random number distribution {0} is already defined".format(
@@ -249,11 +227,9 @@ class WrongParameterNumberException(DataSpecificationException):
 
     def __init__(self, function_id, no_of_parameters_required, parameters):
         """
-        :param function_id: The ID of the function
-        :type function_id: int
-        :param parameters: The parameters used in the function call
-        :type parameters: list
-        :param no_of_parameters_required: \
+        :param int function_id: The ID of the function
+        :param list parameters: The parameters used in the function call
+        :param int no_of_parameters_required:
             The number of parameters required by the function
         """
         super(WrongParameterNumberException, self).__init__(
@@ -269,10 +245,8 @@ class DuplicateParameterException(DataSpecificationException):
 
     def __init__(self, command, parameters):
         """
-        :param command: The command called with duplicate parameters
-        :type command: int
-        :param parameters: The parameters used to call the function
-        :type parameters: list
+        :param int command: The command called with duplicate parameters
+        :param list parameters: The parameters used to call the function
         """
         super(DuplicateParameterException, self).__init__(
             "The command {0} has been called with duplicate parameters: "
@@ -295,8 +269,7 @@ class TypeMismatchException(DataSpecificationException):
 
     def __init__(self, command):
         """
-        :param command: The command that generated the exception
-        :type command: int
+        :param str command: The command that generated the exception
         """
         super(TypeMismatchException, self).__init__(
             "A type mismatch has occurred during command {0}".format(
@@ -310,10 +283,8 @@ class UnknownTypeException(DataSpecificationException):
 
     def __init__(self, type_id, command):
         """
-        :param type_id: The ID of the requested type
-        :type type_id: int
-        :param command: The command being executed
-        :type command: str
+        :param int type_id: The ID of the requested type
+        :param str command: The command being executed
         """
         super(UnknownTypeException, self).__init__(
             "Unknown ID value {0} for data type during command {1}".format(
@@ -327,10 +298,8 @@ class UnknownTypeLengthException(DataSpecificationException):
 
     def __init__(self, data_length, command):
         """
-        :param data_length: the length of the requested type
-        :type data_length: int
-        :param command: The command being executed
-        :type command: str
+        :param int data_length: the length of the requested type
+        :param str command: The command being executed
         """
         super(UnknownTypeLengthException, self).__init__(
             "Unknown data length {0} during command {1}".format(
@@ -344,12 +313,9 @@ class InvalidSizeException(DataSpecificationException):
 
     def __init__(self, type_name, type_size, command):
         """
-        :param type_name: The name of the requested type
-        :type type_name: str
-        :param type_size: The size of the requested variable
-        :type type_size: int
-        :param command: The command being executed
-        :type command: str
+        :param str type_name: The name of the requested type
+        :param int type_size: The size of the requested variable
+        :param str command: The command being executed
         """
         super(InvalidSizeException, self).__init__(
             "Invalid size {0} of the requested type {1} during "
@@ -363,8 +329,7 @@ class InvalidCommandException(DataSpecificationException):
 
     def __init__(self, command):
         """
-        :param command: The command being executed
-        :type command: str
+        :param str command: The command being executed
         """
         super(InvalidCommandException, self).__init__(
             "The requested command {0} cannot be executed at this point "
@@ -378,10 +343,8 @@ class UnknownConditionException(DataSpecificationException):
 
     def __init__(self, condition_id, command):
         """
-        :param condition_id: ID of the condition being requested
-        :type condition_id: int
-        :param command: The command being executed
-        :type command: str
+        :param int condition_id: ID of the condition being requested
+        :param str command: The command being executed
         """
         super(UnknownConditionException, self).__init__(
             "The requested condition with ID {0} does not belong to the "
@@ -396,13 +359,10 @@ class InvalidOperationException(DataSpecificationException):
 
     def __init__(self, operation_type, requested_operation_id, command):
         """
-        :param operation_type: \
+        :param str operation_type: \
             The type of operation requested (i.e. arithmetic or logic)
-        :type operation_type: str
-        :param requested_operation_id: The ID of the requested operation
-        :type requested_operation_id: int
-        :param command: The command being executed
-        :type command: str
+        :param int requested_operation_id: The ID of the requested operation
+        :param str command: The command being executed
         """
         super(InvalidOperationException, self).__init__(
             "The {0} operation requested with ID {1} does not match "
@@ -417,11 +377,9 @@ class ExecuteBreakInstruction(DataSpecificationException):
 
     def __init__(self, address, filename):
         """
-        :param address: address of the data specification being executed\
+        :param int address: address of the data specification being executed\
             at the time of breakpoint
-        :type address: int
-        :param filename: file being parsed
-        :param filename: str
+        :param str filename: file being parsed
         """
         super(ExecuteBreakInstruction, self).__init__(
             "Executing BREAK instruction at address {0} of file {1}"
@@ -444,11 +402,9 @@ class TablePointerOutOfMemoryException(DataSpecificationException):
     def __init__(self, memory_available, memory_required):
         """
 
-        :param memory_available: on-chip memory available
-        :type memory_available: int
-        :param memory_required: on-chip memory required to complete the\
+        :param int memory_available: on-chip memory available
+        :param int memory_required: on-chip memory required to complete the\
             execution of the specification file
-        :type memory_required: int
         """
         super(TablePointerOutOfMemoryException, self).__init__(
             "The memory available {0} is not sufficient for the allocated"
@@ -463,10 +419,8 @@ class RegionNotAllocatedException(DataSpecificationException):
 
     def __init__(self, region, command):
         """
-        :param region:
-        :type region:
-        :param command:
-        :type command:
+        :param int region: The ID of the region that was not allocated.
+        :param str command: The name of the command that was being handled.
         """
         super(RegionNotAllocatedException, self).__init__(
             "Region {0} has not been allocated during execution of "
@@ -480,8 +434,7 @@ class UnimplementedDSECommandError(DataSpecificationException):
 
     def __init__(self, command):
         """
-        :param command: Command attempted to be executed by the DSE
-        :type command: str
+        :param str command: Command attempted to be executed by the DSE
         """
         super(UnimplementedDSECommandError, self).__init__(
             "Command {0} in the data specification executor has not yet "
@@ -495,8 +448,7 @@ class UnimplementedDSGCommandError(DataSpecificationException):
 
     def __init__(self, command):
         """
-        :param command: Command attempted to be generated by the DSG
-        :type command: str
+        :param str command: Command attempted to be generated by the DSG
         """
         super(UnimplementedDSGCommandError, self).__init__(
             "Command {0} in the data specification generator has not yet "

@@ -27,10 +27,8 @@ class MemoryRegionCollection(object):
     ]
 
     def __init__(self, n_regions):
-        """ Create a new MemoryRegionCollection with the given number of\
-            regions.
-
-        :type n_regions: int
+        """
+        :param int n_regions: The number of regions in the collection.
         """
         self._regions = [None] * n_regions
 
@@ -42,18 +40,18 @@ class MemoryRegionCollection(object):
 
     def __getitem__(self, key):
         """
-        :rtype: :py:class:`~data_specification.MemoryRegion`
+        :rtype: MemoryRegion
         """
         return self._regions[key]
 
     def __setitem__(self, key, value):
         """
-        :type key: int
-        :type value: :py:class:`~data_specification.MemoryRegion`
+        :param int key:
+        :param MemoryRegion value:
         """
         if key < 0 or key >= len(self._regions):
             raise NoRegionSelectedException(
-                "the region ID requested is beyond the supported number of"
+                "the region ID requested is beyond the supported number of "
                 "available region IDs")
         if self._regions[key] is not None:
             raise RegionInUseException(key)
@@ -61,26 +59,29 @@ class MemoryRegionCollection(object):
 
     def __iter__(self):
         """
-        :rtype: iterable(:py:class:`~data_specification.MemoryRegion`)
+        :rtype: iterable(MemoryRegion)
         """
         return iter(self._regions)
 
     @property
     def regions(self):
-        """
-        :rtype: iterable(:py:class:`~data_specification.MemoryRegion`)
+        """ The regions in the collection.
+
+        :rtype: iterable(MemoryRegion)
         """
         for r in self._regions:
             yield r
 
     def is_empty(self, region):
         """
+        :param int region: The ID of the region
         :rtype: bool
         """
         return self._regions[region] is None
 
     def is_unfilled(self, region):
         """
+        :param int region: The ID of the region
         :rtype: bool
         """
         if self.is_empty(region):
@@ -88,7 +89,8 @@ class MemoryRegionCollection(object):
         return self._regions[region].unfilled
 
     def count_used_regions(self):
-        """
+        """ The number of regions in the collection that are used.
+
         :rtype: int
         """
         return sum(r is not None for r in self._regions)
@@ -97,15 +99,15 @@ class MemoryRegionCollection(object):
         """ Helper method which determines if a unfilled region actually \
             needs to be written (optimisation to stop large data files).
 
-        :param region: the region ID to which the test is being ran on
-        :return: a boolean stating if the region needs to be written
+        :param int region: the region ID to which the test is being ran on
+        :return: whether the region needs to be written
         :rtype: bool
-        :raise NoRegionSelectedException: \
+        :raise NoRegionSelectedException:
             when the ID is beyond the expected region range
         """
-        if region >= len(self._regions):
+        if region < 0 or region >= len(self._regions):
             raise NoRegionSelectedException(
-                "the region ID requested is beyond the supported number of"
+                "the region ID requested is beyond the supported number of "
                 "available region IDs")
         if not self.is_unfilled(region):
             return True

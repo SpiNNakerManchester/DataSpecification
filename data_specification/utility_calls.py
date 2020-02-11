@@ -28,21 +28,29 @@ _lock_condition = threading.Condition()
 
 
 def _mkdir(directory):
+    """ Make a directory if it doesn't exist.
+
+    .. note::
+        This code is not intended to be secure against malicious third parties
+
+    :param str directory: The directory to create
+    """
     # Guarded to stop us from hitting things twice internally; it's not
     # perfect since other processes could also happen along.
     with _lock_condition:
         try:
             if not os.path.exists(directory):
                 os.mkdir(directory)
-        except OSError:
+        except OSError:  # pragma: no cover
             # Assume an external race beat us
             pass
 
 
 def get_region_base_address_offset(app_data_base_address, region):
     """ Find the address of the of a given region for the DSG
-    :param app_data_base_address: base address for the core
-    :param region: the region ID we're looking for
+
+    :param int app_data_base_address: base address for the core
+    :param int region: the region ID we're looking for
     """
     return (app_data_base_address +
             APP_PTR_TABLE_HEADER_BYTE_SIZE + (region * 4))
@@ -57,27 +65,20 @@ def get_data_spec_and_file_writer_filename(
         processor_chip_x, processor_chip_y, processor_id,
         hostname, report_directory="TEMP", write_text_specs=False,
         application_run_time_report_folder="TEMP"):
-    """ Encapsulates the creation of the DSG writer and the file paths
-    :param processor_chip_x: x-coordinate of the chip
-    :type processor_chip_x: int
-    :param processor_chip_y: y-coordinate of the chip
-    :type processor_chip_y: int
-    :param processor_id: The processor ID
-    :type processor_id: int
-    :param hostname: The hostname of the SpiNNaker machine
-    :type hostname: str
-    :param report_directory: the directory for the reports folder
-    :type report_directory: file path
-    :param write_text_specs:\
+    """ Encapsulates the creation of the DSG writer and the file paths.
+
+    :param int processor_chip_x: x-coordinate of the chip
+    :param int processor_chip_y: y-coordinate of the chip
+    :param int processor_id: The processor ID
+    :param str hostname: The hostname of the SpiNNaker machine
+    :param str report_directory: the directory for the reports folder
+    :param bool write_text_specs:
         True if a textual version of the specification should be written
-    :type write_text_specs: bool
-    :param application_run_time_report_folder:\
-        The folder to contain the resulting specification files; if 'TEMP'\
+    :param str application_run_time_report_folder:
+        The folder to contain the resulting specification files; if 'TEMP'
         then a temporary directory is used.
-    :type application_run_time_report_folder: str
     :return: the filename of the data writer and the data specification object
-    :rtype: tuple(str, \
-        :py:class:`~data_specification.DataSpecificationGenerator`)
+    :rtype: tuple(str, DataSpecificationGenerator)
     """
     # pylint: disable=too-many-arguments
     if application_run_time_report_folder == "TEMP":
@@ -103,35 +104,30 @@ def get_data_spec_and_file_writer_filename(
 def get_report_writer(
         processor_chip_x, processor_chip_y, processor_id,
         hostname, report_directory="TEMP", write_text_specs=False):
-    """ check if text reports are needed and if so initialise the report
-        writer to send down to DSG
-    :param processor_chip_x: x-coordinate of the chip
-    :type processor_chip_x: int
-    :param processor_chip_y: y-coordinate of the chip
-    :type processor_chip_y: int
-    :param processor_id: The processor ID
-    :type processor_id: int
-    :param hostname: The hostname of the SpiNNaker machine
-    :type hostname: str
-    :param report_directory: the directory for the reports folder
-    :type report_directory: file path
-    :param write_text_specs:\
+    """ Check if text reports are needed, and if so initialise the report\
+        writer to send down to DSG.
+
+    :param int processor_chip_x: x-coordinate of the chip
+    :param int processor_chip_y: y-coordinate of the chip
+    :param int processor_id: The processor ID
+    :param str hostname: The hostname of the SpiNNaker machine
+    :param str report_directory: the directory for the reports folder
+    :param bool write_text_specs:
         True if a textual version of the specification should be written
-    :type write_text_specs: bool
-    :return: the report_writer_object or None if not reporting
+    :return: the report_writer_object, or None if not reporting
+    :rtype: ~spinn_storage_handlers.FileDataWriter or None
     """
     # pylint: disable=too-many-arguments
 
-    # check if text reports are needed and if so initialise the report
-    # writer to send down to DSG
-    report_writer = None
-    if write_text_specs:
-        if report_directory == "TEMP":
-            report_directory = tempfile.gettempdir()
-        new_report_directory = os.path.join(report_directory, _RPT_DIR)
-        _mkdir(new_report_directory)
-        report_writer = FileDataWriter(
-            os.path.join(new_report_directory, _RPT_TMPL.format(
-                hostname, processor_chip_x, processor_chip_y, processor_id)))
+    # check if text reports are needed at all
+    if not write_text_specs:
+        return None
 
-    return report_writer
+    # initialise the report writer to send down to DSG
+    if report_directory == "TEMP":
+        report_directory = tempfile.gettempdir()
+    new_report_directory = os.path.join(report_directory, _RPT_DIR)
+    _mkdir(new_report_directory)
+    return FileDataWriter(
+        os.path.join(new_report_directory, _RPT_TMPL.format(
+            hostname, processor_chip_x, processor_chip_y, processor_id)))

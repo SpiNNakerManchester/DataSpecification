@@ -20,6 +20,7 @@ class RandomNumberGenerator(Enum):
     """ Random number generator types
     """
 
+    #: The well-known Mersenne Twister PRNG
     MERSENNE_TWISTER = (0, "The well-known Mersenne Twister PRNG")
 
     def __new__(cls, value, doc=""):

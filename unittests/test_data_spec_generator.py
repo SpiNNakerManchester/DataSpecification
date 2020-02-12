@@ -1149,25 +1149,8 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x04400F0A)
         self.assertEqual(self.get_next_word(), 0x04420F0A)
 
-    def test_write_array_working_subset(self):
-        SDRAM(1000)
-        with self.assertRaises(NoRegionSelectedException):
-            self.dsg.write_array([0, 1, 2, 3], DataType.UINT32)
-
-        self.dsg.reserve_memory_region(0, 100)
-        self.dsg.switch_write_focus(0)
-
-        self.dsg.write_array([], DataType.UINT32)
-        self.dsg.write_array([0, 1, 2, 3], DataType.UINT32)
-
-        self.skip_words(3)
-        # WRITE_ARRAY
-        self.assertEqual(self.get_next_word(2), [0x14300004, 0])
-        self.assertEqual(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
-
-    @unittest.skip("buggy")
     def test_write_array(self):
-        # TODO: Make write_array work with non-UINT32
+        SDRAM(1000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_array([0, 1, 2, 3], DataType.UINT8)
 
@@ -1175,23 +1158,25 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.switch_write_focus(0)
 
         self.dsg.write_array([], DataType.UINT8)
+        self.dsg.write_array([], DataType.UINT32)
         self.dsg.write_array([0, 1, 2, 3], DataType.UINT8)
         self.dsg.write_array([0, 1, 2, 3], DataType.UINT16)
         self.dsg.write_array([0, 1, 2, 3], DataType.UINT32)
-        self.dsg.write_array([0, 1, 2, 3, 4], DataType.UINT16)
-        self.dsg.write_array([0, 1, 2, 3, 4], DataType.UINT8)
+        self.dsg.write_array([0, 1, 2, 3, 4, 5], DataType.UINT16)
+        self.dsg.write_array([0, 1, 2, 3, 4, 5, 6, 7], DataType.UINT8)
 
         self.skip_words(3)
         # WRITE_ARRAY
         self.assertEqual(self.get_next_word(2), [0x14300001, 0])
-        self.assertEqual(self.get_next_word(3), [0x14300001, 4, 0x03020100])
+        self.assertEqual(self.get_next_word(2), [0x14300004, 0])
+        self.assertEqual(self.get_next_word(3), [0x14300001, 1, 0x03020100])
         self.assertEqual(self.get_next_word(4),
-                         [0x14300002, 4, 0x00010000, 0x00030002])
+                         [0x14300002, 2, 0x00010000, 0x00030002])
         self.assertEqual(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
         self.assertEqual(self.get_next_word(5),
-                         [0x14300002, 5, 0x00010000, 0x00030002, 0x00000004])
+                         [0x14300002, 3, 0x00010000, 0x00030002, 0x00050004])
         self.assertEqual(self.get_next_word(4),
-                         [0x14300001, 5, 0x03020100, 0x00000004])
+                         [0x14300001, 2, 0x03020100, 0x07060504])
 
     def test_set_structure_value(self):
         with self.assertRaises(NotAllocatedException):

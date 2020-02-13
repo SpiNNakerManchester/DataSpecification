@@ -138,7 +138,7 @@ class DataType(Enum):
            "H",
            True,
            None,
-           None,
+           np.uint16,
            "8.8 unsigned fixed point number")
     #: 16.16 unsigned fixed point number
     U1616 = (9,
@@ -149,7 +149,7 @@ class DataType(Enum):
              "I",
              True,
              None,
-             None,
+             np.uint32,
              "16.16 unsigned fixed point number")
     #: 32.32 unsigned fixed point number
     #: (use *not* recommended: representability)
@@ -161,7 +161,7 @@ class DataType(Enum):
              "Q",
              True,
              None,
-             None,
+             np.uint64,
              "32.32 unsigned fixed point number")  # rounding problem for max
     #: 8.7 signed fixed point number
     S87 = (11,
@@ -172,7 +172,7 @@ class DataType(Enum):
            "h",
            True,
            None,
-           None,
+           np.int16,
            "8.7 signed fixed point number")
     #: 16.15 signed fixed point number
     S1615 = (12,
@@ -183,7 +183,7 @@ class DataType(Enum):
              "i",
              True,
              None,
-             None,
+             np.int32,
              "16.15 signed fixed point number")
     #: 32.31 signed fixed point number
     #: (use *not* recommended: representability)
@@ -195,7 +195,7 @@ class DataType(Enum):
              "q",
              True,
              None,
-             None,
+             np.int64,
              "32.31 signed fixed point number")  # rounding problem for max
     #: 32-bit floating point number
     FLOAT_32 = (14,
@@ -229,7 +229,7 @@ class DataType(Enum):
            "B",
            True,
            None,
-           None,
+           np.uint16,
            "0.8 unsigned fixed point number")
     #: 0.16 unsigned fixed point number
     U016 = (17,
@@ -240,7 +240,7 @@ class DataType(Enum):
             "H",
             True,
             None,
-            None,
+            np.uint16,
             "0.16 unsigned fixed point number")
     #: 0.32 unsigned fixed point number
     U032 = (18,
@@ -251,7 +251,7 @@ class DataType(Enum):
             "I",
             True,
             None,
-            None,
+            np.uint32,
             "0.32 unsigned fixed point number")
     #: 0.64 unsigned fixed point number
     #: (use *not* recommended: representability)
@@ -264,7 +264,7 @@ class DataType(Enum):
             "Q",
             True,
             None,
-            None,
+            np.uint64,
             "0.64 unsigned fixed point number")  # rounding problem for max
     #: 0.7 signed fixed point number
     S07 = (20,
@@ -275,7 +275,7 @@ class DataType(Enum):
            "b",
            True,
            None,
-           None,
+           np.int8,
            "0.7 signed fixed point number")
     #: 0.15 signed fixed point number
     S015 = (21,
@@ -286,7 +286,7 @@ class DataType(Enum):
             "h",
             True,
             None,
-            None,
+            np.int16,
             "0.15 signed fixed point number")
     #: 0.32 signed fixed point number
     S031 = (22,
@@ -297,7 +297,7 @@ class DataType(Enum):
             "i",
             True,
             None,
-            None,
+            np.int32,
             "0.32 signed fixed point number")
     #: 0.63 signed fixed point number
     #: (use *not* recommended: representability)
@@ -310,7 +310,7 @@ class DataType(Enum):
             "q",
             True,
             None,
-            None,
+            np.int64,
             "0.63 signed fixed point number")  # rounding problem for max
 
     def __new__(cls, value, size, min_val, max_val, scale, struct_encoding,
@@ -445,3 +445,15 @@ class DataType(Enum):
         :rtype: ~numpy.ndarray(~numpy.uint32 or ~numpy.float64)
         """
         return array / float(self._scale)
+
+    def decode_array(self, values):
+        """ Decodes a byte array into iterable of this type.
+
+        :param values: the bytes to decode into this given data type
+        :rtype: numpy array
+        """
+        array = np.asarray(values, dtype="uint8").view(
+            dtype=self.numpy_typename)
+        if self._apply_scale:
+            return array / float(self.scale)
+        return array

@@ -388,6 +388,10 @@ class DataType(Enum):
         :rtype: int
         """
         if self._apply_scale:
+            # Deal with the cases that return np.int64 (e.g. RandomDistribution
+            # when using 'poisson', 'binomial' etc.)
+            if type(value) is np.int64:
+                value = int(value)
             if not (self._min <= value <= self._max):
                 raise ValueError(
                     "value {:f} cannot be converted to {:s}: out of range"

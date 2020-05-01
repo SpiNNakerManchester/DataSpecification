@@ -380,6 +380,16 @@ class DataType(Enum):
         """
         return self._numpy_typename
 
+    def closest_representable_value(self, value):
+        """ Returns the closest value to the given value that can be
+            represented by this type
+
+        :param value:
+        :type value: float or in
+        :rtype: float
+        """
+        return self.decode_from_int(self.encode_as_int(value))
+
     def encode_as_int(self, value):
         """ Returns the value as an integer, according to this type.
 
@@ -449,6 +459,14 @@ class DataType(Enum):
         :rtype: ~numpy.ndarray(~numpy.uint32 or ~numpy.float64)
         """
         return array / float(self._scale)
+
+    def decode_from_int(self, value):
+        """ Decode a single value represented as an int according to this type.
+
+        :param int array:
+        :rtype: float or int
+        """
+        return value / float(self._scale)
 
     def decode_array(self, values):
         """ Decodes a byte array into iterable of this type.

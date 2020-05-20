@@ -19,6 +19,15 @@ from enum import Enum
 import numpy as np
 
 
+def _round_to_int(value):
+    """ Rounds a number to the closest integer
+
+    :param float value: The value to round
+    :rtype: int
+    """
+    return int(round(value))
+
+
 class DataType(Enum):
     """ Supported data types.
     Internally, these are actually tuples.
@@ -49,7 +58,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "B",
              False,
-             int,
+             _round_to_int,
              np.uint8,
              "8-bit unsigned integer")
     #: 16-bit unsigned integer
@@ -60,7 +69,7 @@ class DataType(Enum):
               decimal.Decimal("1"),
               "H",
               False,
-              int,
+              _round_to_int,
               np.uint16,
               "16-bit unsigned integer")
     #: 32-bit unsigned integer
@@ -71,7 +80,7 @@ class DataType(Enum):
               decimal.Decimal("1"),
               "I",
               False,
-              int,
+              _round_to_int,
               np.uint32,
               "32-bit unsigned integer")
     #: 64-bit unsigned integer
@@ -82,7 +91,7 @@ class DataType(Enum):
               decimal.Decimal("1"),
               "Q",
               False,
-              int,
+              _round_to_int,
               np.uint64,
               "64-bit unsigned integer")
     #: 8-bit signed integer
@@ -93,7 +102,7 @@ class DataType(Enum):
             decimal.Decimal("1"),
             "b",
             False,
-            int,
+            _round_to_int,
             np.int8,
             "8-bit signed integer")
     #: 16-bit signed integer
@@ -104,7 +113,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "h",
              False,
-             int,
+             _round_to_int,
              np.int16,
              "16-bit signed integer")
     #: 32-bit signed integer
@@ -115,7 +124,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "i",
              False,
-             int,
+             _round_to_int,
              np.int32,
              "32-bit signed integer")
     #: 64-bit signed integer
@@ -126,7 +135,7 @@ class DataType(Enum):
              decimal.Decimal("1"),
              "q",
              False,
-             int,
+             _round_to_int,
              np.int64,
              "64-bit signed integer")
     #: 8.8 unsigned fixed point number

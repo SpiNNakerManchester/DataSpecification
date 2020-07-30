@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/SpiNNakerManchester/DataSpecification.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/DataSpecification)
+[![Build Status](https://travis-ci.com/SpiNNakerManchester/DataSpecification.svg?branch=master)](https://travis-ci.com/SpiNNakerManchester/DataSpecification)
 [![Documentation Status](https://readthedocs.org/projects/dataspecification/badge/?version=latest)](https://dataspecification.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/DataSpecification/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/DataSpecification?branch=master)
 

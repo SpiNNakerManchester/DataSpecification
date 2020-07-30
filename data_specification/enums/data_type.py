@@ -399,6 +399,19 @@ class DataType(Enum):
         """
         return self.decode_from_int(self.encode_as_int(value))
 
+    def closest_representable_value_above(self, value):
+        """ Returns the closest value above the given value that can be
+            represented by this type
+
+        :param value:
+        :type value: float or in
+        :rtype: float
+        """
+        closest_value = self.decode_from_int(self.encode_as_int(value))
+        if closest_value >= value:
+            return closest_value
+        return self.decode_from_int(self.encode_as_int(value)+1)
+
     def encode_as_int(self, value):
         """ Returns the value as an integer, according to this type.
 

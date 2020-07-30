@@ -25,6 +25,8 @@ def _round_to_int(value):
     :param float value: The value to round
     :rtype: int
     """
+    if isinstance(value, int):
+        return value
     return int(round(value))
 
 

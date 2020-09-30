@@ -16,10 +16,8 @@
 import unittest
 import struct
 import os
-from io import FileIO
 import tempfile
 from spinn_machine import SDRAM
-from spinn_storage_handlers import FileDataWriter
 from data_specification import constants, DataSpecificationGenerator
 from data_specification.exceptions import (
     TypeMismatchException, ParameterOutOfBoundsException,
@@ -41,15 +39,17 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.temp_dir = tempfile.mkdtemp()
         self.spec_file = os.path.join(self.temp_dir, "spec")
         self.report_file = os.path.join(self.temp_dir, "report")
-        self.spec_writer = FileDataWriter(self.spec_file)
-        self.report_writer = FileDataWriter(self.report_file)
-        self.spec_reader = FileIO(self.spec_file)
-        self.report_reader = FileIO(self.report_file)
+        self.spec_writer = open(self.spec_file, "wb")
+        self.report_writer = open(self.report_file, "w")
+        self.spec_reader = open(self.spec_file, "rb")
+        self.report_reader = open(self.report_file, "r")
         self.dsg = DataSpecificationGenerator(self.spec_writer,
                                               self.report_writer)
         SDRAM.max_sdram_found = 0
 
     def tearDown(self):
+        self.spec_reader.close()
+        self.report_reader.close()
         os.remove(self.spec_file)
         os.remove(self.report_file)
         os.rmdir(self.temp_dir)

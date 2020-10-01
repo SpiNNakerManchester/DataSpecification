@@ -16,9 +16,10 @@
 """ Utility calls for interpreting bits of the DSG
 """
 
+import io
 import os
-import threading
 import tempfile
+import threading
 from .constants import APP_PTR_TABLE_HEADER_BYTE_SIZE
 from .data_specification_generator import DataSpecificationGenerator
 
@@ -86,7 +87,7 @@ def get_data_spec_and_file_writer_filename(
     filename = os.path.join(
         application_run_time_report_folder, _DAT_TMPL.format(
             hostname, processor_chip_x, processor_chip_y, processor_id))
-    data_writer = open(filename, "wb")
+    data_writer = io.FileIO(filename, "wb")
 
     # check if text reports are needed and if so initialise the report
     # writer to send down to DSG
@@ -128,7 +129,6 @@ def get_report_writer(
         report_directory = tempfile.gettempdir()
     new_report_directory = os.path.join(report_directory, _RPT_DIR)
     _mkdir(new_report_directory)
-    return open(
-        os.path.join(new_report_directory, _RPT_TMPL.format(
-            hostname, processor_chip_x, processor_chip_y, processor_id)),
-        "w")
+    name = os.path.join(new_report_directory, _RPT_TMPL.format(
+        hostname, processor_chip_x, processor_chip_y, processor_id))
+    return io.TextIOWrapper(io.FileIO(name, "w"))

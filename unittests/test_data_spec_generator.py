@@ -14,12 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-import struct
+import io
 import os
-from io import FileIO
+import struct
 import tempfile
 from spinn_machine import SDRAM
-from spinn_storage_handlers import FileDataWriter
 from data_specification import constants, DataSpecificationGenerator
 from data_specification.exceptions import (
     TypeMismatchException, ParameterOutOfBoundsException,
@@ -41,15 +40,17 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.temp_dir = tempfile.mkdtemp()
         self.spec_file = os.path.join(self.temp_dir, "spec")
         self.report_file = os.path.join(self.temp_dir, "report")
-        self.spec_writer = FileDataWriter(self.spec_file)
-        self.report_writer = FileDataWriter(self.report_file)
-        self.spec_reader = FileIO(self.spec_file)
-        self.report_reader = FileIO(self.report_file)
+        self.spec_writer = io.FileIO(self.spec_file, "wb")
+        self.report_writer = io.TextIOWrapper(io.FileIO(self.report_file, "w"))
+        self.spec_reader = io.FileIO(self.spec_file, "rb")
+        self.report_reader = io.TextIOWrapper(io.FileIO(self.report_file, "r"))
         self.dsg = DataSpecificationGenerator(self.spec_writer,
                                               self.report_writer)
         SDRAM.max_sdram_found = 0
 
     def tearDown(self):
+        self.spec_reader.close()
+        self.report_reader.close()
         os.remove(self.spec_file)
         os.remove(self.report_file)
         os.rmdir(self.temp_dir)
@@ -612,7 +613,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         # Comment generated data specification
         self.report_writer.flush()
         self.assertEqual(self.spec_writer.tell(), 0)
-        self.assertEqual(self.report_reader.read(), b"test\n")
+        self.assertEqual(self.report_reader.read(), "test\n")
 
     def test_copy_structure(self):
         self.dsg.define_structure(0, [("first", DataType.UINT8, 0xAB)])

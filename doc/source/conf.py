@@ -56,8 +56,6 @@ intersphinx_mapping = {
     'numpy': ("https://docs.scipy.org/doc/numpy/", None),
     'spinn_machine': (
         'https://spinnmachine.readthedocs.io/en/latest/', None),
-    'spinn_storage_handlers': (
-        'https://spinnstoragehandlers.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.

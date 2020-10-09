@@ -11,13 +11,13 @@ In addition to a standard Python installation, this package depends on:
 
  - six
  - enum34
- - SpiNNStorageHandlers
+ - SpiNNMachine
 
 These requirements can be install using `pip`:
 
     pip install six
     pip install enum34
-    pip install SpiNNStorageHandlers
+    pip install SpiNNMachine
 
 User Installation
 =================

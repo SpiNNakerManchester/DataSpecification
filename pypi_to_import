@@ -1,4 +1,3 @@
 enum34:enum
 SpiNNUtilities:spinn_utilities
 SpiNNMachine:spinn_machine
-SpiNNStorageHandlers:spinn_storage_handlers

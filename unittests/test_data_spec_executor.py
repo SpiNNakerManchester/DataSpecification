@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import io
 import struct
 from tempfile import mktemp
 from spinn_machine import SDRAM
-from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification.enums import DataType
 from data_specification import (
     DataSpecificationExecutor, DataSpecificationGenerator, constants)
@@ -32,7 +32,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         SDRAM(1000)
         # Write a data spec to execute
         temp_spec = mktemp()
-        spec_writer = FileDataWriter(temp_spec)
+        spec_writer = io.FileIO(temp_spec, "w")
         spec = DataSpecificationGenerator(spec_writer)
         spec.reserve_memory_region(0, 100)
         spec.reserve_memory_region(1, 200, empty=True)
@@ -48,7 +48,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.end_specification()
 
         # Execute the spec
-        spec_reader = FileDataReader(temp_spec)
+        spec_reader = io.FileIO(temp_spec, "r")
         executor = DataSpecificationExecutor(spec_reader, 400)
         executor.execute()
 
@@ -98,10 +98,10 @@ class TestDataSpecExecutor(unittest.TestCase):
 
     def test_trivial_spec(self):
         temp_spec = mktemp()
-        spec = DataSpecificationGenerator(FileDataWriter(temp_spec))
+        spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
         spec.end_specification()
 
-        executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
+        executor = DataSpecificationExecutor(io.FileIO(temp_spec, "r"), 400)
         executor.execute()
         for r in range(constants.MAX_MEM_REGIONS):
             self.assertIsNone(executor.get_region(r))
@@ -110,7 +110,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         # Create a sdram just to set max chip size
         SDRAM(1000)
         temp_spec = mktemp()
-        spec = DataSpecificationGenerator(FileDataWriter(temp_spec))
+        spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
         spec.reserve_memory_region(0, 44)
         spec.switch_write_focus(0)
         spec.set_register_value(3, 0x31323341)
@@ -132,7 +132,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.write_value(0x7d, data_type=DataType.INT64)
         spec.end_specification()
 
-        executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
+        executor = DataSpecificationExecutor(io.FileIO(temp_spec, "r"), 400)
         executor.execute()
         r = executor.get_region(0)
         self.assertEqual(r.allocated_size, 44)
@@ -146,14 +146,14 @@ class TestDataSpecExecutor(unittest.TestCase):
         # Create a sdram just to set max chip size
         SDRAM(1000)
         temp_spec = mktemp()
-        spec = DataSpecificationGenerator(FileDataWriter(temp_spec))
+        spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
         spec.reserve_memory_region(0, 4)
         spec.switch_write_focus(0)
         spec.write_value(1)
         spec.write_value(2)
         spec.end_specification()
 
-        executor = DataSpecificationExecutor(FileDataReader(temp_spec), 400)
+        executor = DataSpecificationExecutor(io.FileIO(temp_spec, "r"), 400)
         self.assertRaises(NoMoreException, executor.execute)
 
 

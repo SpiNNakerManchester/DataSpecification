@@ -46,8 +46,7 @@ before_install:
   # SpiNNakerManchester internal dependencies; development mode
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNUtils.git
   - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNMachine.git
-  - support/pipinstall.sh git://github.com/SpiNNakerManchester/SpiNNStorageHandlers.git
-
+ 
 install:
   - pip install -r requirements-test.txt
   - pip install 'pylint<2.5' python-coveralls 'coverage>=4.4,<5.0'

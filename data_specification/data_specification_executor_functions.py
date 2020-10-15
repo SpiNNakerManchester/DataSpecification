@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import io
 import struct
+from spinn_utilities.overrides import overrides
 from .constants import (
     END_SPEC_EXECUTOR, LEN2, LEN3, MAX_MEM_REGIONS, MAX_REGISTERS)
 from .exceptions import (
@@ -24,7 +26,6 @@ from .exceptions import (
 from data_specification.spi import AbstractExecutorFunctions
 from .memory_region import MemoryRegion
 from .memory_region_collection import MemoryRegionCollection
-from spinn_utilities.overrides import overrides
 
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")
@@ -56,10 +57,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     def __init__(self, spec_reader, memory_space):
         """
-        :param spec_reader:
+        :param ~io.RawIOBase spec_reader:
             The object to read the specification language file from
-        :type spec_reader:
-            ~spinn_storage_handlers.abstract_classes.AbstractDataReader
         :param int memory_space:
             Memory space available for the data to be generated *per region*
         """
@@ -127,8 +126,11 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :raise ExecuteBreakInstruction:
             Raises the exception to break the execution of the DSE
         """
-        raise ExecuteBreakInstruction(
-            self._spec_reader.tell(), self._spec_reader.filename)
+        if isinstance(self._spec_reader, io.FileIO):
+            name = self._spec_reader.name
+        else:
+            name = "<stream>"
+        raise ExecuteBreakInstruction(self._spec_reader.tell(), name)
 
     @overrides(AbstractExecutorFunctions.execute_reserve)
     def execute_reserve(self, cmd):

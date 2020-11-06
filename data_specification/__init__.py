@@ -71,5 +71,5 @@ from .memory_region import MemoryRegion
 from .memory_region_collection import MemoryRegionCollection
 
 __all__ = ["DataSpecificationExecutor", "DataSpecificationExecutorFunctions",
-           "DataSpecificationGenerator","MemoryRegion",
+           "DataSpecificationGenerator", "MemoryRegion",
            "MemoryRegionCollection"]

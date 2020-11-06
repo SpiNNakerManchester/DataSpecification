@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# The use of exceptions/__init__.py is for pylint pythin 2.7
+# TODO change back when python 2.7 support dropped
+
 
 class DataSpecificationException(Exception):
     """ A general purpose exception indicating that something went\

@@ -68,10 +68,10 @@ from .data_specification_executor_functions import (
     DataSpecificationExecutorFunctions)
 from .data_specification_generator import DataSpecificationGenerator
 # this is needed because pylint 2.7 can not find data_specification.exceptions
-from .exceptions import (DataSpecificationException, UnknownTypeException)
+import data_specification.exceptions
 from .memory_region import MemoryRegion
 from .memory_region_collection import MemoryRegionCollection
 
-__all__ = ["DataSpecificationExecutor", "DataSpecificationException",
+__all__ = ["DataSpecificationExecutor", "exceptions",
            "DataSpecificationExecutorFunctions", "DataSpecificationGenerator",
-           "MemoryRegion", "MemoryRegionCollection", "UnknownTypeException"]
+           "MemoryRegion", "MemoryRegionCollection"]

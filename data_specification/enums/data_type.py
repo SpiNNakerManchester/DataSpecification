@@ -390,7 +390,7 @@ class DataType(Enum):
         if self._apply_scale:
             # Deal with the cases that return np.int64 (e.g. RandomDistribution
             # when using 'poisson', 'binomial' etc.)
-            if type(value) is np.int64:
+            if isinstance(value, np.integer):
                 value = int(value)
             if not (self._min <= value <= self._max):
                 raise ValueError(

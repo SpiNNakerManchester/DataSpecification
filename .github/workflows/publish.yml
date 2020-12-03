@@ -17,8 +17,13 @@ name: Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      do-it:
+        description: "Do it!"
+        required: false
+        default: yes
   push:
-  #  branches: [ master ]
+    branches: [ master ]
 
 jobs:
   build:

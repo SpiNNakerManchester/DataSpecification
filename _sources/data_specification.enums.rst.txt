@@ -1,0 +1,10 @@
+data_specification.enums package
+================================
+
+Module contents
+---------------
+
+.. automodule:: data_specification.enums
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,46 @@
+data_specification package
+==========================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    data_specification.enums
+    data_specification.spi
+
+Submodules
+----------
+
+data_specification.constants module
+-----------------------------------
+
+.. automodule:: data_specification.constants
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+data_specification.exceptions module
+------------------------------------
+
+.. automodule:: data_specification.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+data_specification.utility_calls module
+---------------------------------------
+
+.. automodule:: data_specification.utility_calls
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: data_specification
+    :members:
+    :undoc-members:
+    :show-inheritance:

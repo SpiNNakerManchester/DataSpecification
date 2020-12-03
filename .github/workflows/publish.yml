@@ -23,7 +23,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      DEPLOY_DIR: doc/source/_build/html
+      TYPE: html
       DEPS: SpiNNUtils SpiNNMachine
     steps:
       - name: Set up Python 3.6
@@ -37,13 +37,11 @@ jobs:
         with:
           repository: SpiNNakerManchester/SupportScripts
           path: support
-      - name: Checkout SpiNNaker Dependencies
+      - name: Checkout & Install
         run: |
           for dep in $DEPS; do
-            support/gitclone2.sh https://github.com/SpiNNakerManchester/$dep.git
+            support/gitclone2.sh https://github.com/SpiNNakerManchester/$dep.git || exit 1
           done
-      - name: Install Python dependencies
-        run: |
           python -m pip install --upgrade pip wheel setuptools
           for dep in $DEPS; do
             (cd $dep || exit 1; exec python setup.py install)
@@ -52,16 +50,14 @@ jobs:
           python setup.py install
 
       - name: Build Python Documentation
-        run: support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
-
-      - name: Prepare for deployment
         run: |
-          touch .nojekyll
-        working-directory: ${{ env.DEPLOY_DIR }}
+          sphinx-build -W -T -E -b $TYPE -d _build/doctrees-readthedocsdirhtml -D language=en . _build/$TYPE
+          touch _build/$TYPE/.nojekyll
+        working-directory: doc/source
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: gh-pages
-          folder: ${{ env.DEPLOY_DIR }}
+          folder: doc/source/_build/${{ env.TYPE }}

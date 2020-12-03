@@ -16,14 +16,8 @@
 name: Publish
 
 on:
-  workflow_dispatch:
-    inputs:
-      do-it:
-        description: "Do it!"
-        required: false
-        default: yes
   push:
-    branches: [ master ]
+    branches: [ master, doc-update ]
 
 jobs:
   build:
@@ -55,6 +49,7 @@ jobs:
             (cd $dep || exit 1; exec python setup.py install)
           done
           pip install -r requirements-test.txt
+          python setup.py install
 
       - name: Build Python Documentation
         run: support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html

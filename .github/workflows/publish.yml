@@ -16,9 +16,9 @@
 name: Publish
 
 on:
-  #workflow_dispatch:
+  workflow_dispatch:
   push:
-    branches: [ master ]
+  #  branches: [ master ]
 
 jobs:
   build:

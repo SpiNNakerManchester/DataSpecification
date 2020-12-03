@@ -36,6 +36,9 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="modules.html" title="data_specification"
              accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">DataSpecification  documentation</a> &#187;</li> 
@@ -46,6 +49,9 @@
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Data Specification</a><ul>
+<li><a class="reference internal" href="#functional-requirements">Functional Requirements</a></li>
+<li><a class="reference internal" href="#use-cases">Use Cases</a></li>
+<li><a class="reference internal" href="#main-api">Main API</a></li>
 <li><a class="reference internal" href="#contents">Contents</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
@@ -85,6 +91,48 @@ which is part of the <a class="reference external" href="http://apt.cs.mancheste
 <p>This code depends on <a class="reference external" href="http://spinnutils.readthedocs.io">SpiNNUtils</a> and <a class="reference external" href="http://spinnmachine.readthedocs.io">SpiNNMachine</a> (<a class="reference external" href="http://spinnakermanchester.readthedocs.io">Combined_documentation</a>).</p>
 <div class="section" id="data-specification">
 <h1>Data Specification<a class="headerlink" href="#data-specification" title="Permalink to this headline">¶</a></h1>
+<p>Used to generate memory images for a SpiNNaker CPU core from a set of     instructions.</p>
+<p>The main part of this package is the
+<a class="reference internal" href="data_specification.html#data_specification.DataSpecificationGenerator" title="data_specification.DataSpecificationGenerator"><code class="xref py py-class docutils literal"><span class="pre">DataSpecificationGenerator</span></code></a>
+class. This is used to generate a &#8220;Data Specification&#8221;, which can then be
+executed to produce a memory image.  This package also handles this function
+if required, through the
+<a class="reference internal" href="data_specification.html#data_specification.DataSpecificationExecutor" title="data_specification.DataSpecificationExecutor"><code class="xref py py-class docutils literal"><span class="pre">DataSpecificationExecutor</span></code></a> class.</p>
+<div class="section" id="functional-requirements">
+<h2>Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Creation of a Data Specification Language file which can be executed to
+produce a memory image.</p>
+<ul class="simple">
+<li>Any errors that can be checked during the creation of the specification
+should throw an exception.</li>
+<li>It will be impossible to detect all errors at creation time.</li>
+<li>There should be no assumption of where the data specification will be
+stored, although a default provision of a way to write the specification to
+a file is acceptable.</li>
+</ul>
+<p>Execution of a Data Specification Language file, producing a memory image.</p>
+<ul class="simple">
+<li>This should detect any errors during execution and report them, halting the
+execution.</li>
+<li>There should be no assumption of where the data specification is read from,
+although a default provision of a way to read the specification from a file
+is acceptable.</li>
+</ul>
+</div>
+<div class="section" id="use-cases">
+<h2>Use Cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
+<p>There are a number of use-cases of this library:</p>
+<ul class="simple">
+<li><a class="reference internal" href="data_specification.html#data_specification.DataSpecificationGenerator" title="data_specification.DataSpecificationGenerator"><code class="xref py py-class docutils literal"><span class="pre">DataSpecificationGenerator</span></code></a> is used to create a compressed memory
+image which can be expanded later, to reduce the amount of data that needs
+to be transferred over a slow connection.</li>
+<li><a class="reference internal" href="data_specification.html#data_specification.DataSpecificationExecutor" title="data_specification.DataSpecificationExecutor"><code class="xref py py-class docutils literal"><span class="pre">DataSpecificationExecutor</span></code></a> is used to execute a previously
+generated specification at the receiving end of a slow connection.</li>
+</ul>
+</div>
+<div class="section" id="main-api">
+<h2>Main API<a class="headerlink" href="#main-api" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -97,10 +145,15 @@ which is part of the <a class="reference external" href="http://apt.cs.mancheste
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_specification.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_specification.html#data-specification-constants-module">data_specification.constants module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_specification.html#data-specification-exceptions-module">data_specification.exceptions module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_specification.html#data-specification-utility-calls-module">data_specification.utility_calls module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-contents">Module contents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification.constants">data_specification.constants module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification.exceptions">data_specification.exceptions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification.utility_calls">data_specification.utility_calls module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification">Module contents</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#functional-requirements">Functional Requirements</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#use-cases">Use Cases</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#main-api">Main API</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -130,6 +183,9 @@ which is part of the <a class="reference external" href="http://apt.cs.mancheste
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="modules.html" title="data_specification"
              >next</a> |</li>

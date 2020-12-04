@@ -75,10 +75,10 @@ setup(
     install_requires=[
         'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
         'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
-        "numpy >= 1.12, <= 1.18; python_version == '2.7'",
-        ("numpy >= 1.12, <= 1.19; "
-         "python_version >= '3.5' and python_version <= '3.6'"),
-        "numpy >= 1.12, <= 1.20; python_version == '3.7'",
+        "numpy == 1.18; python_version == '2.7'",
+        "numpy == 1.18; python_version == '3.5'",
+        "numpy == 1.19; python_version == '3.6'",
+        "numpy >= 1.19, <= 1.20; python_version == '3.7'",
         "numpy; python_version >= '3.8'",
         'six',
         'enum34'],

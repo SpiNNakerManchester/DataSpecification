@@ -422,9 +422,10 @@ class DataType(Enum):
         :rtype: int
         """
         if self._apply_scale:
-            # Deal with the cases that return np.int64 (e.g. RandomDistribution
-            # when using 'poisson', 'binomial' etc.)
-            if type(value) is np.int64:
+            # Deal with the cases that return np.int64  or np.int32
+            # (e.g. RandomDistribution when using 'poisson', 'binomial' etc.)
+            # The less than raises TypeError even with int32 on some numpy
+            if isinstance(value, np.integer):
                 value = int(value)
             if not (self._min <= value <= self._max):
                 raise ValueError(

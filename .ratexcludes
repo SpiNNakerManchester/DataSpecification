@@ -1,2 +1,4 @@
 **/*.png
 **/*.dia
+**/SpiNNUtils/**
+**/SpiNNMachine/**

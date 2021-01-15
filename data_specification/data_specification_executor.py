@@ -18,6 +18,7 @@ import struct
 import functools
 import numpy
 from six import raise_from
+from spinn_utilities.log import FormatAdapter
 from .data_specification_executor_functions import (
     DataSpecificationExecutorFunctions)
 from .constants import (
@@ -26,7 +27,7 @@ from .constants import (
 from .enums import Commands
 from .exceptions import DataSpecificationException
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
 
 

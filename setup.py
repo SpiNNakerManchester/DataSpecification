@@ -65,7 +65,6 @@ setup(
         "Operating System :: MacOS",
 
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -75,13 +74,9 @@ setup(
     install_requires=[
         'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
         'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
-        "numpy > 1.13, < 1.17; python_version == '2.7'",
-        "numpy > 1.13, < 1.19; python_version == '3.5'",
         "numpy > 1.13, < 1.20; python_version == '3.6'",
         "numpy > 1.13, < 1.21; python_version == '3.7'",
-        "numpy; python_version >= '3.8'",
-        'six',
-        'enum34'],
+        "numpy; python_version >= '3.8'"],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
 )

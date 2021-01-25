@@ -18,7 +18,6 @@ import io
 import logging
 import struct
 import numpy
-import six
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import sdram
 from .constants import (
@@ -2414,7 +2413,7 @@ class DataSpecificationGenerator(object):
                 formatted_cmd_string = "{:08X}. {}{}\n".format(
                     self._instruction_counter, indent_string, cmd_string)
                 self._instruction_counter += len(cmd_word_list)
-            self._report_writer.write(six.text_type(formatted_cmd_string))
+            self._report_writer.write(str(formatted_cmd_string))
             if indent is True:
                 self._txt_indent += 1
         return

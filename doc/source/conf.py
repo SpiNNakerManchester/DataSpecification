@@ -29,7 +29,7 @@
 
 # import sys
 import os
-from sphinx import apidoc
+from sphinx.ext import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -54,6 +54,8 @@ extensions = [
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.6', None),
     'numpy': ("https://numpy.org/doc/1.19/", None),
+    'spinn_utilities': (
+        'https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': (
         'https://spinnmachine.readthedocs.io/en/latest/', None),
 }
@@ -359,11 +361,11 @@ epub_exclude_files = ['search.html']
 autoclass_content = 'both'
 
 # Do the rst generation
+rst_whitelist = ("index.rst", "modules.rst")
 for f in os.listdir("."):
-    if (os.path.isfile(f) and f.endswith(
-            ".rst") and f != "index.rst" and f != "modules.rst"):
+    if os.path.isfile(f) and f.endswith(".rst") and f not in rst_whitelist:
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../data_specification",
+apidoc.main(['-o', ".", "../../data_specification",
              # Exclusions
              "../../data_specification/[dm]*.py",
              "../../data_specification/spi/a*.py",

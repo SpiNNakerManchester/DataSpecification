@@ -16,6 +16,7 @@ Data Specification
 
 .. automodule:: data_specification
    :special-members:
+   :noindex:
 
 Contents
 --------
@@ -32,4 +33,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

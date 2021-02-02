@@ -19,6 +19,7 @@ import logging
 import struct
 import numpy
 import six
+from spinn_utilities.log import FormatAdapter
 from spinn_machine import sdram
 from .constants import (
     MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,
@@ -38,7 +39,7 @@ from .enums import (
     DataType, RandomNumberGenerator, Commands, Condition, LogicOperation,
     ArithmeticOperation)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_SBYTE = struct.Struct("<b")
 _ONE_WORD = struct.Struct("<I")
 _ONE_SIGNED_INT = struct.Struct("<i")

@@ -42,7 +42,7 @@ class RegionInUseException(DataSpecificationException):
         else:
             msg = "Region {0:d} ({1:s}) was already allocated".format(
                 region, label)
-        super(RegionInUseException, self).__init__(msg)
+        super().__init__(msg)
 
 
 class StructureInUseException(DataSpecificationException):
@@ -54,8 +54,8 @@ class StructureInUseException(DataSpecificationException):
         """
         :param int structure: The structure that was already allocated
         """
-        super(StructureInUseException, self).__init__(
-            "Structure {0} was already allocated".format(structure))
+        super().__init__("Structure {0} was already allocated".format(
+            structure))
 
 
 class RegionUnfilledException(DataSpecificationException):
@@ -68,7 +68,7 @@ class RegionUnfilledException(DataSpecificationException):
         :param int region: The region that was requested as unfilled
         :param str command: The command being executed
         """
-        super(RegionUnfilledException, self).__init__(
+        super().__init__(
             "Region {0} was requested unfilled, but command {1} "
             "requests its use".format(region, command))
 
@@ -81,7 +81,7 @@ class NoRegionSelectedException(DataSpecificationException):
         """
         :param str command: The command being executed
         """
-        super(NoRegionSelectedException, self).__init__(
+        super().__init__(
             "Command {0} tries to operate on an unspecified memory region"
             .format(command))
 
@@ -100,7 +100,7 @@ class RegionExhaustedException(DataSpecificationException):
             space that has already been allocated, in bytes
         :param str command: The command being executed
         """
-        super(RegionExhaustedException, self).__init__(
+        super().__init__(
             "Region {0} with size {1} ran out of allocated memory "
             "(space already occupied {2}) during command {3:s}".format(
                 region, region_size, allocated_size, command))
@@ -119,7 +119,7 @@ class RegionOutOfBoundsException(DataSpecificationException):
         :param int requested_offset: The offset being requested, in bytes
         :param str command: The command being executed
         """
-        super(RegionOutOfBoundsException, self).__init__(
+        super().__init__(
             "Requesting offset {0} into region {1} with size {2} "
             "during command {3}".format(
                 requested_offset, region, region_size, command))
@@ -142,7 +142,7 @@ class ParameterOutOfBoundsException(DataSpecificationException):
         :param str command: The command being executed
         """
         # pylint: disable=too-many-arguments
-        super(ParameterOutOfBoundsException, self).__init__(
+        super().__init__(
             "Requesting value {} for parameter {} whose allowed range is "
             "from {} to {} during command {}".format(
                 value, parameter, range_min, range_max, command))
@@ -159,7 +159,7 @@ class NotAllocatedException(DataSpecificationException):
         :param int item_id: The ID of the item being used
         :param str command: The command being executed
         """
-        super(NotAllocatedException, self).__init__(
+        super().__init__(
             "Using unallocated item with type {0} and ID {1} during "
             "command {2}".format(item_type, item_id, command))
 
@@ -174,7 +174,7 @@ class NoMoreException(DataSpecificationException):
         :param int space_available: The space available in the region
         :param int space_required: The space requested by the write command
         """
-        super(NoMoreException, self).__init__(
+        super().__init__(
             "Space unavailable to write all the elements requested by the "
             "write operation. Space available: {0}; space requested: "
             "{1} for region {2}.".format(
@@ -189,8 +189,7 @@ class FunctionInUseException(DataSpecificationException):
         """
         :param int function_id: The ID of the function
         """
-        super(FunctionInUseException, self).__init__(
-            "Function {0} is already defined".format(function_id))
+        super().__init__("Function {0} is already defined".format(function_id))
 
 
 class RNGInUseException(DataSpecificationException):
@@ -202,7 +201,7 @@ class RNGInUseException(DataSpecificationException):
         """
         :param int rng_id: The ID of the rng
         """
-        super(RNGInUseException, self).__init__(
+        super().__init__(
             "Random number generator {0} is already defined".format(rng_id))
 
 
@@ -215,7 +214,7 @@ class RandomNumberDistributionInUseException(DataSpecificationException):
         """
         :param int rng_id: The ID of the random number distribution
         """
-        super(RandomNumberDistributionInUseException, self).__init__(
+        super().__init__(
             "Random number distribution {0} is already defined".format(
                 rng_id))
 
@@ -232,7 +231,7 @@ class WrongParameterNumberException(DataSpecificationException):
         :param int no_of_parameters_required:
             The number of parameters required by the function
         """
-        super(WrongParameterNumberException, self).__init__(
+        super().__init__(
             "Function {0} that requires {1} parameters has been called "
             "with the following parameters: {2}".format(
                 function_id, no_of_parameters_required, parameters))
@@ -248,7 +247,7 @@ class DuplicateParameterException(DataSpecificationException):
         :param int command: The command called with duplicate parameters
         :param list parameters: The parameters used to call the function
         """
-        super(DuplicateParameterException, self).__init__(
+        super().__init__(
             "The command {0} has been called with duplicate parameters: "
             "{1}".format(command, repr(parameters)))
 
@@ -259,8 +258,7 @@ class NestedFunctionException(DataSpecificationException):
     """
 
     def __init__(self):
-        super(NestedFunctionException, self).__init__(
-            "Nested function definition not supported")
+        super().__init__("Nested function definition not supported")
 
 
 class TypeMismatchException(DataSpecificationException):
@@ -271,7 +269,7 @@ class TypeMismatchException(DataSpecificationException):
         """
         :param str command: The command that generated the exception
         """
-        super(TypeMismatchException, self).__init__(
+        super().__init__(
             "A type mismatch has occurred during command {0}".format(
                 command))
 
@@ -286,7 +284,7 @@ class UnknownTypeException(DataSpecificationException):
         :param int type_id: The ID of the requested type
         :param str command: The command being executed
         """
-        super(UnknownTypeException, self).__init__(
+        super().__init__(
             "Unknown ID value {0} for data type during command {1}".format(
                 type_id, command))
 
@@ -301,9 +299,8 @@ class UnknownTypeLengthException(DataSpecificationException):
         :param int data_length: the length of the requested type
         :param str command: The command being executed
         """
-        super(UnknownTypeLengthException, self).__init__(
-            "Unknown data length {0} during command {1}".format(
-                data_length, command))
+        super().__init__("Unknown data length {0} during command {1}".format(
+            data_length, command))
 
 
 class InvalidSizeException(DataSpecificationException):
@@ -317,7 +314,7 @@ class InvalidSizeException(DataSpecificationException):
         :param int type_size: The size of the requested variable
         :param str command: The command being executed
         """
-        super(InvalidSizeException, self).__init__(
+        super().__init__(
             "Invalid size {0} of the requested type {1} during "
             "command {2}".format(type_size, type_name, command))
 
@@ -331,7 +328,7 @@ class InvalidCommandException(DataSpecificationException):
         """
         :param str command: The command being executed
         """
-        super(InvalidCommandException, self).__init__(
+        super().__init__(
             "The requested command {0} cannot be executed at this point "
             "in the specification".format(command))
 
@@ -346,7 +343,7 @@ class UnknownConditionException(DataSpecificationException):
         :param int condition_id: ID of the condition being requested
         :param str command: The command being executed
         """
-        super(UnknownConditionException, self).__init__(
+        super().__init__(
             "The requested condition with ID {0} does not belong to the "
             "list of possible tests during command {1}".format(
                 condition_id, command))
@@ -359,12 +356,12 @@ class InvalidOperationException(DataSpecificationException):
 
     def __init__(self, operation_type, requested_operation_id, command):
         """
-        :param str operation_type: \
+        :param str operation_type:
             The type of operation requested (i.e. arithmetic or logic)
         :param int requested_operation_id: The ID of the requested operation
         :param str command: The command being executed
         """
-        super(InvalidOperationException, self).__init__(
+        super().__init__(
             "The {0} operation requested with ID {1} does not match "
             "the possible operations available during command {2}".format(
                 operation_type, requested_operation_id, command))
@@ -377,11 +374,11 @@ class ExecuteBreakInstruction(DataSpecificationException):
 
     def __init__(self, address, filename):
         """
-        :param int address: address of the data specification being executed\
+        :param int address: address of the data specification being executed
             at the time of breakpoint
         :param str filename: file being parsed
         """
-        super(ExecuteBreakInstruction, self).__init__(
+        super().__init__(
             "Executing BREAK instruction at address {0} of file {1}"
             .format(address, filename))
 
@@ -403,10 +400,10 @@ class TablePointerOutOfMemoryException(DataSpecificationException):
         """
 
         :param int memory_available: on-chip memory available
-        :param int memory_required: on-chip memory required to complete the\
+        :param int memory_required: on-chip memory required to complete the
             execution of the specification file
         """
-        super(TablePointerOutOfMemoryException, self).__init__(
+        super().__init__(
             "The memory available {0} is not sufficient for the allocated"
             " regions plus the header table pointer {1}".format(
                 memory_available, memory_required))
@@ -422,7 +419,7 @@ class RegionNotAllocatedException(DataSpecificationException):
         :param int region: The ID of the region that was not allocated.
         :param str command: The name of the command that was being handled.
         """
-        super(RegionNotAllocatedException, self).__init__(
+        super().__init__(
             "Region {0} has not been allocated during execution of "
             "command {1}".format(region, command))
 
@@ -436,7 +433,7 @@ class UnimplementedDSECommandError(DataSpecificationException):
         """
         :param str command: Command attempted to be executed by the DSE
         """
-        super(UnimplementedDSECommandError, self).__init__(
+        super().__init__(
             "Command {0} in the data specification executor has not yet "
             "been implemented".format(command))
 
@@ -450,6 +447,6 @@ class UnimplementedDSGCommandError(DataSpecificationException):
         """
         :param str command: Command attempted to be generated by the DSG
         """
-        super(UnimplementedDSGCommandError, self).__init__(
+        super().__init__(
             "Command {0} in the data specification generator has not yet "
             "been implemented".format(command))

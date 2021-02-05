@@ -29,6 +29,8 @@ class AbstractExecutorFunctions(object):
         """ This command raises an exception to stop the execution of the \
             data spec executor (DSE).
 
+        Implements :py:obj:`~.BREAK`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -41,6 +43,8 @@ class AbstractExecutorFunctions(object):
     def execute_nop(self, cmd):
         """ This command executes no operation.
 
+        Implements :py:obj:`~.NOP`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :rtype: None
@@ -51,6 +55,8 @@ class AbstractExecutorFunctions(object):
     def execute_reserve(self, cmd):  # pragma: no cover
         """ This command reserves a region and assigns some memory space \
             to it.
+
+        Implements :py:obj:`~.RESERVE`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -64,6 +70,8 @@ class AbstractExecutorFunctions(object):
     def execute_free(self, cmd):  # pragma: no cover
         """ This command frees some memory.
 
+        Implements :py:obj:`~.FREE`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -75,6 +83,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_declare_rng(self, cmd):  # pragma: no cover
         """ This command declares a random number generator.
+
+        Implements :py:obj:`~.DECLARE_RNG`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -88,6 +98,8 @@ class AbstractExecutorFunctions(object):
     def execute_random_dist(self, cmd):  # pragma: no cover
         """ This command defines a random disribution.
 
+        Implements :py:obj:`~.DECLARE_RANDOM_DIST`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -99,6 +111,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_get_random_rumber(self, cmd):  # pragma: no cover
         """ This command obtains a random number from a distribution.
+
+        Implements :py:obj:`~.GET_RANDOM_NUMBER`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -112,6 +126,8 @@ class AbstractExecutorFunctions(object):
     def execute_start_struct(self, cmd):  # pragma: no cover
         """ This command starts to define a structure.
 
+        Implements :py:obj:`~.START_STRUCT`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -123,6 +139,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_struct_elem(self, cmd):  # pragma: no cover
         """ This command adds an element to a structure.
+
+        Implements :py:obj:`~.STRUCT_ELEM`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -136,6 +154,8 @@ class AbstractExecutorFunctions(object):
     def execute_end_struct(self, cmd):  # pragma: no cover
         """ This command completes the definition of a structure.
 
+        Implements :py:obj:`~.END_STRUCT`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -147,6 +167,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_start_constructor(self, cmd):  # pragma: no cover
         """ This command starts the definition of a function.
+
+        Implements :py:obj:`~.START_CONSTRUCTOR`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -160,6 +182,8 @@ class AbstractExecutorFunctions(object):
     def execute_end_constructor(self, cmd):  # pragma: no cover
         """ This command ends the definition of a function.
 
+        Implements :py:obj:`~.END_CONSTRUCTOR`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -172,6 +196,8 @@ class AbstractExecutorFunctions(object):
     def execute_construct(self, cmd):  # pragma: no cover
         """ This command calls a function.
 
+        Implements :py:obj:`~.CONSTRUCT`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -183,6 +209,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_read(self, cmd):  # pragma: no cover
         """ This command reads a word from memory.
+
+        Implements :py:obj:`~.READ`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -198,6 +226,8 @@ class AbstractExecutorFunctions(object):
             number of times as identified by either a value in the command \
             or a register value.
 
+        Implements :py:obj:`~.WRITE`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -210,6 +240,8 @@ class AbstractExecutorFunctions(object):
     def execute_write_array(self, cmd):  # pragma: no cover
         """ This command writes an array of values in the specified region.
 
+        Implements :py:obj:`~.WRITE_ARRAY`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -221,6 +253,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_write_struct(self, cmd):  # pragma: no cover
         """ This command writes a structure to memory.
+
+        Implements :py:obj:`~.WRITE_STRUCT`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -235,6 +269,8 @@ class AbstractExecutorFunctions(object):
         """ This command copies a block of memory from one location to \
             another.
 
+        Implements :py:obj:`~.BLOCK_COPY`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -248,6 +284,8 @@ class AbstractExecutorFunctions(object):
         """ This command switches the focus to the desired, already allocated,\
             memory region.
 
+        Implements :py:obj:`~.SWITCH_FOCUS`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -259,6 +297,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_loop(self, cmd):  # pragma: no cover
         """ This command starts a loop.
+
+        Implements :py:obj:`~.LOOP`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -272,6 +312,8 @@ class AbstractExecutorFunctions(object):
     def execute_break_loop(self, cmd):  # pragma: no cover
         """ This command stops a loop early.
 
+        Implements :py:obj:`~.BREAK_LOOP`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -283,6 +325,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_end_loop(self, cmd):  # pragma: no cover
         """ This command finishes a loop.
+
+        Implements :py:obj:`~.END_LOOP`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -296,6 +340,8 @@ class AbstractExecutorFunctions(object):
     def execute_if(self, cmd):  # pragma: no cover
         """ This command does a conditional branch.
 
+        Implements :py:obj:`~.IF`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -308,6 +354,8 @@ class AbstractExecutorFunctions(object):
     def execute_else(self, cmd):  # pragma: no cover
         """ This command handles the other branch of a conditional.
 
+        Implements :py:obj:`~.ELSE`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -319,6 +367,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_end_if(self, cmd):  # pragma: no cover
         """ This command ends a conditional.
+
+        Implements :py:obj:`~.END_IF`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -333,6 +383,8 @@ class AbstractExecutorFunctions(object):
         """ This command moves an immediate value to a register or copies the \
             value of a register to another register.
 
+        Implements :py:obj:`~.MV`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -345,6 +397,8 @@ class AbstractExecutorFunctions(object):
     def execute_get_wr_ptr(self, cmd):  # pragma: no cover
         """ This command gets the current write pointer.
 
+        Implements :py:obj:`~.GET_WR_PTR`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -356,6 +410,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_set_wr_ptr(self, cmd):  # pragma: no cover
         """ This command sets the current write pointer.
+
+        Implements :py:obj:`~.SET_WR_PTR`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -383,6 +439,8 @@ class AbstractExecutorFunctions(object):
         """ This command moves the write pointer to be at the start of the \
             next word if it isn't already at the start of a word.
 
+        Implements :py:obj:`~.ALIGN_WR_PTR`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -394,6 +452,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_arith_op(self, cmd):  # pragma: no cover
         """ This command performs an arithmetic operation.
+
+        Implements :py:obj:`~.ARITH_OP`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -407,6 +467,8 @@ class AbstractExecutorFunctions(object):
     def execute_logic_op(self, cmd):  # pragma: no cover
         """ This command performs a logical operation.
 
+        Implements :py:obj:`~.LOGIC_OP`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -419,6 +481,8 @@ class AbstractExecutorFunctions(object):
     def execute_reformat(self, cmd):  # pragma: no cover
         """ This command is never generated!
 
+        Implements :py:obj:`~.REFORMAT`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -430,6 +494,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_copy_struct(self, cmd):  # pragma: no cover
         """ This command copies a structure from one slot to another.
+
+        Implements :py:obj:`~.COPY_STRUCT`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -444,6 +510,8 @@ class AbstractExecutorFunctions(object):
         """ This command copies a field of a structure to another field of \
             a possibly-different structure.
 
+        Implements :py:obj:`~.COPY_PARAM`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -455,6 +523,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_write_param(self, cmd):  # pragma: no cover
         """ This command handles a single element of a structure.
+
+        Implements :py:obj:`~.WRITE_PARAM`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -468,6 +538,8 @@ class AbstractExecutorFunctions(object):
     def execute_write_param_component(self, cmd):  # pragma: no cover
         """ This command is never generated!
 
+        Implements :py:obj:`~.WRITE_PARAM_COMPONENT`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -479,6 +551,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_print_val(self, cmd):  # pragma: no cover
         """ This command prints a value to the log.
+
+        Implements :py:obj:`~.PRINT_VAL`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -492,6 +566,8 @@ class AbstractExecutorFunctions(object):
     def execute_print_txt(self, cmd):  # pragma: no cover
         """ This command prints a short string to the log.
 
+        Implements :py:obj:`~.PRINT_TXT`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -503,6 +579,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_print_struct(self, cmd):  # pragma: no cover
         """ This command prints a structure to the log.
+
+        Implements :py:obj:`~.PRINT_STRUCT`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned
@@ -516,6 +594,8 @@ class AbstractExecutorFunctions(object):
     def execute_read_param(self, cmd):  # pragma: no cover
         """ This command extracts an element from a structure.
 
+        Implements :py:obj:`~.READ_PARAM`
+
         :param int cmd: the command which triggered the function call
         :return: No value returned
         :raise DataSpecificationSyntaxError:\
@@ -527,6 +607,8 @@ class AbstractExecutorFunctions(object):
 
     def execute_end_spec(self, cmd):  # pragma: no cover
         """ This command marks the end of the specification program.
+
+        Implements :py:obj:`~.END_SPEC`
 
         :param int cmd: the command which triggered the function call
         :return: A special marker to signal the end.

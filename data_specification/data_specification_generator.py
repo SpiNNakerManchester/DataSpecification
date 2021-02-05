@@ -2380,10 +2380,11 @@ class DataSpecificationGenerator(object):
                                 outdent=False, no_instruction_number=False):
         """ Writes the binary command to the binary output file and, if the\
             user has requested a text output for debug purposes, also write\
-            the text version to the text file.\
-            Setting the optional parameter ``indent`` to True causes\
-            subsequent commands to be indented by two spaces relative to this\
-            one. Similarly, setting ``outdent`` to True, reverses this spacing.
+            the text version to the text file.
+
+        Setting the optional parameter ``indent`` to ``True`` causes subsequent
+        commands to be indented by two spaces relative to this one. Similarly,
+        setting ``outdent`` to ``True`` reverses this spacing.
 
         :param bytearray cmd_word_list: list of binary words to be added to
             the binary data specification file
@@ -2421,8 +2422,10 @@ class DataSpecificationGenerator(object):
 
     @property
     def region_sizes(self):
-        """ A list of sizes of each region that has been reserved. Note that\
-            the list will include 0s for each non-reserved region.
+        """ A list of sizes of each region that has been reserved.
+
+        .. note::
+            The list will include ``0`` for each non-reserved region.
 
         :rtype: list(int)
         """
@@ -2431,7 +2434,7 @@ class DataSpecificationGenerator(object):
     @property
     def current_region(self):
         """ The ID of the current DSG region we're writing to.\
-            If not yet writing to any region, None.
+            If not yet writing to any region, ``None``.
 
         :rtype: int or None
         """

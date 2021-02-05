@@ -29,7 +29,6 @@
 
 # import sys
 import os
-from sphinx import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -363,8 +362,43 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../data_specification",
-             # Exclusions
-             "../../data_specification/[dm]*.py",
-             "../../data_specification/spi/a*.py",
-             "../../data_specification/enums/[a-z]*.py"])
+
+
+# We want to document __call__ when encountered
+autodoc_default_options = {
+    "members": True,
+    "special-members": "__call__"
+}
+
+
+def filtered_files(base, excludes=None):
+    if not excludes:
+        excludes = []
+    for root, _dirs, files in os.walk(base):
+        for filename in files:
+            if filename.endswith(".py") and not filename.startswith("_"):
+                full = root + "/" + filename
+                if full not in excludes:
+                    yield full
+
+
+# UGH!
+output_dir = os.path.abspath(".")
+os.chdir("../..")
+
+# We only document __init__.py files... except for these special cases.
+# Use the unix full pathname from the root of the checked out repo
+explicit_wanted_files = [
+    "data_specification/constants.py",
+    "data_specification/utility_calls.py",
+    "data_specification/exceptions.py"]
+options = ['-o', output_dir, "data_specification"]
+options.extend(filtered_files("data_specification", explicit_wanted_files))
+try:
+    # Old style API; Python 2.7
+    from sphinx import apidoc
+    options = [None] + options
+except ImportError:
+    # New style API; Python 3.6 onwards
+    from sphinx.ext import apidoc
+apidoc.main(options)

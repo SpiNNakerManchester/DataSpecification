@@ -57,5 +57,7 @@ enabled, run:
 Documentation
 =============
 [DataSpecification python documentation](http://dataspecification.readthedocs.io)
+<br>
+[Alternate location](https://spinnakermanchester.github.io/DataSpecification/)
 
 [Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)

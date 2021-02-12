@@ -37,6 +37,10 @@ _ONE_SIGNED_INT = struct.Struct("<i")
 class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     """ This class includes the function related to each of the commands\
         of the data specification file.
+
+    .. note::
+        DSG operations not mentioned in this class will cause an error during
+        DSE if used.
     """
 
     __slots__ = [

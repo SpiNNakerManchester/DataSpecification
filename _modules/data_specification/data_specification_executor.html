@@ -1,0 +1,229 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>data_specification.data_specification_executor &#8212; DataSpecification  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">DataSpecification  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">data_specification.data_specification_executor</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for data_specification.data_specification_executor</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">.data_specification_executor_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataSpecificationExecutorFunctions</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">APPDATA_MAGIC_NUM</span><span class="p">,</span> <span class="n">DSE_VERSION</span><span class="p">,</span> <span class="n">END_SPEC_EXECUTOR</span><span class="p">,</span>
+    <span class="n">MAX_MEM_REGIONS</span><span class="p">,</span> <span class="n">APP_PTR_TABLE_BYTE_SIZE</span><span class="p">,</span> <span class="n">APP_PTR_TABLE_HEADER_BYTE_SIZE</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.enums</span> <span class="kn">import</span> <span class="n">Commands</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">DataSpecificationException</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+<span class="n">_ONE_WORD</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSpecificationExecutor"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationExecutor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Used to execute a SpiNNaker data specification language file to\</span>
+<span class="sd">        produce a memory image.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># The object to read the specification language file</span>
+        <span class="s2">&quot;_spec_reader&quot;</span><span class="p">,</span>
+
+        <span class="c1"># The executer functions</span>
+        <span class="s2">&quot;dsef&quot;</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~io.RawIOBase spec_reader:</span>
+<span class="sd">            The object to read the specification language file from</span>
+<span class="sd">        :param int memory_space:</span>
+<span class="sd">            memory available on the destination architecture</span>
+<span class="sd">        :raise IOError: If a read or write fails</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#: The object to read the specification to execute.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span> <span class="o">=</span> <span class="n">spec_reader</span>
+        <span class="c1">#: The executor functions themselves.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dsef</span> <span class="o">=</span> <span class="n">DataSpecificationExecutorFunctions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">)</span>
+        <span class="c1"># TODO: make the dsef field a private detail of the executor</span>
+        <span class="c1"># Currently accessed directly from FEC to get memory regions...</span>
+
+    <span class="k">def</span> <span class="nf">__operation_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Decode the command and select an implementation of the command.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">opcode</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+            <span class="c1"># noinspection PyArgumentList</span>
+            <span class="c1"># pylint: disable=no-value-for-parameter</span>
+            <span class="k">return</span> <span class="n">functools</span><span class="o">.</span><span class="n">partial</span><span class="p">(</span><span class="n">Commands</span><span class="p">(</span><span class="n">opcode</span><span class="p">)</span><span class="o">.</span><span class="n">exec_function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dsef</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;problem decoding opcode </span><span class="si">%d</span><span class="s2"> at index </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+                         <span class="n">cmd</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">DataSpecificationException</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid command 0x</span><span class="si">{0:X}</span><span class="s2"> while reading file </span><span class="si">{1:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
+
+<div class="viewcode-block" id="DataSpecificationExecutor.execute"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Executes the specification. This will result in a configuration \</span>
+<span class="sd">            of memory regions being done.</span>
+
+<span class="sd">        :raise IOError: If a read or write fails</span>
+<span class="sd">        :raise DataSpecificationException:</span>
+<span class="sd">            If there is an error when executing the specification</span>
+<span class="sd">        :raise TablePointerOutOfMemoryException:</span>
+<span class="sd">            If the table pointer generated as data header exceeds the size of</span>
+<span class="sd">            the available memory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">instruction_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">instruction_spec</span><span class="p">:</span>
+            <span class="c1"># process the received command</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">instruction_spec</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">operation_fn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__operation_func</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">operation_fn</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span> <span class="o">==</span> <span class="n">END_SPEC_EXECUTOR</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">instruction_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="mi">4</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutor.get_region"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_region">[docs]</a>    <span class="k">def</span> <span class="nf">get_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_id</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get a region with a given ID.</span>
+
+<span class="sd">        :param int region_id: The ID of the region to get</span>
+<span class="sd">        :return: The region, or None if the region was not allocated</span>
+<span class="sd">        :rtype: MemoryRegion or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dsef</span><span class="o">.</span><span class="n">mem_regions</span><span class="p">[</span><span class="n">region_id</span><span class="p">]</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mem_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; An enumeration of the mapping from region ID to region holder.</span>
+
+<span class="sd">        :rtype: iterable(tuple(int, MemoryRegion or None))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dsef</span><span class="o">.</span><span class="n">mem_regions</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DataSpecificationExecutor.get_header"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_header">[docs]</a>    <span class="k">def</span> <span class="nf">get_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the header of the data as a numpy array.</span>
+
+<span class="sd">        :rtype: numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">APPDATA_MAGIC_NUM</span><span class="p">,</span> <span class="n">DSE_VERSION</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u4&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutor.get_pointer_table"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_pointer_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_pointer_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_address</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the pointer table as a numpy array.</span>
+
+<span class="sd">        :param int start_address: The base address of the data to be written</span>
+<span class="sd">        :rtype: numpy.ndarray</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pointer_table</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MAX_MEM_REGIONS</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u4&quot;</span><span class="p">)</span>
+        <span class="n">pointer_table_size</span> <span class="o">=</span> <span class="n">MAX_MEM_REGIONS</span> <span class="o">*</span> <span class="mi">4</span>
+        <span class="n">next_free_offset</span> <span class="o">=</span> <span class="n">pointer_table_size</span> <span class="o">+</span> <span class="n">APP_PTR_TABLE_HEADER_BYTE_SIZE</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_regions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_free_offset</span> <span class="o">+</span> <span class="n">start_address</span>
+                <span class="n">next_free_offset</span> <span class="o">+=</span> <span class="n">region</span><span class="o">.</span><span class="n">allocated_size</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">pointer_table</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutor.get_constructed_data_size"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_constructed_data_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_constructed_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Return the size of the data that will be written to memory.</span>
+
+<span class="sd">        :return: size of the data that will be written to memory</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">APP_PTR_TABLE_BYTE_SIZE</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">region</span><span class="o">.</span><span class="n">allocated_size</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_regions</span> <span class="k">if</span> <span class="n">region</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">DataSpecification  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">data_specification.data_specification_executor</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2019.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+  </body>
+</html>

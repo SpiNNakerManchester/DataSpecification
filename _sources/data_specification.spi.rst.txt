@@ -1,10 +1,10 @@
-data_specification.spi package
-==============================
+data\_specification.spi package
+===============================
 
 Module contents
 ---------------
 
 .. automodule:: data_specification.spi
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

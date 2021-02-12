@@ -1,0 +1,454 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>data_specification.data_specification_executor_functions &#8212; DataSpecification  documentation</title>
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">DataSpecification  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">data_specification.data_specification_executor_functions</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for data_specification.data_specification_executor_functions</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">END_SPEC_EXECUTOR</span><span class="p">,</span> <span class="n">LEN2</span><span class="p">,</span> <span class="n">LEN3</span><span class="p">,</span> <span class="n">MAX_MEM_REGIONS</span><span class="p">,</span> <span class="n">MAX_REGISTERS</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataSpecificationSyntaxError</span><span class="p">,</span> <span class="n">ExecuteBreakInstruction</span><span class="p">,</span> <span class="n">NoMoreException</span><span class="p">,</span>
+    <span class="n">NoRegionSelectedException</span><span class="p">,</span> <span class="n">ParameterOutOfBoundsException</span><span class="p">,</span>
+    <span class="n">RegionInUseException</span><span class="p">,</span> <span class="n">RegionNotAllocatedException</span><span class="p">,</span>
+    <span class="n">RegionUnfilledException</span><span class="p">,</span> <span class="n">UnknownTypeLengthException</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">data_specification.spi</span> <span class="kn">import</span> <span class="n">AbstractExecutorFunctions</span>
+<span class="kn">from</span> <span class="nn">.memory_region</span> <span class="kn">import</span> <span class="n">MemoryRegion</span>
+<span class="kn">from</span> <span class="nn">.memory_region_collection</span> <span class="kn">import</span> <span class="n">MemoryRegionCollection</span>
+
+<span class="n">_ONE_BYTE</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;B&quot;</span><span class="p">)</span>
+<span class="n">_ONE_SHORT</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;H&quot;</span><span class="p">)</span>
+<span class="n">_ONE_WORD</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
+<span class="n">_ONE_LONG</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;Q&quot;</span><span class="p">)</span>
+<span class="n">_ONE_SIGNED_INT</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;i&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationExecutorFunctions</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; This class includes the function related to each of the commands\</span>
+<span class="sd">        of the data specification file.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        DSG operations not mentioned in this class will cause an error during</span>
+<span class="sd">        DSE if used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;_spec_reader&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_memory_space&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_space_allocated&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_current_region&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_registers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_mem_regions&quot;</span><span class="p">,</span>
+
+        <span class="c1"># Decodings of the current command</span>
+        <span class="s2">&quot;__cmd_size&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__opcode&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__dest_reg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__src1_reg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__src2_reg&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__data_len&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~io.RawIOBase spec_reader:</span>
+<span class="sd">            The object to read the specification language file from</span>
+<span class="sd">        :param int memory_space:</span>
+<span class="sd">            Memory space available for the data to be generated *per region*</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1">#: Where we are reading the data spec from</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span> <span class="o">=</span> <span class="n">spec_reader</span>
+        <span class="c1">#: How much space do we have available? Maximum *PER REGION*</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_memory_space</span> <span class="o">=</span> <span class="n">memory_space</span>
+
+        <span class="c1">#: How much space has been allocated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_space_allocated</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1">#: What is the current region that we&#39;re writing to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_region</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1">#: The model registers, a list of 16 ints</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_REGISTERS</span>
+        <span class="c1">#: The collection of memory regions that can be written to</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mem_regions</span> <span class="o">=</span> <span class="n">MemoryRegionCollection</span><span class="p">(</span><span class="n">MAX_MEM_REGIONS</span><span class="p">)</span>
+
+        <span class="c1">#: Decoded from command: size in words</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: Decoded from command: operation code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__opcode</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: Decoded from command: destination register or None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dest_reg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: Decoded from command: first source register or None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: Decoded from command: second source register or None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__src2_reg</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1">#: Decoded from command: data length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_len</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mem_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The collection of memory regions that can be written to.</span>
+
+<span class="sd">        :rtype: MemoryRegionCollection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mem_regions</span>
+
+    <span class="k">def</span> <span class="nf">__unpack_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Routine to unpack the command read from the data spec file. The\</span>
+<span class="sd">            parameters of the command are stored in the class data.</span>
+
+<span class="sd">        :param int cmd: The command read form the data spec file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">28</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__opcode</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+        <span class="n">use_dest_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mh">0x1</span>
+        <span class="n">use_src1_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">17</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mh">0x1</span>
+        <span class="n">use_src2_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mh">0x1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dest_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xF</span> <span class="k">if</span> <span class="n">use_dest_reg</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xF</span> <span class="k">if</span> <span class="n">use_src1_reg</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__src2_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xF</span> <span class="k">if</span> <span class="n">use_src2_reg</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_len</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">12</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x3</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_region</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mem_regions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_region</span><span class="p">]</span>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_break"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_break">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_break</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_break</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :raise ExecuteBreakInstruction:</span>
+<span class="sd">            Raises the exception to break the execution of the DSE</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="p">,</span> <span class="n">io</span><span class="o">.</span><span class="n">FileIO</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;&lt;stream&gt;&quot;</span>
+        <span class="k">raise</span> <span class="n">ExecuteBreakInstruction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">tell</span><span class="p">(),</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_reserve"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_reserve">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_reserve</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_reserve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :raise ParameterOutOfBoundsException:</span>
+<span class="sd">            If the requested size of the region is beyond the available\</span>
+<span class="sd">            memory space</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unpack_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">&amp;</span> <span class="mh">0x1F</span>  <span class="c1"># cmd[4:0]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span> <span class="o">!=</span> <span class="n">LEN2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataSpecificationSyntaxError</span><span class="p">(</span>
+                <span class="s2">&quot;Command </span><span class="si">{0:s}</span><span class="s2"> requires one word as argument (total 2 words), &quot;</span>
+                <span class="s2">&quot;but the current encoding (</span><span class="si">{1:X}</span><span class="s2">) is specified to be </span><span class="si">{2:d}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;words long&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;RESERVE&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span><span class="p">))</span>
+
+        <span class="n">unfilled</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mh">0x1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mem_regions</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">region</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">RegionInUseException</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+
+        <span class="n">size</span> <span class="o">=</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="o">&amp;</span> <span class="mh">0x3</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">size</span> <span class="o">&amp;</span> <span class="mh">0x3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memory_space</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ParameterOutOfBoundsException</span><span class="p">(</span>
+                <span class="s2">&quot;region size&quot;</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_memory_space</span><span class="p">,</span> <span class="s2">&quot;RESERVE&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mem_regions</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="n">MemoryRegion</span><span class="p">(</span>
+            <span class="n">unfilled</span><span class="o">=</span><span class="n">unfilled</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_space_allocated</span> <span class="o">+=</span> <span class="n">size</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_write"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_write">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_write</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :raise NoRegionSelectedException:</span>
+<span class="sd">            If there is no memory region selected for the write operation</span>
+<span class="sd">        :raise RegionNotAllocatedException:</span>
+<span class="sd">            If the selected region has not been allocated memory space</span>
+<span class="sd">        :raise NoMoreException:</span>
+<span class="sd">            If the selected region has not enough available memory to store</span>
+<span class="sd">            the required data</span>
+<span class="sd">        :raise UnknownTypeLengthException:</span>
+<span class="sd">            If the data type size is not 1, 2, 4, or 8 bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unpack_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src2_reg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">n_repeats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__src2_reg</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">n_repeats</span> <span class="o">=</span> <span class="n">cmd</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+
+        <span class="c1"># Convert data length to bytes</span>
+        <span class="n">data_len</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_len</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span> <span class="o">==</span> <span class="n">LEN2</span> <span class="ow">and</span> <span class="n">data_len</span> <span class="o">!=</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span> <span class="o">==</span> <span class="n">LEN3</span> <span class="ow">and</span> <span class="n">data_len</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">_ONE_LONG</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">8</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataSpecificationSyntaxError</span><span class="p">(</span>
+                <span class="s2">&quot;Command </span><span class="si">{0:s}</span><span class="s2"> requires a value as an argument, but the &quot;</span>
+                <span class="s2">&quot;current encoding (</span><span class="si">{1:X}</span><span class="s2">) is specified to be </span><span class="si">{2:d}</span><span class="s2"> words &quot;</span>
+                <span class="s2">&quot;long and the data length command argument is specified &quot;</span>
+                <span class="s2">&quot;to be </span><span class="si">{3:d}</span><span class="s2"> bytes long&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="s2">&quot;WRITE&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span><span class="p">,</span> <span class="n">data_len</span><span class="p">))</span>
+
+        <span class="c1"># Perform the writes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_to_mem</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">data_len</span><span class="p">,</span> <span class="n">n_repeats</span><span class="p">,</span> <span class="s2">&quot;WRITE&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_write_array"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_write_array">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_write_array</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_write_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># @UnusedVariable</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :raise NoRegionSelectedException:</span>
+<span class="sd">            If there is no memory region selected for the write operation</span>
+<span class="sd">        :raise RegionNotAllocatedException:</span>
+<span class="sd">            If the selected region has not been allocated memory space</span>
+<span class="sd">        :raise NoMoreException:</span>
+<span class="sd">            If the selected region has not enough available memory to store</span>
+<span class="sd">            the required data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">value_encoded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">length</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_bytes_to_mem</span><span class="p">(</span><span class="n">value_encoded</span><span class="p">,</span> <span class="s2">&quot;WRITE_ARRAY&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_switch_focus"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_switch_focus">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_switch_focus</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_switch_focus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :raise RegionUnfilledException:</span>
+<span class="sd">            If the focus is being switched to a region of memory which has</span>
+<span class="sd">            been declared to be kept unfilled</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unpack_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">region</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xF</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mem_regions</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">region</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">RegionUnfilledException</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="s2">&quot;SWITCH_FOCUS&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_region</span> <span class="o">=</span> <span class="n">region</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_mv"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_mv">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_mv</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unpack_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dest_reg</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataSpecificationSyntaxError</span><span class="p">(</span>
+                <span class="s2">&quot;Destination register not correctly specified&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__dest_reg</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__dest_reg</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_set_wr_ptr"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_set_wr_ptr">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_set_wr_ptr</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_set_wr_ptr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :raise NoRegionSelectedException:</span>
+<span class="sd">            If there is no memory region selected for the set-ptr operation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unpack_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># the data is a register</span>
+            <span class="n">future_address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registers</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__src1_reg</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># the data is a raw address</span>
+            <span class="n">future_address</span> <span class="o">=</span> <span class="n">_ONE_WORD</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># check that the address is relative or absolute</span>
+        <span class="k">if</span> <span class="n">cmd</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># relative to its current write pointer</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">NoRegionSelectedException</span><span class="p">(</span>
+                    <span class="s2">&quot;the write pointer for this region is currently undefined&quot;</span><span class="p">)</span>
+
+            <span class="c1"># relative to the base address of the region (obsolete)</span>
+            <span class="c1"># noinspection PyTypeChecker</span>
+            <span class="n">address</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="o">.</span><span class="n">write_pointer</span> <span class="o">+</span> <span class="n">future_address</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">address</span> <span class="o">=</span> <span class="n">future_address</span>
+
+        <span class="c1"># update write pointer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_region</span><span class="o">.</span><span class="n">write_pointer</span> <span class="o">=</span> <span class="n">address</span></div>
+
+<div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_end_spec"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_end_spec">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_end_spec</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">execute_end_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># @UnusedVariable</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">_ONE_SIGNED_INT</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">4</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataSpecificationSyntaxError</span><span class="p">(</span>
+                <span class="s2">&quot;Command END_SPEC requires an argument equal to -1. The &quot;</span>
+                <span class="s2">&quot;current argument value is </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">END_SPEC_EXECUTOR</span></div>
+
+    <span class="k">def</span> <span class="nf">_write_to_mem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write the specified value to data memory the specified amount of\</span>
+<span class="sd">            times.</span>
+
+<span class="sd">            The selected memory region needs to be already allocated</span>
+
+<span class="sd">        :param int value: the value to be written in the data memory region</span>
+<span class="sd">        :param int n_bytes: number of bytes that represent the value</span>
+<span class="sd">        :param int repeat: the number of times the value is to be repeated</span>
+<span class="sd">        :param str command: the command which is being executed</span>
+<span class="sd">        :raise NoRegionSelectedException:</span>
+<span class="sd">            If there is no memory region selected for the write operation</span>
+<span class="sd">        :raise RegionNotAllocatedException:</span>
+<span class="sd">            If the selected region has not been allocated memory space</span>
+<span class="sd">        :raise NoMoreException:</span>
+<span class="sd">            f the selected region has not enough available memory to</span>
+<span class="sd">            store the required data</span>
+<span class="sd">        :raise UnknownTypeLengthException:</span>
+<span class="sd">            If the data type size is not 1, 2, 4, or 8 bytes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">n_bytes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">_ONE_BYTE</span>
+        <span class="k">elif</span> <span class="n">n_bytes</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">_ONE_SHORT</span>
+        <span class="k">elif</span> <span class="n">n_bytes</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">_ONE_WORD</span>
+        <span class="k">elif</span> <span class="n">n_bytes</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">_ONE_LONG</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownTypeLengthException</span><span class="p">(</span><span class="n">n_bytes</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_bytes_to_mem</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">*</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_bytes_to_mem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Write raw bytes to data memory</span>
+
+<span class="sd">            The selected memory region needs to be already allocated</span>
+
+<span class="sd">        :param data: the value to be written in the data memory region</span>
+<span class="sd">        :type data: bytes or bytearray</span>
+<span class="sd">        :param str command: the command which is being executed</span>
+<span class="sd">        :raise NoRegionSelectedException:</span>
+<span class="sd">            If there is no memory region selected for the write operation</span>
+<span class="sd">        :raise RegionNotAllocatedException:</span>
+<span class="sd">            If the selected region has not been allocated memory space</span>
+<span class="sd">        :raise NoMoreException:</span>
+<span class="sd">            If the selected region has not enough available memory to store</span>
+<span class="sd">            the required data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># A region must&#39;ve been selected</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoRegionSelectedException</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+
+        <span class="c1"># It must be a real region</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RegionNotAllocatedException</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_region</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__write_blob</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__write_blob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Does the actual write to the region, enforcing that writes cannot\</span>
+<span class="sd">            go outside the region.</span>
+
+<span class="sd">        :param data: The data to write</span>
+<span class="sd">        :type data: bytes or bytearray</span>
+<span class="sd">        :raise NoMoreException:</span>
+<span class="sd">            if the selected region has not enough space to store the data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># It must have enough space</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_region</span>
+        <span class="k">if</span> <span class="n">region</span><span class="o">.</span><span class="n">remaining_space</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">NoMoreException</span><span class="p">(</span>
+                <span class="n">region</span><span class="o">.</span><span class="n">remaining_space</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_region</span><span class="p">)</span>
+
+        <span class="c1"># We can safely write</span>
+        <span class="n">write_ptr</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">write_pointer</span>
+        <span class="n">region</span><span class="o">.</span><span class="n">region_data</span><span class="p">[</span><span class="n">write_ptr</span><span class="p">:</span><span class="n">write_ptr</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="n">region</span><span class="o">.</span><span class="n">increment_write_pointer</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">DataSpecification  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">data_specification.data_specification_executor_functions</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2019.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    </div>
+  </body>
+</html>

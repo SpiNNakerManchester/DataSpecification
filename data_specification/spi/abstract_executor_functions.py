@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.abstract_base import AbstractBase
 from data_specification.exceptions import UnimplementedDSECommandError
 
 
-class AbstractExecutorFunctions(object):
+class AbstractExecutorFunctions(object, metaclass=AbstractBase):
     """ This class defines a function related to each of the commands of the\
         data specification file. Subclasses need to provide implementations\
         that work for the operations they wish to support.

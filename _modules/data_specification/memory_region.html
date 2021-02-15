@@ -64,7 +64,7 @@
         <span class="s2">&quot;_max_write_pointer&quot;</span>
     <span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unfilled</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<div class="viewcode-block" id="MemoryRegion.__init__"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegion.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unfilled</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param bool unfilled: if the region should not be written to by the</span>
 <span class="sd">            data specification (i.e., because the vertex uses it as a working</span>
@@ -80,7 +80,7 @@
         <span class="c1">#: the position in the memory where the writing is currently occurring</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_pointer</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1">#: the max point where if written over, it will cause an error</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span> <span class="o">=</span> <span class="mi">0</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allocated_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -187,7 +187,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2019.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.0.
     </div>
   </body>
 </html>

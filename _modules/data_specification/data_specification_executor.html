@@ -81,7 +81,7 @@
         <span class="s2">&quot;dsef&quot;</span>
     <span class="p">]</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">):</span>
+<div class="viewcode-block" id="DataSpecificationExecutor.__init__"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~io.RawIOBase spec_reader:</span>
 <span class="sd">            The object to read the specification language file from</span>
@@ -93,7 +93,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span> <span class="o">=</span> <span class="n">spec_reader</span>
         <span class="c1">#: The executor functions themselves.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dsef</span> <span class="o">=</span> <span class="n">DataSpecificationExecutorFunctions</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">)</span></div>
         <span class="c1"># TODO: make the dsef field a private detail of the executor</span>
         <span class="c1"># Currently accessed directly from FEC to get memory regions...</span>
 
@@ -223,7 +223,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2019.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.0.
     </div>
   </body>
 </html>

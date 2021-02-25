@@ -22,42 +22,39 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      TYPE: html
-      DEPS: SpiNNUtils SpiNNMachine
     steps:
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Checkout SupportScripts
-        uses: actions/checkout@v2
-        with:
-          repository: SpiNNakerManchester/SupportScripts
-          path: support
-      - name: Checkout & Install
-        run: |
-          for dep in $DEPS; do
-            support/gitclone2.sh https://github.com/SpiNNakerManchester/$dep.git || exit 1
-          done
-          python -m pip install --upgrade pip wheel setuptools
-          for dep in $DEPS; do
-            (cd $dep || exit 1; exec python setup.py install)
-          done
-          pip install -r requirements-test.txt
-          python setup.py install
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Checkout SupportScripts
+      uses: actions/checkout@v2
+      with:
+        repository: SpiNNakerManchester/SupportScripts
+        path: support
+    - name: Install pip, etc
+      uses: ./support/actions/python-tools
+    - name: Install Spinnaker Dependencies
+      uses: ./support/actions/checkout-spinn-deps
+      with:
+        repositories: SpiNNUtils SpiNNMachine
+        install: true  
+    - name: Setup
+      uses: ./support/actions/run-setup
 
-      - name: Build Python Documentation
-        run: |
-          sphinx-build -W -T -E -b $TYPE -d _build/doctrees-readthedocsdirhtml -D language=en . _build/$TYPE
-          touch _build/$TYPE/.nojekyll
-        working-directory: doc/source
+    - name: Build Python Documentation
+      uses: ./support/actions/sphinx
+      with:
+        directory: doc/source
+    - name: Hack for Github Pages
+      run: touch .nojekyll
+      working-directory: doc/source/_build/html
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          folder: doc/source/_build/${{ env.TYPE }}
+    - name: Deploy to GitHub Pages
+      uses: JamesIves/github-pages-deploy-action@3.7.1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: gh-pages
+        folder: doc/source/_build/html

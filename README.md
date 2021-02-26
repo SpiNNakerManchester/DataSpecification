@@ -9,14 +9,10 @@ Requirements
 ============
 In addition to a standard Python installation, this package depends on:
 
- - six
- - enum34
  - SpiNNMachine
 
 These requirements can be install using `pip`:
 
-    pip install six
-    pip install enum34
     pip install SpiNNMachine
 
 User Installation
@@ -61,7 +57,5 @@ Documentation
 [DataSpecification python documentation](http://dataspecification.readthedocs.io)
 <br>
 [Alternate location](https://spinnakermanchester.github.io/DataSpecification/)
-
-[Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
 
 [Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)

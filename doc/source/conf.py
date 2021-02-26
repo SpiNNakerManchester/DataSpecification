@@ -29,6 +29,7 @@
 
 # import sys
 import os
+from sphinx.ext import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -51,8 +52,10 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    'python': ('https://docs.python.org/3.6', None),
-    'numpy': ("https://numpy.org/doc/1.19/", None),
+    'python': ('https://docs.python.org/3.8', None),
+    'numpy': ("https://numpy.org/doc/1.20/", None),
+    'spinn_utilities': (
+        'https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': (
         'https://spinnmachine.readthedocs.io/en/latest/', None),
 }
@@ -357,18 +360,17 @@ epub_exclude_files = ['search.html']
 
 autoclass_content = 'both'
 
-# Do the rst generation
-for f in os.listdir("."):
-    if (os.path.isfile(f) and f.endswith(
-            ".rst") and f != "index.rst" and f != "modules.rst"):
-        os.remove(f)
-
-
 # We want to document __call__ when encountered
 autodoc_default_options = {
-    "members": True,
+    "members": None,
     "special-members": "__call__"
 }
+
+# Do the rst generation
+rst_whitelist = ("index.rst", "modules.rst")
+for f in os.listdir("."):
+    if os.path.isfile(f) and f.endswith(".rst") and f not in rst_whitelist:
+        os.remove(f)
 
 
 def filtered_files(base, excludes=None):
@@ -394,11 +396,4 @@ explicit_wanted_files = [
     "data_specification/exceptions.py"]
 options = ['-o', output_dir, "data_specification"]
 options.extend(filtered_files("data_specification", explicit_wanted_files))
-try:
-    # Old style API; Python 2.7
-    from sphinx import apidoc
-    options = [None] + options
-except ImportError:
-    # New style API; Python 3.6 onwards
-    from sphinx.ext import apidoc
 apidoc.main(options)

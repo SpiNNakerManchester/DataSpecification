@@ -17,7 +17,6 @@ import logging
 import struct
 import functools
 import numpy
-from six import raise_from
 from spinn_utilities.log import FormatAdapter
 from .data_specification_executor_functions import (
     DataSpecificationExecutorFunctions)
@@ -71,9 +70,9 @@ class DataSpecificationExecutor(object):
         except (ValueError, TypeError) as e:
             logger.debug("problem decoding opcode %d at index %d",
                          cmd, index, exc_info=True)
-            raise_from(DataSpecificationException(
+            raise DataSpecificationException(
                 "Invalid command 0x{0:X} while reading file {1:s}".format(
-                    cmd, self._spec_reader.filename)), e)
+                    cmd, self._spec_reader.filename)) from e
 
     def execute(self):
         """ Executes the specification. This will result in a configuration \

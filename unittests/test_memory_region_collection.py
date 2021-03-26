@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from data_specification import MemoryRegionCollection, MemoryRegion
+from data_specification import MemoryRegionCollection, MemoryRegionReal
 from data_specification.exceptions import (
     RegionInUseException, NoRegionSelectedException)
 
@@ -23,8 +23,8 @@ class MyTestCase(unittest.TestCase):
     def test_mrc_basics(self):
         mrc = MemoryRegionCollection(16)
         self.assertEqual(len(mrc), 16)
-        mr = MemoryRegion(False, 32)
-        mr_b = MemoryRegion(True, 16)
+        mr = MemoryRegionReal(False, 32)
+        mr_b = MemoryRegionReal(True, 16)
         mrc[2] = mr
         self.assertEqual(len(mrc), 16)
         with self.assertRaises(RegionInUseException):
@@ -41,7 +41,7 @@ class MyTestCase(unittest.TestCase):
                 self.assertTrue(mrc.is_empty(r))
         mrc[7] = mr_b
         self.assertFalse(mrc.is_empty(7))
-        mr0 = MemoryRegion(True, 0)
+        mr0 = MemoryRegionReal(True, 0)
         for r in range(7):
             if mrc.is_empty(r):
                 mrc[r] = mr0

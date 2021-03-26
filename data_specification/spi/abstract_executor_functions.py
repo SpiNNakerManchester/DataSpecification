@@ -68,6 +68,20 @@ class AbstractExecutorFunctions(object, metaclass=AbstractBase):
         """
         raise UnimplementedDSECommandError("RESERVE")
 
+    def execute_reference(self, cmd):  # pragma: no cover
+        """ This command reserves a region and sets it to reference another
+
+        Implements :py:obj:`~.REFERENCE`
+
+        :param int cmd: the command which triggered the function call
+        :return: No value returned
+        :raise DataSpecificationSyntaxError:\
+            If there is an error in the command syntax
+        :raise UnimplementedDSECommandError:\
+            If the command is not implemented.
+        """
+        raise UnimplementedDSECommandError("REFERENCE")
+
     def execute_free(self, cmd):  # pragma: no cover
         """ This command frees some memory.
 

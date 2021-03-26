@@ -1,4 +1,4 @@
-# Copyright (c) 2021 The University of Manchester
+# Copyright (c) 2017-2019 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,7 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .memory_region import MemoryRegion
 
-class MemoryRegion(object):
-    """ Identifies something as a Memory region
+
+class MemoryRegionReference(MemoryRegion):
+    """ A reference to another memory region
     """
+
+    __slots__ = ["__references"]
+
+    def __init__(self, references):
+        """
+        :param tuple references: Identifies what this refers to
+        """
+        self.__references = references
+
+    @property
+    def references(self):
+        """ Identifies what this references
+
+        :rtype: tuple
+        """
+        return self.__references

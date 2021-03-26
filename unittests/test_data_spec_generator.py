@@ -100,6 +100,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.reserve_memory_region(2, 0x1122)
         self.dsg.reserve_memory_region(3, 0x1122, empty=True)
         self.dsg.reserve_memory_region(4, 0x3344, label='test')
+        self.dsg.reserve_memory_region(5, 0x5564, referenceable=True)
 
         with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.reserve_memory_region(-1, 0x100)
@@ -109,13 +110,15 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.reserve_memory_region(1, 0x100)
 
         # RESERVE for memory region 1
-        self.assertEqual(self.get_next_word(2), [0x10200041, 0x111])
+        self.assertEqual(self.get_next_word(2), [0x10200001, 0x111])
         # RESERVE for memory region 2
-        self.assertEqual(self.get_next_word(2), [0x10200042, 0x1122])
+        self.assertEqual(self.get_next_word(2), [0x10200002, 0x1122])
         # RESERVE for memory region 3
-        self.assertEqual(self.get_next_word(2), [0x102000C3, 0x1122])
+        self.assertEqual(self.get_next_word(2), [0x10200083, 0x1122])
         # RESERVE for memory region 4
-        self.assertEqual(self.get_next_word(2), [0x10200044, 0x3344])
+        self.assertEqual(self.get_next_word(2), [0x10200004, 0x3344])
+        # RESERVE for memory region 5
+        self.assertEqual(self.get_next_word(2), [0x10200045, 0x5564])
         # Memory region 1 DSG data wrong
         self.assertEqual(self.dsg._mem_slots[1].size, 0x114)
         self.assertIsNone(self.dsg._mem_slots[1].label)
@@ -132,6 +135,33 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.dsg._mem_slots[4].size, 0x3344)
         self.assertEqual(self.dsg._mem_slots[4].label, "test")
         self.assertEqual(self.dsg._mem_slots[4].empty, False)
+        # Memory region 4 DSG data
+        self.assertEqual(self.dsg._mem_slots[5].size, 0x5564)
+        self.assertIsNone(self.dsg._mem_slots[5].label)
+        self.assertEqual(self.dsg._mem_slots[5].empty, False)
+
+    def test_reference_memory_region(self):
+        self.dsg.reference_memory_region(1, 0, 0, 1)
+        self.dsg.reference_memory_region(2, 1, 2, 3, label="TestRef")
+
+        with self.assertRaises(ParameterOutOfBoundsException):
+            self.dsg.reference_memory_region(-1, 10, 11, 12)
+        with self.assertRaises(ParameterOutOfBoundsException):
+            self.dsg.reference_memory_region(
+                constants.MAX_MEM_REGIONS, 0, 0, 0)
+
+        # REFERENCE for memory region 1
+        self.assertEqual(self.get_next_word(4), [0x30400001, 0, 0, 1])
+        # REFERENCE for memory region 2
+        self.assertEqual(self.get_next_word(4), [0x30400002, 1, 2, 3])
+
+        self.assertEqual(self.dsg._mem_slots[1].size, 0)
+        self.assertIsNone(self.dsg._mem_slots[1].label)
+        self.assertEqual(self.dsg._mem_slots[1].empty, True)
+
+        self.assertEqual(self.dsg._mem_slots[2].size, 0)
+        self.assertEqual(self.dsg._mem_slots[2].label, "TestRef")
+        self.assertEqual(self.dsg._mem_slots[2].empty, True)
 
     def test_free_memory_region(self):
         # Create a sdram just to set max chip size

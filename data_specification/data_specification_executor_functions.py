@@ -24,12 +24,15 @@ from .exceptions import (
     RegionInUseException, RegionNotAllocatedException,
     RegionUnfilledException, UnknownTypeLengthException)
 from data_specification.spi import AbstractExecutorFunctions
-from .memory_region import MemoryRegion
+from .memory_region_real import MemoryRegionReal
+from .memory_region_reference import MemoryRegionReference
 from .memory_region_collection import MemoryRegionCollection
+from data_specification.constants import LEN4
 
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")
 _ONE_WORD = struct.Struct("<I")
+_THREE_WORDS = struct.Struct("<III")
 _ONE_LONG = struct.Struct("<Q")
 _ONE_SIGNED_INT = struct.Struct("<i")
 
@@ -50,6 +53,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "_current_region",
         "_registers",
         "_mem_regions",
+        "_referenceable_regions",
 
         # Decodings of the current command
         "__cmd_size",
@@ -80,6 +84,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self._registers = [0] * MAX_REGISTERS
         #: The collection of memory regions that can be written to
         self._mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
+        #: The indices of regions that are marked as copyable
+        self._referenceable_regions = []
 
         #: Decoded from command: size in words
         self.__cmd_size = None
@@ -154,6 +160,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
                     "RESERVE", cmd, self.__cmd_size))
 
         unfilled = (cmd >> 7) & 0x1 == 0x1
+        referenceable = (cmd >> 6) & 0x1 == 0x1
 
         if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
@@ -166,9 +173,34 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             raise ParameterOutOfBoundsException(
                 "region size", size, 1, self._memory_space, "RESERVE")
 
-        self._mem_regions[region] = MemoryRegion(
+        self._mem_regions[region] = MemoryRegionReal(
             unfilled=unfilled, size=size)
+        if referenceable:
+            self._referenceable_regions.append(region)
         self._space_allocated += size
+
+    @overrides(AbstractExecutorFunctions.execute_reference)
+    def execute_reference(self, cmd):
+        """
+        :raise ParameterOutOfBoundsException:
+            If the requested size of the region is beyond the available\
+            memory space
+        """
+        self.__unpack_cmd(cmd)
+        region = cmd & 0x1F  # cmd[4:0]
+
+        if self.__cmd_size != LEN4:
+            raise DataSpecificationSyntaxError(
+                "Command {0:s} requires one word as argument (total 4 words), "
+                "but the current encoding ({1:X}) is specified to be {2:d} "
+                "words long".format(
+                    "RESERVE", cmd, self.__cmd_size))
+
+        if not self._mem_regions.is_empty(region):
+            raise RegionInUseException(region)
+
+        x, y, p = _THREE_WORDS.unpack(self._spec_reader.read(12))
+        self._mem_regions[region] = MemoryRegionReference((x, y, p))
 
     @overrides(AbstractExecutorFunctions.execute_write)
     def execute_write(self, cmd):
@@ -372,3 +404,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         write_ptr = region.write_pointer
         region.region_data[write_ptr:write_ptr + len(data)] = data
         region.increment_write_pointer(len(data))
+
+    @property
+    def referenceable_regions(self):
+        """ The regions that can be referenced by others
+        """
+        return self._referenceable_regions

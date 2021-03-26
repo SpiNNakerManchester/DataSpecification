@@ -27,14 +27,14 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-# import sys
 import os
+import sys
 from sphinx.ext import apidoc
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../..'))
 
 # -- General configuration ------------------------------------------------
 
@@ -366,34 +366,32 @@ autodoc_default_options = {
     "special-members": "__call__"
 }
 
-# Do the rst generation
-rst_whitelist = ("index.rst", "modules.rst")
-for f in os.listdir("."):
-    if os.path.isfile(f) and f.endswith(".rst") and f not in rst_whitelist:
-        os.remove(f)
 
-
-def filtered_files(base, excludes=None):
-    if not excludes:
-        excludes = []
+def filtered_files(base, unfiltered_files_filename):
+    with open(unfiltered_files_filename) as f:
+        lines = [line.rstrip() for line in f]
+    # Skip comments and empty lines to get list of files we DON'T want to
+    # filter out; this is definitely complicated
+    unfiltered = set(
+        line for line in lines if not line.startswith("#") and line != "")
     for root, _dirs, files in os.walk(base):
         for filename in files:
             if filename.endswith(".py") and not filename.startswith("_"):
                 full = root + "/" + filename
-                if full not in excludes:
+                if full not in unfiltered:
                     yield full
 
 
-# UGH!
-output_dir = os.path.abspath(".")
-os.chdir("../..")
+_output_dir = os.path.abspath(".")
+_unfiltered_files = os.path.abspath("../unfiltered-files.txt")
+_package_base = "data_specification"
 
-# We only document __init__.py files... except for these special cases.
-# Use the unix full pathname from the root of the checked out repo
-explicit_wanted_files = [
-    "data_specification/constants.py",
-    "data_specification/utility_calls.py",
-    "data_specification/exceptions.py"]
-options = ['-o', output_dir, "data_specification"]
-options.extend(filtered_files("data_specification", explicit_wanted_files))
-apidoc.main(options)
+# Do the rst generation; remove files which aren't in git first!
+for fl in os.listdir("."):
+    if (os.path.isfile(fl) and fl.endswith(".rst") and
+            fl not in ("index.rst", "modules.rst")):
+        os.remove(fl)
+os.chdir("../..")  # WARNING! RELATIVE FILENAMES CHANGE MEANING HERE!
+apidoc.main([
+    '-o', _output_dir, _package_base,
+    *filtered_files(_package_base, _unfiltered_files)])

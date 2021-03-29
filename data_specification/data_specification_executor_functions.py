@@ -52,6 +52,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "_registers",
         "_mem_regions",
         "_referenceable_regions",
+        "_references_to_fill"
 
         # Decodings of the current command
         "__cmd_size",
@@ -84,6 +85,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self._mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
         #: The indices of regions that are marked as copyable
         self._referenceable_regions = []
+        #: The indices of regions thar are references of others
+        self._references_to_fill = []
 
         #: Decoded from command: size in words
         self.__cmd_size = None
@@ -198,6 +201,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         ref = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
         self._mem_regions[region] = MemoryRegionReference(ref)
+        self._references_to_fill.append(region)
 
     @overrides(AbstractExecutorFunctions.execute_write)
     def execute_write(self, cmd):
@@ -405,5 +409,15 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     @property
     def referenceable_regions(self):
         """ The regions that can be referenced by others
+
+        :rtype: list(int)
         """
         return self._referenceable_regions
+
+    @property
+    def references_to_fill(self):
+        """ The references that need to be filled
+
+        :rtype: list(int)
+        """
+        return self._references_to_fill

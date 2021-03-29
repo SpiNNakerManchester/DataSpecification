@@ -39,7 +39,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.reserve_memory_region(1, 200, empty=True)
         spec.reserve_memory_region(2, 4)
         spec.reserve_memory_region(3, 12, referenceable=True)
-        spec.reference_memory_region(4, 2, 3, 3)
+        spec.reference_memory_region(4, 2)
         spec.switch_write_focus(0)
         spec.write_array([0, 1, 2])
         spec.set_write_pointer(20)
@@ -95,7 +95,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         # Test region 4
         region_4 = executor.get_region(4)
         self.assertIsInstance(region_4, MemoryRegionReference)
-        self.assertEqual(region_4.references, (2, 3, 3))
+        self.assertEqual(region_4.ref, 2)
 
         # Test the pointer table
         table = executor.get_pointer_table(0)

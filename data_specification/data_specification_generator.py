@@ -41,7 +41,6 @@ from .enums import (
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_SBYTE = struct.Struct("<b")
 _ONE_WORD = struct.Struct("<I")
-_THREE_WORDS = struct.Struct("<III")
 _ONE_SIGNED_INT = struct.Struct("<i")
 _TWO_WORDS = struct.Struct("<II")
 
@@ -264,13 +263,11 @@ class DataSpecificationGenerator(object):
 
         self._write_command_to_files(cmd_word + encoded_size, cmd_string)
 
-    def reference_memory_region(self, region, x, y, p, label=None):
+    def reference_memory_region(self, region, ref, label=None):
         """ Insert command to reference another memory region
 
         :param int region: The number of the region to reserve, from 0 to 15
-        :param int x: The x value of the region to reference
-        :param int y: The y value of the region to reference
-        :param int p: The p value of the region to reference
+        :param int ref: The identifier of the region to reference
         :param label: An optional label for the region
         :type label: str or None
         :raise DataUndefinedWriterException:
@@ -289,13 +286,12 @@ class DataSpecificationGenerator(object):
         self._mem_slots[region] = _MemSlot(label, 0, True)
 
         cmd_word = _binencode(Commands.REFERENCE, {
-            _Field.LENGTH: LEN4,
+            _Field.LENGTH: LEN2,
             _Field.IMMEDIATE: region})
-        encoded_args = _THREE_WORDS.pack(x, y, p)
+        encoded_args = _ONE_WORD.pack(ref)
 
         cmd_string = Commands.REFERENCE.name
-        cmd_string += " memRegion={0:d} ref={1:d}, {2:d}, {3:d}".format(
-            region, x, y, p)
+        cmd_string += " memRegion={0:d} ref={1:d}".format(region, ref)
         if label is not None:
             cmd_string += " label='{0:s}'".format(label)
 

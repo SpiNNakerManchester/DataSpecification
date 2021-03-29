@@ -20,18 +20,18 @@ class MemoryRegionReference(MemoryRegion):
     """ A reference to another memory region
     """
 
-    __slots__ = ["__references"]
+    __slots__ = ["__ref"]
 
-    def __init__(self, references):
+    def __init__(self, ref):
         """
-        :param tuple references: Identifies what this refers to
+        :param int ref: Identifies what this refers to
         """
-        self.__references = references
+        self.__ref = ref
 
     @property
-    def references(self):
+    def ref(self):
         """ Identifies what this references
 
-        :rtype: tuple
+        :rtype: int
         """
-        return self.__references
+        return self.__ref

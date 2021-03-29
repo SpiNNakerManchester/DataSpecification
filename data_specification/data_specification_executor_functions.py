@@ -27,12 +27,10 @@ from data_specification.spi import AbstractExecutorFunctions
 from .memory_region_real import MemoryRegionReal
 from .memory_region_reference import MemoryRegionReference
 from .memory_region_collection import MemoryRegionCollection
-from data_specification.constants import LEN4
 
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")
 _ONE_WORD = struct.Struct("<I")
-_THREE_WORDS = struct.Struct("<III")
 _ONE_LONG = struct.Struct("<Q")
 _ONE_SIGNED_INT = struct.Struct("<i")
 
@@ -189,18 +187,17 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__unpack_cmd(cmd)
         region = cmd & 0x1F  # cmd[4:0]
 
-        if self.__cmd_size != LEN4:
+        if self.__cmd_size != LEN2:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires one word as argument (total 4 words), "
+                "Command {0:s} requires one word as argument (total 2 words), "
                 "but the current encoding ({1:X}) is specified to be {2:d} "
-                "words long".format(
-                    "RESERVE", cmd, self.__cmd_size))
+                "words long".format("REFERENCE", cmd, self.__cmd_size))
 
         if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
 
-        x, y, p = _THREE_WORDS.unpack(self._spec_reader.read(12))
-        self._mem_regions[region] = MemoryRegionReference((x, y, p))
+        ref = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
+        self._mem_regions[region] = MemoryRegionReference(ref)
 
     @overrides(AbstractExecutorFunctions.execute_write)
     def execute_write(self, cmd):

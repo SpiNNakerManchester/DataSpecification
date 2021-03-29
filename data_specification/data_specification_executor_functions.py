@@ -52,7 +52,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "_registers",
         "_mem_regions",
         "_referenceable_regions",
-        "_references_to_fill"
+        "_references_to_fill",
 
         # Decodings of the current command
         "__cmd_size",

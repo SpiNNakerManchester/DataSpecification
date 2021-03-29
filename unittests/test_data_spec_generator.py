@@ -100,7 +100,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.dsg.reserve_memory_region(2, 0x1122)
         self.dsg.reserve_memory_region(3, 0x1122, empty=True)
         self.dsg.reserve_memory_region(4, 0x3344, label='test')
-        self.dsg.reserve_memory_region(5, 0x5564, referenceable=True)
+        self.dsg.reserve_memory_region(5, 0x5564, reference=1)
 
         with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.reserve_memory_region(-1, 0x100)
@@ -118,7 +118,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         # RESERVE for memory region 4
         self.assertEqual(self.get_next_word(2), [0x10200004, 0x3344])
         # RESERVE for memory region 5
-        self.assertEqual(self.get_next_word(2), [0x10200045, 0x5564])
+        self.assertEqual(self.get_next_word(3), [0x20200045, 0x5564, 1])
         # Memory region 1 DSG data wrong
         self.assertEqual(self.dsg._mem_slots[1].size, 0x114)
         self.assertIsNone(self.dsg._mem_slots[1].label)

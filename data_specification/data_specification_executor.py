@@ -141,7 +141,19 @@ class DataSpecificationExecutor(object):
 
     @property
     def referenceable_regions(self):
+        """ The regions that can be referenced by others
+
+        :rtype: list(int)
+        """
         return self.dsef.referenceable_regions
+
+    @property
+    def references_to_fill(self):
+        """ The references that need to be filled
+
+        :rtype: list(int)
+        """
+        return self.dsef.references_to_fill
 
     def get_constructed_data_size(self):
         """ Return the size of the data that will be written to memory.

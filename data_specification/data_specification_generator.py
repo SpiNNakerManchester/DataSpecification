@@ -220,7 +220,7 @@ class DataSpecificationGenerator(object):
         return
 
     def reserve_memory_region(
-            self, region, size, label=None, empty=False, referenceable=False):
+            self, region, size, label=None, empty=False, reference=None):
         """ Insert command to reserve a memory region
 
         :param int region: The number of the region to reserve, from 0 to 15
@@ -228,7 +228,8 @@ class DataSpecificationGenerator(object):
         :param label: An optional label for the region
         :type label: str or None
         :param bool empty: Specifies if the region will be left empty
-        :param bool referenceable: Specifies if the region can be referenced
+        :param reference: A globally unique reference for this region
+        :type reference: int or None
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
         :raise IOError: If a write to external storage fails
@@ -247,12 +248,15 @@ class DataSpecificationGenerator(object):
         self._mem_slots[region] = _MemSlot(label, size, empty)
 
         cmd_word = _binencode(Commands.RESERVE, {
-            _Field.LENGTH: LEN2,
+            _Field.LENGTH: LEN2 if reference is None else LEN3,
             _Field.USAGE: NO_REGS,
             _Field.EMPTY: bool(empty),
-            _Field.REFERENCEABLE: bool(referenceable),
+            _Field.REFERENCEABLE: reference is not None,
             _Field.IMMEDIATE: region})
         encoded_size = _ONE_WORD.pack(size)
+        encoded_ref = b""
+        if reference is not None:
+            encoded_ref = _ONE_WORD.pack(reference)
 
         cmd_string = Commands.RESERVE.name
         cmd_string += " memRegion={0:d} size={1:d}".format(region, size)
@@ -260,8 +264,11 @@ class DataSpecificationGenerator(object):
             cmd_string += " label='{0:s}'".format(label)
         if empty:
             cmd_string += " UNFILLED"
+        if reference is not None:
+            cmd_string += " REF {0:d}".format(reference)
 
-        self._write_command_to_files(cmd_word + encoded_size, cmd_string)
+        self._write_command_to_files(
+            cmd_word + encoded_size + encoded_ref, cmd_string)
 
     def reference_memory_region(self, region, ref, label=None):
         """ Insert command to reference another memory region

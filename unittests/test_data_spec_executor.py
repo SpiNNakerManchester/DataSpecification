@@ -38,7 +38,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.reserve_memory_region(0, 100)
         spec.reserve_memory_region(1, 200, empty=True)
         spec.reserve_memory_region(2, 4)
-        spec.reserve_memory_region(3, 12, referenceable=True)
+        spec.reserve_memory_region(3, 12, reference=1)
         spec.reference_memory_region(4, 2)
         spec.switch_write_focus(0)
         spec.write_array([0, 1, 2])
@@ -70,6 +70,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertEqual(region_0.allocated_size, 100)
         self.assertEqual(region_0.max_write_pointer, 24)
         self.assertFalse(region_0.unfilled)
+        self.assertIsNone(region_0.reference)
         self.assertEqual(
             region_0.region_data[:region_0.max_write_pointer],
             struct.pack("<IIIIII", 0, 1, 2, 0, 0, 4))
@@ -79,23 +80,27 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertIsInstance(region_1, MemoryRegionReal)
         self.assertEqual(region_1.allocated_size, 200)
         self.assertTrue(region_1.unfilled)
+        self.assertIsNone(region_1.reference)
 
         # Test region 2
         region_2 = executor.get_region(2)
         self.assertIsInstance(region_2, MemoryRegionReal)
         self.assertEqual(region_2.allocated_size, 4)
+        self.assertIsNone(region_2.reference)
         self.assertEqual(region_2.region_data, struct.pack("<I", 10))
 
         # Test region 3
         region_3 = executor.get_region(3)
         self.assertIsInstance(region_3, MemoryRegionReal)
         self.assertEqual(region_3.allocated_size, 12)
+        self.assertEqual(region_3.reference, 1)
         self.assertEqual(executor.referenceable_regions, [3])
 
         # Test region 4
         region_4 = executor.get_region(4)
         self.assertIsInstance(region_4, MemoryRegionReference)
         self.assertEqual(region_4.ref, 2)
+        self.assertEqual(executor.references_to_fill, [4])
 
         # Test the pointer table
         table = executor.get_pointer_table(0)

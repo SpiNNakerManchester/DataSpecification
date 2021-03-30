@@ -38,8 +38,7 @@ class Commands(Enum):
         "Releases previously reserved memory")
     REFERENCE = (
         0x04, DataSpecificationExecutorFunctions.execute_reference,
-        "References a region completely from another core, linking to it if"
-        " possible i.e. on same chip")
+        "References a region completely from another core on the same chip")
     DECLARE_RNG = (
         0x05, DataSpecificationExecutorFunctions.execute_declare_rng,
         "Declares a new random number generator")

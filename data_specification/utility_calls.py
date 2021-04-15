@@ -20,6 +20,7 @@ import io
 import os
 import tempfile
 import threading
+from contextlib import suppress
 from .constants import APP_PTR_TABLE_HEADER_BYTE_SIZE
 from .data_specification_generator import DataSpecificationGenerator
 
@@ -37,13 +38,9 @@ def _mkdir(directory):
     """
     # Guarded to stop us from hitting things twice internally; it's not
     # perfect since other processes could also happen along.
-    with _lock_condition:
-        try:
-            if not os.path.exists(directory):
-                os.mkdir(directory)
-        except OSError:  # pragma: no cover
-            # Assume an external race beat us
-            pass
+    with _lock_condition, suppress(OSError):
+        if not os.path.exists(directory):
+            os.mkdir(directory)
 
 
 def get_region_base_address_offset(app_data_base_address, region):

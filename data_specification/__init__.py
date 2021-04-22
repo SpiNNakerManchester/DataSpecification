@@ -72,7 +72,9 @@ from .memory_region import MemoryRegion
 from .memory_region_real import MemoryRegionReal
 from .memory_region_reference import MemoryRegionReference
 from .memory_region_collection import MemoryRegionCollection
+from .reference_context import ReferenceContext
 
 __all__ = ["DataSpecificationExecutor", "DataSpecificationExecutorFunctions",
            "DataSpecificationGenerator", "MemoryRegion", "MemoryRegionReal",
-           "MemoryRegionReference", "MemoryRegionCollection"]
+           "MemoryRegionReference", "MemoryRegionCollection",
+           "ReferenceContext"]

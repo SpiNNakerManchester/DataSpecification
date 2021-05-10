@@ -26,7 +26,7 @@ class TestingUtilities(unittest.TestCase):
 
     def test_get_data_spec_and_file_writer_filename(self):
         a, b = get_data_spec_and_file_writer_filename(
-            2, 3, 5, "example.com", "TEMP", True, "TEMP")
+            2, 3, 5, "example.com", "TEMP", "TEMP")
         self.assertEqual(os.path.split(a)[-1],
                          "example.com_dataSpec_2_3_5.dat")
         # Should be a DSG

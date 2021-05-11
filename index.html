@@ -4,11 +4,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
     <title>Data Specification &#8212; DataSpecification 6.0.1 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinxdoc.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
@@ -41,7 +42,7 @@
   <p>These pages document the python code for the <a class="reference external" href="https://github.com/SpiNNakerManchester/DataSpecification">DataSpecification</a> module
 which is part of the <a class="reference external" href="http://apt.cs.manchester.ac.uk/projects/SpiNNaker/">SpiNNaker</a> Project.</p>
 <p>This code depends on <a class="reference external" href="http://spinnutils.readthedocs.io">SpiNNUtils</a> and <a class="reference external" href="http://spinnmachine.readthedocs.io">SpiNNMachine</a> (<a class="reference external" href="http://spinnakermanchester.readthedocs.io">Combined_documentation</a>).</p>
-<div class="section" id="data-specification">
+<section id="data-specification">
 <h1>Data Specification<a class="headerlink" href="#data-specification" title="Permalink to this headline">¶</a></h1>
 <p>Used to generate memory images for a SpiNNaker CPU core from a set of     instructions.</p>
 <p>The main part of this package is the
@@ -50,7 +51,7 @@ class. This is used to generate a “Data Specification”, which can then be
 executed to produce a memory image.  This package also handles this function
 if required, through the
 <a class="reference internal" href="data_specification.html#data_specification.DataSpecificationExecutor" title="data_specification.DataSpecificationExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationExecutor</span></code></a> class.</p>
-<div class="section" id="functional-requirements">
+<section id="functional-requirements">
 <h2>Functional Requirements<a class="headerlink" href="#functional-requirements" title="Permalink to this headline">¶</a></h2>
 <p>Creation of a Data Specification Language file which can be executed to
 produce a memory image.</p>
@@ -70,8 +71,8 @@ execution.</p></li>
 although a default provision of a way to read the specification from a file
 is acceptable.</p></li>
 </ul>
-</div>
-<div class="section" id="use-cases">
+</section>
+<section id="use-cases">
 <h2>Use Cases<a class="headerlink" href="#use-cases" title="Permalink to this headline">¶</a></h2>
 <p>There are a number of use-cases of this library:</p>
 <ul class="simple">
@@ -81,12 +82,12 @@ to be transferred over a slow connection.</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.DataSpecificationExecutor" title="data_specification.DataSpecificationExecutor"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationExecutor</span></code></a> is used to execute a previously
 generated specification at the receiving end of a slow connection.</p></li>
 </ul>
-</div>
-<div class="section" id="main-api">
+</section>
+<section id="main-api">
 <h2>Main API<a class="headerlink" href="#main-api" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt>
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">data_specification.</span></code><code class="sig-name descname"><span class="pre">DataSpecificationExecutor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Used to execute a SpiNNaker data specification language file to        produce a memory image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -100,8 +101,8 @@ generated specification at the receiving end of a slow connection.</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -116,14 +117,14 @@ generated specification at the receiving end of a slow connection.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt>
-<code class="sig-name descname"><span class="pre">dsef</span></code></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">dsef</span></span></dt>
 <dd><p>The executor functions themselves.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Executes the specification. This will result in a configuration             of memory regions being done.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -138,8 +139,8 @@ the available memory</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">get_constructed_data_size</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_constructed_data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_constructed_data_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_constructed_data_size"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Return the size of the data that will be written to memory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -152,8 +153,8 @@ the available memory</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">get_header</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_header</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_header"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Get the header of the data as a numpy array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -163,8 +164,8 @@ the available memory</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">get_pointer_table</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_pointer_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_pointer_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_address</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_pointer_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Get the pointer table as a numpy array.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -177,8 +178,8 @@ the available memory</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">get_region</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.get_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Get a region with a given ID.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -193,9 +194,9 @@ the available memory</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">mem_regions</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mem_regions</span></span></dt>
 <dd><p>An enumeration of the mapping from region ID to region holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -207,8 +208,8 @@ the available memory</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt>
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">data_specification.</span></code><code class="sig-name descname"><span class="pre">DataSpecificationExecutorFunctions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationExecutorFunctions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This class includes the function related to each of the commands        of the data specification file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -224,8 +225,8 @@ DSE if used.</p>
 </dd>
 </dl>
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -237,8 +238,8 @@ DSE if used.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_break</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_break"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_break</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_break"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command raises an exception to stop the execution of the             data spec executor (DSE).</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.BREAK" title="data_specification.enums.Commands.BREAK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BREAK</span></code></a></p>
 <dl class="field-list simple">
@@ -259,8 +260,8 @@ DSE if used.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_end_spec</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_end_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_end_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_end_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command marks the end of the specification program.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.END_SPEC" title="data_specification.enums.Commands.END_SPEC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">END_SPEC</span></code></a></p>
 <dl class="field-list simple">
@@ -280,8 +281,8 @@ DSE if used.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_mv</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_mv"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_mv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_mv"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command moves an immediate value to a register or copies the             value of a register to another register.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.MV" title="data_specification.enums.Commands.MV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MV</span></code></a></p>
 <dl class="field-list simple">
@@ -301,8 +302,8 @@ DSE if used.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_reserve</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_reserve"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_reserve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_reserve"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command reserves a region and assigns some memory space             to it.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.RESERVE" title="data_specification.enums.Commands.RESERVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESERVE</span></code></a></p>
 <dl class="field-list simple">
@@ -323,8 +324,8 @@ DSE if used.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_set_wr_ptr</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_set_wr_ptr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_set_wr_ptr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_set_wr_ptr"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command sets the current write pointer.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.SET_WR_PTR" title="data_specification.enums.Commands.SET_WR_PTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SET_WR_PTR</span></code></a></p>
 <dl class="field-list simple">
@@ -345,8 +346,8 @@ DSE if used.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_switch_focus</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_switch_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_switch_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_switch_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command switches the focus to the desired, already allocated,            memory region.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.SWITCH_FOCUS" title="data_specification.enums.Commands.SWITCH_FOCUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SWITCH_FOCUS</span></code></a></p>
 <dl class="field-list simple">
@@ -368,8 +369,8 @@ been declared to be kept unfilled</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_write</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_write"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_write"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command writes the given value in the specified region a            number of times as identified by either a value in the command             or a register value.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE" title="data_specification.enums.Commands.WRITE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WRITE</span></code></a></p>
 <dl class="field-list simple">
@@ -394,8 +395,8 @@ the required data</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">execute_write_array</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_write_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">execute_write_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_write_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>This command writes an array of values in the specified region.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE_ARRAY" title="data_specification.enums.Commands.WRITE_ARRAY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WRITE_ARRAY</span></code></a></p>
 <dl class="field-list simple">
@@ -418,9 +419,9 @@ the required data</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">mem_regions</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">mem_regions</span></span></dt>
 <dd><p>The collection of memory regions that can be written to.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -432,8 +433,8 @@ the required data</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt>
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">data_specification.</span></code><code class="sig-name descname"><span class="pre">DataSpecificationGenerator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Used to generate a SpiNNaker data specification language file that        can be executed to produce a memory image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -448,8 +449,8 @@ written and, if so, where. No report is written if this is None.</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -465,8 +466,8 @@ written and, if so, where. No report is written if this is None.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">align_write_pointer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_block_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_block_size_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_register_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.align_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">align_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_block_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_block_size_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_register_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.align_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to align the write pointer against a power-of-2            block size in bytes.  Zeros are inserted in the intervening space</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -506,8 +507,8 @@ region</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">break_loop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.break_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">break_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.break_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to break out of a loop before it has completed</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -521,8 +522,8 @@ region</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">call_arithmetic_operation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_arithmetic_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">call_arithmetic_operation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_arithmetic_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to perform an arithmetic operation on two signed or            unsigned values and store the result in a register</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -565,8 +566,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">call_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_ids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">call_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_ids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to call a function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -599,8 +600,8 @@ the function, each between 0 and 15</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">call_random_distribution</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_random_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">call_random_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_random_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to get the next random number from a random            distribution, placing the result in a register to be used in a            future call</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -622,8 +623,8 @@ of range</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">comment</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Write a comment to the text version of the specification.            Note that this is ignored by the binary file</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -639,8 +640,8 @@ of range</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">copy_structure</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.copy_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">copy_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.copy_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to copy a structure, possibly overwriting another            structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -688,8 +689,8 @@ allocated</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">copy_structure_parameter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_parameter_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.copy_structure_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">copy_structure_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_parameter_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.copy_structure_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to copy the value of a parameter from one            structure to another.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -728,8 +729,8 @@ allocated</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">create_cmd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.create_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">create_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.create_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Creates command to write a value to the current write pointer,            causing the write pointer to move on by the number of bytes            required to represent the data type. The data is passed as a            parameter to this function.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -766,9 +767,9 @@ fractional part</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">current_region</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">current_region</span></span></dt>
 <dd><p>The ID of the current DSG region we’re writing to.            If not yet writing to any region, <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -778,8 +779,8 @@ fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">declare_random_number_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.declare_random_number_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">declare_random_number_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.declare_random_number_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to declare a random number generator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -807,8 +808,8 @@ defined</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">declare_uniform_random_distribution</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.declare_uniform_random_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">declare_uniform_random_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.declare_uniform_random_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert commands to declare a uniform random distribution</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -838,8 +839,8 @@ out of range</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">define_break</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.define_break"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">define_break</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.define_break"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to stop execution with an exception (for debugging)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -852,8 +853,8 @@ out of range</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">define_structure</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.define_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">define_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.define_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert commands to define a data structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -894,8 +895,8 @@ but has a fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">else_conditional</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.else_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">else_conditional</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.else_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command for the else of an if…then…else construct.            If the condition of the conditional evaluates to false, the            statements up between the conditional and the insertion of this            “else” are skipped, and the statements from this point until the            end of the conditional are executed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -909,8 +910,8 @@ but has a fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">end_conditional</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">end_conditional</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to mark the end of an if…then…else construct</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -924,8 +925,8 @@ but has a fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">end_function</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">end_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to mark the end of a function definition</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -935,8 +936,8 @@ but has a fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">end_loop</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">end_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to indicate that this is the end of the loop.            Commands between the start of the loop and this command will be            repeated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -950,8 +951,8 @@ but has a fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">end_specification</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">close_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_specification"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">end_specification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">close_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_specification"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert a command to indicate that the specification has finished            and finish writing</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -967,8 +968,8 @@ but has a fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">free_memory_region</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.free_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">free_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.free_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to free a previously reserved memory region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -986,8 +987,8 @@ but has a fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">get_structure_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.get_structure_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">get_structure_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.get_structure_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to get a value from a structure.            The value is copied in a register.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1019,8 +1020,8 @@ declared in the original structure</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">logical_and</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_and"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logical_and</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_and"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to perform a logical AND operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1060,8 +1061,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">logical_left_shift</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_left_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logical_left_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_left_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to perform a logical left shift operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1101,8 +1102,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">logical_not</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_not"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logical_not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_not"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to perform a logical not operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1133,8 +1134,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">logical_or</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_or"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logical_or</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_or"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to perform a logical OR operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1174,8 +1175,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">logical_right_shift</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_right_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logical_right_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_right_shift"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to perform a logical right shift operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1215,8 +1216,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">logical_xor</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_xor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">logical_xor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_xor"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to perform a logical xor operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1256,8 +1257,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">no_operation</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.no_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">no_operation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.no_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to execute nothing</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises</dt>
@@ -1270,8 +1271,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">print_struct</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">print_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to print out a structure (for debugging)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1305,8 +1306,8 @@ the ID of a structure that has not been allocated</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">print_text</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ASCII'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">print_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ASCII'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to print some text (for debugging)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1325,8 +1326,8 @@ the ID of a structure that has not been allocated</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">print_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">value_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">print_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value</span></em>, <em class="sig-param"><span class="pre">value_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to print out a value (for debugging)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1362,8 +1363,8 @@ overflow the data type</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">read_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.read_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">read_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.read_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to read a value from the current write pointer,            causing the write pointer to move by the number of bytes read.            The data is stored in a register passed as argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1378,9 +1379,9 @@ overflow the data type</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">region_sizes</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">region_sizes</span></span></dt>
 <dd><p>A list of sizes of each region that has been reserved.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1394,8 +1395,8 @@ overflow the data type</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">reserve_memory_region</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shrink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.reserve_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">reserve_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shrink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.reserve_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to reserve a memory region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1420,8 +1421,8 @@ overflow the data type</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">save_write_pointer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.save_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">save_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.save_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to save the write pointer to a register</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1439,8 +1440,8 @@ overflow the data type</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">set_register_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">register_id</span></em>, <em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">data_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_register_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_register_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">register_id</span></em>, <em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">data_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_register_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to set the value of a register</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1478,8 +1479,8 @@ the data type</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">set_structure_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_structure_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_structure_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_structure_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to set a value in a structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1532,8 +1533,8 @@ register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">set_write_pointer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_to_current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_to_current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to set the position of the write pointer within the            current region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1565,8 +1566,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">start_conditional</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">start_conditional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to start a conditional if…then…else construct.            If the condition evaluates to true, the statement is executed up            to the next else statement, or the end of the conditional,            whichever comes first.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1600,8 +1601,8 @@ register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">start_function</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argument_by_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">start_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argument_by_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to start a function definition, with up to 5            arguments, which are the IDs of structures to be used within the            function, each of which can be passed by reference or by value.            In the commands following this command up to the            <a class="reference internal" href="data_specification.html#data_specification.DataSpecificationGenerator.end_function" title="data_specification.DataSpecificationGenerator.end_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end_function()</span></code></a> command, structures can only be referenced            using the numbers 1 to 5 which address the arguments, rather than            the original structure IDs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1626,8 +1627,8 @@ determined by the length of this list.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">start_loop</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counter_register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">start_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counter_register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to start a loop</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1689,8 +1690,8 @@ in the allowed range</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">switch_write_focus</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.switch_write_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">switch_write_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.switch_write_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to switch the region being written to</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1709,8 +1710,8 @@ in the allowed range</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">write_array</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">array_values</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">write_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">array_values</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to write an array, causing the write pointer            to move on by (data type size * the array size), in bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1730,8 +1731,8 @@ in the allowed range</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">write_cmd</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd_word_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">write_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd_word_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_string</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Applies write commands created previously created (and cached).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1756,8 +1757,8 @@ the report for the data specification file</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">write_repeated_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">repeats=1</span></em>, <em class="sig-param"><span class="pre">repeats_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_repeated_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">write_repeated_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">repeats=1</span></em>, <em class="sig-param"><span class="pre">repeats_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_repeated_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to write a value one or more times to the current            write pointer, causing the write pointer to move on by the number            of bytes required to represent the data type. The data is passed            as a parameter to this function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1799,8 +1800,8 @@ fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">write_structure</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">write_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to write a structure to the current write pointer,            causing the current write pointer to move on by the number of            bytes needed to represent the structure</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1842,8 +1843,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">write_value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">write_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to write a value (once) to the current            write pointer, causing the write pointer to move on by the number            of bytes required to represent the data type. The data is passed            as a parameter to this function</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -1875,8 +1876,8 @@ fractional part</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">write_value_from_register</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_register</span></em>, <em class="sig-param"><span class="pre">repeats=1</span></em>, <em class="sig-param"><span class="pre">repeats_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_value_from_register"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">write_value_from_register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">data_register</span></em>, <em class="sig-param"><span class="pre">repeats=1</span></em>, <em class="sig-param"><span class="pre">repeats_is_register=False</span></em>, <em class="sig-param"><span class="pre">data_type=&lt;DataType.UINT32:</span> <span class="pre">2&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_value_from_register"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Insert command to write a value one or more times at the write            pointer of the current memory region, causing it to move.            The data is contained in a register whose ID is passed to the            function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1918,8 +1919,8 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt>
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">data_specification.</span></code><code class="sig-name descname"><span class="pre">MemoryRegion</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfilled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfilled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Memory region storage object.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1932,8 +1933,8 @@ data region or an output region)</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfilled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfilled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1946,9 +1947,9 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">allocated_size</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">allocated_size</span></span></dt>
 <dd><p>The size of the region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1958,8 +1959,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">increment_write_pointer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion.increment_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">increment_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion.increment_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Advance the write pointer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1968,9 +1969,9 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">max_write_pointer</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">max_write_pointer</span></span></dt>
 <dd><p>The max point where if written over, it will cause an error.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1979,9 +1980,9 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">region_data</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">region_data</span></span></dt>
 <dd><p>The buffer which holds the data written in this region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -1990,9 +1991,9 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">remaining_space</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">remaining_space</span></span></dt>
 <dd><p>The space between the current write pointer and the end of the            region, which is the number of bytes remaining in the region that            can be written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -2001,9 +2002,9 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">unfilled</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">unfilled</span></span></dt>
 <dd><p>Whether the region is marked as not fillable; unfilled regions            will not contain any data at write time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -2012,9 +2013,9 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">write_pointer</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">write_pointer</span></span></dt>
 <dd><p>The position in the buffer where data will be written to next.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -2026,8 +2027,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt>
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">data_specification.</span></code><code class="sig-name descname"><span class="pre">MemoryRegionCollection</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_regions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegionCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_regions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Collection of memory regions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2035,8 +2036,8 @@ data region or an output region)</p></li>
 </dd>
 </dl>
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__getitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="data_specification.html#data_specification.MemoryRegion" title="data_specification.MemoryRegion">MemoryRegion</a></p>
@@ -2045,8 +2046,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__init__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_regions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_regions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>n_regions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of regions in the collection.</p>
@@ -2055,8 +2056,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__iter__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p>iterable(<a class="reference internal" href="data_specification.html#data_specification.MemoryRegion" title="data_specification.MemoryRegion">MemoryRegion</a>)</p>
@@ -2065,8 +2066,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__len__</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -2075,8 +2076,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">__setitem__</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -2088,8 +2089,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">count_used_regions</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.count_used_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">count_used_regions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.count_used_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>The number of regions in the collection that are used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -2099,8 +2100,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">is_empty</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.is_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">is_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.is_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the region</p>
@@ -2112,8 +2113,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">is_unfilled</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.is_unfilled"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">is_unfilled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.is_unfilled"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the region</p>
@@ -2125,8 +2126,8 @@ data region or an output region)</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt>
-<code class="sig-name descname"><span class="pre">needs_to_write_region</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.needs_to_write_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">needs_to_write_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.needs_to_write_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
 <dd><p>Helper method which determines if a unfilled region actually             needs to be written (optimisation to stop large data files).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2144,9 +2145,9 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt>
-<em class="property"><span class="pre">property</span> </em><code class="sig-name descname"><span class="pre">regions</span></code></dt>
+<dl class="py property">
+<dt class="sig sig-object py">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">regions</span></span></dt>
 <dd><p>The regions in the collection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
@@ -2157,8 +2158,8 @@ data region or an output region)</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="contents">
+</section>
+<section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -2185,16 +2186,16 @@ data region or an output region)</p></li>
 </li>
 </ul>
 </div>
-</div>
-<div class="section" id="indices-and-tables">
+</section>
+<section id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -2257,7 +2258,7 @@ data region or an output region)</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.5.4.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.1.
     </div>
   </body>
 </html>

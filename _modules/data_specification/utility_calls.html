@@ -58,6 +58,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="n">get_config_bool</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="n">APP_PTR_TABLE_HEADER_BYTE_SIZE</span>
 <span class="kn">from</span> <span class="nn">.data_specification_generator</span> <span class="kn">import</span> <span class="n">DataSpecificationGenerator</span>
 
@@ -101,7 +102,7 @@
 
 <div class="viewcode-block" id="get_data_spec_and_file_writer_filename"><a class="viewcode-back" href="../../data_specification.html#data_specification.utility_calls.get_data_spec_and_file_writer_filename">[docs]</a><span class="k">def</span> <span class="nf">get_data_spec_and_file_writer_filename</span><span class="p">(</span>
         <span class="n">processor_chip_x</span><span class="p">,</span> <span class="n">processor_chip_y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">,</span>
-        <span class="n">hostname</span><span class="p">,</span> <span class="n">report_directory</span><span class="o">=</span><span class="s2">&quot;TEMP&quot;</span><span class="p">,</span> <span class="n">write_text_specs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">hostname</span><span class="p">,</span> <span class="n">report_directory</span><span class="o">=</span><span class="s2">&quot;TEMP&quot;</span><span class="p">,</span>
         <span class="n">application_run_time_report_folder</span><span class="o">=</span><span class="s2">&quot;TEMP&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Encapsulates the creation of the DSG writer and the file paths.</span>
 
@@ -110,8 +111,6 @@
 <span class="sd">    :param int processor_id: The processor ID</span>
 <span class="sd">    :param str hostname: The hostname of the SpiNNaker machine</span>
 <span class="sd">    :param str report_directory: the directory for the reports folder</span>
-<span class="sd">    :param bool write_text_specs:</span>
-<span class="sd">        True if a textual version of the specification should be written</span>
 <span class="sd">    :param str application_run_time_report_folder:</span>
 <span class="sd">        The folder to contain the resulting specification files; if &#39;TEMP&#39;</span>
 <span class="sd">        then a temporary directory is used.</span>
@@ -131,8 +130,7 @@
     <span class="c1"># writer to send down to DSG</span>
     <span class="n">report_writer</span> <span class="o">=</span> <span class="n">get_report_writer</span><span class="p">(</span>
         <span class="n">processor_chip_x</span><span class="p">,</span> <span class="n">processor_chip_y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">,</span>
-        <span class="n">hostname</span><span class="p">,</span> <span class="n">report_directory</span><span class="o">=</span><span class="n">report_directory</span><span class="p">,</span>
-        <span class="n">write_text_specs</span><span class="o">=</span><span class="n">write_text_specs</span><span class="p">)</span>
+        <span class="n">hostname</span><span class="p">,</span> <span class="n">report_directory</span><span class="o">=</span><span class="n">report_directory</span><span class="p">)</span>
 
     <span class="c1"># build the file writer for the spec</span>
     <span class="n">spec</span> <span class="o">=</span> <span class="n">DataSpecificationGenerator</span><span class="p">(</span><span class="n">data_writer</span><span class="p">,</span> <span class="n">report_writer</span><span class="p">)</span>
@@ -142,7 +140,7 @@
 
 <div class="viewcode-block" id="get_report_writer"><a class="viewcode-back" href="../../data_specification.html#data_specification.utility_calls.get_report_writer">[docs]</a><span class="k">def</span> <span class="nf">get_report_writer</span><span class="p">(</span>
         <span class="n">processor_chip_x</span><span class="p">,</span> <span class="n">processor_chip_y</span><span class="p">,</span> <span class="n">processor_id</span><span class="p">,</span>
-        <span class="n">hostname</span><span class="p">,</span> <span class="n">report_directory</span><span class="o">=</span><span class="s2">&quot;TEMP&quot;</span><span class="p">,</span> <span class="n">write_text_specs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">hostname</span><span class="p">,</span> <span class="n">report_directory</span><span class="o">=</span><span class="s2">&quot;TEMP&quot;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Check if text reports are needed, and if so initialise the report\</span>
 <span class="sd">        writer to send down to DSG.</span>
 
@@ -151,15 +149,13 @@
 <span class="sd">    :param int processor_id: The processor ID</span>
 <span class="sd">    :param str hostname: The hostname of the SpiNNaker machine</span>
 <span class="sd">    :param str report_directory: the directory for the reports folder</span>
-<span class="sd">    :param bool write_text_specs:</span>
-<span class="sd">        True if a textual version of the specification should be written</span>
 <span class="sd">    :return: the report_writer_object, or None if not reporting</span>
 <span class="sd">    :rtype: ~io.FileIO or None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
 
     <span class="c1"># check if text reports are needed at all</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">write_text_specs</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">get_config_bool</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_text_specs&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="c1"># initialise the report writer to send down to DSG</span>

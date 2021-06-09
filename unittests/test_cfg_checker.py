@@ -16,14 +16,13 @@
 import os
 import unittest
 from spinn_utilities.config_holder import run_config_checks
-from data_specification.config_setup import reset_configs
+from data_specification.config_setup import unittest_setup
 
 
 class TestCfgChecker(unittest.TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        reset_configs()
+    def setUp(self):
+        unittest_setup()
 
     def test_cfg_check(self):
         unittests = os.path.dirname(__file__)

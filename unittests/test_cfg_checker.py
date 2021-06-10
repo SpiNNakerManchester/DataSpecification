@@ -13,9 +13,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
--r requirements.txt
-flake8
-coverage >= 4.4, < 5.0
-# pytest will be brought in by pytest-cov
-pytest-cov
-sphinx >= 4
+import os
+import unittest
+from spinn_utilities.config_holder import run_config_checks
+from data_specification.config_setup import reset_configs
+
+
+class TestCfgChecker(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        reset_configs()
+
+    def test_cfg_check(self):
+        unittests = os.path.dirname(__file__)
+        parent = os.path.dirname(unittests)
+        data_specification = os.path.join(parent, "data_specification")
+        run_config_checks(directories=[
+            data_specification,  unittests])

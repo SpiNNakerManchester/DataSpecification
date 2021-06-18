@@ -14,6 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class MemoryRegion(object):
+class AbstractMemoryRegion(object):
     """ Identifies something as a Memory region
     """

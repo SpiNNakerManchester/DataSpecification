@@ -12,10 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from .memory_region import MemoryRegion
+from .abstract_memory_region import AbstractMemoryRegion
 
 
-class MemoryRegionReal(MemoryRegion):
+class MemoryRegionReal(AbstractMemoryRegion):
     """ Memory region storage object.
     """
 

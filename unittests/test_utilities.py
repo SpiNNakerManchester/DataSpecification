@@ -15,7 +15,7 @@
 
 import os.path
 import unittest
-from data_specification.config_setup import reset_configs
+from data_specification.config_setup import unittest_setup
 from data_specification.utility_calls import (
     get_region_base_address_offset, get_data_spec_and_file_writer_filename)
 
@@ -23,7 +23,7 @@ from data_specification.utility_calls import (
 class TestingUtilities(unittest.TestCase):
 
     def setUp(self):
-        reset_configs()
+        unittest_setup()
 
     def test_get_region_base_address_offset(self):
         val = get_region_base_address_offset(48, 7)

@@ -13,20 +13,31 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
+import os.path
 import unittest
-from spinn_utilities.config_holder import run_config_checks
 from data_specification.config_setup import unittest_setup
+from data_specification.utility_calls import (
+    get_region_base_address_offset, get_data_spec_and_file_writer_filename)
 
 
-class TestCfgChecker(unittest.TestCase):
+class TestingUtilities(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
 
-    def test_cfg_check(self):
-        unittests = os.path.dirname(__file__)
-        parent = os.path.dirname(unittests)
-        data_specification = os.path.join(parent, "data_specification")
-        run_config_checks(directories=[
-            data_specification,  unittests])
+    def test_get_region_base_address_offset(self):
+        val = get_region_base_address_offset(48, 7)
+        self.assertEqual(val, 84)
+
+    def test_get_data_spec_and_file_writer_filename(self):
+        a, b = get_data_spec_and_file_writer_filename(
+            2, 3, 5, "example.com", "TEMP", "TEMP")
+        self.assertEqual(os.path.split(a)[-1],
+                         "example.com_dataSpec_2_3_5.dat")
+        # Should be a DSG
+        self.assertEqual(b.region_sizes,
+                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+
+if __name__ == '__main__':
+    unittest.main()

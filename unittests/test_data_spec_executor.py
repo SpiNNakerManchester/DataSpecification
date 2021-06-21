@@ -18,6 +18,7 @@ import io
 import struct
 from tempfile import mktemp
 from spinn_machine import SDRAM
+from data_specification.config_setup import unittest_setup
 from data_specification.enums import DataType
 from data_specification import (
     DataSpecificationExecutor, DataSpecificationGenerator, constants)
@@ -25,6 +26,9 @@ from data_specification.exceptions import NoMoreException
 
 
 class TestDataSpecExecutor(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_simple_spec(self):
 

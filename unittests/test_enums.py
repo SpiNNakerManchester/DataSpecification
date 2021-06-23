@@ -15,12 +15,17 @@
 
 import unittest
 import decimal
+from data_specification.config_setup import unittest_setup
 from data_specification.enums import (
     ArithmeticOperation, Commands, Condition, DataType, LogicOperation,
     RandomNumberGenerator)
 
 
 class TestingEnums(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
+
     def test_arithmetic_operation_enum(self):
         self.assertEqual(ArithmeticOperation.ADD.value, 0)
         self.assertEqual(ArithmeticOperation.SUBTRACT.value, 1)

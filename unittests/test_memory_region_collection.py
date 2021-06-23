@@ -15,11 +15,16 @@
 
 import unittest
 from data_specification import MemoryRegionCollection, MemoryRegionReal
+from data_specification.config_setup import unittest_setup
 from data_specification.exceptions import (
     RegionInUseException, NoRegionSelectedException)
 
 
 class MyTestCase(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
+
     def test_mrc_basics(self):
         mrc = MemoryRegionCollection(16)
         self.assertEqual(len(mrc), 16)

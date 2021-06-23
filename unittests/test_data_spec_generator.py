@@ -20,6 +20,7 @@ import struct
 import tempfile
 from spinn_machine import SDRAM
 from data_specification import constants, DataSpecificationGenerator
+from data_specification.config_setup import unittest_setup
 from data_specification.exceptions import (
     TypeMismatchException, ParameterOutOfBoundsException,
     RegionInUseException, NotAllocatedException, StructureInUseException,
@@ -37,6 +38,7 @@ _64BIT_VALUE = 0x1234567890ABCDEF
 
 class TestDataSpecGeneration(unittest.TestCase):
     def setUp(self):
+        unittest_setup()
         self.temp_dir = tempfile.mkdtemp()
         self.spec_file = os.path.join(self.temp_dir, "spec")
         self.report_file = os.path.join(self.temp_dir, "report")

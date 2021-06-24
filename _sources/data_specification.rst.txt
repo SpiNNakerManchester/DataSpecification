@@ -29,14 +29,6 @@ data\_specification.exceptions module
    :undoc-members:
    :show-inheritance:
 
-data\_specification.utility\_calls module
------------------------------------------
-
-.. automodule:: data_specification.utility_calls
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

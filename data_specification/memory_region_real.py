@@ -12,9 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from .abstract_memory_region import AbstractMemoryRegion
 
 
-class MemoryRegion(object):
+class MemoryRegionReal(AbstractMemoryRegion):
     """ Memory region storage object.
     """
 
@@ -23,15 +24,18 @@ class MemoryRegion(object):
         "_allocated_size",
         "_region_data",
         "_write_pointer",
-        "_max_write_pointer"
+        "_max_write_pointer",
+        "_reference"
     ]
 
-    def __init__(self, unfilled, size):
+    def __init__(self, unfilled, size, reference=None):
         """
         :param bool unfilled: if the region should not be written to by the
             data specification (i.e., because the vertex uses it as a working
             data region or an output region)
         :param int size: the size of the region, in bytes
+        :param reference: An optional globally unique reference for the region
+        :type reference: int or None
         """
         #: flag that states if the region is filled or not
         self._unfilled = unfilled
@@ -43,6 +47,8 @@ class MemoryRegion(object):
         self._write_pointer = 0
         #: the max point where if written over, it will cause an error
         self._max_write_pointer = 0
+        #: the globally unique reference or None
+        self._reference = reference
 
     @property
     def allocated_size(self):
@@ -111,3 +117,11 @@ class MemoryRegion(object):
         self._write_pointer += n_bytes
         self._max_write_pointer = max((
             self._write_pointer, self._max_write_pointer))
+
+    @property
+    def reference(self):
+        """ The globally unique reference of this region, or None if none
+
+        :rtype: int or None
+        """
+        return self._reference

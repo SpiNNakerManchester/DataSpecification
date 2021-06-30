@@ -64,13 +64,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions">AbstractExecutorFunctions (class in data_specification.spi)</a>
 </li>
+      <li><a href="data_specification.html#data_specification.AbstractMemoryRegion">AbstractMemoryRegion (class in data_specification)</a>
+</li>
       <li><a href="data_specification.enums.html#data_specification.enums.ArithmeticOperation.ADD">ADD (data_specification.enums.ArithmeticOperation attribute)</a>
 </li>
       <li><a href="data_specification.enums.html#data_specification.enums.Commands.ALIGN_WR_PTR">ALIGN_WR_PTR (data_specification.enums.Commands attribute)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.align_write_pointer">align_write_pointer() (data_specification.DataSpecificationGenerator method)</a>
 </li>
-      <li><a href="data_specification.html#data_specification.MemoryRegion.allocated_size">allocated_size (data_specification.MemoryRegion property)</a>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.allocated_size">allocated_size (data_specification.MemoryRegionReal property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -120,10 +122,10 @@
 </li>
       <li><a href="data_specification.enums.html#data_specification.enums.Condition">Condition (class in data_specification.enums)</a>
 </li>
-      <li><a href="data_specification.enums.html#data_specification.enums.Commands.CONSTRUCT">CONSTRUCT (data_specification.enums.Commands attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="data_specification.enums.html#data_specification.enums.Commands.CONSTRUCT">CONSTRUCT (data_specification.enums.Commands attribute)</a>
+</li>
       <li><a href="data_specification.enums.html#data_specification.enums.Commands.COPY_PARAM">COPY_PARAM (data_specification.enums.Commands attribute)</a>
 </li>
       <li><a href="data_specification.enums.html#data_specification.enums.Commands.COPY_STRUCT">COPY_STRUCT (data_specification.enums.Commands attribute)</a>
@@ -131,8 +133,6 @@
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.copy_structure">copy_structure() (data_specification.DataSpecificationGenerator method)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.copy_structure_parameter">copy_structure_parameter() (data_specification.DataSpecificationGenerator method)</a>
-</li>
-      <li><a href="data_specification.html#data_specification.MemoryRegionCollection.count_used_regions">count_used_regions() (data_specification.MemoryRegionCollection method)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.create_cmd">create_cmd() (data_specification.DataSpecificationGenerator method)</a>
 </li>
@@ -297,10 +297,10 @@
       </ul></li>
       <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_struct">execute_end_struct() (data_specification.spi.AbstractExecutorFunctions method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_free">execute_free() (data_specification.spi.AbstractExecutorFunctions method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_get_random_rumber">execute_get_random_rumber() (data_specification.spi.AbstractExecutorFunctions method)</a>
 </li>
       <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_get_wr_ptr">execute_get_wr_ptr() (data_specification.spi.AbstractExecutorFunctions method)</a>
@@ -331,6 +331,12 @@
 </li>
       <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_read_param">execute_read_param() (data_specification.spi.AbstractExecutorFunctions method)</a>
 </li>
+      <li><a href="data_specification.html#data_specification.DataSpecificationExecutorFunctions.execute_reference">execute_reference() (data_specification.DataSpecificationExecutorFunctions method)</a>
+
+      <ul>
+        <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reference">(data_specification.spi.AbstractExecutorFunctions method)</a>
+</li>
+      </ul></li>
       <li><a href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reformat">execute_reformat() (data_specification.spi.AbstractExecutorFunctions method)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationExecutorFunctions.execute_reserve">execute_reserve() (data_specification.DataSpecificationExecutorFunctions method)</a>
@@ -431,7 +437,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_specification.enums.html#data_specification.enums.Commands.IF">IF (data_specification.enums.Commands attribute)</a>
 </li>
-      <li><a href="data_specification.html#data_specification.MemoryRegion.increment_write_pointer">increment_write_pointer() (data_specification.MemoryRegion method)</a>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.increment_write_pointer">increment_write_pointer() (data_specification.MemoryRegionReal method)</a>
 </li>
       <li><a href="data_specification.enums.html#data_specification.enums.DataType.INT16">INT16 (data_specification.enums.DataType attribute)</a>
 </li>
@@ -450,8 +456,6 @@
       <li><a href="data_specification.html#data_specification.exceptions.InvalidSizeException">InvalidSizeException</a>
 </li>
       <li><a href="data_specification.html#data_specification.MemoryRegionCollection.is_empty">is_empty() (data_specification.MemoryRegionCollection method)</a>
-</li>
-      <li><a href="data_specification.html#data_specification.MemoryRegionCollection.is_unfilled">is_unfilled() (data_specification.MemoryRegionCollection method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -511,7 +515,7 @@
 </li>
       <li><a href="data_specification.html#data_specification.constants.MAX_STRUCT_SLOTS">MAX_STRUCT_SLOTS (in module data_specification.constants)</a>
 </li>
-      <li><a href="data_specification.html#data_specification.MemoryRegion.max_write_pointer">max_write_pointer (data_specification.MemoryRegion property)</a>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.max_write_pointer">max_write_pointer (data_specification.MemoryRegionReal property)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationExecutor.mem_regions">mem_regions (data_specification.DataSpecificationExecutor property)</a>
 
@@ -521,9 +525,11 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_specification.html#data_specification.MemoryRegion">MemoryRegion (class in data_specification)</a>
-</li>
       <li><a href="data_specification.html#data_specification.MemoryRegionCollection">MemoryRegionCollection (class in data_specification)</a>
+</li>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal">MemoryRegionReal (class in data_specification)</a>
+</li>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReference">MemoryRegionReference (class in data_specification)</a>
 </li>
       <li><a href="data_specification.enums.html#data_specification.enums.RandomNumberGenerator.MERSENNE_TWISTER">MERSENNE_TWISTER (data_specification.enums.RandomNumberGenerator attribute)</a>
 </li>
@@ -554,9 +560,9 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_specification.html#data_specification.MemoryRegionCollection.needs_to_write_region">needs_to_write_region() (data_specification.MemoryRegionCollection method)</a>
-</li>
       <li><a href="data_specification.html#data_specification.exceptions.NestedFunctionException">NestedFunctionException</a>
+</li>
+      <li><a href="data_specification.html#data_specification.ReferenceContext.next">next() (data_specification.ReferenceContext class method)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.no_operation">no_operation() (data_specification.DataSpecificationGenerator method)</a>
 </li>
@@ -622,27 +628,47 @@
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.read_value">read_value() (data_specification.DataSpecificationGenerator method)</a>
 </li>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReference.ref">ref (data_specification.MemoryRegionReference property)</a>
+</li>
+      <li><a href="data_specification.enums.html#data_specification.enums.Commands.REFERENCE">REFERENCE (data_specification.enums.Commands attribute)</a>
+</li>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.reference">reference (data_specification.MemoryRegionReal property)</a>
+</li>
+      <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.reference_memory_region">reference_memory_region() (data_specification.DataSpecificationGenerator method)</a>
+</li>
+      <li><a href="data_specification.html#data_specification.DataSpecificationExecutor.referenceable_regions">referenceable_regions (data_specification.DataSpecificationExecutor property)</a>
+
+      <ul>
+        <li><a href="data_specification.html#data_specification.DataSpecificationExecutorFunctions.referenceable_regions">(data_specification.DataSpecificationExecutorFunctions property)</a>
+</li>
+      </ul></li>
+      <li><a href="data_specification.html#data_specification.ReferenceContext">ReferenceContext (class in data_specification)</a>
+</li>
+      <li><a href="data_specification.html#data_specification.DataSpecificationExecutor.references_to_fill">references_to_fill (data_specification.DataSpecificationExecutor property)</a>
+
+      <ul>
+        <li><a href="data_specification.html#data_specification.DataSpecificationExecutorFunctions.references_to_fill">(data_specification.DataSpecificationExecutorFunctions property)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_specification.enums.html#data_specification.enums.Commands.REFORMAT">REFORMAT (data_specification.enums.Commands attribute)</a>
 </li>
-      <li><a href="data_specification.html#data_specification.MemoryRegion.region_data">region_data (data_specification.MemoryRegion property)</a>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.region_data">region_data (data_specification.MemoryRegionReal property)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.region_sizes">region_sizes (data_specification.DataSpecificationGenerator property)</a>
 </li>
       <li><a href="data_specification.html#data_specification.exceptions.RegionExhaustedException">RegionExhaustedException</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="data_specification.html#data_specification.exceptions.RegionInUseException">RegionInUseException</a>
 </li>
       <li><a href="data_specification.html#data_specification.exceptions.RegionNotAllocatedException">RegionNotAllocatedException</a>
 </li>
       <li><a href="data_specification.html#data_specification.exceptions.RegionOutOfBoundsException">RegionOutOfBoundsException</a>
 </li>
-      <li><a href="data_specification.html#data_specification.MemoryRegionCollection.regions">regions (data_specification.MemoryRegionCollection property)</a>
-</li>
       <li><a href="data_specification.html#data_specification.exceptions.RegionUnfilledException">RegionUnfilledException</a>
 </li>
-      <li><a href="data_specification.html#data_specification.MemoryRegion.remaining_space">remaining_space (data_specification.MemoryRegion property)</a>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.remaining_space">remaining_space (data_specification.MemoryRegionReal property)</a>
 </li>
       <li><a href="data_specification.enums.html#data_specification.enums.Commands.RESERVE">RESERVE (data_specification.enums.Commands attribute)</a>
 </li>
@@ -752,7 +778,7 @@
 </li>
       <li><a href="data_specification.enums.html#data_specification.enums.DataType.UINT8">UINT8 (data_specification.enums.DataType attribute)</a>
 </li>
-      <li><a href="data_specification.html#data_specification.MemoryRegion.unfilled">unfilled (data_specification.MemoryRegion property)</a>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.unfilled">unfilled (data_specification.MemoryRegionReal property)</a>
 </li>
       <li><a href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError">UnimplementedDSECommandError</a>
 </li>
@@ -784,7 +810,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="data_specification.html#data_specification.MemoryRegion.write_pointer">write_pointer (data_specification.MemoryRegion property)</a>
+      <li><a href="data_specification.html#data_specification.MemoryRegionReal.write_pointer">write_pointer (data_specification.MemoryRegionReal property)</a>
 </li>
       <li><a href="data_specification.html#data_specification.DataSpecificationGenerator.write_repeated_value">write_repeated_value() (data_specification.DataSpecificationGenerator method)</a>
 </li>

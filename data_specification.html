@@ -605,6 +605,13 @@ generated specification at the receiving end of a slow connection.</p></li>
 <section id="main-api">
 <h3>Main API<a class="headerlink" href="#main-api" title="Permalink to this headline">¶</a></h3>
 <dl class="py class">
+<dt class="sig sig-object py" id="data_specification.AbstractMemoryRegion">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">AbstractMemoryRegion</span></span><a class="reference internal" href="_modules/data_specification/abstract_memory_region.html#AbstractMemoryRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.AbstractMemoryRegion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Identifies something as a Memory region</p>
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
@@ -693,7 +700,7 @@ the available memory</p></li>
 <dd class="field-even"><p>The region, or None if the region was not allocated</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#data_specification.MemoryRegion" title="data_specification.MemoryRegion">MemoryRegion</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#data_specification.MemoryRegionReal" title="data_specification.MemoryRegionReal">MemoryRegionReal</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -704,7 +711,29 @@ the available memory</p></li>
 <dd><p>An enumeration of the mapping from region ID to region holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference internal" href="#data_specification.MemoryRegion" title="data_specification.MemoryRegion">MemoryRegion</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a>))</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, MemoryRegion or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a>))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor.referenceable_regions">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">referenceable_regions</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutor.referenceable_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>The regions that can be referenced by others</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor.references_to_fill">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">references_to_fill</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutor.references_to_fill" title="Permalink to this definition">¶</a></dt>
+<dd><p>The references that need to be filled</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -788,6 +817,28 @@ DSE if used.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.execute_reference">
+<span class="sig-name descname"><span class="pre">execute_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_reference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.execute_reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>This command reserves a region and sets it to reference another</p>
+<p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.REFERENCE" title="data_specification.enums.Commands.REFERENCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REFERENCE</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>No value returned</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
+<li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
+<li><p><a class="reference internal" href="#data_specification.exceptions.ParameterOutOfBoundsException" title="data_specification.exceptions.ParameterOutOfBoundsException"><strong>ParameterOutOfBoundsException</strong></a> – If the requested size of the region is beyond the available            memory space</p></li>
 </ul>
 </dd>
 </dl>
@@ -918,6 +969,28 @@ the required data</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><a class="reference internal" href="#data_specification.MemoryRegionCollection" title="data_specification.MemoryRegionCollection">MemoryRegionCollection</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.referenceable_regions">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">referenceable_regions</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.referenceable_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>The regions that can be referenced by others</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.references_to_fill">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">references_to_fill</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.references_to_fill" title="Permalink to this definition">¶</a></dt>
+<dd><p>The references that need to be filled</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1855,6 +1928,30 @@ overflow the data type</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.reference_memory_region">
+<span class="sig-name descname"><span class="pre">reference_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.reference_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.reference_memory_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert command to reference another memory region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of the region to reserve, from 0 to 15</p></li>
+<li><p><strong>ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The identifier of the region to reference</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – An optional label for the region</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="#data_specification.exceptions.DataUndefinedWriterException" title="data_specification.exceptions.DataUndefinedWriterException"><strong>DataUndefinedWriterException</strong></a> – If the binary specification file writer has not been initialised</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#IOError" title="(in Python v3.8)"><strong>IOError</strong></a> – If a write to external storage fails</p></li>
+<li><p><a class="reference internal" href="#data_specification.exceptions.RegionInUseException" title="data_specification.exceptions.RegionInUseException"><strong>RegionInUseException</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">region</span></code> was already reserved</p></li>
+<li><p><a class="reference internal" href="#data_specification.exceptions.ParameterOutOfBoundsException" title="data_specification.exceptions.ParameterOutOfBoundsException"><strong>ParameterOutOfBoundsException</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">region</span></code> requested was out of the allowed range, or the
+<code class="docutils literal notranslate"><span class="pre">size</span></code> was too big to fit in SDRAM</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.region_sizes">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">region_sizes</span></span><a class="headerlink" href="#data_specification.DataSpecificationGenerator.region_sizes" title="Permalink to this definition">¶</a></dt>
@@ -1872,7 +1969,7 @@ overflow the data type</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.reserve_memory_region">
-<span class="sig-name descname"><span class="pre">reserve_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shrink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.reserve_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.reserve_memory_region" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reserve_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.reserve_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.reserve_memory_region" title="Permalink to this definition">¶</a></dt>
 <dd><p>Insert command to reserve a memory region</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1881,7 +1978,7 @@ overflow the data type</p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size to reserve for the region, in bytes</p></li>
 <li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – An optional label for the region</p></li>
 <li><p><strong>empty</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Specifies if the region will be left empty</p></li>
-<li><p><strong>shrink</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Specifies if the region will be compressed</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A globally unique reference for this region</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -2395,100 +2492,6 @@ valid register ID</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfilled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegion" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Memory region storage object.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>unfilled</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – if the region should not be written to by the
-data specification (i.e., because the vertex uses it as a working
-data region or an output region)</p></li>
-<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the size of the region, in bytes</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py property">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion.allocated_size">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">allocated_size</span></span><a class="headerlink" href="#data_specification.MemoryRegion.allocated_size" title="Permalink to this definition">¶</a></dt>
-<dd><p>The size of the region.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion.increment_write_pointer">
-<span class="sig-name descname"><span class="pre">increment_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region.html#MemoryRegion.increment_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegion.increment_write_pointer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Advance the write pointer.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>n_bytes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of bytes to advance the pointer by.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion.max_write_pointer">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">max_write_pointer</span></span><a class="headerlink" href="#data_specification.MemoryRegion.max_write_pointer" title="Permalink to this definition">¶</a></dt>
-<dd><p>The max point where if written over, it will cause an error.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion.region_data">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">region_data</span></span><a class="headerlink" href="#data_specification.MemoryRegion.region_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>The buffer which holds the data written in this region.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)">bytearray</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion.remaining_space">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">remaining_space</span></span><a class="headerlink" href="#data_specification.MemoryRegion.remaining_space" title="Permalink to this definition">¶</a></dt>
-<dd><p>The space between the current write pointer and the end of the            region, which is the number of bytes remaining in the region that            can be written.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion.unfilled">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">unfilled</span></span><a class="headerlink" href="#data_specification.MemoryRegion.unfilled" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether the region is marked as not fillable; unfilled regions            will not contain any data at write time.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data_specification.MemoryRegion.write_pointer">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">write_pointer</span></span><a class="headerlink" href="#data_specification.MemoryRegion.write_pointer" title="Permalink to this definition">¶</a></dt>
-<dd><p>The position in the buffer where data will be written to next.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="data_specification.MemoryRegionCollection">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegionCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_regions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionCollection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
@@ -2498,17 +2501,6 @@ data region or an output region)</p></li>
 <dd class="field-odd"><p><strong>n_regions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of regions in the collection.</p>
 </dd>
 </dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="data_specification.MemoryRegionCollection.count_used_regions">
-<span class="sig-name descname"><span class="pre">count_used_regions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.count_used_regions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionCollection.count_used_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>The number of regions in the collection that are used.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.MemoryRegionCollection.is_empty">
 <span class="sig-name descname"><span class="pre">is_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.is_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionCollection.is_empty" title="Permalink to this definition">¶</a></dt>
@@ -2522,48 +2514,146 @@ data region or an output region)</p></li>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="data_specification.MemoryRegionCollection.is_unfilled">
-<span class="sig-name descname"><span class="pre">is_unfilled</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.is_unfilled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionCollection.is_unfilled" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegionReal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unfilled</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_real.html#MemoryRegionReal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionReal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_specification.AbstractMemoryRegion" title="data_specification.abstract_memory_region.AbstractMemoryRegion"><code class="xref py py-class docutils literal notranslate"><span class="pre">data_specification.abstract_memory_region.AbstractMemoryRegion</span></code></a></p>
+<p>Memory region storage object.</p>
+<dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the region</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unfilled</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – if the region should not be written to by the
+data specification (i.e., because the vertex uses it as a working
+data region or an output region)</p></li>
+<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the size of the region, in bytes</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – An optional globally unique reference for the region</p></li>
+</ul>
 </dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.allocated_size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">allocated_size</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.allocated_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="data_specification.MemoryRegionCollection.needs_to_write_region">
-<span class="sig-name descname"><span class="pre">needs_to_write_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection.needs_to_write_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionCollection.needs_to_write_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Helper method which determines if a unfilled region actually             needs to be written (optimisation to stop large data files).</p>
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.increment_write_pointer">
+<span class="sig-name descname"><span class="pre">increment_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_real.html#MemoryRegionReal.increment_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionReal.increment_write_pointer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Advance the write pointer.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the region ID to which the test is being ran on</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>whether the region needs to be written</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><a class="reference internal" href="#data_specification.exceptions.NoRegionSelectedException" title="data_specification.exceptions.NoRegionSelectedException"><strong>NoRegionSelectedException</strong></a> – when the ID is beyond the expected region range</p>
+<dd class="field-odd"><p><strong>n_bytes</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of bytes to advance the pointer by.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="data_specification.MemoryRegionCollection.regions">
-<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">regions</span></span><a class="headerlink" href="#data_specification.MemoryRegionCollection.regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>The regions in the collection.</p>
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.max_write_pointer">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">max_write_pointer</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.max_write_pointer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The max point where if written over, it will cause an error.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference internal" href="#data_specification.MemoryRegion" title="data_specification.MemoryRegion">MemoryRegion</a>)</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.reference">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">reference</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.reference" title="Permalink to this definition">¶</a></dt>
+<dd><p>The globally unique reference of this region, or None if none</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.region_data">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">region_data</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.region_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>The buffer which holds the data written in this region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#bytearray" title="(in Python v3.8)">bytearray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.remaining_space">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">remaining_space</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.remaining_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>The space between the current write pointer and the end of the            region, which is the number of bytes remaining in the region that            can be written.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.unfilled">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">unfilled</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.unfilled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the region is marked as not fillable; unfilled regions            will not contain any data at write time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReal.write_pointer">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">write_pointer</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.write_pointer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The position in the buffer where data will be written to next.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReference">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegionReference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_reference.html#MemoryRegionReference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionReference" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#data_specification.AbstractMemoryRegion" title="data_specification.abstract_memory_region.AbstractMemoryRegion"><code class="xref py py-class docutils literal notranslate"><span class="pre">data_specification.abstract_memory_region.AbstractMemoryRegion</span></code></a></p>
+<p>A reference to another memory region</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Identifies what this refers to</p>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="data_specification.MemoryRegionReference.ref">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">ref</span></span><a class="headerlink" href="#data_specification.MemoryRegionReference.ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Identifies what this references</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data_specification.ReferenceContext">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">ReferenceContext</span></span><a class="reference internal" href="_modules/data_specification/reference_context.html#ReferenceContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.ReferenceContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Allows the generation of unique references within a context</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="data_specification.ReferenceContext.next">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/reference_context.html#ReferenceContext.next"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.ReferenceContext.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the next reference in the current context</p>
 </dd></dl>
 
 </dd></dl>

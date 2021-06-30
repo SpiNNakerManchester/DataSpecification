@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>data_specification.memory_region &#8212; DataSpecification 6.0.1 documentation</title>
+    <title>data_specification.memory_region_real &#8212; DataSpecification 6.0.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
@@ -26,7 +26,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">DataSpecification 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">data_specification.memory_region</a></li> 
+        <li class="nav-item nav-item-this"><a href="">data_specification.memory_region_real</a></li> 
       </ul>
     </div>  
 
@@ -35,7 +35,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for data_specification.memory_region</h1><div class="highlight"><pre>
+  <h1>Source code for data_specification.memory_region_real</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
@@ -50,9 +50,10 @@
 <span class="c1">#</span>
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">from</span> <span class="nn">.abstract_memory_region</span> <span class="kn">import</span> <span class="n">AbstractMemoryRegion</span>
 
 
-<div class="viewcode-block" id="MemoryRegion"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegion">[docs]</a><span class="k">class</span> <span class="nc">MemoryRegion</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MemoryRegionReal"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionReal">[docs]</a><span class="k">class</span> <span class="nc">MemoryRegionReal</span><span class="p">(</span><span class="n">AbstractMemoryRegion</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Memory region storage object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -61,15 +62,18 @@
         <span class="s2">&quot;_allocated_size&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_region_data&quot;</span><span class="p">,</span>
         <span class="s2">&quot;_write_pointer&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;_max_write_pointer&quot;</span>
+        <span class="s2">&quot;_max_write_pointer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_reference&quot;</span>
     <span class="p">]</span>
 
-<div class="viewcode-block" id="MemoryRegion.__init__"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegion.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unfilled</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<div class="viewcode-block" id="MemoryRegionReal.__init__"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionReal.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unfilled</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param bool unfilled: if the region should not be written to by the</span>
 <span class="sd">            data specification (i.e., because the vertex uses it as a working</span>
 <span class="sd">            data region or an output region)</span>
 <span class="sd">        :param int size: the size of the region, in bytes</span>
+<span class="sd">        :param reference: An optional globally unique reference for the region</span>
+<span class="sd">        :type reference: int or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1">#: flag that states if the region is filled or not</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_unfilled</span> <span class="o">=</span> <span class="n">unfilled</span>
@@ -80,7 +84,9 @@
         <span class="c1">#: the position in the memory where the writing is currently occurring</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_pointer</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="c1">#: the max point where if written over, it will cause an error</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span> <span class="o">=</span> <span class="mi">0</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1">#: the globally unique reference or None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reference</span> <span class="o">=</span> <span class="n">reference</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allocated_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -141,14 +147,22 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span>
 
-<div class="viewcode-block" id="MemoryRegion.increment_write_pointer"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegion.increment_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">increment_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">):</span>
+<div class="viewcode-block" id="MemoryRegionReal.increment_write_pointer"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionReal.increment_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">increment_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Advance the write pointer.</span>
 
 <span class="sd">        :param int n_bytes: The number of bytes to advance the pointer by.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_pointer</span> <span class="o">+=</span> <span class="n">n_bytes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_write_pointer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span><span class="p">))</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_pointer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">reference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The globally unique reference of this region, or None if none</span>
+
+<span class="sd">        :rtype: int or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reference</span></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -182,7 +196,7 @@
              >modules</a> |</li>
         <li class="nav-item nav-item-0"><a href="../../index.html">DataSpecification 6.0.1 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">data_specification.memory_region</a></li> 
+        <li class="nav-item nav-item-this"><a href="">data_specification.memory_region_real</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

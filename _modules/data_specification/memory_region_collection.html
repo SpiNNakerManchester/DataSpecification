@@ -101,57 +101,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">)</span></div>
 
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The regions in the collection.</span>
-
-<span class="sd">        :rtype: iterable(MemoryRegion)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">r</span>
-
 <div class="viewcode-block" id="MemoryRegionCollection.is_empty"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection.is_empty">[docs]</a>    <span class="k">def</span> <span class="nf">is_empty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int region: The ID of the region</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span></div>
-
-<div class="viewcode-block" id="MemoryRegionCollection.is_unfilled"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection.is_unfilled">[docs]</a>    <span class="k">def</span> <span class="nf">is_unfilled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param int region: The ID of the region</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_empty</span><span class="p">(</span><span class="n">region</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">[</span><span class="n">region</span><span class="p">]</span><span class="o">.</span><span class="n">unfilled</span></div>
-
-<div class="viewcode-block" id="MemoryRegionCollection.count_used_regions"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection.count_used_regions">[docs]</a>    <span class="k">def</span> <span class="nf">count_used_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The number of regions in the collection that are used.</span>
-
-<span class="sd">        :rtype: int</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="MemoryRegionCollection.needs_to_write_region"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection.needs_to_write_region">[docs]</a>    <span class="k">def</span> <span class="nf">needs_to_write_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Helper method which determines if a unfilled region actually \</span>
-<span class="sd">            needs to be written (optimisation to stop large data files).</span>
-
-<span class="sd">        :param int region: the region ID to which the test is being ran on</span>
-<span class="sd">        :return: whether the region needs to be written</span>
-<span class="sd">        :rtype: bool</span>
-<span class="sd">        :raise NoRegionSelectedException:</span>
-<span class="sd">            when the ID is beyond the expected region range</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">region</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">region</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">NoRegionSelectedException</span><span class="p">(</span>
-                <span class="s2">&quot;the region ID requested is beyond the supported number of &quot;</span>
-                <span class="s2">&quot;available region IDs&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_unfilled</span><span class="p">(</span><span class="n">region</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_unfilled</span><span class="p">(</span><span class="n">r_id</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">r_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">)))</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>

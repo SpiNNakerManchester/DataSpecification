@@ -280,7 +280,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self.__src1_reg is not None:
             region = self._registers[self.__src1_reg]
         else:
-            region = (cmd >> 8) & 0xF
+            region = (cmd >> 8) & 0x1F
 
         if self._mem_regions.is_empty(region):
             raise RegionUnfilledException(region, "SWITCH_FOCUS")

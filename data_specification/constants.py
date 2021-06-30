@@ -29,23 +29,23 @@ DSE_VERSION = 0x00010000
 
 # DSG Arrays and tables sizes:
 #: Maximum number of registers in DSG virtual machine.
-MAX_REGISTERS = 16
+MAX_REGISTERS = 32
 #: Maximum number of memory regions in DSG virtual machine.
-MAX_MEM_REGIONS = 16
+MAX_MEM_REGIONS = 32
 #: Maximum number of structure slots in DSG virtual machine.
-MAX_STRUCT_SLOTS = 16
+MAX_STRUCT_SLOTS = 32
 #: Maximum number of structure elements in DSG virtual machine.
 MAX_STRUCT_ELEMENTS = 255
 #: Maximum number of packing specification slots in DSG virtual machine.
-MAX_PACKSPEC_SLOTS = 16
+MAX_PACKSPEC_SLOTS = 32
 #: Maximum number of functions in DSG virtual machine.
-MAX_CONSTRUCTORS = 16
+MAX_CONSTRUCTORS = 32
 #: Maximum number of parameter lists in DSG virtual machine.
-MAX_PARAM_LISTS = 16
+MAX_PARAM_LISTS = 32
 #: Maximum number of random number generators in DSG virtual machine.
-MAX_RNGS = 16
+MAX_RNGS = 32
 #: Maximum number of random distributions in DSG virtual machine.
-MAX_RANDOM_DISTS = 16
+MAX_RANDOM_DISTS = 32
 
 #: Size of header of data spec pointer table produced by DSE, in bytes.
 APP_PTR_TABLE_HEADER_BYTE_SIZE = 8

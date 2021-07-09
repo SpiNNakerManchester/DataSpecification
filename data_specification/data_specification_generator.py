@@ -74,7 +74,7 @@ class _Field(IntEnum):
     FUNCTION = 11
     SOURCE_1 = 8
     EMPTY = 7
-    SHRINK = 6
+    REFERENCEABLE = 6
     SOURCE_2 = 4
     IMMEDIATE = 0
 
@@ -220,7 +220,7 @@ class DataSpecificationGenerator(object):
         return
 
     def reserve_memory_region(
-            self, region, size, label=None, empty=False, shrink=True):
+            self, region, size, label=None, empty=False, reference=None):
         """ Insert command to reserve a memory region
 
         :param int region: The number of the region to reserve, from 0 to 15
@@ -228,7 +228,8 @@ class DataSpecificationGenerator(object):
         :param label: An optional label for the region
         :type label: str or None
         :param bool empty: Specifies if the region will be left empty
-        :param bool shrink: Specifies if the region will be compressed
+        :param reference: A globally unique reference for this region
+        :type reference: int or None
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
         :raise IOError: If a write to external storage fails
@@ -247,12 +248,15 @@ class DataSpecificationGenerator(object):
         self._mem_slots[region] = _MemSlot(label, size, empty)
 
         cmd_word = _binencode(Commands.RESERVE, {
-            _Field.LENGTH: LEN2,
+            _Field.LENGTH: LEN2 if reference is None else LEN3,
             _Field.USAGE: NO_REGS,
             _Field.EMPTY: bool(empty),
-            _Field.SHRINK: bool(shrink),
+            _Field.REFERENCEABLE: reference is not None,
             _Field.IMMEDIATE: region})
         encoded_size = _ONE_WORD.pack(size)
+        encoded_ref = b""
+        if reference is not None:
+            encoded_ref = _ONE_WORD.pack(reference)
 
         cmd_string = Commands.RESERVE.name
         cmd_string += " memRegion={0:d} size={1:d}".format(region, size)
@@ -260,8 +264,45 @@ class DataSpecificationGenerator(object):
             cmd_string += " label='{0:s}'".format(label)
         if empty:
             cmd_string += " UNFILLED"
+        if reference is not None:
+            cmd_string += " REF {0:d}".format(reference)
 
-        self._write_command_to_files(cmd_word + encoded_size, cmd_string)
+        self._write_command_to_files(
+            cmd_word + encoded_size + encoded_ref, cmd_string)
+
+    def reference_memory_region(self, region, ref, label=None):
+        """ Insert command to reference another memory region
+
+        :param int region: The number of the region to reserve, from 0 to 15
+        :param int ref: The identifier of the region to reference
+        :param label: An optional label for the region
+        :type label: str or None
+        :raise DataUndefinedWriterException:
+            If the binary specification file writer has not been initialised
+        :raise IOError: If a write to external storage fails
+        :raise RegionInUseException: If the ``region`` was already reserved
+        :raise ParameterOutOfBoundsException:
+            If the ``region`` requested was out of the allowed range, or the
+            ``size`` was too big to fit in SDRAM
+        """
+        _bounds(Commands.REFERENCE, "memory region identifier",
+                region, 0, MAX_MEM_REGIONS)
+        if self._mem_slots[region] is not None:
+            raise RegionInUseException(region, self._mem_slots[region].label)
+
+        self._mem_slots[region] = _MemSlot(label, 0, True)
+
+        cmd_word = _binencode(Commands.REFERENCE, {
+            _Field.LENGTH: LEN2,
+            _Field.IMMEDIATE: region})
+        encoded_args = _ONE_WORD.pack(ref)
+
+        cmd_string = Commands.REFERENCE.name
+        cmd_string += " memRegion={0:d} ref={1:d}".format(region, ref)
+        if label is not None:
+            cmd_string += " label='{0:s}'".format(label)
+
+        self._write_command_to_files(cmd_word + encoded_args, cmd_string)
 
     def free_memory_region(self, region):
         """ Insert command to free a previously reserved memory region

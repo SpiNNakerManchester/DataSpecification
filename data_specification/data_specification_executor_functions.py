@@ -24,12 +24,14 @@ from .exceptions import (
     RegionInUseException, RegionNotAllocatedException,
     RegionUnfilledException, UnknownTypeLengthException)
 from data_specification.spi import AbstractExecutorFunctions
-from .memory_region import MemoryRegion
+from .memory_region_real import MemoryRegionReal
+from .memory_region_reference import MemoryRegionReference
 from .memory_region_collection import MemoryRegionCollection
 
 _ONE_BYTE = struct.Struct("<B")
 _ONE_SHORT = struct.Struct("<H")
 _ONE_WORD = struct.Struct("<I")
+_TWO_WORDS = struct.Struct("<II")
 _ONE_LONG = struct.Struct("<Q")
 _ONE_SIGNED_INT = struct.Struct("<i")
 
@@ -50,6 +52,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "_current_region",
         "_registers",
         "_mem_regions",
+        "_referenceable_regions",
+        "_references_to_fill",
 
         # Decodings of the current command
         "__cmd_size",
@@ -80,6 +84,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self._registers = [0] * MAX_REGISTERS
         #: The collection of memory regions that can be written to
         self._mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
+        #: The indices of regions that are marked as referenceable
+        self._referenceable_regions = []
+        #: The indices of regions that are references of others
+        self._references_to_fill = []
 
         #: Decoded from command: size in words
         self.__cmd_size = None
@@ -146,19 +154,29 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__unpack_cmd(cmd)
         region = cmd & 0x1F  # cmd[4:0]
 
-        if self.__cmd_size != LEN2:
+        unfilled = (cmd >> 7) & 0x1 == 0x1
+        referenceable = (cmd >> 6) & 0x1 == 0x1
+
+        if not referenceable and self.__cmd_size != LEN2:
             raise DataSpecificationSyntaxError(
                 "Command {0:s} requires one word as argument (total 2 words), "
                 "but the current encoding ({1:X}) is specified to be {2:d} "
                 "words long".format(
                     "RESERVE", cmd, self.__cmd_size))
-
-        unfilled = (cmd >> 7) & 0x1 == 0x1
+        if referenceable and self.__cmd_size != LEN3:
+            raise DataSpecificationSyntaxError(
+                "Command {0:s} requires two words as arguments (total 3 "
+                "words), but the current encoding ({1:X}) is specified to be "
+                "{2:d} words long".format("RESERVE", cmd, self.__cmd_size))
 
         if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
 
-        size = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
+        if not referenceable:
+            size = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
+            reference = None
+        else:
+            size, reference = _TWO_WORDS.unpack(self._spec_reader.read(8))
         if size & 0x3 != 0:
             size = (size + 4) - (size & 0x3)
 
@@ -166,9 +184,34 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             raise ParameterOutOfBoundsException(
                 "region size", size, 1, self._memory_space, "RESERVE")
 
-        self._mem_regions[region] = MemoryRegion(
-            unfilled=unfilled, size=size)
+        self._mem_regions[region] = MemoryRegionReal(
+            unfilled=unfilled, size=size, reference=reference)
+        if referenceable:
+            self._referenceable_regions.append(region)
         self._space_allocated += size
+
+    @overrides(AbstractExecutorFunctions.execute_reference)
+    def execute_reference(self, cmd):
+        """
+        :raise ParameterOutOfBoundsException:
+            If the requested size of the region is beyond the available\
+            memory space
+        """
+        self.__unpack_cmd(cmd)
+        region = cmd & 0x1F  # cmd[4:0]
+
+        if self.__cmd_size != LEN2:
+            raise DataSpecificationSyntaxError(
+                "Command {0:s} requires one word as argument (total 2 words), "
+                "but the current encoding ({1:X}) is specified to be {2:d} "
+                "words long".format("REFERENCE", cmd, self.__cmd_size))
+
+        if not self._mem_regions.is_empty(region):
+            raise RegionInUseException(region)
+
+        ref = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
+        self._mem_regions[region] = MemoryRegionReference(ref)
+        self._references_to_fill.append(region)
 
     @overrides(AbstractExecutorFunctions.execute_write)
     def execute_write(self, cmd):
@@ -372,3 +415,19 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         write_ptr = region.write_pointer
         region.region_data[write_ptr:write_ptr + len(data)] = data
         region.increment_write_pointer(len(data))
+
+    @property
+    def referenceable_regions(self):
+        """ The regions that can be referenced by others
+
+        :rtype: list(int)
+        """
+        return self._referenceable_regions
+
+    @property
+    def references_to_fill(self):
+        """ The references that need to be filled
+
+        :rtype: list(int)
+        """
+        return self._references_to_fill

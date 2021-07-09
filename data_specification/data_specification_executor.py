@@ -25,6 +25,7 @@ from .constants import (
     MAX_MEM_REGIONS, APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE)
 from .enums import Commands
 from .exceptions import DataSpecificationException
+from .memory_region_real import MemoryRegionReal
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
@@ -101,7 +102,7 @@ class DataSpecificationExecutor(object):
 
         :param int region_id: The ID of the region to get
         :return: The region, or None if the region was not allocated
-        :rtype: MemoryRegion or None
+        :rtype: MemoryRegionReal or None
         """
         return self.dsef.mem_regions[region_id]
 
@@ -131,12 +132,28 @@ class DataSpecificationExecutor(object):
         next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
         for i, region in self.mem_regions:
-            if region is not None:
+            if isinstance(region, MemoryRegionReal):
                 pointer_table[i] = next_free_offset + start_address
                 next_free_offset += region.allocated_size
             else:
                 pointer_table[i] = 0
         return pointer_table
+
+    @property
+    def referenceable_regions(self):
+        """ The regions that can be referenced by others
+
+        :rtype: list(int)
+        """
+        return self.dsef.referenceable_regions
+
+    @property
+    def references_to_fill(self):
+        """ The references that need to be filled
+
+        :rtype: list(int)
+        """
+        return self.dsef.references_to_fill
 
     def get_constructed_data_size(self):
         """ Return the size of the data that will be written to memory.
@@ -146,4 +163,5 @@ class DataSpecificationExecutor(object):
         """
         return APP_PTR_TABLE_BYTE_SIZE + sum(
             region.allocated_size
-            for _, region in self.mem_regions if region is not None)
+            for _, region in self.mem_regions
+            if isinstance(region, MemoryRegionReal))

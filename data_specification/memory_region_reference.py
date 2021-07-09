@@ -13,19 +13,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
+from .abstract_memory_region import AbstractMemoryRegion
 
 
-class ImportAllModule(unittest.TestCase):
+class MemoryRegionReference(AbstractMemoryRegion):
+    """ A reference to another memory region
+    """
 
-    # no unittest_setup to check all imports work without it
+    __slots__ = ["__ref"]
 
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("data_specification",
-                                       remove_pyc_files=False)
-        else:
-            package_loader.load_module("data_specification",
-                                       remove_pyc_files=True)
+    def __init__(self, ref):
+        """
+        :param int ref: Identifies what this refers to
+        """
+        self.__ref = ref
+
+    @property
+    def ref(self):
+        """ Identifies what this references
+
+        :rtype: int
+        """
+        return self.__ref

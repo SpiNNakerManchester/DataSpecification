@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2019 The University of Manchester
+# Copyright (c) 2021 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -13,19 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import unittest
-import spinn_utilities.package_loader as package_loader
 
-
-class ImportAllModule(unittest.TestCase):
-
-    # no unittest_setup to check all imports work without it
-
-    def test_import_all(self):
-        if os.environ.get('CONTINUOUS_INTEGRATION', 'false').lower() == 'true':
-            package_loader.load_module("data_specification",
-                                       remove_pyc_files=False)
-        else:
-            package_loader.load_module("data_specification",
-                                       remove_pyc_files=True)
+class AbstractMemoryRegion(object):
+    """ Identifies something as a Memory region
+    """

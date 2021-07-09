@@ -18,13 +18,18 @@ import io
 import struct
 from tempfile import mktemp
 from spinn_machine import SDRAM
+from data_specification.config_setup import unittest_setup
 from data_specification.enums import DataType
 from data_specification import (
-    DataSpecificationExecutor, DataSpecificationGenerator, constants)
+    DataSpecificationExecutor, DataSpecificationGenerator, constants,
+    MemoryRegionReference, MemoryRegionReal)
 from data_specification.exceptions import NoMoreException
 
 
 class TestDataSpecExecutor(unittest.TestCase):
+
+    def setUp(self):
+        unittest_setup()
 
     def test_simple_spec(self):
 
@@ -37,6 +42,8 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.reserve_memory_region(0, 100)
         spec.reserve_memory_region(1, 200, empty=True)
         spec.reserve_memory_region(2, 4)
+        spec.reserve_memory_region(3, 12, reference=1)
+        spec.reference_memory_region(4, 2)
         spec.switch_write_focus(0)
         spec.write_array([0, 1, 2])
         spec.set_write_pointer(20)
@@ -56,10 +63,10 @@ class TestDataSpecExecutor(unittest.TestCase):
         header_and_table_size = (constants.MAX_MEM_REGIONS + 2) * 4
         self.assertEqual(
             executor.get_constructed_data_size(),
-            header_and_table_size + 100 + 200 + 4)
+            header_and_table_size + 100 + 200 + 4 + 12)
 
         # Test the unused regions
-        for region in range(3, constants.MAX_MEM_REGIONS):
+        for region in range(5, constants.MAX_MEM_REGIONS):
             self.assertIsNone(executor.get_region(region))
 
         # Test region 0
@@ -67,19 +74,37 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertEqual(region_0.allocated_size, 100)
         self.assertEqual(region_0.max_write_pointer, 24)
         self.assertFalse(region_0.unfilled)
+        self.assertIsNone(region_0.reference)
         self.assertEqual(
             region_0.region_data[:region_0.max_write_pointer],
             struct.pack("<IIIIII", 0, 1, 2, 0, 0, 4))
 
         # Test region 1
         region_1 = executor.get_region(1)
+        self.assertIsInstance(region_1, MemoryRegionReal)
         self.assertEqual(region_1.allocated_size, 200)
         self.assertTrue(region_1.unfilled)
+        self.assertIsNone(region_1.reference)
 
         # Test region 2
         region_2 = executor.get_region(2)
+        self.assertIsInstance(region_2, MemoryRegionReal)
         self.assertEqual(region_2.allocated_size, 4)
+        self.assertIsNone(region_2.reference)
         self.assertEqual(region_2.region_data, struct.pack("<I", 10))
+
+        # Test region 3
+        region_3 = executor.get_region(3)
+        self.assertIsInstance(region_3, MemoryRegionReal)
+        self.assertEqual(region_3.allocated_size, 12)
+        self.assertEqual(region_3.reference, 1)
+        self.assertEqual(executor.referenceable_regions, [3])
+
+        # Test region 4
+        region_4 = executor.get_region(4)
+        self.assertIsInstance(region_4, MemoryRegionReference)
+        self.assertEqual(region_4.ref, 2)
+        self.assertEqual(executor.references_to_fill, [4])
 
         # Test the pointer table
         table = executor.get_pointer_table(0)
@@ -87,7 +112,9 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertEqual(table[0], header_and_table_size)
         self.assertEqual(table[1], header_and_table_size + 100)
         self.assertEqual(table[2], header_and_table_size + 300)
-        for region in range(3, constants.MAX_MEM_REGIONS):
+        self.assertEqual(table[3], header_and_table_size + 304)
+        # 4 is also 0 because it is a reference
+        for region in range(4, constants.MAX_MEM_REGIONS):
             self.assertEqual(table[region], 0)
 
         # Test the header

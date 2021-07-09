@@ -68,9 +68,13 @@ from .data_specification_executor import DataSpecificationExecutor
 from .data_specification_executor_functions import (
     DataSpecificationExecutorFunctions)
 from .data_specification_generator import DataSpecificationGenerator
-from .memory_region import MemoryRegion
+from .abstract_memory_region import AbstractMemoryRegion
+from .memory_region_real import MemoryRegionReal
+from .memory_region_reference import MemoryRegionReference
 from .memory_region_collection import MemoryRegionCollection
+from .reference_context import ReferenceContext
 
 __all__ = ["DataSpecificationExecutor", "DataSpecificationExecutorFunctions",
-           "DataSpecificationGenerator", "MemoryRegion",
-           "MemoryRegionCollection"]
+           "DataSpecificationGenerator", "AbstractMemoryRegion",
+           "MemoryRegionReal", "MemoryRegionReference",
+           "MemoryRegionCollection", "ReferenceContext"]

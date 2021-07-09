@@ -803,7 +803,8 @@
                 <span class="n">_Field</span><span class="o">.</span><span class="n">IMMEDIATE</span><span class="p">:</span> <span class="n">structure_id</span><span class="p">})</span>
             <span class="n">cmd_string</span> <span class="o">+=</span> <span class="s2">&quot;repeats=reg[</span><span class="si">{0:d}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repeats</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">_bounds</span><span class="p">(</span><span class="n">Commands</span><span class="o">.</span><span class="n">WRITE_STRUCT</span><span class="p">,</span> <span class="s2">&quot;repeats&quot;</span><span class="p">,</span> <span class="n">repeats</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+            <span class="n">_bounds</span><span class="p">(</span><span class="n">Commands</span><span class="o">.</span><span class="n">WRITE_STRUCT</span><span class="p">,</span> <span class="s2">&quot;repeats&quot;</span><span class="p">,</span>
+                    <span class="n">repeats</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">MAX_STRUCT_SLOTS</span><span class="p">)</span>
             <span class="n">cmd_word</span> <span class="o">=</span> <span class="n">_binencode</span><span class="p">(</span><span class="n">Commands</span><span class="o">.</span><span class="n">WRITE_STRUCT</span><span class="p">,</span> <span class="p">{</span>
                 <span class="n">_Field</span><span class="o">.</span><span class="n">LENGTH</span><span class="p">:</span> <span class="n">LEN1</span><span class="p">,</span>
                 <span class="n">_Field</span><span class="o">.</span><span class="n">SOURCE_1</span><span class="p">:</span> <span class="n">repeats</span><span class="p">,</span>
@@ -2555,7 +2556,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.0.3.
     </div>
   </body>
 </html>

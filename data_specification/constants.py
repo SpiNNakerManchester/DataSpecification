@@ -31,7 +31,7 @@ DSE_VERSION = 0x00010000
 #: Maximum number of registers in DSG virtual machine.
 MAX_REGISTERS = 16
 #: Maximum number of memory regions in DSG virtual machine.
-MAX_MEM_REGIONS = 16
+MAX_MEM_REGIONS = 32
 #: Maximum number of structure slots in DSG virtual machine.
 MAX_STRUCT_SLOTS = 16
 #: Maximum number of structure elements in DSG virtual machine.

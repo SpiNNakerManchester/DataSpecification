@@ -1170,7 +1170,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         with self.assertRaises(ParameterOutOfBoundsException):
             self.dsg.write_structure(-1)
         with self.assertRaises(ParameterOutOfBoundsException):
-            self.dsg.write_structure(16)
+            self.dsg.write_structure(32)
 
         self.skip_words(15)
         # WRITE_STRUCT

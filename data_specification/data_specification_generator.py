@@ -765,7 +765,8 @@ class DataSpecificationGenerator(object):
                 _Field.IMMEDIATE: structure_id})
             cmd_string += "repeats=reg[{0:d}]".format(repeats)
         else:
-            _bounds(Commands.WRITE_STRUCT, "repeats", repeats, 0, 16)
+            _bounds(Commands.WRITE_STRUCT, "repeats",
+                    repeats, 0, MAX_STRUCT_SLOTS)
             cmd_word = _binencode(Commands.WRITE_STRUCT, {
                 _Field.LENGTH: LEN1,
                 _Field.SOURCE_1: repeats,

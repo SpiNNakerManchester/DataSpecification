@@ -382,7 +382,7 @@ space that has already been allocated, in bytes</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The region that was already allocated</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – What label is known for the region</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – What label is known for the region</p></li>
 </ul>
 </dd>
 </dl>
@@ -700,7 +700,7 @@ the available memory</p></li>
 <dd class="field-even"><p>The region, or None if the region was not allocated</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="#data_specification.MemoryRegionReal" title="data_specification.MemoryRegionReal">MemoryRegionReal</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="#data_specification.MemoryRegionReal" title="data_specification.MemoryRegionReal">MemoryRegionReal</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -711,7 +711,7 @@ the available memory</p></li>
 <dd><p>An enumeration of the mapping from region ID to region holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, MemoryRegion or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a>))</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, MemoryRegion or None))</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1006,7 +1006,7 @@ the required data</p></li>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec_writer</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.RawIOBase" title="(in Python v3.8)"><em>RawIOBase</em></a>) – The object to write the specification to</p></li>
-<li><p><strong>report_writer</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.TextIOBase" title="(in Python v3.8)"><em>TextIOBase</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – Determines if a text version of the specification is to be
+<li><p><strong>report_writer</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.TextIOBase" title="(in Python v3.8)"><em>TextIOBase</em></a><em> or </em><em>None</em>) – Determines if a text version of the specification is to be
 written and, if so, where. No report is written if this is None.</p></li>
 </ul>
 </dd>
@@ -1031,7 +1031,7 @@ between 0 and 15</p></li>
 </ul>
 </p></li>
 <li><p><strong>log_block_size_is_register</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Indicates if <code class="docutils literal notranslate"><span class="pre">log_block_size</span></code> is a register ID</p></li>
-<li><p><strong>return_register_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – The ID of a register where the write
+<li><p><strong>return_register_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The ID of a register where the write
 pointer will be written to once it has been updated, between
 0 and 15, or None if no such writing is to be done</p></li>
 </ul>
@@ -1322,7 +1322,7 @@ fractional part</p></li>
 <dd><p>The ID of the current DSG region we’re writing to.            If not yet writing to any region, <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1937,7 +1937,7 @@ overflow the data type</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of the region to reserve, from 0 to 15</p></li>
 <li><p><strong>ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The identifier of the region to reference</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – An optional label for the region</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – An optional label for the region</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -1976,9 +1976,9 @@ overflow the data type</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of the region to reserve, from 0 to 15</p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The size to reserve for the region, in bytes</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – An optional label for the region</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em> or </em><em>None</em>) – An optional label for the region</p></li>
 <li><p><strong>empty</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Specifies if the region will be left empty</p></li>
-<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – A globally unique reference for this region</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – A globally unique reference for this region</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises</dt>
@@ -2528,7 +2528,7 @@ valid register ID</p></li>
 data specification (i.e., because the vertex uses it as a working
 data region or an output region)</p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the size of the region, in bytes</p></li>
-<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a>) – An optional globally unique reference for the region</p></li>
+<li><p><strong>reference</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – An optional globally unique reference for the region</p></li>
 </ul>
 </dd>
 </dl>
@@ -2571,7 +2571,7 @@ data region or an output region)</p></li>
 <dd><p>The globally unique reference of this region, or None if none</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or <a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
@@ -2669,8 +2669,9 @@ data region or an output region)</p></li>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">data_specification package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -2686,12 +2687,17 @@ data region or an output region)</p></li>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="modules.html"
-                        title="previous chapter">data_specification</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="data_specification.enums.html"
-                        title="next chapter">data_specification.enums package</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="modules.html"
+                          title="previous chapter">data_specification</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="data_specification.enums.html"
+                          title="next chapter">data_specification.enums package</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -2735,7 +2741,7 @@ data region or an output region)</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
     </div>
   </body>
 </html>

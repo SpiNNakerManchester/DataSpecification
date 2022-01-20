@@ -57,7 +57,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         # Decodings of the current command
         "__cmd_size",
-        "__opcode",
+        # "__opcode",
         "__dest_reg",
         "__src1_reg",
         "__src2_reg",
@@ -91,8 +91,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         #: Decoded from command: size in words
         self.__cmd_size = None
-        #: Decoded from command: operation code
-        self.__opcode = None
+        # Decoded from command: operation code
+        # self.__opcode = None
         #: Decoded from command: destination register or None
         self.__dest_reg = None
         #: Decoded from command: first source register or None
@@ -117,7 +117,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :param int cmd: The command read form the data spec file
         """
         self.__cmd_size = (cmd >> 28) & 0x3
-        self.__opcode = (cmd >> 20) & 0xFF
+        # self.__opcode = (cmd >> 20) & 0xFF
         use_dest_reg = (cmd >> 18) & 0x1 == 0x1
         use_src1_reg = (cmd >> 17) & 0x1 == 0x1
         use_src2_reg = (cmd >> 16) & 0x1 == 0x1

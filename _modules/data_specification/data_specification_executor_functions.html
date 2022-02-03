@@ -95,7 +95,6 @@
 
         <span class="c1"># Decodings of the current command</span>
         <span class="s2">&quot;__cmd_size&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__opcode&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__dest_reg&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__src1_reg&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__src2_reg&quot;</span><span class="p">,</span>
@@ -129,8 +128,6 @@
 
         <span class="c1">#: Decoded from command: size in words</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="c1">#: Decoded from command: operation code</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__opcode</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1">#: Decoded from command: destination register or None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dest_reg</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1">#: Decoded from command: first source register or None</span>
@@ -155,7 +152,6 @@
 <span class="sd">        :param int cmd: The command read form the data spec file</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">28</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x3</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__opcode</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
         <span class="n">use_dest_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">18</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mh">0x1</span>
         <span class="n">use_src1_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">17</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mh">0x1</span>
         <span class="n">use_src2_reg</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">16</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span> <span class="o">==</span> <span class="mh">0x1</span>

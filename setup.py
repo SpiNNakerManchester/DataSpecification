@@ -86,6 +86,6 @@ setup(
         'SpiNNUtilities == 1!6.0.1',
         'SpiNNMachine == 1!6.0.1'],
     maintainer="SpiNNakerTeam",
-    maintainer_email="spinnakerusers@googlegroups.com"
+    maintainer_email="spinnakerusers@googlegroups.com",
     **long_description
 )

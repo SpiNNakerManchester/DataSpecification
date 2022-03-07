@@ -2,10 +2,6 @@
 [![Documentation Status](https://readthedocs.org/projects/dataspecification/badge/?version=latest)](https://dataspecification.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/DataSpecification/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/DataSpecification?branch=master)
 
-This software received funding from the European Union’s Horizon 2020 Framework
-Programme for Research and Innovation under the Framework Partnership Agreement
-No. 650003 (HBP FPA).
-
 This package provides utilities for specifying binary data algorithmically,
 and executing the specifications to produce the data.
 
@@ -63,3 +59,9 @@ Documentation
 [Alternate location](https://spinnakermanchester.github.io/DataSpecification/)
 
 [Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
+
+Acknowledgements
+================
+This software received funding from the European Union’s Horizon 2020 Framework
+Programme for Research and Innovation under the Framework Partnership Agreement
+No. 650003 (HBP FPA).

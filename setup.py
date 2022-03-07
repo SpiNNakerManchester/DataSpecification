@@ -44,6 +44,16 @@ for dirname, dirnames, filenames in os.walk(main_package_dir):
                 main_package, dirname[start:].replace(os.sep, '.'))
             package_data[package].append(filename)
 
+long_description = {}
+this_directory = os.path.abspath(os.path.dirname(__file__))
+try:
+    with open(os.path.join(this_directory, 'README.md')) as f:
+        long_description["long_description"] = f.read()
+        long_description["long_description_content_type"] = "text/markdown"
+except IOError:
+    # If we can't read the long description, so be it; it's not a fatal error
+    pass
+
 setup(
     name="SpiNNaker_DataSpecification",
     version=__version__,
@@ -77,4 +87,5 @@ setup(
         'SpiNNMachine == 1!6.0.1'],
     maintainer="SpiNNakerTeam",
     maintainer_email="spinnakerusers@googlegroups.com"
+    **long_description
 )

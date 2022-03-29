@@ -17,11 +17,12 @@ import logging
 import struct
 import functools
 import numpy
+import math
 from spinn_utilities.log import FormatAdapter
 from .data_specification_executor_functions import (
     DataSpecificationExecutorFunctions)
 from .constants import (
-    APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR,
+    APPDATA_MAGIC_NUM, DSE_VERSION, END_SPEC_EXECUTOR, BYTES_PER_WORD,
     MAX_MEM_REGIONS, APP_PTR_TABLE_BYTE_SIZE, APP_PTR_TABLE_HEADER_BYTE_SIZE)
 from .enums import Commands
 from .exceptions import DataSpecificationException
@@ -43,6 +44,9 @@ class DataSpecificationExecutor(object):
         # The executer functions
         "dsef"
     ]
+
+    TABLE_TYPE = numpy.dtype(
+        [("pointer", "<u4"), ("checksum", "<u4"), ("n_words", "<u4")])
 
     def __init__(self, spec_reader, memory_space):
         """
@@ -127,16 +131,27 @@ class DataSpecificationExecutor(object):
         :param int start_address: The base address of the data to be written
         :rtype: numpy.ndarray
         """
-        pointer_table = numpy.zeros(MAX_MEM_REGIONS, dtype="<u4")
-        pointer_table_size = MAX_MEM_REGIONS * 4
+        pointer_table = numpy.zeros(MAX_MEM_REGIONS, dtype=self.TABLE_TYPE)
+        pointer_table_size = MAX_MEM_REGIONS * self.TABLE_TYPE.itemsize
         next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
         for i, region in self.mem_regions:
             if isinstance(region, MemoryRegionReal):
-                pointer_table[i] = next_free_offset + start_address
+                data = numpy.array(region.region_data, dtype="uint8")
+                if data.size % BYTES_PER_WORD != 0:
+                    data = numpy.concatenate((
+                        data, numpy.zeros(
+                            BYTES_PER_WORD - (data.size % BYTES_PER_WORD))))
+                pointer_table[i]["pointer"] = next_free_offset + start_address
+                pointer_table[i]["n_words"] = int(
+                    math.ceil(region.max_write_pointer / BYTES_PER_WORD))
+                pointer_table[i]["checksum"] = int(numpy.sum(
+                    data.view("uint32"))) & 0xFFFFFFFF
                 next_free_offset += region.allocated_size
             else:
-                pointer_table[i] = 0
+                pointer_table[i]["pointer"] = 0
+                pointer_table[i]["n_words"] = 0
+                pointer_table[i]["checksum"] = 0
         return pointer_table
 
     @property

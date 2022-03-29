@@ -50,7 +50,8 @@ MAX_RANDOM_DISTS = 16
 #: Size of header of data spec pointer table produced by DSE, in bytes.
 APP_PTR_TABLE_HEADER_BYTE_SIZE = 8
 #: Size of data spec pointer table produced by DSE, in bytes.
-APP_PTR_TABLE_BYTE_SIZE = APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4
+APP_PTR_TABLE_BYTE_SIZE = (
+    APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4 * 3)
 
 # Constants used by DSG command encoding; not relevant outside
 LEN1 = 0

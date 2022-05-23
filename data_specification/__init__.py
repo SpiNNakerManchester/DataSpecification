@@ -62,7 +62,7 @@ There are a number of use-cases of this library:
 Main API
 ========
 """
-from data_specification._version import (  # noqa
+from data_specification._version import (
     __version__, __version_name__, __version_month__, __version_year__)
 from .data_specification_executor import DataSpecificationExecutor
 from .data_specification_executor_functions import (

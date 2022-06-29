@@ -47,11 +47,17 @@ MAX_RNGS = 16
 #: Maximum number of random distributions in DSG virtual machine.
 MAX_RANDOM_DISTS = 16
 
+# conversion from words to bytes
+BYTES_PER_WORD = 4
+
 #: Size of header of data spec pointer table produced by DSE, in bytes.
 APP_PTR_TABLE_HEADER_BYTE_SIZE = 8
+#: Size of a region description in the pointer table
+APP_PTR_TABLE_REGION_BYTE_SIZE = 3 * BYTES_PER_WORD
 #: Size of data spec pointer table produced by DSE, in bytes.
 APP_PTR_TABLE_BYTE_SIZE = (
-    APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4 * 3)
+    APP_PTR_TABLE_HEADER_BYTE_SIZE +
+    (MAX_MEM_REGIONS * APP_PTR_TABLE_REGION_BYTE_SIZE))
 
 # Constants used by DSG command encoding; not relevant outside
 LEN1 = 0
@@ -69,6 +75,3 @@ ALL_REGS = 7
 
 # return values from functions of the data spec executor
 END_SPEC_EXECUTOR = -1
-
-# conversion from words to bytes
-BYTES_PER_WORD = 4

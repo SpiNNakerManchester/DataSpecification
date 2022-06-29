@@ -51,8 +51,12 @@ MAX_RANDOM_DISTS = 16
 BYTES_PER_WORD = 4
 
 #: Size of header of data spec pointer table produced by DSE, in bytes.
-APP_PTR_TABLE_HEADER_BYTE_SIZE = 8
-#: Size of a region description in the pointer table
+#: Note that the header consists of 2 uint32_t variables
+#: (magic_number, version)
+APP_PTR_TABLE_HEADER_BYTE_SIZE = 2 * BYTES_PER_WORD
+#: Size of a region description in the pointer table.
+#: Note that the description consists of a pointer and 2 uint32_t variables:
+#: (pointer, checksum, n_words)
 APP_PTR_TABLE_REGION_BYTE_SIZE = 3 * BYTES_PER_WORD
 #: Size of data spec pointer table produced by DSE, in bytes.
 APP_PTR_TABLE_BYTE_SIZE = (

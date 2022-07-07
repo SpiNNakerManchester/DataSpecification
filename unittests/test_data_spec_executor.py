@@ -60,7 +60,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         executor.execute()
 
         # Test the size
-        header_and_table_size = (constants.MAX_MEM_REGIONS + 2) * 4
+        header_and_table_size = ((constants.MAX_MEM_REGIONS * 3) + 2) * 4
         self.assertEqual(
             executor.get_constructed_data_size(),
             header_and_table_size + 100 + 200 + 4 + 12)
@@ -109,13 +109,13 @@ class TestDataSpecExecutor(unittest.TestCase):
         # Test the pointer table
         table = executor.get_pointer_table(0)
         self.assertEqual(len(table), constants.MAX_MEM_REGIONS)
-        self.assertEqual(table[0], header_and_table_size)
-        self.assertEqual(table[1], header_and_table_size + 100)
-        self.assertEqual(table[2], header_and_table_size + 300)
-        self.assertEqual(table[3], header_and_table_size + 304)
+        self.assertEqual(table[0]["pointer"], header_and_table_size)
+        self.assertEqual(table[1]["pointer"], header_and_table_size + 100)
+        self.assertEqual(table[2]["pointer"], header_and_table_size + 300)
+        self.assertEqual(table[3]["pointer"], header_and_table_size + 304)
         # 4 is also 0 because it is a reference
         for region in range(4, constants.MAX_MEM_REGIONS):
-            self.assertEqual(table[region], 0)
+            self.assertEqual(table[region]["pointer"], 0)
 
         # Test the header
         header = executor.get_header()

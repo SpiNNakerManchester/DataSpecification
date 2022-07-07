@@ -76,14 +76,24 @@
 
 <dl class="py data">
 <dt class="sig sig-object py" id="data_specification.constants.APP_PTR_TABLE_BYTE_SIZE">
-<span class="sig-prename descclassname"><span class="pre">data_specification.constants.</span></span><span class="sig-name descname"><span class="pre">APP_PTR_TABLE_BYTE_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">136</span></em><a class="headerlink" href="#data_specification.constants.APP_PTR_TABLE_BYTE_SIZE" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">data_specification.constants.</span></span><span class="sig-name descname"><span class="pre">APP_PTR_TABLE_BYTE_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">392</span></em><a class="headerlink" href="#data_specification.constants.APP_PTR_TABLE_BYTE_SIZE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Size of data spec pointer table produced by DSE, in bytes.</p>
 </dd></dl>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="data_specification.constants.APP_PTR_TABLE_HEADER_BYTE_SIZE">
 <span class="sig-prename descclassname"><span class="pre">data_specification.constants.</span></span><span class="sig-name descname"><span class="pre">APP_PTR_TABLE_HEADER_BYTE_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">8</span></em><a class="headerlink" href="#data_specification.constants.APP_PTR_TABLE_HEADER_BYTE_SIZE" title="Permalink to this definition">¶</a></dt>
-<dd><p>Size of header of data spec pointer table produced by DSE, in bytes.</p>
+<dd><p>Size of header of data spec pointer table produced by DSE, in bytes.
+Note that the header consists of 2 uint32_t variables
+(magic_number, version)</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="data_specification.constants.APP_PTR_TABLE_REGION_BYTE_SIZE">
+<span class="sig-prename descclassname"><span class="pre">data_specification.constants.</span></span><span class="sig-name descname"><span class="pre">APP_PTR_TABLE_REGION_BYTE_SIZE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">12</span></em><a class="headerlink" href="#data_specification.constants.APP_PTR_TABLE_REGION_BYTE_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Size of a region description in the pointer table.
+Note that the description consists of a pointer and 2 uint32_t variables:
+(pointer, checksum, n_words)</p>
 </dd></dl>
 
 <dl class="py data">
@@ -628,6 +638,11 @@ generated specification at the receiving end of a slow connection.</p></li>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#IOError" title="(in Python v3.8)"><strong>IOError</strong></a> – If a read or write fails</p>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor.TABLE_TYPE">
+<span class="sig-name descname"><span class="pre">TABLE_TYPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">dtype([('pointer',</span> <span class="pre">'&lt;u4'),</span> <span class="pre">('checksum',</span> <span class="pre">'&lt;u4'),</span> <span class="pre">('n_words',</span> <span class="pre">'&lt;u4')])</span></em><a class="headerlink" href="#data_specification.DataSpecificationExecutor.TABLE_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor.dsef">
 <span class="sig-name descname"><span class="pre">dsef</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutor.dsef" title="Permalink to this definition">¶</a></dt>
@@ -2742,7 +2757,7 @@ data region or an output region)</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

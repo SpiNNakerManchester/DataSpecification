@@ -56,11 +56,12 @@
 <span class="kn">import</span> <span class="nn">struct</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">.data_specification_executor_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">DataSpecificationExecutorFunctions</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">APPDATA_MAGIC_NUM</span><span class="p">,</span> <span class="n">DSE_VERSION</span><span class="p">,</span> <span class="n">END_SPEC_EXECUTOR</span><span class="p">,</span>
+    <span class="n">APPDATA_MAGIC_NUM</span><span class="p">,</span> <span class="n">DSE_VERSION</span><span class="p">,</span> <span class="n">END_SPEC_EXECUTOR</span><span class="p">,</span> <span class="n">BYTES_PER_WORD</span><span class="p">,</span>
     <span class="n">MAX_MEM_REGIONS</span><span class="p">,</span> <span class="n">APP_PTR_TABLE_BYTE_SIZE</span><span class="p">,</span> <span class="n">APP_PTR_TABLE_HEADER_BYTE_SIZE</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.enums</span> <span class="kn">import</span> <span class="n">Commands</span>
 <span class="kn">from</span> <span class="nn">.exceptions</span> <span class="kn">import</span> <span class="n">DataSpecificationException</span>
@@ -82,6 +83,9 @@
         <span class="c1"># The executer functions</span>
         <span class="s2">&quot;dsef&quot;</span>
     <span class="p">]</span>
+
+    <span class="n">TABLE_TYPE</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span>
+        <span class="p">[(</span><span class="s2">&quot;pointer&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;checksum&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;n_words&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">)])</span>
 
 <div class="viewcode-block" id="DataSpecificationExecutor.__init__"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -166,16 +170,27 @@
 <span class="sd">        :param int start_address: The base address of the data to be written</span>
 <span class="sd">        :rtype: numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pointer_table</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MAX_MEM_REGIONS</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u4&quot;</span><span class="p">)</span>
-        <span class="n">pointer_table_size</span> <span class="o">=</span> <span class="n">MAX_MEM_REGIONS</span> <span class="o">*</span> <span class="mi">4</span>
+        <span class="n">pointer_table</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">MAX_MEM_REGIONS</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TABLE_TYPE</span><span class="p">)</span>
+        <span class="n">pointer_table_size</span> <span class="o">=</span> <span class="n">MAX_MEM_REGIONS</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">TABLE_TYPE</span><span class="o">.</span><span class="n">itemsize</span>
         <span class="n">next_free_offset</span> <span class="o">=</span> <span class="n">pointer_table_size</span> <span class="o">+</span> <span class="n">APP_PTR_TABLE_HEADER_BYTE_SIZE</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mem_regions</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">MemoryRegionReal</span><span class="p">):</span>
-                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_free_offset</span> <span class="o">+</span> <span class="n">start_address</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">region_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="n">BYTES_PER_WORD</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span>
+                        <span class="n">data</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+                            <span class="n">BYTES_PER_WORD</span> <span class="o">-</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">size</span> <span class="o">%</span> <span class="n">BYTES_PER_WORD</span><span class="p">))))</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;pointer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">next_free_offset</span> <span class="o">+</span> <span class="n">start_address</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;n_words&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                    <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">region</span><span class="o">.</span><span class="n">max_write_pointer</span> <span class="o">/</span> <span class="n">BYTES_PER_WORD</span><span class="p">))</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;checksum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)))</span> <span class="o">&amp;</span> <span class="mh">0xFFFFFFFF</span>
                 <span class="n">next_free_offset</span> <span class="o">+=</span> <span class="n">region</span><span class="o">.</span><span class="n">allocated_size</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;pointer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;n_words&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;checksum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">pointer_table</span></div>
 
     <span class="nd">@property</span>
@@ -242,7 +257,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
     </div>
   </body>
 </html>

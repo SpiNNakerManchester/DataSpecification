@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="data_specification.spi package" href="data_specification.spi.html" />
@@ -682,7 +683,121 @@ representability and lack of hardware/library support.</p>
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul>
 <li><a class="reference internal" href="#">data_specification.enums package</a><ul>
-<li><a class="reference internal" href="#module-data_specification.enums">Module contents</a></li>
+<li><a class="reference internal" href="#module-data_specification.enums">Module contents</a><ul>
+<li><a class="reference internal" href="#data_specification.enums.ArithmeticOperation"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.enums.ArithmeticOperation.ADD"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation.ADD</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.ArithmeticOperation.MULTIPLY"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation.MULTIPLY</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.ArithmeticOperation.SUBTRACT"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation.SUBTRACT</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.enums.Commands"><code class="docutils literal notranslate"><span class="pre">Commands</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.enums.Commands.ALIGN_WR_PTR"><code class="docutils literal notranslate"><span class="pre">Commands.ALIGN_WR_PTR</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.ARITH_OP"><code class="docutils literal notranslate"><span class="pre">Commands.ARITH_OP</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.BLOCK_COPY"><code class="docutils literal notranslate"><span class="pre">Commands.BLOCK_COPY</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.BREAK"><code class="docutils literal notranslate"><span class="pre">Commands.BREAK</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.BREAK_LOOP"><code class="docutils literal notranslate"><span class="pre">Commands.BREAK_LOOP</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.CONSTRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.CONSTRUCT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.COPY_PARAM"><code class="docutils literal notranslate"><span class="pre">Commands.COPY_PARAM</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.COPY_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.COPY_STRUCT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.DECLARE_RANDOM_DIST"><code class="docutils literal notranslate"><span class="pre">Commands.DECLARE_RANDOM_DIST</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.DECLARE_RNG"><code class="docutils literal notranslate"><span class="pre">Commands.DECLARE_RNG</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.ELSE"><code class="docutils literal notranslate"><span class="pre">Commands.ELSE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.END_CONSTRUCTOR"><code class="docutils literal notranslate"><span class="pre">Commands.END_CONSTRUCTOR</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.END_IF"><code class="docutils literal notranslate"><span class="pre">Commands.END_IF</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.END_LOOP"><code class="docutils literal notranslate"><span class="pre">Commands.END_LOOP</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.END_SPEC"><code class="docutils literal notranslate"><span class="pre">Commands.END_SPEC</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.END_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.END_STRUCT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.FREE"><code class="docutils literal notranslate"><span class="pre">Commands.FREE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.GET_RANDOM_NUMBER"><code class="docutils literal notranslate"><span class="pre">Commands.GET_RANDOM_NUMBER</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.GET_WR_PTR"><code class="docutils literal notranslate"><span class="pre">Commands.GET_WR_PTR</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.IF"><code class="docutils literal notranslate"><span class="pre">Commands.IF</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.LOGIC_OP"><code class="docutils literal notranslate"><span class="pre">Commands.LOGIC_OP</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.LOOP"><code class="docutils literal notranslate"><span class="pre">Commands.LOOP</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.MV"><code class="docutils literal notranslate"><span class="pre">Commands.MV</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.NOP"><code class="docutils literal notranslate"><span class="pre">Commands.NOP</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.PRINT_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.PRINT_STRUCT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.PRINT_TXT"><code class="docutils literal notranslate"><span class="pre">Commands.PRINT_TXT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.PRINT_VAL"><code class="docutils literal notranslate"><span class="pre">Commands.PRINT_VAL</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.READ"><code class="docutils literal notranslate"><span class="pre">Commands.READ</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.READ_PARAM"><code class="docutils literal notranslate"><span class="pre">Commands.READ_PARAM</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.REFERENCE"><code class="docutils literal notranslate"><span class="pre">Commands.REFERENCE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.REFORMAT"><code class="docutils literal notranslate"><span class="pre">Commands.REFORMAT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.RESERVE"><code class="docutils literal notranslate"><span class="pre">Commands.RESERVE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.SET_WR_PTR"><code class="docutils literal notranslate"><span class="pre">Commands.SET_WR_PTR</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.START_CONSTRUCTOR"><code class="docutils literal notranslate"><span class="pre">Commands.START_CONSTRUCTOR</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.START_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.START_STRUCT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.STRUCT_ELEM"><code class="docutils literal notranslate"><span class="pre">Commands.STRUCT_ELEM</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.SWITCH_FOCUS"><code class="docutils literal notranslate"><span class="pre">Commands.SWITCH_FOCUS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.WRITE"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.WRITE_ARRAY"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_ARRAY</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.WRITE_PARAM"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_PARAM</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.WRITE_PARAM_COMPONENT"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_PARAM_COMPONENT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Commands.WRITE_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_STRUCT</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.enums.Condition"><code class="docutils literal notranslate"><span class="pre">Condition</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.enums.Condition.EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.EQUAL</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Condition.GREATER_THAN"><code class="docutils literal notranslate"><span class="pre">Condition.GREATER_THAN</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Condition.GREATER_THAN_OR_EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.GREATER_THAN_OR_EQUAL</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Condition.LESS_THAN"><code class="docutils literal notranslate"><span class="pre">Condition.LESS_THAN</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Condition.LESS_THAN_OR_EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.LESS_THAN_OR_EQUAL</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.Condition.NOT_EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.NOT_EQUAL</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.enums.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.enums.DataType.FLOAT_32"><code class="docutils literal notranslate"><span class="pre">DataType.FLOAT_32</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.FLOAT_64"><code class="docutils literal notranslate"><span class="pre">DataType.FLOAT_64</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.INT16"><code class="docutils literal notranslate"><span class="pre">DataType.INT16</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.INT32"><code class="docutils literal notranslate"><span class="pre">DataType.INT32</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.INT64"><code class="docutils literal notranslate"><span class="pre">DataType.INT64</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.INT8"><code class="docutils literal notranslate"><span class="pre">DataType.INT8</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.S015"><code class="docutils literal notranslate"><span class="pre">DataType.S015</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.S031"><code class="docutils literal notranslate"><span class="pre">DataType.S031</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.S063"><code class="docutils literal notranslate"><span class="pre">DataType.S063</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.S07"><code class="docutils literal notranslate"><span class="pre">DataType.S07</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.S1615"><code class="docutils literal notranslate"><span class="pre">DataType.S1615</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.S3231"><code class="docutils literal notranslate"><span class="pre">DataType.S3231</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.S87"><code class="docutils literal notranslate"><span class="pre">DataType.S87</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.U016"><code class="docutils literal notranslate"><span class="pre">DataType.U016</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.U032"><code class="docutils literal notranslate"><span class="pre">DataType.U032</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.U064"><code class="docutils literal notranslate"><span class="pre">DataType.U064</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.U08"><code class="docutils literal notranslate"><span class="pre">DataType.U08</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.U1616"><code class="docutils literal notranslate"><span class="pre">DataType.U1616</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.U3232"><code class="docutils literal notranslate"><span class="pre">DataType.U3232</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.U88"><code class="docutils literal notranslate"><span class="pre">DataType.U88</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.UINT16"><code class="docutils literal notranslate"><span class="pre">DataType.UINT16</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.UINT32"><code class="docutils literal notranslate"><span class="pre">DataType.UINT32</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.UINT64"><code class="docutils literal notranslate"><span class="pre">DataType.UINT64</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.UINT8"><code class="docutils literal notranslate"><span class="pre">DataType.UINT8</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.decode_array"><code class="docutils literal notranslate"><span class="pre">DataType.decode_array()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.decode_numpy_array"><code class="docutils literal notranslate"><span class="pre">DataType.decode_numpy_array()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.encode"><code class="docutils literal notranslate"><span class="pre">DataType.encode()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.encode_as_int"><code class="docutils literal notranslate"><span class="pre">DataType.encode_as_int()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.encode_as_numpy_int"><code class="docutils literal notranslate"><span class="pre">DataType.encode_as_numpy_int()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.encode_as_numpy_int_array"><code class="docutils literal notranslate"><span class="pre">DataType.encode_as_numpy_int_array()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.max"><code class="docutils literal notranslate"><span class="pre">DataType.max</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.min"><code class="docutils literal notranslate"><span class="pre">DataType.min</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.numpy_typename"><code class="docutils literal notranslate"><span class="pre">DataType.numpy_typename</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.scale"><code class="docutils literal notranslate"><span class="pre">DataType.scale</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.size"><code class="docutils literal notranslate"><span class="pre">DataType.size</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.DataType.struct_encoding"><code class="docutils literal notranslate"><span class="pre">DataType.struct_encoding</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.enums.LogicOperation"><code class="docutils literal notranslate"><span class="pre">LogicOperation</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.enums.LogicOperation.AND"><code class="docutils literal notranslate"><span class="pre">LogicOperation.AND</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.LogicOperation.LEFT_SHIFT"><code class="docutils literal notranslate"><span class="pre">LogicOperation.LEFT_SHIFT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.LogicOperation.NOT"><code class="docutils literal notranslate"><span class="pre">LogicOperation.NOT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.LogicOperation.OR"><code class="docutils literal notranslate"><span class="pre">LogicOperation.OR</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.LogicOperation.RIGHT_SHIFT"><code class="docutils literal notranslate"><span class="pre">LogicOperation.RIGHT_SHIFT</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.enums.LogicOperation.XOR"><code class="docutils literal notranslate"><span class="pre">LogicOperation.XOR</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.enums.RandomNumberGenerator"><code class="docutils literal notranslate"><span class="pre">RandomNumberGenerator</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.enums.RandomNumberGenerator.MERSENNE_TWISTER"><code class="docutils literal notranslate"><span class="pre">RandomNumberGenerator.MERSENNE_TWISTER</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -742,7 +857,7 @@ representability and lack of hardware/library support.</p>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

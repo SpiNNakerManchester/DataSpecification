@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="data_specification.enums package" href="data_specification.enums.html" />
@@ -52,11 +53,173 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="data_specification.enums.html">data_specification.enums package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_specification.enums.html#module-data_specification.enums">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_specification.enums.html#module-data_specification.enums">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.ArithmeticOperation"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.ArithmeticOperation.ADD"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation.ADD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.ArithmeticOperation.MULTIPLY"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation.MULTIPLY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.ArithmeticOperation.SUBTRACT"><code class="docutils literal notranslate"><span class="pre">ArithmeticOperation.SUBTRACT</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands"><code class="docutils literal notranslate"><span class="pre">Commands</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.ALIGN_WR_PTR"><code class="docutils literal notranslate"><span class="pre">Commands.ALIGN_WR_PTR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.ARITH_OP"><code class="docutils literal notranslate"><span class="pre">Commands.ARITH_OP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.BLOCK_COPY"><code class="docutils literal notranslate"><span class="pre">Commands.BLOCK_COPY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.BREAK"><code class="docutils literal notranslate"><span class="pre">Commands.BREAK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.BREAK_LOOP"><code class="docutils literal notranslate"><span class="pre">Commands.BREAK_LOOP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.CONSTRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.CONSTRUCT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.COPY_PARAM"><code class="docutils literal notranslate"><span class="pre">Commands.COPY_PARAM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.COPY_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.COPY_STRUCT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.DECLARE_RANDOM_DIST"><code class="docutils literal notranslate"><span class="pre">Commands.DECLARE_RANDOM_DIST</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.DECLARE_RNG"><code class="docutils literal notranslate"><span class="pre">Commands.DECLARE_RNG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.ELSE"><code class="docutils literal notranslate"><span class="pre">Commands.ELSE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.END_CONSTRUCTOR"><code class="docutils literal notranslate"><span class="pre">Commands.END_CONSTRUCTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.END_IF"><code class="docutils literal notranslate"><span class="pre">Commands.END_IF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.END_LOOP"><code class="docutils literal notranslate"><span class="pre">Commands.END_LOOP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.END_SPEC"><code class="docutils literal notranslate"><span class="pre">Commands.END_SPEC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.END_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.END_STRUCT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.FREE"><code class="docutils literal notranslate"><span class="pre">Commands.FREE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.GET_RANDOM_NUMBER"><code class="docutils literal notranslate"><span class="pre">Commands.GET_RANDOM_NUMBER</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.GET_WR_PTR"><code class="docutils literal notranslate"><span class="pre">Commands.GET_WR_PTR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.IF"><code class="docutils literal notranslate"><span class="pre">Commands.IF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.LOGIC_OP"><code class="docutils literal notranslate"><span class="pre">Commands.LOGIC_OP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.LOOP"><code class="docutils literal notranslate"><span class="pre">Commands.LOOP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.MV"><code class="docutils literal notranslate"><span class="pre">Commands.MV</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.NOP"><code class="docutils literal notranslate"><span class="pre">Commands.NOP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.PRINT_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.PRINT_STRUCT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.PRINT_TXT"><code class="docutils literal notranslate"><span class="pre">Commands.PRINT_TXT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.PRINT_VAL"><code class="docutils literal notranslate"><span class="pre">Commands.PRINT_VAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.READ"><code class="docutils literal notranslate"><span class="pre">Commands.READ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.READ_PARAM"><code class="docutils literal notranslate"><span class="pre">Commands.READ_PARAM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.REFERENCE"><code class="docutils literal notranslate"><span class="pre">Commands.REFERENCE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.REFORMAT"><code class="docutils literal notranslate"><span class="pre">Commands.REFORMAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.RESERVE"><code class="docutils literal notranslate"><span class="pre">Commands.RESERVE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.SET_WR_PTR"><code class="docutils literal notranslate"><span class="pre">Commands.SET_WR_PTR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.START_CONSTRUCTOR"><code class="docutils literal notranslate"><span class="pre">Commands.START_CONSTRUCTOR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.START_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.START_STRUCT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.STRUCT_ELEM"><code class="docutils literal notranslate"><span class="pre">Commands.STRUCT_ELEM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.SWITCH_FOCUS"><code class="docutils literal notranslate"><span class="pre">Commands.SWITCH_FOCUS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE_ARRAY"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_ARRAY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE_PARAM"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_PARAM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE_PARAM_COMPONENT"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_PARAM_COMPONENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE_STRUCT"><code class="docutils literal notranslate"><span class="pre">Commands.WRITE_STRUCT</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Condition"><code class="docutils literal notranslate"><span class="pre">Condition</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Condition.EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.EQUAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Condition.GREATER_THAN"><code class="docutils literal notranslate"><span class="pre">Condition.GREATER_THAN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Condition.GREATER_THAN_OR_EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.GREATER_THAN_OR_EQUAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Condition.LESS_THAN"><code class="docutils literal notranslate"><span class="pre">Condition.LESS_THAN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Condition.LESS_THAN_OR_EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.LESS_THAN_OR_EQUAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.Condition.NOT_EQUAL"><code class="docutils literal notranslate"><span class="pre">Condition.NOT_EQUAL</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType"><code class="docutils literal notranslate"><span class="pre">DataType</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.FLOAT_32"><code class="docutils literal notranslate"><span class="pre">DataType.FLOAT_32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.FLOAT_64"><code class="docutils literal notranslate"><span class="pre">DataType.FLOAT_64</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.INT16"><code class="docutils literal notranslate"><span class="pre">DataType.INT16</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.INT32"><code class="docutils literal notranslate"><span class="pre">DataType.INT32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.INT64"><code class="docutils literal notranslate"><span class="pre">DataType.INT64</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.INT8"><code class="docutils literal notranslate"><span class="pre">DataType.INT8</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.S015"><code class="docutils literal notranslate"><span class="pre">DataType.S015</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.S031"><code class="docutils literal notranslate"><span class="pre">DataType.S031</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.S063"><code class="docutils literal notranslate"><span class="pre">DataType.S063</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.S07"><code class="docutils literal notranslate"><span class="pre">DataType.S07</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.S1615"><code class="docutils literal notranslate"><span class="pre">DataType.S1615</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.S3231"><code class="docutils literal notranslate"><span class="pre">DataType.S3231</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.S87"><code class="docutils literal notranslate"><span class="pre">DataType.S87</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.U016"><code class="docutils literal notranslate"><span class="pre">DataType.U016</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.U032"><code class="docutils literal notranslate"><span class="pre">DataType.U032</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.U064"><code class="docutils literal notranslate"><span class="pre">DataType.U064</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.U08"><code class="docutils literal notranslate"><span class="pre">DataType.U08</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.U1616"><code class="docutils literal notranslate"><span class="pre">DataType.U1616</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.U3232"><code class="docutils literal notranslate"><span class="pre">DataType.U3232</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.U88"><code class="docutils literal notranslate"><span class="pre">DataType.U88</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.UINT16"><code class="docutils literal notranslate"><span class="pre">DataType.UINT16</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.UINT32"><code class="docutils literal notranslate"><span class="pre">DataType.UINT32</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.UINT64"><code class="docutils literal notranslate"><span class="pre">DataType.UINT64</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.UINT8"><code class="docutils literal notranslate"><span class="pre">DataType.UINT8</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.decode_array"><code class="docutils literal notranslate"><span class="pre">DataType.decode_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.decode_numpy_array"><code class="docutils literal notranslate"><span class="pre">DataType.decode_numpy_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.encode"><code class="docutils literal notranslate"><span class="pre">DataType.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.encode_as_int"><code class="docutils literal notranslate"><span class="pre">DataType.encode_as_int()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.encode_as_numpy_int"><code class="docutils literal notranslate"><span class="pre">DataType.encode_as_numpy_int()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.encode_as_numpy_int_array"><code class="docutils literal notranslate"><span class="pre">DataType.encode_as_numpy_int_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.max"><code class="docutils literal notranslate"><span class="pre">DataType.max</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.min"><code class="docutils literal notranslate"><span class="pre">DataType.min</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.numpy_typename"><code class="docutils literal notranslate"><span class="pre">DataType.numpy_typename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.scale"><code class="docutils literal notranslate"><span class="pre">DataType.scale</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.size"><code class="docutils literal notranslate"><span class="pre">DataType.size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.DataType.struct_encoding"><code class="docutils literal notranslate"><span class="pre">DataType.struct_encoding</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.LogicOperation"><code class="docutils literal notranslate"><span class="pre">LogicOperation</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.LogicOperation.AND"><code class="docutils literal notranslate"><span class="pre">LogicOperation.AND</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.LogicOperation.LEFT_SHIFT"><code class="docutils literal notranslate"><span class="pre">LogicOperation.LEFT_SHIFT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.LogicOperation.NOT"><code class="docutils literal notranslate"><span class="pre">LogicOperation.NOT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.LogicOperation.OR"><code class="docutils literal notranslate"><span class="pre">LogicOperation.OR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.LogicOperation.RIGHT_SHIFT"><code class="docutils literal notranslate"><span class="pre">LogicOperation.RIGHT_SHIFT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.LogicOperation.XOR"><code class="docutils literal notranslate"><span class="pre">LogicOperation.XOR</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.RandomNumberGenerator"><code class="docutils literal notranslate"><span class="pre">RandomNumberGenerator</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.enums.html#data_specification.enums.RandomNumberGenerator.MERSENNE_TWISTER"><code class="docutils literal notranslate"><span class="pre">RandomNumberGenerator.MERSENNE_TWISTER</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_specification.spi.html">data_specification.spi package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="data_specification.spi.html#module-data_specification.spi">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_specification.spi.html#module-data_specification.spi">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_align_wr_ptr"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_align_wr_ptr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_arith_op"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_arith_op()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_block_copy"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_block_copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_break"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_break()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_break_loop"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_break_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_construct"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_construct()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_copy_param"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_copy_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_copy_struct"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_copy_struct()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_declare_rng"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_declare_rng()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_else"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_else()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_constructor"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_end_constructor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_if"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_end_if()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_loop"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_end_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_spec"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_end_spec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_struct"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_end_struct()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_free"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_free()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_get_random_rumber"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_get_random_rumber()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_get_wr_ptr"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_get_wr_ptr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_if"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_if()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_logic_op"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_logic_op()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_loop"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_loop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_mv"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_mv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_nop"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_nop()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_print_struct"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_print_struct()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_print_txt"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_print_txt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_print_val"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_print_val()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_random_dist"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_random_dist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_read"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_read_param"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_read_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reference"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_reference()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reformat"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_reformat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reserve"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_reserve()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reset_wr_ptr"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_reset_wr_ptr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_set_wr_ptr"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_set_wr_ptr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_start_constructor"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_start_constructor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_start_struct"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_start_struct()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_struct_elem"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_struct_elem()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_switch_focus"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_switch_focus()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_write()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_array"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_write_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_param"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_write_param()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_param_component"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_write_param_component()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_struct"><code class="docutils literal notranslate"><span class="pre">AbstractExecutorFunctions.execute_write_struct()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -615,6 +778,7 @@ generated specification at the receiving end of a slow connection.</p></li>
 </section>
 <section id="main-api">
 <h3>Main API<a class="headerlink" href="#main-api" title="Permalink to this heading">¶</a></h3>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py" id="data_specification.AbstractMemoryRegion">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">AbstractMemoryRegion</span></span><a class="reference internal" href="_modules/data_specification/abstract_memory_region.html#AbstractMemoryRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.AbstractMemoryRegion" title="Permalink to this definition">¶</a></dt>
@@ -2676,7 +2840,6 @@ data region or an output region)</p></li>
 
 </section>
 </section>
-</section>
 
 
             <div class="clearer"></div>
@@ -2691,12 +2854,165 @@ data region or an output region)</p></li>
 <li><a class="reference internal" href="#">data_specification package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-data_specification.constants">data_specification.constants module</a></li>
-<li><a class="reference internal" href="#module-data_specification.exceptions">data_specification.exceptions module</a></li>
+<li><a class="reference internal" href="#module-data_specification.constants">data_specification.constants module</a><ul>
+<li><a class="reference internal" href="#data_specification.constants.APPDATA_MAGIC_NUM"><code class="docutils literal notranslate"><span class="pre">APPDATA_MAGIC_NUM</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.APP_PTR_TABLE_BYTE_SIZE"><code class="docutils literal notranslate"><span class="pre">APP_PTR_TABLE_BYTE_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.APP_PTR_TABLE_HEADER_BYTE_SIZE"><code class="docutils literal notranslate"><span class="pre">APP_PTR_TABLE_HEADER_BYTE_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.APP_PTR_TABLE_REGION_BYTE_SIZE"><code class="docutils literal notranslate"><span class="pre">APP_PTR_TABLE_REGION_BYTE_SIZE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.DSE_VERSION"><code class="docutils literal notranslate"><span class="pre">DSE_VERSION</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.DSG_MAGIC_NUM"><code class="docutils literal notranslate"><span class="pre">DSG_MAGIC_NUM</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_CONSTRUCTORS"><code class="docutils literal notranslate"><span class="pre">MAX_CONSTRUCTORS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_MEM_REGIONS"><code class="docutils literal notranslate"><span class="pre">MAX_MEM_REGIONS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_PACKSPEC_SLOTS"><code class="docutils literal notranslate"><span class="pre">MAX_PACKSPEC_SLOTS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_PARAM_LISTS"><code class="docutils literal notranslate"><span class="pre">MAX_PARAM_LISTS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_RANDOM_DISTS"><code class="docutils literal notranslate"><span class="pre">MAX_RANDOM_DISTS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_REGISTERS"><code class="docutils literal notranslate"><span class="pre">MAX_REGISTERS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_RNGS"><code class="docutils literal notranslate"><span class="pre">MAX_RNGS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_STRUCT_ELEMENTS"><code class="docutils literal notranslate"><span class="pre">MAX_STRUCT_ELEMENTS</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.constants.MAX_STRUCT_SLOTS"><code class="docutils literal notranslate"><span class="pre">MAX_STRUCT_SLOTS</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-data_specification.exceptions">data_specification.exceptions module</a><ul>
+<li><a class="reference internal" href="#data_specification.exceptions.DataSpecificationException"><code class="docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError"><code class="docutils literal notranslate"><span class="pre">DataSpecificationSyntaxError</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.DataUndefinedWriterException"><code class="docutils literal notranslate"><span class="pre">DataUndefinedWriterException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.DuplicateParameterException"><code class="docutils literal notranslate"><span class="pre">DuplicateParameterException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.ExecuteBreakInstruction"><code class="docutils literal notranslate"><span class="pre">ExecuteBreakInstruction</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.FunctionInUseException"><code class="docutils literal notranslate"><span class="pre">FunctionInUseException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.InvalidCommandException"><code class="docutils literal notranslate"><span class="pre">InvalidCommandException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.InvalidOperationException"><code class="docutils literal notranslate"><span class="pre">InvalidOperationException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.InvalidSizeException"><code class="docutils literal notranslate"><span class="pre">InvalidSizeException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.NestedFunctionException"><code class="docutils literal notranslate"><span class="pre">NestedFunctionException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.NoMoreException"><code class="docutils literal notranslate"><span class="pre">NoMoreException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.NoRegionSelectedException"><code class="docutils literal notranslate"><span class="pre">NoRegionSelectedException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.NotAllocatedException"><code class="docutils literal notranslate"><span class="pre">NotAllocatedException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.ParameterOutOfBoundsException"><code class="docutils literal notranslate"><span class="pre">ParameterOutOfBoundsException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.RNGInUseException"><code class="docutils literal notranslate"><span class="pre">RNGInUseException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.RandomNumberDistributionInUseException"><code class="docutils literal notranslate"><span class="pre">RandomNumberDistributionInUseException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.RegionExhaustedException"><code class="docutils literal notranslate"><span class="pre">RegionExhaustedException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.RegionInUseException"><code class="docutils literal notranslate"><span class="pre">RegionInUseException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.RegionNotAllocatedException"><code class="docutils literal notranslate"><span class="pre">RegionNotAllocatedException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.RegionOutOfBoundsException"><code class="docutils literal notranslate"><span class="pre">RegionOutOfBoundsException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.RegionUnfilledException"><code class="docutils literal notranslate"><span class="pre">RegionUnfilledException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.StructureInUseException"><code class="docutils literal notranslate"><span class="pre">StructureInUseException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.TablePointerOutOfMemoryException"><code class="docutils literal notranslate"><span class="pre">TablePointerOutOfMemoryException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.TypeMismatchException"><code class="docutils literal notranslate"><span class="pre">TypeMismatchException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError"><code class="docutils literal notranslate"><span class="pre">UnimplementedDSECommandError</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSGCommandError"><code class="docutils literal notranslate"><span class="pre">UnimplementedDSGCommandError</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.UnknownConditionException"><code class="docutils literal notranslate"><span class="pre">UnknownConditionException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.UnknownTypeException"><code class="docutils literal notranslate"><span class="pre">UnknownTypeException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.UnknownTypeLengthException"><code class="docutils literal notranslate"><span class="pre">UnknownTypeLengthException</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.exceptions.WrongParameterNumberException"><code class="docutils literal notranslate"><span class="pre">WrongParameterNumberException</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-data_specification">Module contents</a><ul>
 <li><a class="reference internal" href="#functional-requirements">Functional Requirements</a></li>
 <li><a class="reference internal" href="#use-cases">Use Cases</a></li>
 <li><a class="reference internal" href="#main-api">Main API</a></li>
+<li><a class="reference internal" href="#data_specification.AbstractMemoryRegion"><code class="docutils literal notranslate"><span class="pre">AbstractMemoryRegion</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.TABLE_TYPE"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.TABLE_TYPE</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.dsef"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.dsef</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.execute"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.execute()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.get_constructed_data_size"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.get_constructed_data_size()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.get_header"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.get_header()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.get_pointer_table"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.get_pointer_table()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.get_region"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.get_region()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.mem_regions"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.mem_regions</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.referenceable_regions"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.referenceable_regions</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutor.references_to_fill"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor.references_to_fill</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_break"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_break()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_end_spec"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_end_spec()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_mv"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_mv()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_reference"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_reference()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_reserve"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_reserve()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_set_wr_ptr"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_set_wr_ptr()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_switch_focus"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_switch_focus()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_write"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_write()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.execute_write_array"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.execute_write_array()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.mem_regions"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.mem_regions</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.referenceable_regions"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.referenceable_regions</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationExecutorFunctions.references_to_fill"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions.references_to_fill</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.align_write_pointer"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.align_write_pointer()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.break_loop"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.break_loop()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.call_arithmetic_operation"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.call_arithmetic_operation()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.call_function"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.call_function()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.call_random_distribution"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.call_random_distribution()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.comment"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.comment()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.copy_structure"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.copy_structure()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.copy_structure_parameter"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.copy_structure_parameter()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.create_cmd"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.create_cmd()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.current_region"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.current_region</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.declare_random_number_generator"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.declare_random_number_generator()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.declare_uniform_random_distribution"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.declare_uniform_random_distribution()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.define_break"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.define_break()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.define_structure"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.define_structure()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.else_conditional"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.else_conditional()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.end_conditional"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.end_conditional()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.end_function"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.end_function()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.end_loop"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.end_loop()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.end_specification"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.end_specification()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.free_memory_region"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.free_memory_region()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.get_structure_value"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.get_structure_value()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.logical_and"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.logical_and()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.logical_left_shift"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.logical_left_shift()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.logical_not"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.logical_not()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.logical_or"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.logical_or()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.logical_right_shift"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.logical_right_shift()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.logical_xor"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.logical_xor()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.no_operation"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.no_operation()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.print_struct"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.print_struct()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.print_text"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.print_text()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.print_value"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.print_value()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.read_value"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.read_value()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.reference_memory_region"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.reference_memory_region()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.region_sizes"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.region_sizes</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.reserve_memory_region"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.reserve_memory_region()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.save_write_pointer"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.save_write_pointer()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.set_register_value"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.set_register_value()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.set_structure_value"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.set_structure_value()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.set_write_pointer"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.set_write_pointer()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.start_conditional"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.start_conditional()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.start_function"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.start_function()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.start_loop"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.start_loop()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.switch_write_focus"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.switch_write_focus()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_array"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.write_array()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_cmd"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.write_cmd()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_repeated_value"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.write_repeated_value()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_structure"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.write_structure()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_value"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.write_value()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_value_from_register"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator.write_value_from_register()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionCollection"><code class="docutils literal notranslate"><span class="pre">MemoryRegionCollection</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.MemoryRegionCollection.is_empty"><code class="docutils literal notranslate"><span class="pre">MemoryRegionCollection.is_empty()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.allocated_size"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.allocated_size</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.increment_write_pointer"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.increment_write_pointer()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.max_write_pointer"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.max_write_pointer</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.reference"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.reference</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.region_data"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.region_data</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.remaining_space"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.remaining_space</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.unfilled"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.unfilled</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReal.write_pointer"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal.write_pointer</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReference"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReference</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.MemoryRegionReference.ref"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReference.ref</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#data_specification.ReferenceContext"><code class="docutils literal notranslate"><span class="pre">ReferenceContext</span></code></a><ul>
+<li><a class="reference internal" href="#data_specification.ReferenceContext.next"><code class="docutils literal notranslate"><span class="pre">ReferenceContext.next()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -2757,7 +3073,7 @@ data region or an output region)</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

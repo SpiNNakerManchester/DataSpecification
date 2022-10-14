@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="data_specification" href="modules.html" /> 
@@ -86,6 +87,7 @@ generated specification at the receiving end of a slow connection.</p></li>
 </section>
 <section id="main-api">
 <h2>Main API<a class="headerlink" href="#main-api" title="Permalink to this heading">¶</a></h2>
+</section>
 <dl class="py class">
 <dt class="sig sig-object py">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">AbstractMemoryRegion</span></span><a class="reference internal" href="_modules/data_specification/abstract_memory_region.html#AbstractMemoryRegion"><span class="viewcode-link"><span class="pre">[source]</span></span></a></dt>
@@ -2269,7 +2271,6 @@ data region or an output region)</p></li>
 
 </dd></dl>
 
-</section>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Permalink to this heading">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -2282,12 +2283,69 @@ data region or an output region)</p></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data_specification.html#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification.constants">data_specification.constants module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification.exceptions">data_specification.exceptions module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification.constants">data_specification.constants module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.APPDATA_MAGIC_NUM"><code class="docutils literal notranslate"><span class="pre">APPDATA_MAGIC_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.APP_PTR_TABLE_BYTE_SIZE"><code class="docutils literal notranslate"><span class="pre">APP_PTR_TABLE_BYTE_SIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.APP_PTR_TABLE_HEADER_BYTE_SIZE"><code class="docutils literal notranslate"><span class="pre">APP_PTR_TABLE_HEADER_BYTE_SIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.APP_PTR_TABLE_REGION_BYTE_SIZE"><code class="docutils literal notranslate"><span class="pre">APP_PTR_TABLE_REGION_BYTE_SIZE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.DSE_VERSION"><code class="docutils literal notranslate"><span class="pre">DSE_VERSION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.DSG_MAGIC_NUM"><code class="docutils literal notranslate"><span class="pre">DSG_MAGIC_NUM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_CONSTRUCTORS"><code class="docutils literal notranslate"><span class="pre">MAX_CONSTRUCTORS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_MEM_REGIONS"><code class="docutils literal notranslate"><span class="pre">MAX_MEM_REGIONS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_PACKSPEC_SLOTS"><code class="docutils literal notranslate"><span class="pre">MAX_PACKSPEC_SLOTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_PARAM_LISTS"><code class="docutils literal notranslate"><span class="pre">MAX_PARAM_LISTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_RANDOM_DISTS"><code class="docutils literal notranslate"><span class="pre">MAX_RANDOM_DISTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_REGISTERS"><code class="docutils literal notranslate"><span class="pre">MAX_REGISTERS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_RNGS"><code class="docutils literal notranslate"><span class="pre">MAX_RNGS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_STRUCT_ELEMENTS"><code class="docutils literal notranslate"><span class="pre">MAX_STRUCT_ELEMENTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.constants.MAX_STRUCT_SLOTS"><code class="docutils literal notranslate"><span class="pre">MAX_STRUCT_SLOTS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification.exceptions">data_specification.exceptions module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationException"><code class="docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError"><code class="docutils literal notranslate"><span class="pre">DataSpecificationSyntaxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataUndefinedWriterException"><code class="docutils literal notranslate"><span class="pre">DataUndefinedWriterException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.DuplicateParameterException"><code class="docutils literal notranslate"><span class="pre">DuplicateParameterException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.ExecuteBreakInstruction"><code class="docutils literal notranslate"><span class="pre">ExecuteBreakInstruction</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.FunctionInUseException"><code class="docutils literal notranslate"><span class="pre">FunctionInUseException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.InvalidCommandException"><code class="docutils literal notranslate"><span class="pre">InvalidCommandException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.InvalidOperationException"><code class="docutils literal notranslate"><span class="pre">InvalidOperationException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.InvalidSizeException"><code class="docutils literal notranslate"><span class="pre">InvalidSizeException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.NestedFunctionException"><code class="docutils literal notranslate"><span class="pre">NestedFunctionException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.NoMoreException"><code class="docutils literal notranslate"><span class="pre">NoMoreException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.NoRegionSelectedException"><code class="docutils literal notranslate"><span class="pre">NoRegionSelectedException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.NotAllocatedException"><code class="docutils literal notranslate"><span class="pre">NotAllocatedException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.ParameterOutOfBoundsException"><code class="docutils literal notranslate"><span class="pre">ParameterOutOfBoundsException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.RNGInUseException"><code class="docutils literal notranslate"><span class="pre">RNGInUseException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.RandomNumberDistributionInUseException"><code class="docutils literal notranslate"><span class="pre">RandomNumberDistributionInUseException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.RegionExhaustedException"><code class="docutils literal notranslate"><span class="pre">RegionExhaustedException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.RegionInUseException"><code class="docutils literal notranslate"><span class="pre">RegionInUseException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.RegionNotAllocatedException"><code class="docutils literal notranslate"><span class="pre">RegionNotAllocatedException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.RegionOutOfBoundsException"><code class="docutils literal notranslate"><span class="pre">RegionOutOfBoundsException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.RegionUnfilledException"><code class="docutils literal notranslate"><span class="pre">RegionUnfilledException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.StructureInUseException"><code class="docutils literal notranslate"><span class="pre">StructureInUseException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.TablePointerOutOfMemoryException"><code class="docutils literal notranslate"><span class="pre">TablePointerOutOfMemoryException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.TypeMismatchException"><code class="docutils literal notranslate"><span class="pre">TypeMismatchException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError"><code class="docutils literal notranslate"><span class="pre">UnimplementedDSECommandError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSGCommandError"><code class="docutils literal notranslate"><span class="pre">UnimplementedDSGCommandError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnknownConditionException"><code class="docutils literal notranslate"><span class="pre">UnknownConditionException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnknownTypeException"><code class="docutils literal notranslate"><span class="pre">UnknownTypeException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnknownTypeLengthException"><code class="docutils literal notranslate"><span class="pre">UnknownTypeLengthException</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.exceptions.WrongParameterNumberException"><code class="docutils literal notranslate"><span class="pre">WrongParameterNumberException</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="data_specification.html#module-data_specification">Module contents</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data_specification.html#functional-requirements">Functional Requirements</a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_specification.html#use-cases">Use Cases</a></li>
 <li class="toctree-l4"><a class="reference internal" href="data_specification.html#main-api">Main API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.AbstractMemoryRegion"><code class="docutils literal notranslate"><span class="pre">AbstractMemoryRegion</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.DataSpecificationExecutor"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.DataSpecificationExecutorFunctions"><code class="docutils literal notranslate"><span class="pre">DataSpecificationExecutorFunctions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.DataSpecificationGenerator"><code class="docutils literal notranslate"><span class="pre">DataSpecificationGenerator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.MemoryRegionCollection"><code class="docutils literal notranslate"><span class="pre">MemoryRegionCollection</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.MemoryRegionReal"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReal</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.MemoryRegionReference"><code class="docutils literal notranslate"><span class="pre">MemoryRegionReference</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data_specification.html#data_specification.ReferenceContext"><code class="docutils literal notranslate"><span class="pre">ReferenceContext</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2372,7 +2430,7 @@ data region or an output region)</p></li>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.1.1.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.2.3.
     </div>
   </body>
 </html>

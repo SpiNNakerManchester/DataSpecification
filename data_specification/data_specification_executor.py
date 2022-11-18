@@ -42,7 +42,10 @@ class DataSpecificationExecutor(object):
         "_spec_reader",
 
         # The executer functions
-        "dsef"
+        "dsef",
+
+        # The pointer table (Empty until executed)
+        "__pointer_table"
     ]
 
     TABLE_TYPE = numpy.dtype(
@@ -63,6 +66,10 @@ class DataSpecificationExecutor(object):
             self._spec_reader, memory_space)
         # TODO: make the dsef field a private detail of the executor
         # Currently accessed directly from FEC to get memory regions...
+
+        #: The pointer table (Empty until executed)
+        self.__pointer_table = numpy.zeros(
+            MAX_MEM_REGIONS, dtype=self.TABLE_TYPE)
 
     def __operation_func(self, cmd, index):
         """ Decode the command and select an implementation of the command.
@@ -101,6 +108,22 @@ class DataSpecificationExecutor(object):
             instruction_spec = self._spec_reader.read(4)
             index += 4
 
+        # Make the checksums
+        for i, region in self.mem_regions:
+            if isinstance(region, MemoryRegionReal):
+                data = numpy.array(region.region_data, dtype="uint8")
+                if data.size % BYTES_PER_WORD != 0:
+                    data = numpy.concatenate((
+                        data, numpy.zeros(
+                            BYTES_PER_WORD - (data.size % BYTES_PER_WORD))))
+                self.__pointer_table[i]["n_words"] = int(
+                    math.ceil(region.max_write_pointer / BYTES_PER_WORD))
+                self.__pointer_table[i]["checksum"] = int(numpy.sum(
+                    data.view("uint32"))) & 0xFFFFFFFF
+            else:
+                self.__pointer_table[i]["n_words"] = 0
+                self.__pointer_table[i]["checksum"] = 0
+
     def get_region(self, region_id):
         """ Get a region with a given ID.
 
@@ -131,10 +154,10 @@ class DataSpecificationExecutor(object):
         :param int start_address: The base address of the data to be written
         :rtype: numpy.ndarray
         """
-        pointer_table = numpy.zeros(MAX_MEM_REGIONS, dtype=self.TABLE_TYPE)
         pointer_table_size = MAX_MEM_REGIONS * self.TABLE_TYPE.itemsize
         next_free_offset = pointer_table_size + APP_PTR_TABLE_HEADER_BYTE_SIZE
 
+        # Fill in the last bit of the pointer table
         for i, region in self.mem_regions:
             if isinstance(region, MemoryRegionReal):
                 data = numpy.array(region.region_data, dtype="uint8")
@@ -142,17 +165,12 @@ class DataSpecificationExecutor(object):
                     data = numpy.concatenate((
                         data, numpy.zeros(
                             BYTES_PER_WORD - (data.size % BYTES_PER_WORD))))
-                pointer_table[i]["pointer"] = next_free_offset + start_address
-                pointer_table[i]["n_words"] = int(
-                    math.ceil(region.max_write_pointer / BYTES_PER_WORD))
-                pointer_table[i]["checksum"] = int(numpy.sum(
-                    data.view("uint32"))) & 0xFFFFFFFF
+                self.__pointer_table[i]["pointer"] = (
+                    next_free_offset + start_address)
                 next_free_offset += region.allocated_size
             else:
-                pointer_table[i]["pointer"] = 0
-                pointer_table[i]["n_words"] = 0
-                pointer_table[i]["checksum"] = 0
-        return pointer_table
+                self.__pointer_table[i]["pointer"] = 0
+        return self.__pointer_table
 
     @property
     def referenceable_regions(self):

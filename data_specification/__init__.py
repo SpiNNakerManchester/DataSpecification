@@ -62,7 +62,7 @@ There are a number of use-cases of this library:
 Main API
 ========
 """
-from data_specification._version import (   # noqa: F401
+from data_specification._version import (
     __version__, __version_name__, __version_month__, __version_year__)
 from .data_specification_executor import DataSpecificationExecutor
 from .data_specification_executor_functions import (
@@ -74,7 +74,9 @@ from .memory_region_reference import MemoryRegionReference
 from .memory_region_collection import MemoryRegionCollection
 from .reference_context import ReferenceContext
 
-__all__ = ["DataSpecificationExecutor", "DataSpecificationExecutorFunctions",
-           "DataSpecificationGenerator", "AbstractMemoryRegion",
-           "MemoryRegionReal", "MemoryRegionReference",
-           "MemoryRegionCollection", "ReferenceContext"]
+__all__ = [
+    "__version__", "__version_name__", "__version_month__", "__version_year__",
+    "DataSpecificationExecutor", "DataSpecificationExecutorFunctions",
+    "DataSpecificationGenerator", "AbstractMemoryRegion",
+    "MemoryRegionReal", "MemoryRegionReference",
+    "MemoryRegionCollection", "ReferenceContext"]

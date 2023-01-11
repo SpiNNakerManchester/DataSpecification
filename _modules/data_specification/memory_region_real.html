@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -56,7 +53,7 @@
 
 
 <div class="viewcode-block" id="MemoryRegionReal"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionReal">[docs]</a><span class="k">class</span> <span class="nc">MemoryRegionReal</span><span class="p">(</span><span class="n">AbstractMemoryRegion</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Memory region storage object.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Memory region storage object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -69,7 +66,7 @@
     <span class="p">]</span>
 
 <div class="viewcode-block" id="MemoryRegionReal.__init__"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionReal.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unfilled</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param bool unfilled: if the region should not be written to by the</span>
 <span class="sd">            data specification (i.e., because the vertex uses it as a working</span>
 <span class="sd">            data region or an output region)</span>
@@ -92,7 +89,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allocated_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The size of the region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size of the region.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -100,7 +97,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">remaining_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The space between the current write pointer and the end of the\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The space between the current write pointer and the end of the\</span>
 <span class="sd">            region, which is the number of bytes remaining in the region that\</span>
 <span class="sd">            can be written.</span>
 
@@ -110,7 +107,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">unfilled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Whether the region is marked as not fillable; unfilled regions\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Whether the region is marked as not fillable; unfilled regions\</span>
 <span class="sd">            will not contain any data at write time.</span>
 
 <span class="sd">        :rtype: bool</span>
@@ -119,7 +116,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">region_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The buffer which holds the data written in this region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The buffer which holds the data written in this region.</span>
 
 <span class="sd">        :rtype: bytearray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -129,7 +126,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The position in the buffer where data will be written to next.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The position in the buffer where data will be written to next.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -143,14 +140,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The max point where if written over, it will cause an error.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The max point where if written over, it will cause an error.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_write_pointer</span>
 
 <div class="viewcode-block" id="MemoryRegionReal.increment_write_pointer"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionReal.increment_write_pointer">[docs]</a>    <span class="k">def</span> <span class="nf">increment_write_pointer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Advance the write pointer.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Advance the write pointer.</span>
 
 <span class="sd">        :param int n_bytes: The number of bytes to advance the pointer by.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -160,7 +157,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">reference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The globally unique reference of this region, or None if none</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The globally unique reference of this region, or None if none</span>
 
 <span class="sd">        :rtype: int or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -203,7 +200,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

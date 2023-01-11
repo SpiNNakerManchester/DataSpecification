@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sphinxdoc.css" />
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-    <script src="../../../_static/jquery.js"></script>
-    <script src="../../../_static/underscore.js"></script>
-    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -58,7 +55,7 @@
 
 
 <span class="k">class</span> <span class="nc">AbstractExecutorFunctions</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">AbstractBase</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This class defines a function related to each of the commands of the\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; This class defines a function related to each of the commands of the\</span>
 <span class="sd">        data specification file. Subclasses need to provide implementations\</span>
 <span class="sd">        that work for the operations they wish to support.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -67,7 +64,7 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_break"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_break">[docs]</a>    <span class="k">def</span> <span class="nf">execute_break</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command raises an exception to stop the execution of the \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command raises an exception to stop the execution of the \</span>
 <span class="sd">            data spec executor (DSE).</span>
 
 <span class="sd">        Implements :py:obj:`~.BREAK`</span>
@@ -82,7 +79,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;BREAK&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_nop"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_nop">[docs]</a>    <span class="k">def</span> <span class="nf">execute_nop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; This command executes no operation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command executes no operation.</span>
 
 <span class="sd">        Implements :py:obj:`~.NOP`</span>
 
@@ -94,7 +91,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_reserve"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reserve">[docs]</a>    <span class="k">def</span> <span class="nf">execute_reserve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command reserves a region and assigns some memory space \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command reserves a region and assigns some memory space \</span>
 <span class="sd">            to it.</span>
 
 <span class="sd">        Implements :py:obj:`~.RESERVE`</span>
@@ -109,7 +106,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;RESERVE&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_reference"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reference">[docs]</a>    <span class="k">def</span> <span class="nf">execute_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command reserves a region and sets it to reference another</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command reserves a region and sets it to reference another</span>
 
 <span class="sd">        Implements :py:obj:`~.REFERENCE`</span>
 
@@ -123,7 +120,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;REFERENCE&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_free"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_free">[docs]</a>    <span class="k">def</span> <span class="nf">execute_free</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command frees some memory.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command frees some memory.</span>
 
 <span class="sd">        Implements :py:obj:`~.FREE`</span>
 
@@ -137,7 +134,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;FREE&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_declare_rng"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_declare_rng">[docs]</a>    <span class="k">def</span> <span class="nf">execute_declare_rng</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command declares a random number generator.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command declares a random number generator.</span>
 
 <span class="sd">        Implements :py:obj:`~.DECLARE_RNG`</span>
 
@@ -151,7 +148,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;DECLARE_RNG&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_random_dist"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_random_dist">[docs]</a>    <span class="k">def</span> <span class="nf">execute_random_dist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command defines a random disribution.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command defines a random disribution.</span>
 
 <span class="sd">        Implements :py:obj:`~.DECLARE_RANDOM_DIST`</span>
 
@@ -165,7 +162,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;DECLARE_RANDOM_DIST&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_get_random_rumber"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_get_random_rumber">[docs]</a>    <span class="k">def</span> <span class="nf">execute_get_random_rumber</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command obtains a random number from a distribution.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command obtains a random number from a distribution.</span>
 
 <span class="sd">        Implements :py:obj:`~.GET_RANDOM_NUMBER`</span>
 
@@ -179,7 +176,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;GET_RANDOM_NUMBER&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_start_struct"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_start_struct">[docs]</a>    <span class="k">def</span> <span class="nf">execute_start_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command starts to define a structure.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command starts to define a structure.</span>
 
 <span class="sd">        Implements :py:obj:`~.START_STRUCT`</span>
 
@@ -193,7 +190,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;START_STRUCT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_struct_elem"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_struct_elem">[docs]</a>    <span class="k">def</span> <span class="nf">execute_struct_elem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command adds an element to a structure.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command adds an element to a structure.</span>
 
 <span class="sd">        Implements :py:obj:`~.STRUCT_ELEM`</span>
 
@@ -207,7 +204,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;STRUCT_ELEM&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_end_struct"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_struct">[docs]</a>    <span class="k">def</span> <span class="nf">execute_end_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command completes the definition of a structure.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command completes the definition of a structure.</span>
 
 <span class="sd">        Implements :py:obj:`~.END_STRUCT`</span>
 
@@ -221,7 +218,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;END_STRUCT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_start_constructor"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_start_constructor">[docs]</a>    <span class="k">def</span> <span class="nf">execute_start_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command starts the definition of a function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command starts the definition of a function.</span>
 
 <span class="sd">        Implements :py:obj:`~.START_CONSTRUCTOR`</span>
 
@@ -235,7 +232,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;START_CONSTRUCTOR&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_end_constructor"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_constructor">[docs]</a>    <span class="k">def</span> <span class="nf">execute_end_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command ends the definition of a function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command ends the definition of a function.</span>
 
 <span class="sd">        Implements :py:obj:`~.END_CONSTRUCTOR`</span>
 
@@ -249,7 +246,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;END_CONSTRUCTOR&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_construct"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_construct">[docs]</a>    <span class="k">def</span> <span class="nf">execute_construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command calls a function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command calls a function.</span>
 
 <span class="sd">        Implements :py:obj:`~.CONSTRUCT`</span>
 
@@ -263,7 +260,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;CONSTRUCT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_read"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_read">[docs]</a>    <span class="k">def</span> <span class="nf">execute_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command reads a word from memory.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command reads a word from memory.</span>
 
 <span class="sd">        Implements :py:obj:`~.READ`</span>
 
@@ -277,7 +274,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;READ&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_write"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write">[docs]</a>    <span class="k">def</span> <span class="nf">execute_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command writes the given value in the specified region a\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command writes the given value in the specified region a\</span>
 <span class="sd">            number of times as identified by either a value in the command \</span>
 <span class="sd">            or a register value.</span>
 
@@ -293,7 +290,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;WRITE&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_write_array"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_array">[docs]</a>    <span class="k">def</span> <span class="nf">execute_write_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command writes an array of values in the specified region.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command writes an array of values in the specified region.</span>
 
 <span class="sd">        Implements :py:obj:`~.WRITE_ARRAY`</span>
 
@@ -307,7 +304,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;WRITE_ARRAY&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_write_struct"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_struct">[docs]</a>    <span class="k">def</span> <span class="nf">execute_write_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command writes a structure to memory.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command writes a structure to memory.</span>
 
 <span class="sd">        Implements :py:obj:`~.WRITE_STRUCT`</span>
 
@@ -321,7 +318,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;WRITE_STRUCT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_block_copy"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_block_copy">[docs]</a>    <span class="k">def</span> <span class="nf">execute_block_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command copies a block of memory from one location to \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command copies a block of memory from one location to \</span>
 <span class="sd">            another.</span>
 
 <span class="sd">        Implements :py:obj:`~.BLOCK_COPY`</span>
@@ -336,7 +333,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;BLOCK_COPY&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_switch_focus"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_switch_focus">[docs]</a>    <span class="k">def</span> <span class="nf">execute_switch_focus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command switches the focus to the desired, already allocated,\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command switches the focus to the desired, already allocated,\</span>
 <span class="sd">            memory region.</span>
 
 <span class="sd">        Implements :py:obj:`~.SWITCH_FOCUS`</span>
@@ -351,7 +348,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;SWITCH_FOCUS&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_loop"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_loop">[docs]</a>    <span class="k">def</span> <span class="nf">execute_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command starts a loop.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command starts a loop.</span>
 
 <span class="sd">        Implements :py:obj:`~.LOOP`</span>
 
@@ -365,7 +362,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;LOOP&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_break_loop"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_break_loop">[docs]</a>    <span class="k">def</span> <span class="nf">execute_break_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command stops a loop early.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command stops a loop early.</span>
 
 <span class="sd">        Implements :py:obj:`~.BREAK_LOOP`</span>
 
@@ -379,7 +376,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;BREAK_LOOP&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_end_loop"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_loop">[docs]</a>    <span class="k">def</span> <span class="nf">execute_end_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command finishes a loop.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command finishes a loop.</span>
 
 <span class="sd">        Implements :py:obj:`~.END_LOOP`</span>
 
@@ -393,7 +390,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;END_LOOP&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_if"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_if">[docs]</a>    <span class="k">def</span> <span class="nf">execute_if</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command does a conditional branch.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command does a conditional branch.</span>
 
 <span class="sd">        Implements :py:obj:`~.IF`</span>
 
@@ -407,7 +404,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;IF&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_else"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_else">[docs]</a>    <span class="k">def</span> <span class="nf">execute_else</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command handles the other branch of a conditional.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command handles the other branch of a conditional.</span>
 
 <span class="sd">        Implements :py:obj:`~.ELSE`</span>
 
@@ -421,7 +418,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;ELSE&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_end_if"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_if">[docs]</a>    <span class="k">def</span> <span class="nf">execute_end_if</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command ends a conditional.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command ends a conditional.</span>
 
 <span class="sd">        Implements :py:obj:`~.END_IF`</span>
 
@@ -435,7 +432,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;ENDIF&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_mv"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_mv">[docs]</a>    <span class="k">def</span> <span class="nf">execute_mv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command moves an immediate value to a register or copies the \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command moves an immediate value to a register or copies the \</span>
 <span class="sd">            value of a register to another register.</span>
 
 <span class="sd">        Implements :py:obj:`~.MV`</span>
@@ -450,7 +447,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;MV&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_get_wr_ptr"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_get_wr_ptr">[docs]</a>    <span class="k">def</span> <span class="nf">execute_get_wr_ptr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command gets the current write pointer.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command gets the current write pointer.</span>
 
 <span class="sd">        Implements :py:obj:`~.GET_WR_PTR`</span>
 
@@ -464,7 +461,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;GET_WR_PTR&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_set_wr_ptr"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_set_wr_ptr">[docs]</a>    <span class="k">def</span> <span class="nf">execute_set_wr_ptr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command sets the current write pointer.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command sets the current write pointer.</span>
 
 <span class="sd">        Implements :py:obj:`~.SET_WR_PTR`</span>
 
@@ -478,7 +475,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;SET_WR_PTR&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_reset_wr_ptr"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reset_wr_ptr">[docs]</a>    <span class="k">def</span> <span class="nf">execute_reset_wr_ptr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command resets the current write pointer to the beginning \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command resets the current write pointer to the beginning \</span>
 <span class="sd">            of the memory region.</span>
 
 <span class="sd">        :param int cmd: the command which triggered the function call</span>
@@ -491,7 +488,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;RESET_RW_PTR&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_align_wr_ptr"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_align_wr_ptr">[docs]</a>    <span class="k">def</span> <span class="nf">execute_align_wr_ptr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command moves the write pointer to be at the start of the \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command moves the write pointer to be at the start of the \</span>
 <span class="sd">            next word if it isn&#39;t already at the start of a word.</span>
 
 <span class="sd">        Implements :py:obj:`~.ALIGN_WR_PTR`</span>
@@ -506,7 +503,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;ALIGN_WR_PTR&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_arith_op"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_arith_op">[docs]</a>    <span class="k">def</span> <span class="nf">execute_arith_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command performs an arithmetic operation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command performs an arithmetic operation.</span>
 
 <span class="sd">        Implements :py:obj:`~.ARITH_OP`</span>
 
@@ -520,7 +517,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;ARITH_OP&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_logic_op"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_logic_op">[docs]</a>    <span class="k">def</span> <span class="nf">execute_logic_op</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command performs a logical operation.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command performs a logical operation.</span>
 
 <span class="sd">        Implements :py:obj:`~.LOGIC_OP`</span>
 
@@ -534,7 +531,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;LOGIC_OP&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_reformat"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_reformat">[docs]</a>    <span class="k">def</span> <span class="nf">execute_reformat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command is never generated!</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command is never generated!</span>
 
 <span class="sd">        Implements :py:obj:`~.REFORMAT`</span>
 
@@ -548,7 +545,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;REFORMAT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_copy_struct"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_copy_struct">[docs]</a>    <span class="k">def</span> <span class="nf">execute_copy_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command copies a structure from one slot to another.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command copies a structure from one slot to another.</span>
 
 <span class="sd">        Implements :py:obj:`~.COPY_STRUCT`</span>
 
@@ -562,7 +559,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;COPY_STRUCT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_copy_param"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_copy_param">[docs]</a>    <span class="k">def</span> <span class="nf">execute_copy_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command copies a field of a structure to another field of \</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command copies a field of a structure to another field of \</span>
 <span class="sd">            a possibly-different structure.</span>
 
 <span class="sd">        Implements :py:obj:`~.COPY_PARAM`</span>
@@ -577,7 +574,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;COPY_PARAM&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_write_param"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_param">[docs]</a>    <span class="k">def</span> <span class="nf">execute_write_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command handles a single element of a structure.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command handles a single element of a structure.</span>
 
 <span class="sd">        Implements :py:obj:`~.WRITE_PARAM`</span>
 
@@ -591,7 +588,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;WRITE_PARAM&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_write_param_component"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_write_param_component">[docs]</a>    <span class="k">def</span> <span class="nf">execute_write_param_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command is never generated!</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command is never generated!</span>
 
 <span class="sd">        Implements :py:obj:`~.WRITE_PARAM_COMPONENT`</span>
 
@@ -605,7 +602,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;WRITE_PARAM_COMPONENT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_print_val"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_print_val">[docs]</a>    <span class="k">def</span> <span class="nf">execute_print_val</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command prints a value to the log.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command prints a value to the log.</span>
 
 <span class="sd">        Implements :py:obj:`~.PRINT_VAL`</span>
 
@@ -619,7 +616,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;PRINT_VAL&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_print_txt"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_print_txt">[docs]</a>    <span class="k">def</span> <span class="nf">execute_print_txt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command prints a short string to the log.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command prints a short string to the log.</span>
 
 <span class="sd">        Implements :py:obj:`~.PRINT_TXT`</span>
 
@@ -633,7 +630,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;PRINT_TXT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_print_struct"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_print_struct">[docs]</a>    <span class="k">def</span> <span class="nf">execute_print_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command prints a structure to the log.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command prints a structure to the log.</span>
 
 <span class="sd">        Implements :py:obj:`~.PRINT_STRUCT`</span>
 
@@ -647,7 +644,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;PRINT_STRUCT&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_read_param"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_read_param">[docs]</a>    <span class="k">def</span> <span class="nf">execute_read_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command extracts an element from a structure.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command extracts an element from a structure.</span>
 
 <span class="sd">        Implements :py:obj:`~.READ_PARAM`</span>
 
@@ -661,7 +658,7 @@
         <span class="k">raise</span> <span class="n">UnimplementedDSECommandError</span><span class="p">(</span><span class="s2">&quot;READ_PARAM&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractExecutorFunctions.execute_end_spec"><a class="viewcode-back" href="../../../data_specification.spi.html#data_specification.spi.AbstractExecutorFunctions.execute_end_spec">[docs]</a>    <span class="k">def</span> <span class="nf">execute_end_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
-        <span class="sd">&quot;&quot;&quot; This command marks the end of the specification program.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; This command marks the end of the specification program.</span>
 
 <span class="sd">        Implements :py:obj:`~.END_SPEC`</span>
 
@@ -711,7 +708,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -77,7 +74,7 @@
 
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationExecutorFunctions</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; This class includes the function related to each of the commands\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; This class includes the function related to each of the commands\</span>
 <span class="sd">        of the data specification file.</span>
 
 <span class="sd">    .. note::</span>
@@ -103,7 +100,7 @@
         <span class="s2">&quot;__data_len&quot;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.__init__"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec_reader</span><span class="p">,</span> <span class="n">memory_space</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~io.RawIOBase spec_reader:</span>
 <span class="sd">            The object to read the specification language file from</span>
 <span class="sd">        :param int memory_space:</span>
@@ -141,14 +138,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mem_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The collection of memory regions that can be written to.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The collection of memory regions that can be written to.</span>
 
 <span class="sd">        :rtype: MemoryRegionCollection</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mem_regions</span>
 
     <span class="k">def</span> <span class="nf">__unpack_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Routine to unpack the command read from the data spec file. The\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Routine to unpack the command read from the data spec file. The\</span>
 <span class="sd">            parameters of the command are stored in the class data.</span>
 
 <span class="sd">        :param int cmd: The command read form the data spec file</span>
@@ -170,7 +167,7 @@
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_break"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_break">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_break</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_break</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :raise ExecuteBreakInstruction:</span>
 <span class="sd">            Raises the exception to break the execution of the DSE</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -182,7 +179,7 @@
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_reserve"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_reserve">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_reserve</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_reserve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :raise ParameterOutOfBoundsException:</span>
 <span class="sd">            If the requested size of the region is beyond the available\</span>
 <span class="sd">            memory space</span>
@@ -228,7 +225,7 @@
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_reference"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_reference">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_reference</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_reference</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :raise ParameterOutOfBoundsException:</span>
 <span class="sd">            If the requested size of the region is beyond the available\</span>
 <span class="sd">            memory space</span>
@@ -251,7 +248,7 @@
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_write"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_write">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_write</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :raise NoRegionSelectedException:</span>
 <span class="sd">            If there is no memory region selected for the write operation</span>
 <span class="sd">        :raise RegionNotAllocatedException:</span>
@@ -291,7 +288,7 @@
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_write_array"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_write_array">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_write_array</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_write_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>  <span class="c1"># @UnusedVariable</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :raise NoRegionSelectedException:</span>
 <span class="sd">            If there is no memory region selected for the write operation</span>
 <span class="sd">        :raise RegionNotAllocatedException:</span>
@@ -306,7 +303,7 @@
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_switch_focus"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_switch_focus">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_switch_focus</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_switch_focus</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :raise RegionUnfilledException:</span>
 <span class="sd">            If the focus is being switched to a region of memory which has</span>
 <span class="sd">            been declared to be kept unfilled</span>
@@ -337,7 +334,7 @@
 
 <div class="viewcode-block" id="DataSpecificationExecutorFunctions.execute_set_wr_ptr"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutorFunctions.execute_set_wr_ptr">[docs]</a>    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractExecutorFunctions</span><span class="o">.</span><span class="n">execute_set_wr_ptr</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">execute_set_wr_ptr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :raise NoRegionSelectedException:</span>
 <span class="sd">            If there is no memory region selected for the set-ptr operation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -375,7 +372,7 @@
         <span class="k">return</span> <span class="n">END_SPEC_EXECUTOR</span></div>
 
     <span class="k">def</span> <span class="nf">_write_to_mem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">n_bytes</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write the specified value to data memory the specified amount of\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write the specified value to data memory the specified amount of\</span>
 <span class="sd">            times.</span>
 
 <span class="sd">            The selected memory region needs to be already allocated</span>
@@ -407,7 +404,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_bytes_to_mem</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">*</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">command</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_write_bytes_to_mem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Write raw bytes to data memory</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Write raw bytes to data memory</span>
 
 <span class="sd">            The selected memory region needs to be already allocated</span>
 
@@ -433,7 +430,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__write_blob</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__write_blob</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Does the actual write to the region, enforcing that writes cannot\</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Does the actual write to the region, enforcing that writes cannot\</span>
 <span class="sd">            go outside the region.</span>
 
 <span class="sd">        :param data: The data to write</span>
@@ -454,7 +451,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">referenceable_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The regions that can be referenced by others</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The regions that can be referenced by others</span>
 
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -462,7 +459,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">references_to_fill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The references that need to be filled</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; The references that need to be filled</span>
 
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -505,7 +502,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

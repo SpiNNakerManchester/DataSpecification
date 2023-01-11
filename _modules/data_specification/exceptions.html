@@ -9,9 +9,6 @@
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/sphinxdoc.css" />
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
-    <script src="../../_static/jquery.js"></script>
-    <script src="../../_static/underscore.js"></script>
-    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script src="../../_static/sphinx_highlight.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -55,24 +52,24 @@
 
 
 <div class="viewcode-block" id="DataSpecificationException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.DataSpecificationException">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; A general purpose exception indicating that something went\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; A general purpose exception indicating that something went\</span>
 <span class="sd">        wrong when interacting with a Data Specification</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="DataUndefinedWriterException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.DataUndefinedWriterException">[docs]</a><span class="k">class</span> <span class="nc">DataUndefinedWriterException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that the file data writer has not been\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that the file data writer has not been\</span>
 <span class="sd">        initialised</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="RegionInUseException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.RegionInUseException">[docs]</a><span class="k">class</span> <span class="nc">RegionInUseException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a region has already been\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a region has already been\</span>
 <span class="sd">        allocated</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int region: The region that was already allocated</span>
 <span class="sd">        :param label: What label is known for the region</span>
 <span class="sd">        :type label: str or None</span>
@@ -86,12 +83,12 @@
 
 
 <div class="viewcode-block" id="StructureInUseException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.StructureInUseException">[docs]</a><span class="k">class</span> <span class="nc">StructureInUseException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a structure has already been\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a structure has already been\</span>
 <span class="sd">        defined</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int structure: The structure that was already allocated</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;Structure </span><span class="si">{0}</span><span class="s2"> was already allocated&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -99,12 +96,12 @@
 
 
 <div class="viewcode-block" id="RegionUnfilledException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.RegionUnfilledException">[docs]</a><span class="k">class</span> <span class="nc">RegionUnfilledException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a memory region is being used\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a memory region is being used\</span>
 <span class="sd">        that was originally requested to be unfilled</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int region: The region that was requested as unfilled</span>
 <span class="sd">        :param str command: The command being executed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -114,11 +111,11 @@
 
 
 <div class="viewcode-block" id="NoRegionSelectedException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.NoRegionSelectedException">[docs]</a><span class="k">class</span> <span class="nc">NoRegionSelectedException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a memory region has not been selected</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a memory region has not been selected</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str command: The command being executed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -127,12 +124,12 @@
 
 
 <div class="viewcode-block" id="RegionExhaustedException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.RegionExhaustedException">[docs]</a><span class="k">class</span> <span class="nc">RegionExhaustedException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a region has run out of memory\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a region has run out of memory\</span>
 <span class="sd">        whilst some data is being written</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">region_size</span><span class="p">,</span> <span class="n">allocated_size</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int region: The region that was being written to</span>
 <span class="sd">        :param int region_size: The originally requested size of the region</span>
 <span class="sd">            that has run out of space, in bytes</span>
@@ -147,12 +144,12 @@
 
 
 <div class="viewcode-block" id="RegionOutOfBoundsException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.RegionOutOfBoundsException">[docs]</a><span class="k">class</span> <span class="nc">RegionOutOfBoundsException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that an offset into a region is out\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that an offset into a region is out\</span>
 <span class="sd">        of bounds for that region</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">region_size</span><span class="p">,</span> <span class="n">requested_offset</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int region: The region that was being offset into</span>
 <span class="sd">        :param int region_size:</span>
 <span class="sd">            The originally requested size of the region in question, in bytes</span>
@@ -166,12 +163,12 @@
 
 
 <div class="viewcode-block" id="ParameterOutOfBoundsException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.ParameterOutOfBoundsException">[docs]</a><span class="k">class</span> <span class="nc">ParameterOutOfBoundsException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a parameter value was outside of the\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a parameter value was outside of the\</span>
 <span class="sd">        allowed bounds</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">range_min</span><span class="p">,</span> <span class="n">range_max</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str parameter: The parameter that is out of bounds</span>
 <span class="sd">        :param value: The value specified</span>
 <span class="sd">        :type value: float or int</span>
@@ -189,12 +186,12 @@
 
 
 <div class="viewcode-block" id="NotAllocatedException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.NotAllocatedException">[docs]</a><span class="k">class</span> <span class="nc">NotAllocatedException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that an item is being used\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that an item is being used\</span>
 <span class="sd">        that has not been allocated</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_type</span><span class="p">,</span> <span class="n">item_id</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str item_type: The type of the item being used</span>
 <span class="sd">        :param int item_id: The ID of the item being used</span>
 <span class="sd">        :param str command: The command being executed</span>
@@ -205,12 +202,12 @@
 
 
 <div class="viewcode-block" id="NoMoreException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.NoMoreException">[docs]</a><span class="k">class</span> <span class="nc">NoMoreException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that there is no more space for the\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that there is no more space for the\</span>
 <span class="sd">        requested item</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">space_available</span><span class="p">,</span> <span class="n">space_required</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int space_available: The space available in the region</span>
 <span class="sd">        :param int space_required: The space requested by the write command</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -222,23 +219,23 @@
 
 
 <div class="viewcode-block" id="FunctionInUseException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.FunctionInUseException">[docs]</a><span class="k">class</span> <span class="nc">FunctionInUseException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a function is already defined</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a function is already defined</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int function_id: The ID of the function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;Function </span><span class="si">{0}</span><span class="s2"> is already defined&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">function_id</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="RNGInUseException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.RNGInUseException">[docs]</a><span class="k">class</span> <span class="nc">RNGInUseException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a random number generator is\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a random number generator is\</span>
 <span class="sd">        already defined</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int rng_id: The ID of the rng</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -246,12 +243,12 @@
 
 
 <div class="viewcode-block" id="RandomNumberDistributionInUseException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.RandomNumberDistributionInUseException">[docs]</a><span class="k">class</span> <span class="nc">RandomNumberDistributionInUseException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a random number distribution is\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a random number distribution is\</span>
 <span class="sd">        already defined</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rng_id</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int rng_id: The ID of the random number distribution</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -260,12 +257,12 @@
 
 
 <div class="viewcode-block" id="WrongParameterNumberException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.WrongParameterNumberException">[docs]</a><span class="k">class</span> <span class="nc">WrongParameterNumberException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a function has been called with a\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a function has been called with a\</span>
 <span class="sd">        wrong number of parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function_id</span><span class="p">,</span> <span class="n">no_of_parameters_required</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int function_id: The ID of the function</span>
 <span class="sd">        :param list parameters: The parameters used in the function call</span>
 <span class="sd">        :param int no_of_parameters_required:</span>
@@ -278,12 +275,12 @@
 
 
 <div class="viewcode-block" id="DuplicateParameterException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.DuplicateParameterException">[docs]</a><span class="k">class</span> <span class="nc">DuplicateParameterException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; And exception that indicates that a command has been called with a\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; And exception that indicates that a command has been called with a\</span>
 <span class="sd">        duplicate parameter, which shouldn&#39;t be allowed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int command: The command called with duplicate parameters</span>
 <span class="sd">        :param list parameters: The parameters used to call the function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -293,7 +290,7 @@
 
 
 <div class="viewcode-block" id="NestedFunctionException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.NestedFunctionException">[docs]</a><span class="k">class</span> <span class="nc">NestedFunctionException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a function is being defined within\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a function is being defined within\</span>
 <span class="sd">        the context of another function definition</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -302,11 +299,11 @@
 
 
 <div class="viewcode-block" id="TypeMismatchException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.TypeMismatchException">[docs]</a><span class="k">class</span> <span class="nc">TypeMismatchException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that a type mismatch has occurred</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that a type mismatch has occurred</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str command: The command that generated the exception</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -315,12 +312,12 @@
 
 
 <div class="viewcode-block" id="UnknownTypeException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.UnknownTypeException">[docs]</a><span class="k">class</span> <span class="nc">UnknownTypeException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that the value of the requested type\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that the value of the requested type\</span>
 <span class="sd">        is unknown</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_id</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int type_id: The ID of the requested type</span>
 <span class="sd">        :param str command: The command being executed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -330,12 +327,12 @@
 
 
 <div class="viewcode-block" id="UnknownTypeLengthException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.UnknownTypeLengthException">[docs]</a><span class="k">class</span> <span class="nc">UnknownTypeLengthException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that the value of the requested type\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that the value of the requested type\</span>
 <span class="sd">        is unknown</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_length</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int data_length: the length of the requested type</span>
 <span class="sd">        :param str command: The command being executed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -344,12 +341,12 @@
 
 
 <div class="viewcode-block" id="InvalidSizeException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.InvalidSizeException">[docs]</a><span class="k">class</span> <span class="nc">InvalidSizeException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that the size of the requested type is\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that the size of the requested type is\</span>
 <span class="sd">        invalid</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_name</span><span class="p">,</span> <span class="n">type_size</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str type_name: The name of the requested type</span>
 <span class="sd">        :param int type_size: The size of the requested variable</span>
 <span class="sd">        :param str command: The command being executed</span>
@@ -360,12 +357,12 @@
 
 
 <div class="viewcode-block" id="InvalidCommandException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.InvalidCommandException">[docs]</a><span class="k">class</span> <span class="nc">InvalidCommandException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that the command being requested cannot\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that the command being requested cannot\</span>
 <span class="sd">        be executed at this point in the specification.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str command: The command being executed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -374,12 +371,12 @@
 
 
 <div class="viewcode-block" id="UnknownConditionException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.UnknownConditionException">[docs]</a><span class="k">class</span> <span class="nc">UnknownConditionException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; And exception which is triggered in case the condition in an IF test\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; And exception which is triggered in case the condition in an IF test\</span>
 <span class="sd">        does not exist in the list of possible conditions</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition_id</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int condition_id: ID of the condition being requested</span>
 <span class="sd">        :param str command: The command being executed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -390,12 +387,12 @@
 
 
 <div class="viewcode-block" id="InvalidOperationException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.InvalidOperationException">[docs]</a><span class="k">class</span> <span class="nc">InvalidOperationException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception that indicates that the operation of the type given type\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception that indicates that the operation of the type given type\</span>
 <span class="sd">        is not available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation_type</span><span class="p">,</span> <span class="n">requested_operation_id</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str operation_type:</span>
 <span class="sd">            The type of operation requested (i.e. arithmetic or logic)</span>
 <span class="sd">        :param int requested_operation_id: The ID of the requested operation</span>
@@ -408,12 +405,12 @@
 
 
 <div class="viewcode-block" id="ExecuteBreakInstruction"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.ExecuteBreakInstruction">[docs]</a><span class="k">class</span> <span class="nc">ExecuteBreakInstruction</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception which occurs when a BREAK instruction is found in the\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception which occurs when a BREAK instruction is found in the\</span>
 <span class="sd">        data specification.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int address: address of the data specification being executed</span>
 <span class="sd">            at the time of breakpoint</span>
 <span class="sd">        :param str filename: file being parsed</span>
@@ -424,20 +421,20 @@
 
 
 <div class="viewcode-block" id="DataSpecificationSyntaxError"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationSyntaxError</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception which occurs when a command read from the data\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception which occurs when a command read from the data\</span>
 <span class="sd">        specification file shows an inconsistency in the binary content.</span>
 <span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="TablePointerOutOfMemoryException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.TablePointerOutOfMemoryException">[docs]</a><span class="k">class</span> <span class="nc">TablePointerOutOfMemoryException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception which occurs when building the table pointer as header of\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception which occurs when building the table pointer as header of\</span>
 <span class="sd">        the data generated by the spec executor. This message is printed in\</span>
 <span class="sd">        case the memory available is not enough to contain the pointer table\</span>
 <span class="sd">        for each of the allocated regions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">memory_available</span><span class="p">,</span> <span class="n">memory_required</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        :param int memory_available: on-chip memory available</span>
 <span class="sd">        :param int memory_required: on-chip memory required to complete the</span>
@@ -450,12 +447,12 @@
 
 
 <div class="viewcode-block" id="RegionNotAllocatedException"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.RegionNotAllocatedException">[docs]</a><span class="k">class</span> <span class="nc">RegionNotAllocatedException</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception which occurs when trying to write to an unallocated\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception which occurs when trying to write to an unallocated\</span>
 <span class="sd">        region of memory</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int region: The ID of the region that was not allocated.</span>
 <span class="sd">        :param str command: The name of the command that was being handled.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -465,12 +462,12 @@
 
 
 <div class="viewcode-block" id="UnimplementedDSECommandError"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.UnimplementedDSECommandError">[docs]</a><span class="k">class</span> <span class="nc">UnimplementedDSECommandError</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception which occurs when trying to execute an unimplemented\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception which occurs when trying to execute an unimplemented\</span>
 <span class="sd">        command</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str command: Command attempted to be executed by the DSE</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -479,12 +476,12 @@
 
 
 <div class="viewcode-block" id="UnimplementedDSGCommandError"><a class="viewcode-back" href="../../data_specification.html#data_specification.exceptions.UnimplementedDSGCommandError">[docs]</a><span class="k">class</span> <span class="nc">UnimplementedDSGCommandError</span><span class="p">(</span><span class="n">DataSpecificationException</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; An exception which occurs when trying to write an unimplemented\</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; An exception which occurs when trying to write an unimplemented\</span>
 <span class="sd">        command</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param str command: Command attempted to be generated by the DSG</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -528,7 +525,7 @@
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2014-2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 5.3.0.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
     </div>
   </body>
 </html>

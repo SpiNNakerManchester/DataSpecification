@@ -77,7 +77,8 @@ jobs:
       uses: ./support/actions/check-copyrights
       with:
         config_file: rat_asl20.xml
-     - name: Build documentation with sphinx
+        
+    - name: Build documentation with sphinx
       if: matrix.python-version == 3.8
       uses: ./support/actions/sphinx
       with:

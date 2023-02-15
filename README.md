@@ -1,3 +1,4 @@
+[![PyPi version](https://img.shields.io/pypi/v/SpiNNaker_DataSpecification.svg?style=flat)](https://pypi.org/project/SpiNNaker_DataSpecification/)
 [![Build Status](https://github.com/SpiNNakerManchester/DataSpecification/workflows/Python%20Actions/badge.svg?branch=master)](https://github.com/SpiNNakerManchester/DataSpecification/actions?query=workflow%3A%22Python+Actions%22+branch%3Amaster)
 [![Documentation Status](https://readthedocs.org/projects/dataspecification/badge/?version=latest)](https://dataspecification.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/DataSpecification/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/DataSpecification?branch=master)
@@ -58,4 +59,4 @@ Documentation
 <br>
 [Alternate location](https://spinnakermanchester.github.io/DataSpecification/)
 
-[Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)

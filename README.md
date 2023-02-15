@@ -59,4 +59,4 @@ Documentation
 <br>
 [Alternate location](https://spinnakermanchester.github.io/DataSpecification/)
 
-[Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)
+[Combined python documentation](http://spinnakermanchester.readthedocs.io)

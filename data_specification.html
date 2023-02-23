@@ -225,6 +225,25 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
+<section id="module-data_specification.config_setup">
+<span id="data-specification-config-setup-module"></span><h2>data_specification.config_setup module<a class="headerlink" href="#module-data_specification.config_setup" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="data_specification.config_setup.add_data_specification_cfg">
+<span class="sig-prename descclassname"><span class="pre">data_specification.config_setup.</span></span><span class="sig-name descname"><span class="pre">add_data_specification_cfg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/config_setup.html#add_data_specification_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.config_setup.add_data_specification_cfg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the local cfg and all dependent cfg files.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="data_specification.config_setup.unittest_setup">
+<span class="sig-prename descclassname"><span class="pre">data_specification.config_setup.</span></span><span class="sig-name descname"><span class="pre">unittest_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/config_setup.html#unittest_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.config_setup.unittest_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the configs so only the local default config is included.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This file should only be called from PACMAN/unittests</p>
+</div>
+</dd></dl>
+
+</section>
 <section id="module-data_specification.constants">
 <span id="data-specification-constants-module"></span><h2>data_specification.constants module<a class="headerlink" href="#module-data_specification.constants" title="Permalink to this heading">¶</a></h2>
 <p>Constants used by the Data Structure Generator (DSG)     and the Specification Executor.</p>
@@ -2851,6 +2870,11 @@ data region or an output region)</p></li>
 <li><a class="reference internal" href="#">data_specification package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-data_specification.config_setup">data_specification.config_setup module</a><ul>
+<li><a class="reference internal" href="#data_specification.config_setup.add_data_specification_cfg"><code class="docutils literal notranslate"><span class="pre">add_data_specification_cfg()</span></code></a></li>
+<li><a class="reference internal" href="#data_specification.config_setup.unittest_setup"><code class="docutils literal notranslate"><span class="pre">unittest_setup()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-data_specification.constants">data_specification.constants module</a><ul>
 <li><a class="reference internal" href="#data_specification.constants.APPDATA_MAGIC_NUM"><code class="docutils literal notranslate"><span class="pre">APPDATA_MAGIC_NUM</span></code></a></li>
 <li><a class="reference internal" href="#data_specification.constants.APP_PTR_TABLE_BYTE_SIZE"><code class="docutils literal notranslate"><span class="pre">APP_PTR_TABLE_BYTE_SIZE</span></code></a></li>

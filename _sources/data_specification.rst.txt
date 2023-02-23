@@ -13,6 +13,14 @@ Subpackages
 Submodules
 ----------
 
+data\_specification.config\_setup module
+----------------------------------------
+
+.. automodule:: data_specification.config_setup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 data\_specification.constants module
 ------------------------------------
 

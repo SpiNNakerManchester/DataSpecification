@@ -84,7 +84,7 @@ class AbstractExecutorFunctions(object, metaclass=AbstractBase):
     def execute_free(self, cmd):  # pragma: no cover
         """ This command frees some memory.
 
-        Implements :py:obj:`~.FREE`
+        Implements :py:obj:`~data_specification.enums.commands.FREE`
 
         :param int cmd: the command which triggered the function call
         :return: No value returned

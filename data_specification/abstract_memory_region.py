@@ -14,5 +14,6 @@
 
 
 class AbstractMemoryRegion(object):
-    """ Identifies something as a Memory region
+    """
+    Identifies something as a Memory region
     """

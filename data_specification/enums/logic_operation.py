@@ -16,7 +16,8 @@ from enum import Enum
 
 
 class LogicOperation(Enum):
-    """ Logic Operations
+    """
+    Logic Operations
     """
     #: Shift left (with zero extension)
     LEFT_SHIFT = (0, "LSL", "Shift left")

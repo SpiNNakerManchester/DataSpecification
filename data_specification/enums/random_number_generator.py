@@ -16,7 +16,8 @@ from enum import Enum
 
 
 class RandomNumberGenerator(Enum):
-    """ Random number generator types
+    """
+    Random number generator types.
     """
 
     #: The well-known Mersenne Twister PRNG

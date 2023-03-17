@@ -16,7 +16,8 @@ from .abstract_memory_region import AbstractMemoryRegion
 
 
 class MemoryRegionReference(AbstractMemoryRegion):
-    """ A reference to another memory region
+    """
+    A reference to another memory region.
     """
 
     __slots__ = ["__ref"]
@@ -29,7 +30,8 @@ class MemoryRegionReference(AbstractMemoryRegion):
 
     @property
     def ref(self):
-        """ Identifies what this references
+        """
+        Identifies what this references.
 
         :rtype: int
         """

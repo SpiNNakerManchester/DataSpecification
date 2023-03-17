@@ -45,7 +45,8 @@ _TWO_WORDS = struct.Struct("<II")
 
 
 def _bounds(cmd, name, value, low, high):
-    """ A simple bounds checker.
+    """
+    A simple bounds checker.
     """
     if value < low or value >= high:
         raise ParameterOutOfBoundsException(
@@ -53,7 +54,8 @@ def _bounds(cmd, name, value, low, high):
 
 
 def _typebounds(cmd, name, value, valuetype):
-    """ A simple bounds checker that uses the bounds from a type descriptor.
+    """
+    A simple bounds checker that uses the bounds from a type descriptor.
     """
     if valuetype not in DataType:
         raise UnknownTypeException(valuetype, cmd.name)
@@ -63,7 +65,8 @@ def _typebounds(cmd, name, value, valuetype):
 
 
 class _Field(IntEnum):
-    """ Various shifts for fields used with :py:func:`_binencode`.
+    """
+    Various shifts for fields used with :py:func:`_binencode`.
     """
     LENGTH = 28
     COMMAND = 20
@@ -79,11 +82,11 @@ class _Field(IntEnum):
 
 
 def _binencode(command, arguments):
-    """ Encodes commands as binary words.
+    """
+    Encodes commands as binary words.
 
     :param Commands command: The code of the command being encoded.
-    :param arguments: How to parameterise the command.
-    :type arguments: dict(:py:class:`_Field`,int)
+    :param  dict(_Field,int) arguments: How to parameterise the command.
     :return: the encoded command
     :rtype: bytearray
     """
@@ -101,7 +104,8 @@ def _binencode(command, arguments):
 
 
 class _MemSlot(object):
-    """ Metadata for a memory region.
+    """
+    Metadata for a memory region.
     """
     __slots__ = ["label", "size", "empty"]
 
@@ -118,8 +122,9 @@ class _MemSlot(object):
 
 
 class DataSpecificationGenerator(object):
-    """ Used to generate a SpiNNaker data specification language file that\
-        can be executed to produce a memory image.
+    """
+    Used to generate a SpiNNaker data specification language file that
+    can be executed to produce a memory image.
     """
     # pylint: disable=too-many-arguments
 
@@ -182,8 +187,9 @@ class DataSpecificationGenerator(object):
         self._ongoing_loop = False
 
     def comment(self, comment):
-        """ Write a comment to the text version of the specification.\
-            Note that this is ignored by the binary file
+        """
+        Write a comment to the text version of the specification.
+        Note that this is ignored by the binary file.
 
         :param str comment: The comment to write
         :raise DataUndefinedWriterException:
@@ -194,7 +200,8 @@ class DataSpecificationGenerator(object):
             bytearray(), comment, no_instruction_number=True)
 
     def define_break(self):
-        """ Insert command to stop execution with an exception (for debugging)
+        """
+        Insert command to stop execution with an exception (for debugging).
 
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
@@ -206,7 +213,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def no_operation(self):
-        """ Insert command to execute nothing
+        """
+        Insert command to execute nothing.
 
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
@@ -220,7 +228,8 @@ class DataSpecificationGenerator(object):
 
     def reserve_memory_region(
             self, region, size, label=None, empty=False, reference=None):
-        """ Insert command to reserve a memory region
+        """
+        Insert command to reserve a memory region.
 
         :param int region: The number of the region to reserve, from 0 to 15
         :param int size: The size to reserve for the region, in bytes
@@ -270,7 +279,8 @@ class DataSpecificationGenerator(object):
             cmd_word + encoded_size + encoded_ref, cmd_string)
 
     def reference_memory_region(self, region, ref, label=None):
-        """ Insert command to reference another memory region
+        """
+        Insert command to reference another memory region.
 
         :param int region: The number of the region to reserve, from 0 to 15
         :param int ref: The identifier of the region to reference
@@ -304,7 +314,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word + encoded_args, cmd_string)
 
     def free_memory_region(self, region):
-        """ Insert command to free a previously reserved memory region
+        """
+        Insert command to free a previously reserved memory region.
 
         :param int region: The number of the region to free, from 0 to 15
         :raise DataUndefinedWriterException:
@@ -334,7 +345,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def declare_random_number_generator(self, rng_id, rng_type, seed):
-        """ Insert command to declare a random number generator
+        """
+        Insert command to declare a random number generator.
 
         :param int rng_id: The ID of the random number generator
         :param RandomNumberGenerator rng_type:
@@ -377,7 +389,8 @@ class DataSpecificationGenerator(object):
 
     def declare_uniform_random_distribution(
             self, distribution_id, structure_id, rng_id, min_value, max_value):
-        """ Insert commands to declare a uniform random distribution
+        """
+        Insert commands to declare a uniform random distribution.
 
         :param int distribution_id: ID of the distribution being set up
         :param int structure_id: ID of an empty structure slot to fill with
@@ -437,9 +450,10 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def call_random_distribution(self, distribution_id, register_id):
-        """ Insert command to get the next random number from a random\
-            distribution, placing the result in a register to be used in a\
-            future call
+        """
+        Insert command to get the next random number from a random
+        distribution, placing the result in a register to be used in a
+        future call.
 
         :param int distribution_id:
             The ID of the random distribution to call between 0 and 63
@@ -474,7 +488,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def define_structure(self, structure_id, parameters):
-        """ Insert commands to define a data structure
+        """
+        Insert commands to define a data structure.
 
         :param int structure_id:
             the ID of the structure to create, between 0 and 15
@@ -568,8 +583,9 @@ class DataSpecificationGenerator(object):
     def get_structure_value(
             self, destination_id, structure_id, parameter_index,
             parameter_index_is_register=False):
-        """ Insert command to get a value from a structure.\
-            The value is copied in a register.
+        """
+        Insert command to get a value from a structure.
+        The value is copied in a register.
 
         :param int destination_id: The ID of the destination register
         :param int structure_id: The ID of the source structure
@@ -633,7 +649,8 @@ class DataSpecificationGenerator(object):
 
     def set_structure_value(self, structure_id, parameter_index, value,
                             data_type, value_is_register=False):
-        """ Insert command to set a value in a structure
+        """
+        Insert command to set a value in a structure.
 
         :param int structure_id:
             * If called outside of a function, the ID of the structure,
@@ -717,9 +734,10 @@ class DataSpecificationGenerator(object):
 
     def write_structure(
             self, structure_id, repeats=1, repeats_is_register=False):
-        """ Insert command to write a structure to the current write pointer,\
-            causing the current write pointer to move on by the number of\
-            bytes needed to represent the structure
+        """
+        Insert command to write a structure to the current write pointer,
+        causing the current write pointer to move on by the number of bytes
+        needed to represent the structure.
 
         :param int structure_id:
             * If called within a function, the ID of the structure to write,
@@ -774,13 +792,13 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def start_function(self, function_id, argument_by_value):
-        """ Insert command to start a function definition, with up to 5\
-            arguments, which are the IDs of structures to be used within the\
-            function, each of which can be passed by reference or by value.\
-            In the commands following this command up to the\
-            :meth:`end_function` command, structures can only be referenced\
-            using the numbers 1 to 5 which address the arguments, rather than\
-            the original structure IDs
+        """
+        Insert command to start a function definition, with up to 5 arguments,
+        which are the IDs of structures to be used within the function, each
+        of which can be passed by reference or by value. In the commands
+        following this command up to the :meth:`end_function` command,
+        structures can only be referenced using the numbers 1 to 5 which
+        address the arguments, rather than the original structure IDs.
 
         :param int function_id: The ID of the function currently defined.
         :param list(bool) argument_by_value: A list of up to 5 booleans
@@ -829,7 +847,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string, indent=True)
 
     def end_function(self):
-        """ Insert command to mark the end of a function definition
+        """
+        Insert command to mark the end of a function definition.
 
         :raise InvalidCommandException:
             If there is no function being defined at this point
@@ -845,7 +864,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string, outdent=True)
 
     def call_function(self, function_id, structure_ids):
-        """ Insert command to call a function
+        """
+        Insert command to call a function.
 
         :param int function_id:
             The ID of a previously defined function, between 0 and 31
@@ -909,9 +929,10 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word + param_word_encoded, cmd_string)
 
     def read_value(self, dest_id, data_type):
-        """ Insert command to read a value from the current write pointer,\
-            causing the write pointer to move by the number of bytes read.\
-            The data is stored in a register passed as argument.
+        """
+        Insert command to read a value from the current write pointer, causing
+        the write pointer to move by the number of bytes read. The data is
+        stored in a register passed as argument.
 
         :param int dest_id: The ID of the destination register.
         :param DataType data_type: The type of the data to be read.
@@ -934,10 +955,11 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def create_cmd(self, data, data_type=DataType.UINT32):
-        """ Creates command to write a value to the current write pointer,\
-            causing the write pointer to move on by the number of bytes\
-            required to represent the data type. The data is passed as a\
-            parameter to this function.
+        """
+        Creates command to write a value to the current write pointer, causing
+        the write pointer to move on by the number of bytes required to
+        represent the data type. The data is passed as a parameter to this
+        function.
 
         .. note::
             This does not actually insert the ``WRITE`` command in the spec;
@@ -995,14 +1017,15 @@ class DataSpecificationGenerator(object):
         return (cmd_word_list, cmd_string)
 
     def write_value(self, data, data_type=DataType.UINT32):
-        """ Insert command to write a value (once) to the current\
-            write pointer, causing the write pointer to move on by the number\
-            of bytes required to represent the data type. The data is passed\
-            as a parameter to this function
+        """
+        Insert command to write a value (once) to the current write pointer,
+        causing the write pointer to move on by the number of bytes required
+        to represent the data type. The data is passed as a parameter to this
+        function
 
         .. note::
-            This method used to have two extra parameters ``repeats`` and\
-            ``repeats_is_register``. They have been removed here. If you need\
+            This method used to have two extra parameters ``repeats`` and
+            ``repeats_is_register``. They have been removed here. If you need
             them, use :meth:`write_repeated_value`
 
         :param data: the data to write as a float.
@@ -1025,10 +1048,11 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word_list, cmd_string)
 
     def write_cmd(self, cmd_word_list, cmd_string):
-        """ Applies write commands created previously created (and cached).
+        """
+        Applies write commands created previously created (and cached).
 
         .. note::
-            See :meth:`create_cmd` for how to create the arguments to\
+            See :meth:`create_cmd` for how to create the arguments to
             this method.
 
         :param bytearray cmd_word_list: list of binary words to be added to
@@ -1045,10 +1069,11 @@ class DataSpecificationGenerator(object):
     def write_repeated_value(
             self, data, repeats=1, repeats_is_register=False,
             data_type=DataType.UINT32):
-        """ Insert command to write a value one or more times to the current\
-            write pointer, causing the write pointer to move on by the number\
-            of bytes required to represent the data type. The data is passed\
-            as a parameter to this function
+        """
+        Insert command to write a value one or more times to the current write
+        pointer, causing the write pointer to move on by the number of bytes
+        required to represent the data type. The data is passed as a parameter
+        to this function
 
         :param data: the data to write as a float.
         :type data: float or int
@@ -1128,10 +1153,10 @@ class DataSpecificationGenerator(object):
     def write_value_from_register(
             self, data_register, repeats=1, repeats_is_register=False,
             data_type=DataType.UINT32):
-        """ Insert command to write a value one or more times at the write\
-            pointer of the current memory region, causing it to move.\
-            The data is contained in a register whose ID is passed to the\
-            function
+        """
+        Insert command to write a value one or more times at the write pointer
+        of the current memory region, causing it to move. The data is contained
+        in a register whose ID is passed to the function.
 
         :param int data_register:
             Identifies the register in which the data is stored.
@@ -1205,8 +1230,9 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def write_array(self, array_values, data_type=DataType.UINT32):
-        """ Insert command to write an array, causing the write pointer\
-            to move on by (data type size * the array size), in bytes.
+        """
+        Insert command to write an array, causing the write pointer
+        to move on by (data type size * the array size), in bytes.
 
         :param array_values: An array of words to be written
         :type array_values: list(int) or list(float) or ~numpy.ndarray
@@ -1238,7 +1264,8 @@ class DataSpecificationGenerator(object):
         self._spec_writer.write(data.tostring())
 
     def switch_write_focus(self, region):
-        """ Insert command to switch the region being written to
+        """
+        Insert command to switch the region being written to.
 
         :param int region: The ID of the region to switch to, between 0 and 15
         :raise DataUndefinedWriterException:
@@ -1271,7 +1298,8 @@ class DataSpecificationGenerator(object):
     def start_loop(self, counter_register_id, start, end, increment=1,
                    start_is_register=False, end_is_register=False,
                    increment_is_register=False):
-        """ Insert command to start a loop
+        """
+        Insert command to start a loop.
 
         :param int counter_register_id: The ID of the register to use as the
             loop counter, between 0 and 15
@@ -1371,7 +1399,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word + encoded_values, cmd_string)
 
     def break_loop(self):
-        """ Insert command to break out of a loop before it has completed
+        """
+        Insert command to break out of a loop before it has completed.
 
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
@@ -1388,9 +1417,10 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def end_loop(self):
-        """ Insert command to indicate that this is the end of the loop.\
-            Commands between the start of the loop and this command will be\
-            repeated.
+        """
+        Insert command to indicate that this is the end of the loop.
+        Commands between the start of the loop and this command will be
+        repeated.
 
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
@@ -1408,10 +1438,11 @@ class DataSpecificationGenerator(object):
 
     def start_conditional(self, register_id, condition, value,
                           value_is_register=False):
-        """ Insert command to start a conditional if...then...else construct.\
-            If the condition evaluates to true, the statement is executed up\
-            to the next else statement, or the end of the conditional,\
-            whichever comes first.
+        """
+        Insert command to start a conditional if...then...else construct. If
+        the condition evaluates to true, the statement is executed up to the
+        next else statement, or the end of the conditional, whichever comes
+        first.
 
         :param int register_id: The ID of a register to compare the value of
         :param Condition condition:
@@ -1464,11 +1495,12 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word_list, cmd_string, indent=True)
 
     def else_conditional(self):
-        """ Insert command for the else of an if...then...else construct.\
-            If the condition of the conditional evaluates to false, the\
-            statements up between the conditional and the insertion of this\
-            "else" are skipped, and the statements from this point until the\
-            end of the conditional are executed.
+        """
+        Insert command for the else of an if...then...else construct. If the
+        condition of the conditional evaluates to false, the statements up
+        between the conditional and the insertion of this "else" are skipped,
+        and the statements from this point until the end of the conditional
+        are executed.
 
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
@@ -1489,7 +1521,8 @@ class DataSpecificationGenerator(object):
             cmd_word, cmd_string, indent=True, outdent=True)
 
     def end_conditional(self):
-        """ Insert command to mark the end of an if...then...else construct
+        """
+        Insert command to mark the end of an if...then...else construct
 
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised
@@ -1508,7 +1541,8 @@ class DataSpecificationGenerator(object):
 
     def set_register_value(self, register_id, data, data_is_register=False,
                            data_type=DataType.UINT32):
-        """ Insert command to set the value of a register
+        """
+        Insert command to set the value of a register.
 
         :param int register_id:
             The ID of the register to assign, between 0 and 15
@@ -1565,7 +1599,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word + encoded_data, cmd_string)
 
     def save_write_pointer(self, register_id):
-        """ Insert command to save the write pointer to a register
+        """
+        Insert command to save the write pointer to a register.
 
         :param int register_id:
             The ID of the register to assign, between 0 and 15
@@ -1591,8 +1626,9 @@ class DataSpecificationGenerator(object):
 
     def set_write_pointer(self, address, address_is_register=False,
                           relative_to_current=False):
-        """ Insert command to set the position of the write pointer within the\
-            current region
+        """
+        Insert command to set the position of the write pointer within the
+        current region.
 
         :param int address:
             * If ``address_is_register`` is True, the ID of the register
@@ -1650,8 +1686,9 @@ class DataSpecificationGenerator(object):
     def align_write_pointer(self, log_block_size,
                             log_block_size_is_register=False,
                             return_register_id=None):
-        """ Insert command to align the write pointer against a power-of-2\
-            block size in bytes.  Zeros are inserted in the intervening space
+        """
+        Insert command to align the write pointer against a power-of-2
+        block size in bytes.  Zeros are inserted in the intervening space
 
         :param int log_block_size:
             * If ``log_block_size_is_register`` is False, log to base 2 of
@@ -1719,8 +1756,9 @@ class DataSpecificationGenerator(object):
                                   operand_2, signed,
                                   operand_1_is_register=False,
                                   operand_2_is_register=False):
-        """ Insert command to perform an arithmetic operation on two signed or\
-            unsigned values and store the result in a register
+        """
+        Insert command to perform an arithmetic operation on two signed or
+        unsigned values and store the result in a register
 
         :param int register_id: The ID of the register to store the result in
         :param int operand_1:
@@ -1817,7 +1855,8 @@ class DataSpecificationGenerator(object):
 
     def logical_and(self, register_id, operand_1, operand_2,
                     operand_1_is_register=False, operand_2_is_register=False):
-        """ Insert command to perform a logical AND operation.
+        """
+        Insert command to perform a logical AND operation.
 
         :param int register_id: The ID of the register to store the result in
         :param int operand_1:
@@ -1848,7 +1887,8 @@ class DataSpecificationGenerator(object):
 
     def logical_or(self, register_id, operand_1, operand_2,
                    operand_1_is_register=False, operand_2_is_register=False):
-        """ Insert command to perform a logical OR operation.
+        """
+        Insert command to perform a logical OR operation.
 
         :param int register_id: The ID of the register to store the result in
         :param int operand_1:
@@ -1880,7 +1920,8 @@ class DataSpecificationGenerator(object):
     def logical_left_shift(self, register_id, operand_1, operand_2,
                            operand_1_is_register=False,
                            operand_2_is_register=False):
-        """ Insert command to perform a logical left shift operation.
+        """
+        Insert command to perform a logical left shift operation.
 
         :param int register_id: The ID of the register to store the result in
         :param int operand_1:
@@ -1912,7 +1953,8 @@ class DataSpecificationGenerator(object):
     def logical_right_shift(self, register_id, operand_1, operand_2,
                             operand_1_is_register=False,
                             operand_2_is_register=False):
-        """ Insert command to perform a logical right shift operation.
+        """
+        Insert command to perform a logical right shift operation.
 
         :param int register_id: The ID of the register to store the result in
         :param int operand_1:
@@ -1943,7 +1985,8 @@ class DataSpecificationGenerator(object):
 
     def logical_xor(self, register_id, operand_1, operand_2,
                     operand_1_is_register=False, operand_2_is_register=False):
-        """ Insert command to perform a logical xor operation.
+        """
+        Insert command to perform a logical XOR operation.
 
         :param int register_id: The ID of the register to store the result in
         :param int operand_1:
@@ -1973,7 +2016,8 @@ class DataSpecificationGenerator(object):
             operand_1_is_register, operand_2_is_register)
 
     def logical_not(self, register_id, operand, operand_is_register=False):
-        """ Insert command to perform a logical not operation.
+        """
+        Insert command to perform a logical NOT operation.
 
         :param int register_id: The ID of the register to store the result in
         :param int operand:
@@ -1997,8 +2041,9 @@ class DataSpecificationGenerator(object):
     def _call_logic_operation(self, register_id, operand_1, operation,
                               operand_2, operand_1_is_register=False,
                               operand_2_is_register=False):
-        """ Insert command to perform a logic operation on two signed or\
-            unsigned values and store the result in a register
+        """
+        Insert command to perform a logic operation on two signed or
+        unsigned values and store the result in a register.
 
         :param int register_id: The ID of the register to store the result in
         :param int operand_1:
@@ -2083,8 +2128,9 @@ class DataSpecificationGenerator(object):
     def copy_structure(self, source_structure_id, destination_structure_id,
                        source_id_is_register=False,
                        destination_id_is_register=False):
-        """ Insert command to copy a structure, possibly overwriting another\
-            structure
+        """
+        Insert command to copy a structure, possibly overwriting another
+        structure.
 
         :param int source_structure_id:
             * If ``source_id_is_register`` is True, the ID of the register
@@ -2161,8 +2207,9 @@ class DataSpecificationGenerator(object):
             self, source_structure_id, source_parameter_index,
             destination_id, destination_parameter_index=None,
             destination_is_register=False):
-        """ Insert command to copy the value of a parameter from one\
-            structure to another.
+        """
+        Insert command to copy the value of a parameter from one
+        structure to another.
 
         :param int source_structure_id:
             The ID of the source structure, between 0 and 15
@@ -2266,7 +2313,8 @@ class DataSpecificationGenerator(object):
 
     def print_value(self, value, value_is_register=False,
                     data_type=DataType.UINT32):
-        """ Insert command to print out a value (for debugging)
+        """
+        Insert command to print out a value (for debugging).
 
         :param value:
             * If ``value_is_register`` is True, the ID of the register
@@ -2313,7 +2361,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word + data_encoded, cmd_string)
 
     def print_text(self, text, encoding="ASCII"):
-        """ Insert command to print some text (for debugging)
+        """
+        Insert command to print some text (for debugging).
 
         :param str text: The text to write (max 12 *bytes* once encoded)
         :param str encoding:
@@ -2345,7 +2394,8 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word + text_encoded, cmd_string)
 
     def print_struct(self, structure_id, structure_id_is_register=False):
-        """ Insert command to print out a structure (for debugging)
+        """
+        Insert command to print out a structure (for debugging).
 
         :param int structure_id:
             * If ``structure_id_is_register`` is True, the ID of the register
@@ -2392,8 +2442,9 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word, cmd_string)
 
     def end_specification(self, close_writer=True):
-        """ Insert a command to indicate that the specification has finished\
-            and finish writing
+        """
+        Insert a command to indicate that the specification has finished
+        and finish writing.
 
         :param bool close_writer:
             Indicates whether to close the underlying writer(s)
@@ -2418,9 +2469,10 @@ class DataSpecificationGenerator(object):
 
     def _write_command_to_files(self, cmd_word_list, cmd_string, indent=False,
                                 outdent=False, no_instruction_number=False):
-        """ Writes the binary command to the binary output file and, if the\
-            user has requested a text output for debug purposes, also write\
-            the text version to the text file.
+        """
+        Writes the binary command to the binary output file and, if the
+        user has requested a text output for debug purposes, also write
+        the text version to the text file.
 
         Setting the optional parameter ``indent`` to ``True`` causes subsequent
         commands to be indented by two spaces relative to this one. Similarly,
@@ -2449,8 +2501,7 @@ class DataSpecificationGenerator(object):
                 self._txt_indent = min(self._txt_indent - 1, 0)
             indent_string = "   " * self._txt_indent
             if no_instruction_number:
-                formatted_cmd_string = "{}{}\n".format(
-                    indent_string, cmd_string)
+                formatted_cmd_string = f"{indent_string}{cmd_string}\n"
             else:
                 formatted_cmd_string = "{:08X}. {}{}\n".format(
                     self._instruction_counter, indent_string, cmd_string)
@@ -2462,7 +2513,8 @@ class DataSpecificationGenerator(object):
 
     @property
     def region_sizes(self):
-        """ A list of sizes of each region that has been reserved.
+        """
+        A list of sizes of each region that has been reserved.
 
         .. note::
             The list will include ``0`` for each non-reserved region.
@@ -2473,8 +2525,9 @@ class DataSpecificationGenerator(object):
 
     @property
     def current_region(self):
-        """ The ID of the current DSG region we're writing to.\
-            If not yet writing to any region, ``None``.
+        """
+        The ID of the current DSG region we're writing to.
+        If not yet writing to any region, ``None``.
 
         :rtype: int or None
         """

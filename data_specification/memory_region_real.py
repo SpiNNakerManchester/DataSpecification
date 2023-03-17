@@ -15,7 +15,8 @@ from .abstract_memory_region import AbstractMemoryRegion
 
 
 class MemoryRegionReal(AbstractMemoryRegion):
-    """ Memory region storage object.
+    """
+    Memory region storage object.
     """
 
     __slots__ = [
@@ -51,7 +52,8 @@ class MemoryRegionReal(AbstractMemoryRegion):
 
     @property
     def allocated_size(self):
-        """ The size of the region.
+        """
+        The size of the region.
 
         :rtype: int
         """
@@ -59,9 +61,10 @@ class MemoryRegionReal(AbstractMemoryRegion):
 
     @property
     def remaining_space(self):
-        """ The space between the current write pointer and the end of the\
-            region, which is the number of bytes remaining in the region that\
-            can be written.
+        """
+        The space between the current write pointer and the end of the region,
+        which is the number of bytes remaining in the region that can be
+        written.
 
         :rtype: int
         """
@@ -69,8 +72,9 @@ class MemoryRegionReal(AbstractMemoryRegion):
 
     @property
     def unfilled(self):
-        """ Whether the region is marked as not fillable; unfilled regions\
-            will not contain any data at write time.
+        """
+        Whether the region is marked as not fillable; unfilled regions will
+        not contain any data at write time.
 
         :rtype: bool
         """
@@ -78,7 +82,8 @@ class MemoryRegionReal(AbstractMemoryRegion):
 
     @property
     def region_data(self):
-        """ The buffer which holds the data written in this region.
+        """
+        The buffer which holds the data written in this region.
 
         :rtype: bytearray
         """
@@ -88,7 +93,8 @@ class MemoryRegionReal(AbstractMemoryRegion):
 
     @property
     def write_pointer(self):
-        """ The position in the buffer where data will be written to next.
+        """
+        The position in the buffer where data will be written to next.
 
         :rtype: int
         """
@@ -102,14 +108,16 @@ class MemoryRegionReal(AbstractMemoryRegion):
 
     @property
     def max_write_pointer(self):
-        """ The max point where if written over, it will cause an error.
+        """
+        The max point where if written over, it will cause an error.
 
         :rtype: int
         """
         return self._max_write_pointer
 
     def increment_write_pointer(self, n_bytes):
-        """ Advance the write pointer.
+        """
+        Advance the write pointer.
 
         :param int n_bytes: The number of bytes to advance the pointer by.
         """
@@ -119,7 +127,8 @@ class MemoryRegionReal(AbstractMemoryRegion):
 
     @property
     def reference(self):
-        """ The globally unique reference of this region, or None if none
+        """
+        The globally unique reference of this region, or `None` if none
 
         :rtype: int or None
         """

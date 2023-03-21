@@ -132,7 +132,7 @@ class DataSpecificationExecutor(object):
         Get a region with a given ID.
 
         :param int region_id: The ID of the region to get
-        :return: The region, or None if the region was not allocated
+        :return: The region, or `None` if the region was not allocated
         :rtype: MemoryRegionReal or None
         """
         return self.dsef.mem_regions[region_id]

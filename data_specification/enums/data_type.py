@@ -413,7 +413,7 @@ class DataType(Enum):
         """
         Returns the value as a numpy integer, according to this type.
 
-        .. note:
+        .. note::
             Only works with integer and fixed point data types.
 
         :param value:

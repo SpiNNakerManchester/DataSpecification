@@ -150,7 +150,7 @@ class DataSpecificationGenerator(object):
             The object to write the specification to
         :param report_writer:
             Determines if a text version of the specification is to be
-            written and, if so, where. No report is written if this is None.
+            written and, if so, where. No report is written if this is `None`.
         :type report_writer: ~io.TextIOBase or None
         :raise IOError: If a write to external storage fails
         """
@@ -189,7 +189,9 @@ class DataSpecificationGenerator(object):
     def comment(self, comment):
         """
         Write a comment to the text version of the specification.
-        Note that this is ignored by the binary file.
+
+        .. note::
+            This is ignored by the binary file.
 
         :param str comment: The comment to write
         :raise DataUndefinedWriterException:
@@ -498,7 +500,7 @@ class DataSpecificationGenerator(object):
 
             * `label` is the label of the element (for debugging)
             * `data_type` is the data type of the element
-            * `value` is the value of the element, or None if no value is to
+            * `value` is the value of the element, or `None` if no value is to
                be assigned
         :type parameters: list(tuple(str, DataType, float))
         :raise DataUndefinedWriterException:
@@ -1161,10 +1163,10 @@ class DataSpecificationGenerator(object):
         :param int data_register:
             Identifies the register in which the data is stored.
         :param int repeats:
-            * If ``repeats_is_register`` is None, this parameter identifies
+            * If ``repeats_is_register`` is `None`, this parameter identifies
               the number of times to repeat the data, between 1 and 255
               (default 1)
-            * If ``repeats_is_register`` is not None (i.e. has an integer
+            * If ``repeats_is_register`` is not `None` (i.e. has an integer
               value), the content of this parameter is disregarded
         :param bool repeats_is_register: Identifies if ``repeats`` is the
             register containing the number of repeats of the value to write
@@ -1701,7 +1703,7 @@ class DataSpecificationGenerator(object):
             Indicates if ``log_block_size`` is a register ID
         :param return_register_id: The ID of a register where the write
             pointer will be written to once it has been updated, between
-            0 and 15, or None if no such writing is to be done
+            0 and 15, or `None` if no such writing is to be done
         :type return_register_id: int or None
         :raise DataUndefinedWriterException:
             If the binary specification file writer has not been initialised

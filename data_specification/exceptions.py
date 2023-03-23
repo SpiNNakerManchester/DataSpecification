@@ -41,7 +41,7 @@ class RegionInUseException(DataSpecificationException):
         if label is None:
             msg = f"Region {region:d} was already allocated"
         else:
-            msg = f"Region {region:d} ({label:s}) was already allocated"
+            msg = f"Region {region:d} ({label}) was already allocated"
         super().__init__(msg)
 
 
@@ -105,7 +105,7 @@ class RegionExhaustedException(DataSpecificationException):
         super().__init__(
             f"Region {region} with size {region_size} ran out of allocated "
             f"memory (space already occupied {allocated_size}) during "
-            f"command {command:s}")
+            f"command {command}")
 
 
 class RegionOutOfBoundsException(DataSpecificationException):

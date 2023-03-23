@@ -85,7 +85,7 @@ class DataSpecificationExecutor(object):
                          cmd, index, exc_info=True)
             raise DataSpecificationException(
                 f"Invalid command 0x{cmd:X} while reading "
-                f"file {self._spec_reader.filename:s}") from e
+                f"file {self._spec_reader.filename}") from e
 
     def execute(self):
         """

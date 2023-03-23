@@ -271,7 +271,7 @@ class DataSpecificationGenerator(object):
         cmd_string = Commands.RESERVE.name
         cmd_string += f" memRegion={region:d} size={size:d}"
         if label is not None:
-            cmd_string += f" label='{label:s}'"
+            cmd_string += f" label='{label}'"
         if empty:
             cmd_string += " UNFILLED"
         if reference is not None:
@@ -311,7 +311,7 @@ class DataSpecificationGenerator(object):
         cmd_string = Commands.REFERENCE.name
         cmd_string += f" memRegion={region:d} ref={ref:d}"
         if label is not None:
-            cmd_string += f" label='{label:s}'"
+            cmd_string += f" label='{label}'"
 
         self._write_command_to_files(cmd_word + encoded_args, cmd_string)
 
@@ -342,7 +342,7 @@ class DataSpecificationGenerator(object):
         cmd_string = Commands.FREE.name
         cmd_string += f" memRegion={region:d}"
         if label is not None:
-            cmd_string += f" ({label:s})"
+            cmd_string += f" ({label})"
         self._write_command_to_files(cmd_word, cmd_string)
 
     def declare_random_number_generator(self, rng_id, rng_type, seed):
@@ -543,7 +543,7 @@ class DataSpecificationGenerator(object):
 
             cmd_string = Commands.WRITE_PARAM.name
             cmd_string += (
-                f" element_id={elem_index:d}, element_type={data_type.name:s}")
+                f" element_id={elem_index:d}, element_type={data_type.name}")
             if value is not None:
                 _typebounds(Commands.WRITE_PARAM, "value", value, data_type)
                 if data_type.size <= 4:
@@ -563,7 +563,7 @@ class DataSpecificationGenerator(object):
                 if len(label) == 0:
                     cmd_string += f", value={value:d}"
                 else:
-                    cmd_string += f", value={value:f}, label={label:s}"
+                    cmd_string += f", value={value:f}, label={label}"
                 self._write_command_to_files(
                     cmd_word + value_bytes, cmd_string)
             else:
@@ -571,7 +571,7 @@ class DataSpecificationGenerator(object):
                     _Field.LENGTH: LEN1,
                     _Field.IMMEDIATE: data_type})
                 if len(label):
-                    cmd_string += f", label={label:s}"
+                    cmd_string += f", label={label}"
                 self._write_command_to_files(cmd_word, cmd_string)
 
         # end of struct
@@ -1015,7 +1015,7 @@ class DataSpecificationGenerator(object):
 
         cmd_word_list = cmd_word + data_type.encode(data)
         if self._report_writer is not None:
-            cmd_string += f", dataType={data_type.name:s}"
+            cmd_string += f", dataType={data_type.name}"
         return (cmd_word_list, cmd_string)
 
     def write_value(self, data, data_type=DataType.UINT32):
@@ -1149,7 +1149,7 @@ class DataSpecificationGenerator(object):
             _Field.DESTINATION: data_len,
             _Field.IMMEDIATE: parameters})
         data_word = data_type.encode(data)
-        cmd_string += f", dataType={data_type.name:s}"
+        cmd_string += f", dataType={data_type.name}"
         self._write_command_to_files(cmd_word + data_word, cmd_string)
 
     def write_value_from_register(
@@ -1228,7 +1228,7 @@ class DataSpecificationGenerator(object):
             _Field.DESTINATION: cmd_data_len,
             _Field.SOURCE_1: data_register,
             _Field.IMMEDIATE: parameters})
-        cmd_string += f", dataType={data_type.name:s}"
+        cmd_string += f", dataType={data_type.name}"
         self._write_command_to_files(cmd_word, cmd_string)
 
     def write_array(self, array_values, data_type=DataType.UINT32):
@@ -1479,7 +1479,7 @@ class DataSpecificationGenerator(object):
                 _Field.SOURCE_2: value,
                 _Field.IMMEDIATE: condition})
             cmd_string += (
-                f" reg[{register_id:d}] {condition.operator:s} reg[{value:d}]")
+                f" reg[{register_id:d}] {condition.operator} reg[{value:d}]")
         else:
             _typebounds(Commands.IF, "value", value, DataType.INT32)
             cmd_word = _binencode(Commands.IF, {
@@ -1489,7 +1489,7 @@ class DataSpecificationGenerator(object):
                 _Field.IMMEDIATE: condition})
             data_encoded += _ONE_SIGNED_INT.pack(value)
             cmd_string += (
-                f" reg[{register_id:d}] {condition.operator:s} {value:d}")
+                f" reg[{register_id:d}] {condition.operator} {value:d}")
 
         self._conditionals.append(False)
         cmd_word_list = cmd_word + data_encoded
@@ -1664,7 +1664,7 @@ class DataSpecificationGenerator(object):
                 _Field.USAGE: SRC1_ONLY,
                 _Field.SOURCE_1: address,
                 _Field.IMMEDIATE: relative})
-            cmd_string += f" reg[{address:d}] {relative_string:s}"
+            cmd_string += f" reg[{address:d}] {relative_string}"
         else:
             if not relative_to_current:
                 _typebounds(Commands.SET_WR_PTR, "address",
@@ -1679,7 +1679,7 @@ class DataSpecificationGenerator(object):
                 _Field.LENGTH: LEN2,
                 _Field.USAGE: NO_REGS,
                 _Field.IMMEDIATE: relative})
-            cmd_string += f" {address:d} {relative_string:s}"
+            cmd_string += f" {address:d} {relative_string}"
 
         self._write_command_to_files(cmd_word + data_encoded, cmd_string)
 
@@ -2099,7 +2099,7 @@ class DataSpecificationGenerator(object):
             _typebounds(Commands.LOGIC_OP, "operand_1",
                         operand_1, DataType.UINT32)
             encoded_operands += _ONE_WORD.pack(operand_1)
-            cmd_string += f" {operand_1:s}"
+            cmd_string += f" {operand_1}"
 
         if operation.value != LogicOperation.NOT.value:
             cmd_string += f" {operation.operator}"
@@ -2114,7 +2114,7 @@ class DataSpecificationGenerator(object):
                 _typebounds(Commands.LOGIC_OP, "operand_2",
                             operand_2, DataType.UINT32)
                 encoded_operands += _ONE_WORD.pack(operand_2)
-                cmd_string += f" {operand_2:s}"
+                cmd_string += f" {operand_2}"
 
         cmd_word = _binencode(Commands.LOGIC_OP, {
             _Field.LENGTH: cmd_length,
@@ -2383,7 +2383,7 @@ class DataSpecificationGenerator(object):
             text_encoded += bytearray(4 - text_len % 4)
 
         cmd_string = Commands.PRINT_TXT.name
-        cmd_string += f' "{text:s}"'
+        cmd_string += f' "{text}"'
         cmd_word = _binencode(Commands.PRINT_TXT, {
             _Field.LENGTH: cmd_word_len,
             _Field.IMMEDIATE: text_len - 1})

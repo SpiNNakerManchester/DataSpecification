@@ -402,7 +402,7 @@ class DataType(Enum):
                 value = int(value)
             if not (self._min <= value <= self._max):
                 raise ValueError(
-                    f"value {value:f} cannot be converted to {self.__doc__:s}"
+                    f"value {value:f} cannot be converted to {self.__doc__}"
                     ": out of range")
             return int(round(decimal.Decimal(str(value)) * self._scale))
         if self._force_cast is not None:
@@ -436,7 +436,7 @@ class DataType(Enum):
             if where.any():
                 raise ValueError(
                     f"value {array[where][0]:f} cannot be converted to "
-                    f"{self.__doc__:s}: out of range")
+                    f"{self.__doc__}: out of range")
             return np.round(array * float(self._scale)).astype("uint32")
         if self._force_cast is not None:
             return np.array([self._force_cast(x) for x in array]).astype(

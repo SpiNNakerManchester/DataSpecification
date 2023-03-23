@@ -84,8 +84,8 @@ class DataSpecificationExecutor(object):
             logger.debug("problem decoding opcode %d at index %d",
                          cmd, index, exc_info=True)
             raise DataSpecificationException(
-                "Invalid command 0x{0:X} while reading file {1:s}".format(
-                    cmd, self._spec_reader.filename)) from e
+                f"Invalid command 0x{cmd:X} while reading "
+                f"file {self._spec_reader.filename:s}") from e
 
     def execute(self):
         """

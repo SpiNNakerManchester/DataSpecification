@@ -128,7 +128,7 @@ class MemoryRegionReal(AbstractMemoryRegion):
     @property
     def reference(self):
         """
-        The globally unique reference of this region, or `None` if none
+        The globally unique reference of this region, or `None` if none.
 
         :rtype: int or None
         """

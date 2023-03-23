@@ -157,15 +157,14 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         if not referenceable and self.__cmd_size != LEN2:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires one word as argument (total 2 words), "
-                "but the current encoding ({1:X}) is specified to be {2:d} "
-                "words long".format(
-                    "RESERVE", cmd, self.__cmd_size))
+                "Command RESERVE requires one word as argument (total 2 "
+                f"words), but the current encoding ({cmd:X}) is specified to "
+                f"be {self.__cmd_size:d} words long")
         if referenceable and self.__cmd_size != LEN3:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires two words as arguments (total 3 "
-                "words), but the current encoding ({1:X}) is specified to be "
-                "{2:d} words long".format("RESERVE", cmd, self.__cmd_size))
+                "Command RESERVE requires two words as arguments (total 3 "
+                f"words), but the current encoding ({cmd:X}) is specified to "
+                f"be {self.__cmd_size:d} words long")
 
         if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
@@ -200,9 +199,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         if self.__cmd_size != LEN2:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires one word as argument (total 2 words), "
-                "but the current encoding ({1:X}) is specified to be {2:d} "
-                "words long".format("REFERENCE", cmd, self.__cmd_size))
+                "Command REFERENCE requires one word as argument (total 2 "
+                f"words), but the current encoding ({cmd:X}) is specified to "
+                f"be {self.__cmd_size:d} words long")
 
         if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
@@ -242,11 +241,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             value = _ONE_LONG.unpack(self._spec_reader.read(8))[0]
         else:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires a value as an argument, but the "
-                "current encoding ({1:X}) is specified to be {2:d} words "
-                "long and the data length command argument is specified "
-                "to be {3:d} bytes long".format(
-                    "WRITE", cmd, self.__cmd_size, data_len))
+                "Command WRITE requires a value as an argument, but the "
+                f"current encoding ({cmd:X}) is specified to be "
+                f"{self.__cmd_size:d} words long and the data length command "
+                f"argument is specified to be {data_len:d} bytes long")
 
         # Perform the writes
         self._write_to_mem(value, data_len, n_repeats, "WRITE")
@@ -333,7 +331,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if value != -1:
             raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
-                "current argument value is {0}".format(value))
+                f"current argument value is {value}")
         return END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):

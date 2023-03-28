@@ -49,7 +49,9 @@ class ReferenceContext(object):
     @classmethod
     def next(cls):
         """
-        Get the next reference in the current context.
+        Get the next reference ID in the current context.
+
+        :rtype: int
         """
         if cls.__next_reference is None:
             raise ValueError("Not currently in a reference context!")

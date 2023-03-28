@@ -36,12 +36,12 @@ jobs:
     - name: Install pip, etc
       uses: ./support/actions/python-tools
     - name: Install Spinnaker Dependencies
-      uses: ./support/actions/checkout-spinn-deps
+      uses: ./support/actions/install-spinn-deps
       with:
         repositories: SpiNNUtils SpiNNMachine
         install: true  
     - name: Setup
-      uses: ./support/actions/run-setup
+      uses: ./support/actions/run-install
 
     - name: Build Python Documentation
       uses: ./support/actions/sphinx

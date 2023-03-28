@@ -18,7 +18,7 @@ from .exceptions import (
 
 class MemoryRegionCollection(object):
     """
-    Collection of memory regions.
+    Collection of memory regions (:py:class:`AbstractMemoryRegion`).
     """
 
     __slots__ = [
@@ -40,14 +40,14 @@ class MemoryRegionCollection(object):
 
     def __getitem__(self, key):
         """
-        :rtype: MemoryRegion
+        :rtype: AbstractMemoryRegion
         """
         return self._regions[key]
 
     def __setitem__(self, key, value):
         """
         :param int key:
-        :param MemoryRegion value:
+        :param AbstractMemoryRegion value:
         """
         if key < 0 or key >= len(self._regions):
             raise NoRegionSelectedException(
@@ -59,7 +59,7 @@ class MemoryRegionCollection(object):
 
     def __iter__(self):
         """
-        :rtype: iterable(MemoryRegion)
+        :rtype: iterable(AbstractMemoryRegion)
         """
         return iter(self._regions)
 

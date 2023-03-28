@@ -142,7 +142,7 @@ class DataSpecificationExecutor(object):
         """
         An enumeration of the mapping from region ID to region holder.
 
-        :rtype: iterable(tuple(int, MemoryRegion or None))
+        :rtype: iterable(tuple(int, AbstractMemoryRegion or None))
         """
         return enumerate(self.dsef.mem_regions)
 

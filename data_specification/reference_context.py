@@ -14,7 +14,8 @@
 
 
 class ReferenceContext(object):
-    """ Allows the generation of unique references within a context
+    """
+    Allows the generation of unique references within a context.
     """
 
     # Next available reference within the current context,
@@ -47,7 +48,10 @@ class ReferenceContext(object):
 
     @classmethod
     def next(cls):
-        """ Get the next reference in the current context
+        """
+        Get the next reference ID in the current context.
+
+        :rtype: int
         """
         if cls.__next_reference is None:
             raise ValueError("Not currently in a reference context!")

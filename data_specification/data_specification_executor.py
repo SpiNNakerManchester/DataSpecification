@@ -32,8 +32,9 @@ _ONE_WORD = struct.Struct("<I")
 
 
 class DataSpecificationExecutor(object):
-    """ Used to execute a SpiNNaker data specification language file to\
-        produce a memory image.
+    """
+    Used to execute a SpiNNaker data specification language file to
+    produce a memory image.
     """
 
     __slots__ = [
@@ -71,7 +72,8 @@ class DataSpecificationExecutor(object):
             MAX_MEM_REGIONS, dtype=self.TABLE_TYPE)
 
     def __operation_func(self, cmd, index):
-        """ Decode the command and select an implementation of the command.
+        """
+        Decode the command and select an implementation of the command.
         """
         try:
             opcode = (cmd >> 20) & 0xFF
@@ -82,12 +84,14 @@ class DataSpecificationExecutor(object):
             logger.debug("problem decoding opcode %d at index %d",
                          cmd, index, exc_info=True)
             raise DataSpecificationException(
-                "Invalid command 0x{0:X} while reading file {1:s}".format(
-                    cmd, self._spec_reader.filename)) from e
+                f"Invalid command 0x{cmd:X} while reading "
+                f"file {self._spec_reader.filename}") from e
 
     def execute(self):
-        """ Executes the specification. This will result in a configuration \
-            of memory regions being done.
+        """
+        Executes the specification.
+        This will result in a configuration of memory regions being created
+        (but not actually uploaded to SpiNNaker).
 
         :raise IOError: If a read or write fails
         :raise DataSpecificationException:
@@ -124,31 +128,35 @@ class DataSpecificationExecutor(object):
                 self.__pointer_table[i]["checksum"] = 0
 
     def get_region(self, region_id):
-        """ Get a region with a given ID.
+        """
+        Get a region with a given ID.
 
         :param int region_id: The ID of the region to get
-        :return: The region, or None if the region was not allocated
+        :return: The region, or `None` if the region was not allocated
         :rtype: MemoryRegionReal or None
         """
         return self.dsef.mem_regions[region_id]
 
     @property
     def mem_regions(self):
-        """ An enumeration of the mapping from region ID to region holder.
+        """
+        An enumeration of the mapping from region ID to region holder.
 
-        :rtype: iterable(tuple(int, MemoryRegion or None))
+        :rtype: iterable(tuple(int, AbstractMemoryRegion or None))
         """
         return enumerate(self.dsef.mem_regions)
 
     def get_header(self):
-        """ Get the header of the data as a numpy array.
+        """
+        Get the header of the data as a numpy array.
 
         :rtype: numpy.ndarray
         """
         return numpy.array([APPDATA_MAGIC_NUM, DSE_VERSION], dtype="<u4")
 
     def get_pointer_table(self, start_address):
-        """ Get the pointer table as a numpy array.
+        """
+        Get the pointer table as a numpy array.
 
         :param int start_address: The base address of the data to be written
         :rtype: numpy.ndarray
@@ -173,7 +181,8 @@ class DataSpecificationExecutor(object):
 
     @property
     def referenceable_regions(self):
-        """ The regions that can be referenced by others
+        """
+        The regions that can be referenced by others.
 
         :rtype: list(int)
         """
@@ -181,14 +190,16 @@ class DataSpecificationExecutor(object):
 
     @property
     def references_to_fill(self):
-        """ The references that need to be filled
+        """
+        The references that need to be filled.
 
         :rtype: list(int)
         """
         return self.dsef.references_to_fill
 
     def get_constructed_data_size(self):
-        """ Return the size of the data that will be written to memory.
+        """
+        Return the size of the data that will be written to memory.
 
         :return: size of the data that will be written to memory
         :rtype: int

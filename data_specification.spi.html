@@ -49,21 +49,21 @@
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.spi.</span></span><span class="sig-name descname"><span class="pre">AbstractExecutorFunctions</span></span><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>This class defines a function related to each of the commands of the        data specification file. Subclasses need to provide implementations        that work for the operations they wish to support.</p>
+<p>This class defines a function related to each of the commands of the
+data specification file. Subclasses need to provide implementations
+that work for the operations they wish to support.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_align_wr_ptr">
 <span class="sig-name descname"><span class="pre">execute_align_wr_ptr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_align_wr_ptr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_align_wr_ptr" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command moves the write pointer to be at the start of the             next word if it isn’t already at the start of a word.</p>
+<dd><p>This command moves the write pointer to be at the start of the
+next word if it isn’t already at the start of a word.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.ALIGN_WR_PTR" title="data_specification.enums.Commands.ALIGN_WR_PTR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALIGN_WR_PTR</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -80,11 +80,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -95,17 +92,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_block_copy">
 <span class="sig-name descname"><span class="pre">execute_block_copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_block_copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_block_copy" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command copies a block of memory from one location to             another.</p>
+<dd><p>This command copies a block of memory from one location to another.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.BLOCK_COPY" title="data_specification.enums.Commands.BLOCK_COPY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BLOCK_COPY</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -116,17 +110,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_break">
 <span class="sig-name descname"><span class="pre">execute_break</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_break"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_break" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command raises an exception to stop the execution of the             data spec executor (DSE).</p>
+<dd><p>This command raises an exception to stop the execution of the
+data spec executor (DSE).</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.BREAK" title="data_specification.enums.Commands.BREAK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BREAK</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -143,11 +135,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -164,11 +153,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -179,17 +165,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_copy_param">
 <span class="sig-name descname"><span class="pre">execute_copy_param</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_copy_param"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_copy_param" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command copies a field of a structure to another field of             a possibly-different structure.</p>
+<dd><p>This command copies a field of a structure to another field of
+a possibly-different structure.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.COPY_PARAM" title="data_specification.enums.Commands.COPY_PARAM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">COPY_PARAM</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -206,11 +190,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -227,11 +208,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -248,11 +226,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -269,11 +244,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -290,11 +262,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -311,11 +280,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -353,11 +319,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -374,11 +337,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -395,11 +355,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -416,11 +373,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -437,11 +391,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -458,11 +409,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -479,11 +427,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -494,17 +439,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_mv">
 <span class="sig-name descname"><span class="pre">execute_mv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_mv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_mv" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command moves an immediate value to a register or copies the             value of a register to another register.</p>
+<dd><p>This command moves an immediate value to a register or copies the
+value of a register to another register.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.MV" title="data_specification.enums.Commands.MV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MV</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -521,12 +464,6 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>None</p>
-</dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p>
 </dd>
@@ -542,11 +479,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -563,11 +497,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -584,11 +515,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -599,17 +527,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_random_dist">
 <span class="sig-name descname"><span class="pre">execute_random_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_random_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_random_dist" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command defines a random disribution.</p>
+<dd><p>This command defines a random distribution.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.DECLARE_RANDOM_DIST" title="data_specification.enums.Commands.DECLARE_RANDOM_DIST"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DECLARE_RANDOM_DIST</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -626,11 +551,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -647,11 +569,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -662,17 +581,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_reference">
 <span class="sig-name descname"><span class="pre">execute_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_reference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_reference" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command reserves a region and sets it to reference another</p>
+<dd><p>This command reserves a region and sets it to reference another.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.REFERENCE" title="data_specification.enums.Commands.REFERENCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REFERENCE</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -689,11 +605,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -704,17 +617,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_reserve">
 <span class="sig-name descname"><span class="pre">execute_reserve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_reserve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_reserve" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command reserves a region and assigns some memory space             to it.</p>
+<dd><p>This command reserves a region and assigns some memory space to it.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.RESERVE" title="data_specification.enums.Commands.RESERVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESERVE</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -725,16 +635,14 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_reset_wr_ptr">
 <span class="sig-name descname"><span class="pre">execute_reset_wr_ptr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_reset_wr_ptr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_reset_wr_ptr" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command resets the current write pointer to the beginning             of the memory region.</p>
+<dd><p>This command resets the current write pointer to the beginning
+of the memory region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -751,11 +659,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -772,11 +677,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -793,11 +695,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -814,11 +713,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -829,17 +725,15 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_switch_focus">
 <span class="sig-name descname"><span class="pre">execute_switch_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_switch_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_switch_focus" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command switches the focus to the desired, already allocated,            memory region.</p>
+<dd><p>This command switches the focus to the desired, already allocated,
+memory region.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.SWITCH_FOCUS" title="data_specification.enums.Commands.SWITCH_FOCUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SWITCH_FOCUS</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -850,17 +744,16 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.spi.AbstractExecutorFunctions.execute_write">
 <span class="sig-name descname"><span class="pre">execute_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/spi/abstract_executor_functions.html#AbstractExecutorFunctions.execute_write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.spi.AbstractExecutorFunctions.execute_write" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command writes the given value in the specified region a            number of times as identified by either a value in the command             or a register value.</p>
+<dd><p>This command writes the given value in the specified region a
+number of times as identified by either a value in the command
+or a register value.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE" title="data_specification.enums.Commands.WRITE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WRITE</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -877,11 +770,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -898,11 +788,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -919,11 +806,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -940,11 +824,8 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="data_specification.html#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>

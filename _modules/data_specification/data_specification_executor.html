@@ -69,8 +69,9 @@
 
 
 <div class="viewcode-block" id="DataSpecificationExecutor"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor">[docs]</a><span class="k">class</span> <span class="nc">DataSpecificationExecutor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Used to execute a SpiNNaker data specification language file to\</span>
-<span class="sd">        produce a memory image.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Used to execute a SpiNNaker data specification language file to</span>
+<span class="sd">    produce a memory image.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -108,7 +109,8 @@
             <span class="n">MAX_MEM_REGIONS</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">TABLE_TYPE</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__operation_func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Decode the command and select an implementation of the command.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decode the command and select an implementation of the command.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">opcode</span> <span class="o">=</span> <span class="p">(</span><span class="n">cmd</span> <span class="o">&gt;&gt;</span> <span class="mi">20</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
@@ -119,12 +121,14 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;problem decoding opcode </span><span class="si">%d</span><span class="s2"> at index </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
                          <span class="n">cmd</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">raise</span> <span class="n">DataSpecificationException</span><span class="p">(</span>
-                <span class="s2">&quot;Invalid command 0x</span><span class="si">{0:X}</span><span class="s2"> while reading file </span><span class="si">{1:s}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">cmd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid command 0x</span><span class="si">{</span><span class="n">cmd</span><span class="si">:</span><span class="s2">X</span><span class="si">}</span><span class="s2"> while reading &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_spec_reader</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
 <div class="viewcode-block" id="DataSpecificationExecutor.execute"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Executes the specification. This will result in a configuration \</span>
-<span class="sd">            of memory regions being done.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes the specification.</span>
+<span class="sd">        This will result in a configuration of memory regions being created</span>
+<span class="sd">        (but not actually uploaded to SpiNNaker).</span>
 
 <span class="sd">        :raise IOError: If a read or write fails</span>
 <span class="sd">        :raise DataSpecificationException:</span>
@@ -161,31 +165,35 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__pointer_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;checksum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
 
 <div class="viewcode-block" id="DataSpecificationExecutor.get_region"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_region">[docs]</a>    <span class="k">def</span> <span class="nf">get_region</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">region_id</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get a region with a given ID.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a region with a given ID.</span>
 
 <span class="sd">        :param int region_id: The ID of the region to get</span>
-<span class="sd">        :return: The region, or None if the region was not allocated</span>
+<span class="sd">        :return: The region, or `None` if the region was not allocated</span>
 <span class="sd">        :rtype: MemoryRegionReal or None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dsef</span><span class="o">.</span><span class="n">mem_regions</span><span class="p">[</span><span class="n">region_id</span><span class="p">]</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">mem_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; An enumeration of the mapping from region ID to region holder.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        An enumeration of the mapping from region ID to region holder.</span>
 
-<span class="sd">        :rtype: iterable(tuple(int, MemoryRegion or None))</span>
+<span class="sd">        :rtype: iterable(tuple(int, AbstractMemoryRegion or None))</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dsef</span><span class="o">.</span><span class="n">mem_regions</span><span class="p">)</span>
 
 <div class="viewcode-block" id="DataSpecificationExecutor.get_header"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_header">[docs]</a>    <span class="k">def</span> <span class="nf">get_header</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the header of the data as a numpy array.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the header of the data as a numpy array.</span>
 
 <span class="sd">        :rtype: numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">APPDATA_MAGIC_NUM</span><span class="p">,</span> <span class="n">DSE_VERSION</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&lt;u4&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataSpecificationExecutor.get_pointer_table"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_pointer_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_pointer_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_address</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Get the pointer table as a numpy array.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the pointer table as a numpy array.</span>
 
 <span class="sd">        :param int start_address: The base address of the data to be written</span>
 <span class="sd">        :rtype: numpy.ndarray</span>
@@ -210,7 +218,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">referenceable_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The regions that can be referenced by others</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The regions that can be referenced by others.</span>
 
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -218,14 +227,16 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">references_to_fill</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The references that need to be filled</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The references that need to be filled.</span>
 
 <span class="sd">        :rtype: list(int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dsef</span><span class="o">.</span><span class="n">references_to_fill</span>
 
 <div class="viewcode-block" id="DataSpecificationExecutor.get_constructed_data_size"><a class="viewcode-back" href="../../index.html#data_specification.DataSpecificationExecutor.get_constructed_data_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_constructed_data_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Return the size of the data that will be written to memory.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the size of the data that will be written to memory.</span>
 
 <span class="sd">        :return: size of the data that will be written to memory</span>
 <span class="sd">        :rtype: int</span>

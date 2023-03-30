@@ -52,7 +52,7 @@
 <dt class="sig sig-object py" id="data_specification.enums.ArithmeticOperation">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.enums.</span></span><span class="sig-name descname"><span class="pre">ArithmeticOperation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_specification.enums.ArithmeticOperation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>Arithmetic Operations</p>
+<p>Arithmetic Operations.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_specification.enums.ArithmeticOperation.ADD">
 <span class="sig-name descname"><span class="pre">ADD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#data_specification.enums.ArithmeticOperation.ADD" title="Permalink to this definition">¶</a></dt>
@@ -74,7 +74,7 @@
 <dt class="sig sig-object py" id="data_specification.enums.Commands">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.enums.</span></span><span class="sig-name descname"><span class="pre">Commands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_specification.enums.Commands" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>Set of opcodes for the spec executor</p>
+<p>Set of opcodes for the spec executor.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_specification.enums.Commands.ALIGN_WR_PTR">
 <span class="sig-name descname"><span class="pre">ALIGN_WR_PTR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">101</span></em><a class="headerlink" href="#data_specification.enums.Commands.ALIGN_WR_PTR" title="Permalink to this definition">¶</a></dt>
@@ -291,7 +291,7 @@
 <dt class="sig sig-object py" id="data_specification.enums.Condition">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.enums.</span></span><span class="sig-name descname"><span class="pre">Condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_specification.enums.Condition" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>Comparison Operations</p>
+<p>Comparison Operations.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_specification.enums.Condition.EQUAL">
 <span class="sig-name descname"><span class="pre">EQUAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#data_specification.enums.Condition.EQUAL" title="Permalink to this definition">¶</a></dt>
@@ -530,6 +530,10 @@ representability and lack of hardware/library support.</p>
 <dt class="sig sig-object py" id="data_specification.enums.DataType.encode_as_numpy_int">
 <span class="sig-name descname"><span class="pre">encode_as_numpy_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/enums/data_type.html#DataType.encode_as_numpy_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.enums.DataType.encode_as_numpy_int" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the value as a numpy integer, according to this type.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only works with integer and fixed point data types.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – </p>
@@ -543,7 +547,8 @@ representability and lack of hardware/library support.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.enums.DataType.encode_as_numpy_int_array">
 <span class="sig-name descname"><span class="pre">encode_as_numpy_int_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/enums/data_type.html#DataType.encode_as_numpy_int_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.enums.DataType.encode_as_numpy_int_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the numpy array as an integer numpy array, according to             this type.</p>
+<dd><p>Returns the numpy array as an integer numpy array, according to
+this type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>array</strong> (<a class="reference external" href="https://numpy.org/doc/1.20/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.20)"><em>ndarray</em></a>) – </p>
@@ -658,7 +663,7 @@ representability and lack of hardware/library support.</p>
 <dt class="sig sig-object py" id="data_specification.enums.RandomNumberGenerator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.enums.</span></span><span class="sig-name descname"><span class="pre">RandomNumberGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data_specification.enums.RandomNumberGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/enum.html#enum.Enum" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
-<p>Random number generator types</p>
+<p>Random number generator types.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data_specification.enums.RandomNumberGenerator.MERSENNE_TWISTER">
 <span class="sig-name descname"><span class="pre">MERSENNE_TWISTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#data_specification.enums.RandomNumberGenerator.MERSENNE_TWISTER" title="Permalink to this definition">¶</a></dt>

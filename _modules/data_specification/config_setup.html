@@ -49,6 +49,11 @@
 <span class="c1"># See the License for the specific language governing permissions and</span>
 <span class="c1"># limitations under the License.</span>
 
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. note::</span>
+<span class="sd">    This file should only be called from PACMAN/unit tests.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">add_default_cfg</span><span class="p">,</span> <span class="n">clear_cfg_files</span><span class="p">)</span>
@@ -59,11 +64,7 @@
 
 <div class="viewcode-block" id="unittest_setup"><a class="viewcode-back" href="../../data_specification.html#data_specification.config_setup.unittest_setup">[docs]</a><span class="k">def</span> <span class="nf">unittest_setup</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Resets the configs so only the local default config is included.</span>
-
-<span class="sd">    .. note::</span>
-<span class="sd">        This file should only be called from PACMAN/unittests</span>
-
+<span class="sd">    Resets the configuration so only the local default config is included.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">clear_cfg_files</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">add_data_specification_cfg</span><span class="p">()</span></div>
@@ -71,7 +72,7 @@
 
 <div class="viewcode-block" id="add_data_specification_cfg"><a class="viewcode-back" href="../../data_specification.html#data_specification.config_setup.add_data_specification_cfg">[docs]</a><span class="k">def</span> <span class="nf">add_data_specification_cfg</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Add the local cfg and all dependent cfg files.</span>
+<span class="sd">    Add the local configuration and all dependent config files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">add_spinn_machine_cfg</span><span class="p">()</span>  <span class="c1"># This add its dependencies too</span>
     <span class="n">add_default_cfg</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">BASE_CONFIG_FILE</span><span class="p">))</span></div>

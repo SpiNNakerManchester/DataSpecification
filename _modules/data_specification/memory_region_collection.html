@@ -54,7 +54,8 @@
 
 
 <div class="viewcode-block" id="MemoryRegionCollection"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection">[docs]</a><span class="k">class</span> <span class="nc">MemoryRegionCollection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Collection of memory regions.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Collection of memory regions (:py:class:`AbstractMemoryRegion`).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -76,14 +77,14 @@
 
 <div class="viewcode-block" id="MemoryRegionCollection.__getitem__"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: MemoryRegion</span>
+<span class="sd">        :rtype: AbstractMemoryRegion</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="MemoryRegionCollection.__setitem__"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection.__setitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param int key:</span>
-<span class="sd">        :param MemoryRegion value:</span>
+<span class="sd">        :param AbstractMemoryRegion value:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">NoRegionSelectedException</span><span class="p">(</span>
@@ -95,7 +96,7 @@
 
 <div class="viewcode-block" id="MemoryRegionCollection.__iter__"><a class="viewcode-back" href="../../index.html#data_specification.MemoryRegionCollection.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :rtype: iterable(MemoryRegion)</span>
+<span class="sd">        :rtype: iterable(AbstractMemoryRegion)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_regions</span><span class="p">)</span></div>
 

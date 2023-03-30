@@ -56,7 +56,8 @@
 
 
 <span class="k">class</span> <span class="nc">DataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; Supported data types.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Supported data types.</span>
 <span class="sd">    Internally, these are actually tuples.</span>
 
 <span class="sd">    #. an identifier for the enum class;</span>
@@ -372,7 +373,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The size in bytes of the type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The size in bytes of the type.</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -380,7 +382,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">min</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The minimum possible value for the type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The minimum possible value for the type.</span>
 
 <span class="sd">        :rtype: ~decimal.Decimal</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -388,7 +391,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The maximum possible value for the type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The maximum possible value for the type.</span>
 
 <span class="sd">        :rtype: ~decimal.Decimal</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -396,7 +400,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The scale of the input value to convert it in integer.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The scale of the input value to convert it in integer.</span>
 
 <span class="sd">        :rtype: ~decimal.Decimal</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -404,7 +409,8 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">struct_encoding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The encoding string used for struct. Scaling may also be required.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The encoding string used for struct. Scaling may also be required.</span>
 
 <span class="sd">        :rtype: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -412,12 +418,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">numpy_typename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; The corresponding numpy type, if one exists.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The corresponding numpy type, if one exists.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numpy_typename</span>
 
 <div class="viewcode-block" id="DataType.encode_as_int"><a class="viewcode-back" href="../../../data_specification.enums.html#data_specification.enums.DataType.encode_as_int">[docs]</a>    <span class="k">def</span> <span class="nf">encode_as_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the value as an integer, according to this type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the value as an integer, according to this type.</span>
 
 <span class="sd">        :param value:</span>
 <span class="sd">        :type value: float or int</span>
@@ -431,17 +439,18 @@
                 <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_min</span> <span class="o">&lt;=</span> <span class="n">value</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;value </span><span class="si">{:f}</span><span class="s2"> cannot be converted to </span><span class="si">{:s}</span><span class="s2">: out of range&quot;</span>
-                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">))</span>
+                    <span class="sa">f</span><span class="s2">&quot;value </span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2"> cannot be converted to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;: out of range&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">decimal</span><span class="o">.</span><span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">))</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="DataType.encode_as_numpy_int"><a class="viewcode-back" href="../../../data_specification.enums.html#data_specification.enums.DataType.encode_as_numpy_int">[docs]</a>    <span class="k">def</span> <span class="nf">encode_as_numpy_int</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the value as a numpy integer, according to this type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the value as a numpy integer, according to this type.</span>
 
-<span class="sd">        .. note:</span>
+<span class="sd">        .. note::</span>
 <span class="sd">            Only works with integer and fixed point data types.</span>
 
 <span class="sd">        :param value:</span>
@@ -451,8 +460,9 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">struct_encoding</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataType.encode_as_numpy_int_array"><a class="viewcode-back" href="../../../data_specification.enums.html#data_specification.enums.DataType.encode_as_numpy_int_array">[docs]</a>    <span class="k">def</span> <span class="nf">encode_as_numpy_int_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the numpy array as an integer numpy array, according to \</span>
-<span class="sd">            this type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the numpy array as an integer numpy array, according to</span>
+<span class="sd">        this type.</span>
 
 <span class="sd">        :param ~numpy.ndarray array:</span>
 <span class="sd">        :rtype: ~numpy.ndarray</span>
@@ -462,8 +472,8 @@
             <span class="n">where</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_or</span><span class="p">(</span><span class="n">array</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max</span> <span class="o">&lt;</span> <span class="n">array</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">where</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;value </span><span class="si">{:f}</span><span class="s2"> cannot be converted to </span><span class="si">{:s}</span><span class="s2">: out of range&quot;</span>
-                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">array</span><span class="p">[</span><span class="n">where</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">))</span>
+                    <span class="sa">f</span><span class="s2">&quot;value </span><span class="si">{</span><span class="n">array</span><span class="p">[</span><span class="n">where</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2"> cannot be converted to &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="si">}</span><span class="s2">: out of range&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">array</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_force_cast</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
@@ -471,7 +481,8 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">array</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataType.encode"><a class="viewcode-back" href="../../../data_specification.enums.html#data_specification.enums.DataType.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Encode the Python value for SpiNNaker according to this type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Encode the Python value for SpiNNaker according to this type.</span>
 
 <span class="sd">        :param value:</span>
 <span class="sd">        :type value: float or int</span>
@@ -480,7 +491,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encode_as_int</span><span class="p">(</span><span class="n">value</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="DataType.decode_numpy_array"><a class="viewcode-back" href="../../../data_specification.enums.html#data_specification.enums.DataType.decode_numpy_array">[docs]</a>    <span class="k">def</span> <span class="nf">decode_numpy_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Decode the numpy array of SpiNNaker values according to this type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decode the numpy array of SpiNNaker values according to this type.</span>
 
 <span class="sd">        :param ~numpy.ndarray(~numpy.uint32) array:</span>
 <span class="sd">        :rtype: ~numpy.ndarray(~numpy.uint32 or ~numpy.float64)</span>
@@ -488,7 +500,8 @@
         <span class="k">return</span> <span class="n">array</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="DataType.decode_array"><a class="viewcode-back" href="../../../data_specification.enums.html#data_specification.enums.DataType.decode_array">[docs]</a>    <span class="k">def</span> <span class="nf">decode_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot; Decodes a byte array into iterable of this type.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Decodes a byte array into iterable of this type.</span>
 
 <span class="sd">        :param values: the bytes to decode into this given data type</span>
 <span class="sd">        :rtype: numpy array</span>

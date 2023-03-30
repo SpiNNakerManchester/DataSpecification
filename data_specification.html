@@ -227,26 +227,27 @@
 </section>
 <section id="module-data_specification.config_setup">
 <span id="data-specification-config-setup-module"></span><h2>data_specification.config_setup module<a class="headerlink" href="#module-data_specification.config_setup" title="Permalink to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This file should only be called from PACMAN/unit tests.</p>
+</div>
 <dl class="py function">
 <dt class="sig sig-object py" id="data_specification.config_setup.add_data_specification_cfg">
 <span class="sig-prename descclassname"><span class="pre">data_specification.config_setup.</span></span><span class="sig-name descname"><span class="pre">add_data_specification_cfg</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/config_setup.html#add_data_specification_cfg"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.config_setup.add_data_specification_cfg" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the local cfg and all dependent cfg files.</p>
+<dd><p>Add the local configuration and all dependent config files.</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="data_specification.config_setup.unittest_setup">
 <span class="sig-prename descclassname"><span class="pre">data_specification.config_setup.</span></span><span class="sig-name descname"><span class="pre">unittest_setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/config_setup.html#unittest_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.config_setup.unittest_setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Resets the configs so only the local default config is included.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>This file should only be called from PACMAN/unittests</p>
-</div>
+<dd><p>Resets the configuration so only the local default config is included.</p>
 </dd></dl>
 
 </section>
 <section id="module-data_specification.constants">
 <span id="data-specification-constants-module"></span><h2>data_specification.constants module<a class="headerlink" href="#module-data_specification.constants" title="Permalink to this heading">¶</a></h2>
-<p>Constants used by the Data Structure Generator (DSG)     and the Specification Executor.</p>
+<p>Constants used by the Data Structure Generator (DSG)
+and the Specification Executor.</p>
 <dl class="py data">
 <dt class="sig sig-object py" id="data_specification.constants.APPDATA_MAGIC_NUM">
 <span class="sig-prename descclassname"><span class="pre">data_specification.constants.</span></span><span class="sig-name descname"><span class="pre">APPDATA_MAGIC_NUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2903706326</span></em><a class="headerlink" href="#data_specification.constants.APPDATA_MAGIC_NUM" title="Permalink to this definition">¶</a></dt>
@@ -348,28 +349,32 @@ Note that the description consists of a pointer and 2 uint32_t variables:
 <dt class="sig sig-object py" id="data_specification.exceptions.DataSpecificationException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationException</span></span><a class="reference internal" href="_modules/data_specification/exceptions.html#DataSpecificationException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.DataSpecificationException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#Exception" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
-<p>A general purpose exception indicating that something went        wrong when interacting with a Data Specification</p>
+<p>A general purpose exception indicating that something went
+wrong when interacting with a Data Specification.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="data_specification.exceptions.DataSpecificationSyntaxError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationSyntaxError</span></span><a class="reference internal" href="_modules/data_specification/exceptions.html#DataSpecificationSyntaxError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception which occurs when a command read from the data        specification file shows an inconsistency in the binary content.</p>
+<p>An exception which occurs when a command read from the data
+specification file shows an inconsistency in the binary content.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="data_specification.exceptions.DataUndefinedWriterException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">DataUndefinedWriterException</span></span><a class="reference internal" href="_modules/data_specification/exceptions.html#DataUndefinedWriterException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.DataUndefinedWriterException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/exceptions.html#Exception" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
-<p>An exception that indicates that the file data writer has not been        initialised</p>
+<p>An exception that indicates that the file data writer has not been
+initialised.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="data_specification.exceptions.DuplicateParameterException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">DuplicateParameterException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#DuplicateParameterException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.DuplicateParameterException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>And exception that indicates that a command has been called with a        duplicate parameter, which shouldn’t be allowed.</p>
+<p>An exception that indicates that a command has been called with a
+duplicate parameter, which shouldn’t be allowed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -384,7 +389,8 @@ Note that the description consists of a pointer and 2 uint32_t variables:
 <dt class="sig sig-object py" id="data_specification.exceptions.ExecuteBreakInstruction">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">ExecuteBreakInstruction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#ExecuteBreakInstruction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.ExecuteBreakInstruction" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception which occurs when a BREAK instruction is found in the        data specification.</p>
+<p>An exception which occurs when a <cite>BREAK</cite> instruction is found in the
+data specification.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -400,7 +406,7 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.FunctionInUseException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">FunctionInUseException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#FunctionInUseException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.FunctionInUseException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a function is already defined</p>
+<p>An exception that indicates that a function is already defined.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>function_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the function</p>
@@ -412,7 +418,8 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.InvalidCommandException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidCommandException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#InvalidCommandException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.InvalidCommandException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that the command being requested cannot        be executed at this point in the specification.</p>
+<p>An exception that indicates that the command being requested cannot
+be executed at this point in the specification.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The command being executed</p>
@@ -424,7 +431,8 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.InvalidOperationException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidOperationException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">operation_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_operation_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#InvalidOperationException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.InvalidOperationException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that the operation of the type given type        is not available.</p>
+<p>An exception that indicates that the operation of the type given type
+is not available.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -440,7 +448,7 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.InvalidSizeException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">InvalidSizeException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#InvalidSizeException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.InvalidSizeException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that the size of the requested type is        invalid</p>
+<p>An exception that indicates that the size of the requested type is invalid.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -456,14 +464,16 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.NestedFunctionException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">NestedFunctionException</span></span><a class="reference internal" href="_modules/data_specification/exceptions.html#NestedFunctionException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.NestedFunctionException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a function is being defined within        the context of another function definition</p>
+<p>An exception that indicates that a function is being defined within
+the context of another function definition.</p>
 </dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="data_specification.exceptions.NoMoreException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">NoMoreException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">space_available</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_required</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#NoMoreException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.NoMoreException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that there is no more space for the        requested item</p>
+<p>An exception that indicates that there is no more space for the
+requested item.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -478,7 +488,7 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.NoRegionSelectedException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">NoRegionSelectedException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#NoRegionSelectedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.NoRegionSelectedException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a memory region has not been selected</p>
+<p>An exception that indicates that a memory region has not been selected.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The command being executed</p>
@@ -490,7 +500,8 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.NotAllocatedException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">NotAllocatedException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">item_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#NotAllocatedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.NotAllocatedException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that an item is being used        that has not been allocated</p>
+<p>An exception that indicates that an item is being used
+that has not been allocated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -506,7 +517,8 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.ParameterOutOfBoundsException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">ParameterOutOfBoundsException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#ParameterOutOfBoundsException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.ParameterOutOfBoundsException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a parameter value was outside of the        allowed bounds</p>
+<p>An exception that indicates that a parameter value was outside of the
+allowed bounds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -524,7 +536,8 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.RNGInUseException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">RNGInUseException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#RNGInUseException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.RNGInUseException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a random number generator is        already defined</p>
+<p>An exception that indicates that a random number generator is already
+defined.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rng_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the rng</p>
@@ -536,7 +549,8 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.RandomNumberDistributionInUseException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">RandomNumberDistributionInUseException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#RandomNumberDistributionInUseException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.RandomNumberDistributionInUseException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a random number distribution is        already defined</p>
+<p>An exception that indicates that a random number distribution is already
+defined.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rng_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the random number distribution</p>
@@ -548,7 +562,8 @@ at the time of breakpoint</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.RegionExhaustedException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">RegionExhaustedException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allocated_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#RegionExhaustedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.RegionExhaustedException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a region has run out of memory        whilst some data is being written</p>
+<p>An exception that indicates that a region has run out of memory
+whilst some data is being written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -567,7 +582,7 @@ space that has already been allocated, in bytes</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.RegionInUseException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">RegionInUseException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#RegionInUseException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.RegionInUseException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a region has already been        allocated</p>
+<p>An exception that indicates that a region has already been allocated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -582,7 +597,8 @@ space that has already been allocated, in bytes</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.RegionNotAllocatedException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">RegionNotAllocatedException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#RegionNotAllocatedException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.RegionNotAllocatedException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception which occurs when trying to write to an unallocated        region of memory</p>
+<p>An exception which occurs when trying to write to an unallocated
+region of memory.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -597,7 +613,8 @@ space that has already been allocated, in bytes</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.RegionOutOfBoundsException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">RegionOutOfBoundsException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_offset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#RegionOutOfBoundsException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.RegionOutOfBoundsException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that an offset into a region is out        of bounds for that region</p>
+<p>An exception that indicates that an offset into a region is out
+of bounds for that region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -614,7 +631,8 @@ space that has already been allocated, in bytes</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.RegionUnfilledException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">RegionUnfilledException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#RegionUnfilledException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.RegionUnfilledException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a memory region is being used        that was originally requested to be unfilled</p>
+<p>An exception that indicates that a memory region is being used
+that was originally requested to be unfilled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -629,7 +647,7 @@ space that has already been allocated, in bytes</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.StructureInUseException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">StructureInUseException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#StructureInUseException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.StructureInUseException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a structure has already been        defined</p>
+<p>An exception that indicates that a structure has already been defined.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>structure</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The structure that was already allocated</p>
@@ -641,7 +659,10 @@ space that has already been allocated, in bytes</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.TablePointerOutOfMemoryException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">TablePointerOutOfMemoryException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">memory_available</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_required</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#TablePointerOutOfMemoryException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.TablePointerOutOfMemoryException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception which occurs when building the table pointer as header of        the data generated by the spec executor. This message is printed in        case the memory available is not enough to contain the pointer table        for each of the allocated regions.</p>
+<p>An exception which occurs when building the table pointer as header of the
+data generated by the spec executor. This message is printed in case the
+memory available is not enough to contain the pointer table for each of
+the allocated regions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -657,7 +678,7 @@ execution of the specification file</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.TypeMismatchException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">TypeMismatchException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#TypeMismatchException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.TypeMismatchException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a type mismatch has occurred</p>
+<p>An exception that indicates that a type mismatch has occurred.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The command that generated the exception</p>
@@ -669,7 +690,8 @@ execution of the specification file</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.UnimplementedDSECommandError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnimplementedDSECommandError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#UnimplementedDSECommandError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.UnimplementedDSECommandError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception which occurs when trying to execute an unimplemented        command</p>
+<p>An exception which occurs when trying to execute an unimplemented
+command.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Command attempted to be executed by the DSE</p>
@@ -681,7 +703,7 @@ execution of the specification file</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.UnimplementedDSGCommandError">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnimplementedDSGCommandError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#UnimplementedDSGCommandError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.UnimplementedDSGCommandError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception which occurs when trying to write an unimplemented        command</p>
+<p>An exception which occurs when trying to write an unimplemented command.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>command</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Command attempted to be generated by the DSG</p>
@@ -693,7 +715,8 @@ execution of the specification file</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.UnknownConditionException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnknownConditionException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">condition_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#UnknownConditionException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.UnknownConditionException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>And exception which is triggered in case the condition in an IF test        does not exist in the list of possible conditions</p>
+<p>An exception which is triggered in case the condition in an IF test
+does not exist in the list of possible conditions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -708,7 +731,8 @@ execution of the specification file</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.UnknownTypeException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnknownTypeException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#UnknownTypeException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.UnknownTypeException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that the value of the requested type        is unknown</p>
+<p>An exception that indicates that the value of the requested type
+is unknown.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -723,7 +747,8 @@ execution of the specification file</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.UnknownTypeLengthException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">UnknownTypeLengthException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#UnknownTypeLengthException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.UnknownTypeLengthException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that the value of the requested type        is unknown</p>
+<p>An exception that indicates that the value of the requested type
+is unknown.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -738,7 +763,8 @@ execution of the specification file</p></li>
 <dt class="sig sig-object py" id="data_specification.exceptions.WrongParameterNumberException">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.exceptions.</span></span><span class="sig-name descname"><span class="pre">WrongParameterNumberException</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_of_parameters_required</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/exceptions.html#WrongParameterNumberException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.exceptions.WrongParameterNumberException" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.exceptions.DataSpecificationException" title="data_specification.exceptions.DataSpecificationException"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationException</span></code></a></p>
-<p>An exception that indicates that a function has been called with a        wrong number of parameters.</p>
+<p>An exception that indicates that a function has been called with a
+wrong number of parameters.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -753,7 +779,8 @@ execution of the specification file</p></li>
 </section>
 <section id="module-data_specification">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-data_specification" title="Permalink to this heading">¶</a></h2>
-<p>Used to generate memory images for a SpiNNaker CPU core from a set of     instructions.</p>
+<p>Used to generate memory images for a SpiNNaker CPU core from a set of
+instructions.</p>
 <p>The main part of this package is the
 <a class="reference internal" href="#data_specification.DataSpecificationGenerator" title="data_specification.DataSpecificationGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSpecificationGenerator</span></code></a>
 class. This is used to generate a “Data Specification”, which can then be
@@ -806,7 +833,8 @@ generated specification at the receiving end of a slow connection.</p></li>
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationExecutor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Used to execute a SpiNNaker data specification language file to        produce a memory image.</p>
+<p>Used to execute a SpiNNaker data specification language file to
+produce a memory image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -832,7 +860,9 @@ generated specification at the receiving end of a slow connection.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor.execute">
 <span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor.html#DataSpecificationExecutor.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutor.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Executes the specification. This will result in a configuration             of memory regions being done.</p>
+<dd><p>Executes the specification.
+This will result in a configuration of memory regions being created
+(but not actually uploaded to SpiNNaker).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -893,7 +923,7 @@ the available memory</p></li>
 <dd class="field-odd"><p><strong>region_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the region to get</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The region, or None if the region was not allocated</p>
+<dd class="field-even"><p>The region, or <cite>None</cite> if the region was not allocated</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#data_specification.MemoryRegionReal" title="data_specification.MemoryRegionReal">MemoryRegionReal</a> or None</p>
@@ -907,7 +937,7 @@ the available memory</p></li>
 <dd><p>An enumeration of the mapping from region ID to region holder.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, MemoryRegion or None))</p>
+<dd class="field-odd"><p>iterable(<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#tuple" title="(in Python v3.8)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>, <a class="reference internal" href="#data_specification.AbstractMemoryRegion" title="data_specification.AbstractMemoryRegion">AbstractMemoryRegion</a> or None))</p>
 </dd>
 </dl>
 </dd></dl>
@@ -915,7 +945,7 @@ the available memory</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor.referenceable_regions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">referenceable_regions</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutor.referenceable_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>The regions that can be referenced by others</p>
+<dd><p>The regions that can be referenced by others.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
@@ -926,7 +956,7 @@ the available memory</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutor.references_to_fill">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">references_to_fill</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutor.references_to_fill" title="Permalink to this definition">¶</a></dt>
-<dd><p>The references that need to be filled</p>
+<dd><p>The references that need to be filled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
@@ -940,7 +970,8 @@ the available memory</p></li>
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationExecutorFunctions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_space</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractExecutorFunctions</span></code></p>
-<p>This class includes the function related to each of the commands        of the data specification file.</p>
+<p>This class includes the function related to each of the commands
+of the data specification file.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>DSG operations not mentioned in this class will cause an error during
@@ -957,17 +988,15 @@ DSE if used.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.execute_break">
 <span class="sig-name descname"><span class="pre">execute_break</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_break"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.execute_break" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command raises an exception to stop the execution of the             data spec executor (DSE).</p>
+<dd><p>This command raises an exception to stop the execution of the
+data spec executor (DSE).</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.BREAK" title="data_specification.enums.Commands.BREAK"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BREAK</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.ExecuteBreakInstruction" title="data_specification.exceptions.ExecuteBreakInstruction"><strong>ExecuteBreakInstruction</strong></a> – Raises the exception to break the execution of the DSE</p></li>
@@ -1000,17 +1029,15 @@ DSE if used.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.execute_mv">
 <span class="sig-name descname"><span class="pre">execute_mv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_mv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.execute_mv" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command moves an immediate value to a register or copies the             value of a register to another register.</p>
+<dd><p>This command moves an immediate value to a register or copies the
+value of a register to another register.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.MV" title="data_specification.enums.Commands.MV"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MV</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 </ul>
@@ -1021,20 +1048,18 @@ DSE if used.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.execute_reference">
 <span class="sig-name descname"><span class="pre">execute_reference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_reference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.execute_reference" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command reserves a region and sets it to reference another</p>
+<dd><p>This command reserves a region and sets it to reference another.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.REFERENCE" title="data_specification.enums.Commands.REFERENCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">REFERENCE</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
-<li><p><a class="reference internal" href="#data_specification.exceptions.ParameterOutOfBoundsException" title="data_specification.exceptions.ParameterOutOfBoundsException"><strong>ParameterOutOfBoundsException</strong></a> – If the requested size of the region is beyond the available            memory space</p></li>
+<li><p><a class="reference internal" href="#data_specification.exceptions.ParameterOutOfBoundsException" title="data_specification.exceptions.ParameterOutOfBoundsException"><strong>ParameterOutOfBoundsException</strong></a> – If the requested size of the region is beyond the available
+memory space</p></li>
 </ul>
 </dd>
 </dl>
@@ -1043,20 +1068,18 @@ DSE if used.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.execute_reserve">
 <span class="sig-name descname"><span class="pre">execute_reserve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_reserve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.execute_reserve" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command reserves a region and assigns some memory space             to it.</p>
+<dd><p>This command reserves a region and assigns some memory space to it.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.RESERVE" title="data_specification.enums.Commands.RESERVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RESERVE</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
-<li><p><a class="reference internal" href="#data_specification.exceptions.ParameterOutOfBoundsException" title="data_specification.exceptions.ParameterOutOfBoundsException"><strong>ParameterOutOfBoundsException</strong></a> – If the requested size of the region is beyond the available            memory space</p></li>
+<li><p><a class="reference internal" href="#data_specification.exceptions.ParameterOutOfBoundsException" title="data_specification.exceptions.ParameterOutOfBoundsException"><strong>ParameterOutOfBoundsException</strong></a> – If the requested size of the region is beyond the available
+memory space</p></li>
 </ul>
 </dd>
 </dl>
@@ -1071,11 +1094,8 @@ DSE if used.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.NoRegionSelectedException" title="data_specification.exceptions.NoRegionSelectedException"><strong>NoRegionSelectedException</strong></a> – If there is no memory region selected for the set-ptr operation</p></li>
@@ -1087,17 +1107,15 @@ DSE if used.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.execute_switch_focus">
 <span class="sig-name descname"><span class="pre">execute_switch_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_switch_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.execute_switch_focus" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command switches the focus to the desired, already allocated,            memory region.</p>
+<dd><p>This command switches the focus to the desired, already allocated,
+memory region.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.SWITCH_FOCUS" title="data_specification.enums.Commands.SWITCH_FOCUS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SWITCH_FOCUS</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.RegionUnfilledException" title="data_specification.exceptions.RegionUnfilledException"><strong>RegionUnfilledException</strong></a> – If the focus is being switched to a region of memory which has
@@ -1110,17 +1128,16 @@ been declared to be kept unfilled</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.execute_write">
 <span class="sig-name descname"><span class="pre">execute_write</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_executor_functions.html#DataSpecificationExecutorFunctions.execute_write"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.execute_write" title="Permalink to this definition">¶</a></dt>
-<dd><p>This command writes the given value in the specified region a            number of times as identified by either a value in the command             or a register value.</p>
+<dd><p>This command writes the given value in the specified region a
+number of times as identified by either a value in the command
+or a register value.</p>
 <p>Implements <a class="reference internal" href="data_specification.enums.html#data_specification.enums.Commands.WRITE" title="data_specification.enums.Commands.WRITE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WRITE</span></code></a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.NoRegionSelectedException" title="data_specification.exceptions.NoRegionSelectedException"><strong>NoRegionSelectedException</strong></a> – If there is no memory region selected for the write operation</p></li>
@@ -1142,11 +1159,8 @@ the required data</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>cmd</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – the command which triggered the function call</p>
 </dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>No value returned</p>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><a class="reference internal" href="#data_specification.exceptions.DataSpecificationSyntaxError" title="data_specification.exceptions.DataSpecificationSyntaxError"><strong>DataSpecificationSyntaxError</strong></a> – If there is an error in the command syntax</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.UnimplementedDSECommandError" title="data_specification.exceptions.UnimplementedDSECommandError"><strong>UnimplementedDSECommandError</strong></a> – If the command is not implemented.</p></li>
 <li><p><a class="reference internal" href="#data_specification.exceptions.NoRegionSelectedException" title="data_specification.exceptions.NoRegionSelectedException"><strong>NoRegionSelectedException</strong></a> – If there is no memory region selected for the write operation</p></li>
@@ -1172,7 +1186,7 @@ the required data</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.referenceable_regions">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">referenceable_regions</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.referenceable_regions" title="Permalink to this definition">¶</a></dt>
-<dd><p>The regions that can be referenced by others</p>
+<dd><p>The regions that can be referenced by others.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
@@ -1183,7 +1197,7 @@ the required data</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationExecutorFunctions.references_to_fill">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">references_to_fill</span></span><a class="headerlink" href="#data_specification.DataSpecificationExecutorFunctions.references_to_fill" title="Permalink to this definition">¶</a></dt>
-<dd><p>The references that need to be filled</p>
+<dd><p>The references that need to be filled.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#list" title="(in Python v3.8)">list</a>(<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a>)</p>
@@ -1197,13 +1211,14 @@ the required data</p></li>
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">DataSpecificationGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec_writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">report_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Used to generate a SpiNNaker data specification language file that        can be executed to produce a memory image.</p>
+<p>Used to generate a SpiNNaker data specification language file that
+can be executed to produce a memory image.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spec_writer</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.RawIOBase" title="(in Python v3.8)"><em>RawIOBase</em></a>) – The object to write the specification to</p></li>
 <li><p><strong>report_writer</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/io.html#io.TextIOBase" title="(in Python v3.8)"><em>TextIOBase</em></a><em> or </em><em>None</em>) – Determines if a text version of the specification is to be
-written and, if so, where. No report is written if this is None.</p></li>
+written and, if so, where. No report is written if this is <cite>None</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -1213,7 +1228,8 @@ written and, if so, where. No report is written if this is None.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.align_write_pointer">
 <span class="sig-name descname"><span class="pre">align_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_block_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_block_size_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_register_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.align_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.align_write_pointer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to align the write pointer against a power-of-2            block size in bytes.  Zeros are inserted in the intervening space</p>
+<dd><p>Insert command to align the write pointer against a power-of-2
+block size in bytes.  Zeros are inserted in the intervening space</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1229,7 +1245,7 @@ between 0 and 15</p></li>
 <li><p><strong>log_block_size_is_register</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Indicates if <code class="docutils literal notranslate"><span class="pre">log_block_size</span></code> is a register ID</p></li>
 <li><p><strong>return_register_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a><em> or </em><em>None</em>) – The ID of a register where the write
 pointer will be written to once it has been updated, between
-0 and 15, or None if no such writing is to be done</p></li>
+0 and 15, or <cite>None</cite> if no such writing is to be done</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
@@ -1254,7 +1270,7 @@ region</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.break_loop">
 <span class="sig-name descname"><span class="pre">break_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.break_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.break_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to break out of a loop before it has completed</p>
+<dd><p>Insert command to break out of a loop before it has completed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1269,7 +1285,8 @@ region</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.call_arithmetic_operation">
 <span class="sig-name descname"><span class="pre">call_arithmetic_operation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_arithmetic_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.call_arithmetic_operation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to perform an arithmetic operation on two signed or            unsigned values and store the result in a register</p>
+<dd><p>Insert command to perform an arithmetic operation on two signed or
+unsigned values and store the result in a register</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1313,7 +1330,7 @@ valid register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.call_function">
 <span class="sig-name descname"><span class="pre">call_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_ids</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.call_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to call a function</p>
+<dd><p>Insert command to call a function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1347,7 +1364,9 @@ the function, each between 0 and 15</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.call_random_distribution">
 <span class="sig-name descname"><span class="pre">call_random_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.call_random_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.call_random_distribution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to get the next random number from a random            distribution, placing the result in a register to be used in a            future call</p>
+<dd><p>Insert command to get the next random number from a random
+distribution, placing the result in a register to be used in a
+future call.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1370,7 +1389,11 @@ of range</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.comment">
 <span class="sig-name descname"><span class="pre">comment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comment</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.comment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.comment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write a comment to the text version of the specification.            Note that this is ignored by the binary file</p>
+<dd><p>Write a comment to the text version of the specification.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is ignored by the binary file.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>comment</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – The comment to write</p>
@@ -1387,7 +1410,8 @@ of range</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.copy_structure">
 <span class="sig-name descname"><span class="pre">copy_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.copy_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.copy_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to copy a structure, possibly overwriting another            structure</p>
+<dd><p>Insert command to copy a structure, possibly overwriting another
+structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1436,7 +1460,8 @@ allocated</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.copy_structure_parameter">
 <span class="sig-name descname"><span class="pre">copy_structure_parameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_parameter_index</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.copy_structure_parameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.copy_structure_parameter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to copy the value of a parameter from one            structure to another.</p>
+<dd><p>Insert command to copy the value of a parameter from one
+structure to another.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1476,7 +1501,10 @@ allocated</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.create_cmd">
 <span class="sig-name descname"><span class="pre">create_cmd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DataType.UINT32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.create_cmd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.create_cmd" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates command to write a value to the current write pointer,            causing the write pointer to move on by the number of bytes            required to represent the data type. The data is passed as a            parameter to this function.</p>
+<dd><p>Creates command to write a value to the current write pointer, causing
+the write pointer to move on by the number of bytes required to
+represent the data type. The data is passed as a parameter to this
+function.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This does not actually insert the <code class="docutils literal notranslate"><span class="pre">WRITE</span></code> command in the spec;
@@ -1515,7 +1543,8 @@ fractional part</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.current_region">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_region</span></span><a class="headerlink" href="#data_specification.DataSpecificationGenerator.current_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>The ID of the current DSG region we’re writing to.            If not yet writing to any region, <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+<dd><p>The ID of the current DSG region we’re writing to.
+If not yet writing to any region, <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
@@ -1526,7 +1555,7 @@ fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.declare_random_number_generator">
 <span class="sig-name descname"><span class="pre">declare_random_number_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.declare_random_number_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.declare_random_number_generator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to declare a random number generator</p>
+<dd><p>Insert command to declare a random number generator.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1555,7 +1584,7 @@ defined</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.declare_uniform_random_distribution">
 <span class="sig-name descname"><span class="pre">declare_uniform_random_distribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distribution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.declare_uniform_random_distribution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.declare_uniform_random_distribution" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert commands to declare a uniform random distribution</p>
+<dd><p>Insert commands to declare a uniform random distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1586,7 +1615,7 @@ out of range</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.define_break">
 <span class="sig-name descname"><span class="pre">define_break</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.define_break"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.define_break" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to stop execution with an exception (for debugging)</p>
+<dd><p>Insert command to stop execution with an exception (for debugging).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1600,7 +1629,7 @@ out of range</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.define_structure">
 <span class="sig-name descname"><span class="pre">define_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.define_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.define_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert commands to define a data structure</p>
+<dd><p>Insert commands to define a data structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1611,7 +1640,7 @@ out of range</p></li>
 <li><p><cite>label</cite> is the label of the element (for debugging)</p></li>
 <li><p><cite>data_type</cite> is the data type of the element</p></li>
 <li><dl class="simple">
-<dt><cite>value</cite> is the value of the element, or None if no value is to</dt><dd><p>be assigned</p>
+<dt><cite>value</cite> is the value of the element, or <cite>None</cite> if no value is to</dt><dd><p>be assigned</p>
 </dd>
 </dl>
 </li>
@@ -1642,7 +1671,11 @@ but has a fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.else_conditional">
 <span class="sig-name descname"><span class="pre">else_conditional</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.else_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.else_conditional" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command for the else of an if…then…else construct.            If the condition of the conditional evaluates to false, the            statements up between the conditional and the insertion of this            “else” are skipped, and the statements from this point until the            end of the conditional are executed.</p>
+<dd><p>Insert command for the else of an if…then…else construct. If the
+condition of the conditional evaluates to false, the statements up
+between the conditional and the insertion of this “else” are skipped,
+and the statements from this point until the end of the conditional
+are executed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1672,7 +1705,7 @@ but has a fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.end_function">
 <span class="sig-name descname"><span class="pre">end_function</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.end_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to mark the end of a function definition</p>
+<dd><p>Insert command to mark the end of a function definition.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="#data_specification.exceptions.InvalidCommandException" title="data_specification.exceptions.InvalidCommandException"><strong>InvalidCommandException</strong></a> – If there is no function being defined at this point</p>
@@ -1683,7 +1716,9 @@ but has a fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.end_loop">
 <span class="sig-name descname"><span class="pre">end_loop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.end_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to indicate that this is the end of the loop.            Commands between the start of the loop and this command will be            repeated.</p>
+<dd><p>Insert command to indicate that this is the end of the loop.
+Commands between the start of the loop and this command will be
+repeated.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1698,7 +1733,8 @@ but has a fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.end_specification">
 <span class="sig-name descname"><span class="pre">end_specification</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">close_writer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.end_specification"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.end_specification" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert a command to indicate that the specification has finished            and finish writing</p>
+<dd><p>Insert a command to indicate that the specification has finished
+and finish writing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>close_writer</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a>) – Indicates whether to close the underlying writer(s)</p>
@@ -1715,7 +1751,7 @@ but has a fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.free_memory_region">
 <span class="sig-name descname"><span class="pre">free_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.free_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.free_memory_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to free a previously reserved memory region</p>
+<dd><p>Insert command to free a previously reserved memory region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of the region to free, from 0 to 15</p>
@@ -1734,7 +1770,8 @@ but has a fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.get_structure_value">
 <span class="sig-name descname"><span class="pre">get_structure_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">destination_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.get_structure_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.get_structure_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to get a value from a structure.            The value is copied in a register.</p>
+<dd><p>Insert command to get a value from a structure.
+The value is copied in a register.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1849,7 +1886,7 @@ valid register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.logical_not">
 <span class="sig-name descname"><span class="pre">logical_not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_not"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.logical_not" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to perform a logical not operation.</p>
+<dd><p>Insert command to perform a logical NOT operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -1963,7 +2000,7 @@ valid register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.logical_xor">
 <span class="sig-name descname"><span class="pre">logical_xor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_1_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operand_2_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.logical_xor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.logical_xor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to perform a logical xor operation.</p>
+<dd><p>Insert command to perform a logical XOR operation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2004,7 +2041,7 @@ valid register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.no_operation">
 <span class="sig-name descname"><span class="pre">no_operation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.no_operation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.no_operation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to execute nothing</p>
+<dd><p>Insert command to execute nothing.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2018,7 +2055,7 @@ valid register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.print_struct">
 <span class="sig-name descname"><span class="pre">print_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structure_id_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_struct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.print_struct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to print out a structure (for debugging)</p>
+<dd><p>Insert command to print out a structure (for debugging).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2053,7 +2090,7 @@ the ID of a structure that has not been allocated</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.print_text">
 <span class="sig-name descname"><span class="pre">print_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'ASCII'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.print_text" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to print some text (for debugging)</p>
+<dd><p>Insert command to print some text (for debugging).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2073,7 +2110,7 @@ the ID of a structure that has not been allocated</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.print_value">
 <span class="sig-name descname"><span class="pre">print_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DataType.UINT32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.print_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.print_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to print out a value (for debugging)</p>
+<dd><p>Insert command to print out a value (for debugging).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2110,7 +2147,9 @@ overflow the data type</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.read_value">
 <span class="sig-name descname"><span class="pre">read_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dest_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.read_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.read_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to read a value from the current write pointer,            causing the write pointer to move by the number of bytes read.            The data is stored in a register passed as argument.</p>
+<dd><p>Insert command to read a value from the current write pointer, causing
+the write pointer to move by the number of bytes read. The data is
+stored in a register passed as argument.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2127,7 +2166,7 @@ overflow the data type</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.reference_memory_region">
 <span class="sig-name descname"><span class="pre">reference_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.reference_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.reference_memory_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to reference another memory region</p>
+<dd><p>Insert command to reference another memory region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2166,7 +2205,7 @@ overflow the data type</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.reserve_memory_region">
 <span class="sig-name descname"><span class="pre">reserve_memory_region</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reference</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.reserve_memory_region"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.reserve_memory_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to reserve a memory region</p>
+<dd><p>Insert command to reserve a memory region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2192,7 +2231,7 @@ overflow the data type</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.save_write_pointer">
 <span class="sig-name descname"><span class="pre">save_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.save_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.save_write_pointer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to save the write pointer to a register</p>
+<dd><p>Insert command to save the write pointer to a register.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>register_id</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the register to assign, between 0 and 15</p>
@@ -2211,7 +2250,7 @@ overflow the data type</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.set_register_value">
 <span class="sig-name descname"><span class="pre">set_register_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DataType.UINT32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_register_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.set_register_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to set the value of a register</p>
+<dd><p>Insert command to set the value of a register.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2250,7 +2289,7 @@ the data type</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.set_structure_value">
 <span class="sig-name descname"><span class="pre">set_structure_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameter_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_structure_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.set_structure_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to set a value in a structure</p>
+<dd><p>Insert command to set a value in a structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2304,7 +2343,8 @@ register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.set_write_pointer">
 <span class="sig-name descname"><span class="pre">set_write_pointer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">address_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_to_current</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.set_write_pointer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.set_write_pointer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to set the position of the write pointer within the            current region</p>
+<dd><p>Insert command to set the position of the write pointer within the
+current region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2337,7 +2377,10 @@ valid register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.start_conditional">
 <span class="sig-name descname"><span class="pre">start_conditional</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_conditional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.start_conditional" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to start a conditional if…then…else construct.            If the condition evaluates to true, the statement is executed up            to the next else statement, or the end of the conditional,            whichever comes first.</p>
+<dd><p>Insert command to start a conditional if…then…else construct. If
+the condition evaluates to true, the statement is executed up to the
+next else statement, or the end of the conditional, whichever comes
+first.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2372,7 +2415,12 @@ register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.start_function">
 <span class="sig-name descname"><span class="pre">start_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">argument_by_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.start_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to start a function definition, with up to 5            arguments, which are the IDs of structures to be used within the            function, each of which can be passed by reference or by value.            In the commands following this command up to the            <a class="reference internal" href="#data_specification.DataSpecificationGenerator.end_function" title="data_specification.DataSpecificationGenerator.end_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end_function()</span></code></a> command, structures can only be referenced            using the numbers 1 to 5 which address the arguments, rather than            the original structure IDs</p>
+<dd><p>Insert command to start a function definition, with up to 5 arguments,
+which are the IDs of structures to be used within the function, each
+of which can be passed by reference or by value. In the commands
+following this command up to the <a class="reference internal" href="#data_specification.DataSpecificationGenerator.end_function" title="data_specification.DataSpecificationGenerator.end_function"><code class="xref py py-meth docutils literal notranslate"><span class="pre">end_function()</span></code></a> command,
+structures can only be referenced using the numbers 1 to 5 which
+address the arguments, rather than the original structure IDs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2398,7 +2446,7 @@ determined by the length of this list.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.start_loop">
 <span class="sig-name descname"><span class="pre">start_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counter_register_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">increment_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.start_loop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.start_loop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to start a loop</p>
+<dd><p>Insert command to start a loop.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2461,7 +2509,7 @@ in the allowed range</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.switch_write_focus">
 <span class="sig-name descname"><span class="pre">switch_write_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">region</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.switch_write_focus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.switch_write_focus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to switch the region being written to</p>
+<dd><p>Insert command to switch the region being written to.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>region</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The ID of the region to switch to, between 0 and 15</p>
@@ -2481,7 +2529,8 @@ in the allowed range</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.write_array">
 <span class="sig-name descname"><span class="pre">write_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DataType.UINT32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.write_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to write an array, causing the write pointer            to move on by (data type size * the array size), in bytes.</p>
+<dd><p>Insert command to write an array, causing the write pointer
+to move on by (data type size * the array size), in bytes.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2505,7 +2554,8 @@ in the allowed range</p></li>
 <dd><p>Applies write commands created previously created (and cached).</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>See <a class="reference internal" href="#data_specification.DataSpecificationGenerator.create_cmd" title="data_specification.DataSpecificationGenerator.create_cmd"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_cmd()</span></code></a> for how to create the arguments to            this method.</p>
+<p>See <a class="reference internal" href="#data_specification.DataSpecificationGenerator.create_cmd" title="data_specification.DataSpecificationGenerator.create_cmd"><code class="xref py py-meth docutils literal notranslate"><span class="pre">create_cmd()</span></code></a> for how to create the arguments to
+this method.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2528,7 +2578,10 @@ the report for the data specification file</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.write_repeated_value">
 <span class="sig-name descname"><span class="pre">write_repeated_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DataType.UINT32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_repeated_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.write_repeated_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to write a value one or more times to the current            write pointer, causing the write pointer to move on by the number            of bytes required to represent the data type. The data is passed            as a parameter to this function</p>
+<dd><p>Insert command to write a value one or more times to the current write
+pointer, causing the write pointer to move on by the number of bytes
+required to represent the data type. The data is passed as a parameter
+to this function</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2571,7 +2624,9 @@ fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.write_structure">
 <span class="sig-name descname"><span class="pre">write_structure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_structure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.write_structure" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to write a structure to the current write pointer,            causing the current write pointer to move on by the number of            bytes needed to represent the structure</p>
+<dd><p>Insert command to write a structure to the current write pointer,
+causing the current write pointer to move on by the number of bytes
+needed to represent the structure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -2614,10 +2669,15 @@ valid register ID</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.write_value">
 <span class="sig-name descname"><span class="pre">write_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DataType.UINT32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.write_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to write a value (once) to the current            write pointer, causing the write pointer to move on by the number            of bytes required to represent the data type. The data is passed            as a parameter to this function</p>
+<dd><p>Insert command to write a value (once) to the current write pointer,
+causing the write pointer to move on by the number of bytes required
+to represent the data type. The data is passed as a parameter to this
+function</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This method used to have two extra parameters <code class="docutils literal notranslate"><span class="pre">repeats</span></code> and            <code class="docutils literal notranslate"><span class="pre">repeats_is_register</span></code>. They have been removed here. If you need            them, use <a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_repeated_value" title="data_specification.DataSpecificationGenerator.write_repeated_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_repeated_value()</span></code></a></p>
+<p>This method used to have two extra parameters <code class="docutils literal notranslate"><span class="pre">repeats</span></code> and
+<code class="docutils literal notranslate"><span class="pre">repeats_is_register</span></code>. They have been removed here. If you need
+them, use <a class="reference internal" href="#data_specification.DataSpecificationGenerator.write_repeated_value" title="data_specification.DataSpecificationGenerator.write_repeated_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">write_repeated_value()</span></code></a></p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -2647,16 +2707,18 @@ fractional part</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.DataSpecificationGenerator.write_value_from_register">
 <span class="sig-name descname"><span class="pre">write_value_from_register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_register</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repeats_is_register</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DataType.UINT32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/data_specification_generator.html#DataSpecificationGenerator.write_value_from_register"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.DataSpecificationGenerator.write_value_from_register" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert command to write a value one or more times at the write            pointer of the current memory region, causing it to move.            The data is contained in a register whose ID is passed to the            function</p>
+<dd><p>Insert command to write a value one or more times at the write pointer
+of the current memory region, causing it to move. The data is contained
+in a register whose ID is passed to the function.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data_register</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Identifies the register in which the data is stored.</p></li>
 <li><p><strong>repeats</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – <ul>
-<li><p>If <code class="docutils literal notranslate"><span class="pre">repeats_is_register</span></code> is None, this parameter identifies
+<li><p>If <code class="docutils literal notranslate"><span class="pre">repeats_is_register</span></code> is <cite>None</cite>, this parameter identifies
 the number of times to repeat the data, between 1 and 255
 (default 1)</p></li>
-<li><p>If <code class="docutils literal notranslate"><span class="pre">repeats_is_register</span></code> is not None (i.e. has an integer
+<li><p>If <code class="docutils literal notranslate"><span class="pre">repeats_is_register</span></code> is not <cite>None</cite> (i.e. has an integer
 value), the content of this parameter is disregarded</p></li>
 </ul>
 </p></li>
@@ -2691,7 +2753,7 @@ valid register ID</p></li>
 <dt class="sig sig-object py" id="data_specification.MemoryRegionCollection">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegionCollection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n_regions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_collection.html#MemoryRegionCollection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionCollection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Collection of memory regions.</p>
+<p>Collection of memory regions (<a class="reference internal" href="#data_specification.AbstractMemoryRegion" title="data_specification.AbstractMemoryRegion"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractMemoryRegion</span></code></a>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>n_regions</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – The number of regions in the collection.</p>
@@ -2764,7 +2826,7 @@ data region or an output region)</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.MemoryRegionReal.reference">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reference</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.reference" title="Permalink to this definition">¶</a></dt>
-<dd><p>The globally unique reference of this region, or None if none</p>
+<dd><p>The globally unique reference of this region, or <cite>None</cite> if none.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a> or None</p>
@@ -2786,7 +2848,9 @@ data region or an output region)</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.MemoryRegionReal.remaining_space">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">remaining_space</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.remaining_space" title="Permalink to this definition">¶</a></dt>
-<dd><p>The space between the current write pointer and the end of the            region, which is the number of bytes remaining in the region that            can be written.</p>
+<dd><p>The space between the current write pointer and the end of the region,
+which is the number of bytes remaining in the region that can be
+written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -2797,7 +2861,8 @@ data region or an output region)</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.MemoryRegionReal.unfilled">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unfilled</span></span><a class="headerlink" href="#data_specification.MemoryRegionReal.unfilled" title="Permalink to this definition">¶</a></dt>
-<dd><p>Whether the region is marked as not fillable; unfilled regions            will not contain any data at write time.</p>
+<dd><p>Whether the region is marked as not fillable; unfilled regions will
+not contain any data at write time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
@@ -2822,7 +2887,7 @@ data region or an output region)</p></li>
 <dt class="sig sig-object py" id="data_specification.MemoryRegionReference">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">MemoryRegionReference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/memory_region_reference.html#MemoryRegionReference"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.MemoryRegionReference" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#data_specification.AbstractMemoryRegion" title="data_specification.abstract_memory_region.AbstractMemoryRegion"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractMemoryRegion</span></code></a></p>
-<p>A reference to another memory region</p>
+<p>A reference to another memory region.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ref</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Identifies what this refers to</p>
@@ -2831,7 +2896,7 @@ data region or an output region)</p></li>
 <dl class="py property">
 <dt class="sig sig-object py" id="data_specification.MemoryRegionReference.ref">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ref</span></span><a class="headerlink" href="#data_specification.MemoryRegionReference.ref" title="Permalink to this definition">¶</a></dt>
-<dd><p>Identifies what this references</p>
+<dd><p>Identifies what this references.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
@@ -2845,11 +2910,16 @@ data region or an output region)</p></li>
 <dt class="sig sig-object py" id="data_specification.ReferenceContext">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data_specification.</span></span><span class="sig-name descname"><span class="pre">ReferenceContext</span></span><a class="reference internal" href="_modules/data_specification/reference_context.html#ReferenceContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.ReferenceContext" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Allows the generation of unique references within a context</p>
+<p>Allows the generation of unique references within a context.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="data_specification.ReferenceContext.next">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/data_specification/reference_context.html#ReferenceContext.next"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#data_specification.ReferenceContext.next" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the next reference in the current context</p>
+<dd><p>Get the next reference ID in the current context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

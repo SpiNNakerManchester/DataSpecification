@@ -14,20 +14,22 @@
 
 
 class DataSpecificationException(Exception):
-    """ A general purpose exception indicating that something went\
-        wrong when interacting with a Data Specification
+    """
+    A general purpose exception indicating that something went
+    wrong when interacting with a Data Specification.
     """
 
 
 class DataUndefinedWriterException(Exception):
-    """ An exception that indicates that the file data writer has not been\
-        initialised
+    """
+    An exception that indicates that the file data writer has not been
+    initialised.
     """
 
 
 class RegionInUseException(DataSpecificationException):
-    """ An exception that indicates that a region has already been\
-        allocated
+    """
+    An exception that indicates that a region has already been allocated.
     """
 
     def __init__(self, region, label=None):
@@ -37,29 +39,28 @@ class RegionInUseException(DataSpecificationException):
         :type label: str or None
         """
         if label is None:
-            msg = "Region {0:d} was already allocated".format(region)
+            msg = f"Region {region:d} was already allocated"
         else:
-            msg = "Region {0:d} ({1:s}) was already allocated".format(
-                region, label)
+            msg = f"Region {region:d} ({label}) was already allocated"
         super().__init__(msg)
 
 
 class StructureInUseException(DataSpecificationException):
-    """ An exception that indicates that a structure has already been\
-        defined
+    """
+    An exception that indicates that a structure has already been defined.
     """
 
     def __init__(self, structure):
         """
         :param int structure: The structure that was already allocated
         """
-        super().__init__("Structure {0} was already allocated".format(
-            structure))
+        super().__init__(f"Structure {structure} was already allocated")
 
 
 class RegionUnfilledException(DataSpecificationException):
-    """ An exception that indicates that a memory region is being used\
-        that was originally requested to be unfilled
+    """
+    An exception that indicates that a memory region is being used
+    that was originally requested to be unfilled.
     """
 
     def __init__(self, region, command):
@@ -68,12 +69,13 @@ class RegionUnfilledException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "Region {0} was requested unfilled, but command {1} "
-            "requests its use".format(region, command))
+            f"Region {region} was requested unfilled, but command {command} "
+            "requests its use")
 
 
 class NoRegionSelectedException(DataSpecificationException):
-    """ An exception that indicates that a memory region has not been selected
+    """
+    An exception that indicates that a memory region has not been selected.
     """
 
     def __init__(self, command):
@@ -81,13 +83,14 @@ class NoRegionSelectedException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "Command {0} tries to operate on an unspecified memory region"
-            .format(command))
+            f"Command {command} tries to operate on an unspecified "
+            "memory region")
 
 
 class RegionExhaustedException(DataSpecificationException):
-    """ An exception that indicates that a region has run out of memory\
-        whilst some data is being written
+    """
+    An exception that indicates that a region has run out of memory
+    whilst some data is being written.
     """
 
     def __init__(self, region, region_size, allocated_size, command):
@@ -100,14 +103,15 @@ class RegionExhaustedException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "Region {0} with size {1} ran out of allocated memory "
-            "(space already occupied {2}) during command {3:s}".format(
-                region, region_size, allocated_size, command))
+            f"Region {region} with size {region_size} ran out of allocated "
+            f"memory (space already occupied {allocated_size}) during "
+            f"command {command}")
 
 
 class RegionOutOfBoundsException(DataSpecificationException):
-    """ An exception that indicates that an offset into a region is out\
-        of bounds for that region
+    """
+    An exception that indicates that an offset into a region is out
+    of bounds for that region.
     """
 
     def __init__(self, region, region_size, requested_offset, command):
@@ -119,14 +123,14 @@ class RegionOutOfBoundsException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "Requesting offset {0} into region {1} with size {2} "
-            "during command {3}".format(
-                requested_offset, region, region_size, command))
+            f"Requesting offset {requested_offset} into region {region} "
+            f"with size {region_size} during command {command}")
 
 
 class ParameterOutOfBoundsException(DataSpecificationException):
-    """ An exception that indicates that a parameter value was outside of the\
-        allowed bounds
+    """
+    An exception that indicates that a parameter value was outside of the
+    allowed bounds.
     """
 
     def __init__(self, parameter, value, range_min, range_max, command):
@@ -142,14 +146,15 @@ class ParameterOutOfBoundsException(DataSpecificationException):
         """
         # pylint: disable=too-many-arguments
         super().__init__(
-            "Requesting value {} for parameter {} whose allowed range is "
-            "from {} to {} during command {}".format(
-                value, parameter, range_min, range_max, command))
+            f"Requesting value {value} for parameter {parameter} whose "
+            f"allowed range is from {range_min} to {range_max} during "
+            f"command {command}")
 
 
 class NotAllocatedException(DataSpecificationException):
-    """ An exception that indicates that an item is being used\
-        that has not been allocated
+    """
+    An exception that indicates that an item is being used
+    that has not been allocated.
     """
 
     def __init__(self, item_type, item_id, command):
@@ -159,13 +164,14 @@ class NotAllocatedException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "Using unallocated item with type {0} and ID {1} during "
-            "command {2}".format(item_type, item_id, command))
+            f"Using unallocated item with type {item_type} and ID {item_id} "
+            f"during command {command}")
 
 
 class NoMoreException(DataSpecificationException):
-    """ An exception that indicates that there is no more space for the\
-        requested item
+    """
+    An exception that indicates that there is no more space for the
+    requested item.
     """
 
     def __init__(self, space_available, space_required, region):
@@ -175,25 +181,26 @@ class NoMoreException(DataSpecificationException):
         """
         super().__init__(
             "Space unavailable to write all the elements requested by the "
-            "write operation. Space available: {0}; space requested: "
-            "{1} for region {2}.".format(
-                space_available, space_required, region))
+            f"write operation. Space available: {space_available}; space "
+            f"requested: {space_required} for region {region}.")
 
 
 class FunctionInUseException(DataSpecificationException):
-    """ An exception that indicates that a function is already defined
+    """
+    An exception that indicates that a function is already defined.
     """
 
     def __init__(self, function_id):
         """
         :param int function_id: The ID of the function
         """
-        super().__init__("Function {0} is already defined".format(function_id))
+        super().__init__(f"Function {function_id} is already defined")
 
 
 class RNGInUseException(DataSpecificationException):
-    """ An exception that indicates that a random number generator is\
-        already defined
+    """
+    An exception that indicates that a random number generator is already
+    defined.
     """
 
     def __init__(self, rng_id):
@@ -201,12 +208,13 @@ class RNGInUseException(DataSpecificationException):
         :param int rng_id: The ID of the rng
         """
         super().__init__(
-            "Random number generator {0} is already defined".format(rng_id))
+            f"Random number generator {rng_id} is already defined")
 
 
 class RandomNumberDistributionInUseException(DataSpecificationException):
-    """ An exception that indicates that a random number distribution is\
-        already defined
+    """
+    An exception that indicates that a random number distribution is already
+    defined.
     """
 
     def __init__(self, rng_id):
@@ -214,13 +222,13 @@ class RandomNumberDistributionInUseException(DataSpecificationException):
         :param int rng_id: The ID of the random number distribution
         """
         super().__init__(
-            "Random number distribution {0} is already defined".format(
-                rng_id))
+            f"Random number distribution {rng_id} is already defined")
 
 
 class WrongParameterNumberException(DataSpecificationException):
-    """ An exception that indicates that a function has been called with a\
-        wrong number of parameters.
+    """
+    An exception that indicates that a function has been called with a
+    wrong number of parameters.
     """
 
     def __init__(self, function_id, no_of_parameters_required, parameters):
@@ -231,14 +239,15 @@ class WrongParameterNumberException(DataSpecificationException):
             The number of parameters required by the function
         """
         super().__init__(
-            "Function {0} that requires {1} parameters has been called "
-            "with the following parameters: {2}".format(
-                function_id, no_of_parameters_required, parameters))
+            f"Function {function_id} that requires {no_of_parameters_required}"
+            " parameters has been called with the following "
+            f"parameters: {parameters}")
 
 
 class DuplicateParameterException(DataSpecificationException):
-    """ And exception that indicates that a command has been called with a\
-        duplicate parameter, which shouldn't be allowed.
+    """
+    An exception that indicates that a command has been called with a
+    duplicate parameter, which shouldn't be allowed.
     """
 
     def __init__(self, command, parameters):
@@ -247,13 +256,14 @@ class DuplicateParameterException(DataSpecificationException):
         :param list parameters: The parameters used to call the function
         """
         super().__init__(
-            "The command {0} has been called with duplicate parameters: "
-            "{1}".format(command, repr(parameters)))
+            f"The command {command} has been called with duplicate "
+            f"parameters: {repr(parameters)}")
 
 
 class NestedFunctionException(DataSpecificationException):
-    """ An exception that indicates that a function is being defined within\
-        the context of another function definition
+    """
+    An exception that indicates that a function is being defined within
+    the context of another function definition.
     """
 
     def __init__(self):
@@ -261,7 +271,8 @@ class NestedFunctionException(DataSpecificationException):
 
 
 class TypeMismatchException(DataSpecificationException):
-    """ An exception that indicates that a type mismatch has occurred
+    """
+    An exception that indicates that a type mismatch has occurred.
     """
 
     def __init__(self, command):
@@ -269,13 +280,13 @@ class TypeMismatchException(DataSpecificationException):
         :param str command: The command that generated the exception
         """
         super().__init__(
-            "A type mismatch has occurred during command {0}".format(
-                command))
+            f"A type mismatch has occurred during command {command}")
 
 
 class UnknownTypeException(DataSpecificationException):
-    """ An exception that indicates that the value of the requested type\
-        is unknown
+    """
+    An exception that indicates that the value of the requested type
+    is unknown.
     """
 
     def __init__(self, type_id, command):
@@ -284,13 +295,14 @@ class UnknownTypeException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "Unknown ID value {0} for data type during command {1}".format(
-                type_id, command))
+            f"Unknown ID value {type_id} for data type during "
+            f"command {command}")
 
 
 class UnknownTypeLengthException(DataSpecificationException):
-    """ An exception that indicates that the value of the requested type\
-        is unknown
+    """
+    An exception that indicates that the value of the requested type
+    is unknown.
     """
 
     def __init__(self, data_length, command):
@@ -298,13 +310,13 @@ class UnknownTypeLengthException(DataSpecificationException):
         :param int data_length: the length of the requested type
         :param str command: The command being executed
         """
-        super().__init__("Unknown data length {0} during command {1}".format(
-            data_length, command))
+        super().__init__(
+            f"Unknown data length {data_length} during command {command}")
 
 
 class InvalidSizeException(DataSpecificationException):
-    """ An exception that indicates that the size of the requested type is\
-        invalid
+    """
+    An exception that indicates that the size of the requested type is invalid.
     """
 
     def __init__(self, type_name, type_size, command):
@@ -314,13 +326,14 @@ class InvalidSizeException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "Invalid size {0} of the requested type {1} during "
-            "command {2}".format(type_size, type_name, command))
+            f"Invalid size {type_size} of the requested type {type_name} "
+            f"during command {command}")
 
 
 class InvalidCommandException(DataSpecificationException):
-    """ An exception that indicates that the command being requested cannot\
-        be executed at this point in the specification.
+    """
+    An exception that indicates that the command being requested cannot
+    be executed at this point in the specification.
     """
 
     def __init__(self, command):
@@ -328,13 +341,14 @@ class InvalidCommandException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "The requested command {0} cannot be executed at this point "
-            "in the specification".format(command))
+            f"The requested command {command} cannot be executed at this "
+            "point in the specification")
 
 
 class UnknownConditionException(DataSpecificationException):
-    """ And exception which is triggered in case the condition in an IF test\
-        does not exist in the list of possible conditions
+    """
+    An exception which is triggered in case the condition in an IF test
+    does not exist in the list of possible conditions.
     """
 
     def __init__(self, condition_id, command):
@@ -343,14 +357,14 @@ class UnknownConditionException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "The requested condition with ID {0} does not belong to the "
-            "list of possible tests during command {1}".format(
-                condition_id, command))
+            f"The requested condition with ID {condition_id} does not belong "
+            f"to the list of possible tests during command {command}")
 
 
 class InvalidOperationException(DataSpecificationException):
-    """ An exception that indicates that the operation of the type given type\
-        is not available.
+    """
+    An exception that indicates that the operation of the type given type
+    is not available.
     """
 
     def __init__(self, operation_type, requested_operation_id, command):
@@ -361,14 +375,15 @@ class InvalidOperationException(DataSpecificationException):
         :param str command: The command being executed
         """
         super().__init__(
-            "The {0} operation requested with ID {1} does not match "
-            "the possible operations available during command {2}".format(
-                operation_type, requested_operation_id, command))
+            f"The {operation_type} operation requested with ID "
+            f"{requested_operation_id} does not match the possible operations "
+            f"available during command {command}")
 
 
 class ExecuteBreakInstruction(DataSpecificationException):
-    """ An exception which occurs when a BREAK instruction is found in the\
-        data specification.
+    """
+    An exception which occurs when a `BREAK` instruction is found in the
+    data specification.
     """
 
     def __init__(self, address, filename):
@@ -378,21 +393,23 @@ class ExecuteBreakInstruction(DataSpecificationException):
         :param str filename: file being parsed
         """
         super().__init__(
-            "Executing BREAK instruction at address {0} of file {1}"
-            .format(address, filename))
+            f"Executing BREAK instruction at address {address} of "
+            f"file {filename}")
 
 
 class DataSpecificationSyntaxError(DataSpecificationException):
-    """ An exception which occurs when a command read from the data\
-        specification file shows an inconsistency in the binary content.
+    """
+    An exception which occurs when a command read from the data
+    specification file shows an inconsistency in the binary content.
     """
 
 
 class TablePointerOutOfMemoryException(DataSpecificationException):
-    """ An exception which occurs when building the table pointer as header of\
-        the data generated by the spec executor. This message is printed in\
-        case the memory available is not enough to contain the pointer table\
-        for each of the allocated regions.
+    """
+    An exception which occurs when building the table pointer as header of the
+    data generated by the spec executor. This message is printed in case the
+    memory available is not enough to contain the pointer table for each of
+    the allocated regions.
     """
 
     def __init__(self, memory_available, memory_required):
@@ -403,14 +420,15 @@ class TablePointerOutOfMemoryException(DataSpecificationException):
             execution of the specification file
         """
         super().__init__(
-            "The memory available {0} is not sufficient for the allocated"
-            " regions plus the header table pointer {1}".format(
-                memory_available, memory_required))
+            f"The memory available {memory_available} is not sufficient for "
+            "the allocated regions plus the header table "
+            f"pointer {memory_required}")
 
 
 class RegionNotAllocatedException(DataSpecificationException):
-    """ An exception which occurs when trying to write to an unallocated\
-        region of memory
+    """
+    An exception which occurs when trying to write to an unallocated
+    region of memory.
     """
 
     def __init__(self, region, command):
@@ -419,13 +437,14 @@ class RegionNotAllocatedException(DataSpecificationException):
         :param str command: The name of the command that was being handled.
         """
         super().__init__(
-            "Region {0} has not been allocated during execution of "
-            "command {1}".format(region, command))
+            f"Region {region} has not been allocated during execution of "
+            f"command {command}")
 
 
 class UnimplementedDSECommandError(DataSpecificationException):
-    """ An exception which occurs when trying to execute an unimplemented\
-        command
+    """
+    An exception which occurs when trying to execute an unimplemented
+    command.
     """
 
     def __init__(self, command):
@@ -433,13 +452,13 @@ class UnimplementedDSECommandError(DataSpecificationException):
         :param str command: Command attempted to be executed by the DSE
         """
         super().__init__(
-            "Command {0} in the data specification executor has not yet "
-            "been implemented".format(command))
+            f"Command {command} in the data specification executor has "
+            "not yet been implemented")
 
 
 class UnimplementedDSGCommandError(DataSpecificationException):
-    """ An exception which occurs when trying to write an unimplemented\
-        command
+    """
+    An exception which occurs when trying to write an unimplemented command.
     """
 
     def __init__(self, command):
@@ -447,5 +466,5 @@ class UnimplementedDSGCommandError(DataSpecificationException):
         :param str command: Command attempted to be generated by the DSG
         """
         super().__init__(
-            "Command {0} in the data specification generator has not yet "
-            "been implemented".format(command))
+            f"Command {command} in the data specification generator has "
+            "not yet been implemented")

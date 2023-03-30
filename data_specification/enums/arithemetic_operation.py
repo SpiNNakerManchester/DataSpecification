@@ -16,7 +16,8 @@ from enum import Enum
 
 
 class ArithmeticOperation(Enum):
-    """ Arithmetic Operations
+    """
+    Arithmetic Operations.
     """
 
     #: Addition operation

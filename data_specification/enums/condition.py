@@ -16,7 +16,8 @@ from enum import Enum
 
 
 class Condition(Enum):
-    """ Comparison Operations
+    """
+    Comparison Operations.
     """
 
     #: Compare the operands for equality

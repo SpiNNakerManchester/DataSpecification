@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Used to generate memory images for a SpiNNaker CPU core from a set of \
-    instructions.
+"""
+Used to generate memory images for a SpiNNaker CPU core from a set of
+instructions.
 
 The main part of this package is the
 :py:class:`DataSpecificationGenerator`

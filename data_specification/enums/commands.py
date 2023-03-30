@@ -18,7 +18,9 @@ from data_specification.data_specification_executor_functions import (
 
 
 class Commands(Enum):
-    """ Set of opcodes for the spec executor"""
+    """
+    Set of opcodes for the spec executor.
+    """
 
     #: Halts spec execution with an error.
     BREAK = (

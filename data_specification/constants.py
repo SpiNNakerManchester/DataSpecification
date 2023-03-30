@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-""" Constants used by the Data Structure Generator (DSG) \
-    and the Specification Executor.
+"""
+Constants used by the Data Structure Generator (DSG)
+and the Specification Executor.
 """
 
 # MAGIC Numbers:

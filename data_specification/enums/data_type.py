@@ -19,7 +19,8 @@ import numpy as np
 
 
 class DataType(Enum):
-    """ Supported data types.
+    """
+    Supported data types.
     Internally, these are actually tuples.
 
     #. an identifier for the enum class;
@@ -335,7 +336,8 @@ class DataType(Enum):
 
     @property
     def size(self):
-        """ The size in bytes of the type.
+        """
+        The size in bytes of the type.
 
         :rtype: int
         """
@@ -343,7 +345,8 @@ class DataType(Enum):
 
     @property
     def min(self):
-        """ The minimum possible value for the type.
+        """
+        The minimum possible value for the type.
 
         :rtype: ~decimal.Decimal
         """
@@ -351,7 +354,8 @@ class DataType(Enum):
 
     @property
     def max(self):
-        """ The maximum possible value for the type.
+        """
+        The maximum possible value for the type.
 
         :rtype: ~decimal.Decimal
         """
@@ -359,7 +363,8 @@ class DataType(Enum):
 
     @property
     def scale(self):
-        """ The scale of the input value to convert it in integer.
+        """
+        The scale of the input value to convert it in integer.
 
         :rtype: ~decimal.Decimal
         """
@@ -367,7 +372,8 @@ class DataType(Enum):
 
     @property
     def struct_encoding(self):
-        """ The encoding string used for struct. Scaling may also be required.
+        """
+        The encoding string used for struct. Scaling may also be required.
 
         :rtype: str
         """
@@ -375,12 +381,14 @@ class DataType(Enum):
 
     @property
     def numpy_typename(self):
-        """ The corresponding numpy type, if one exists.
+        """
+        The corresponding numpy type, if one exists.
         """
         return self._numpy_typename
 
     def encode_as_int(self, value):
-        """ Returns the value as an integer, according to this type.
+        """
+        Returns the value as an integer, according to this type.
 
         :param value:
         :type value: float or int
@@ -394,17 +402,18 @@ class DataType(Enum):
                 value = int(value)
             if not (self._min <= value <= self._max):
                 raise ValueError(
-                    "value {:f} cannot be converted to {:s}: out of range"
-                    .format(value, self.__doc__))
+                    f"value {value:f} cannot be converted to {self.__doc__}"
+                    ": out of range")
             return int(round(decimal.Decimal(str(value)) * self._scale))
         if self._force_cast is not None:
             return self._force_cast(value)
         return value
 
     def encode_as_numpy_int(self, value):
-        """ Returns the value as a numpy integer, according to this type.
+        """
+        Returns the value as a numpy integer, according to this type.
 
-        .. note:
+        .. note::
             Only works with integer and fixed point data types.
 
         :param value:
@@ -414,8 +423,9 @@ class DataType(Enum):
         return np.round(self.encode_as_int(value)).astype(self.struct_encoding)
 
     def encode_as_numpy_int_array(self, array):
-        """ Returns the numpy array as an integer numpy array, according to \
-            this type.
+        """
+        Returns the numpy array as an integer numpy array, according to
+        this type.
 
         :param ~numpy.ndarray array:
         :rtype: ~numpy.ndarray
@@ -425,8 +435,8 @@ class DataType(Enum):
             where = np.logical_or(array < self._min, self._max < array)
             if where.any():
                 raise ValueError(
-                    "value {:f} cannot be converted to {:s}: out of range"
-                    .format(array[where][0], self.__doc__))
+                    f"value {array[where][0]:f} cannot be converted to "
+                    f"{self.__doc__}: out of range")
             return np.round(array * float(self._scale)).astype("uint32")
         if self._force_cast is not None:
             return np.array([self._force_cast(x) for x in array]).astype(
@@ -434,7 +444,8 @@ class DataType(Enum):
         return np.array(array)
 
     def encode(self, value):
-        """ Encode the Python value for SpiNNaker according to this type.
+        """
+        Encode the Python value for SpiNNaker according to this type.
 
         :param value:
         :type value: float or int
@@ -443,7 +454,8 @@ class DataType(Enum):
         return self._struct.pack(self.encode_as_int(value))
 
     def decode_numpy_array(self, array):
-        """ Decode the numpy array of SpiNNaker values according to this type.
+        """
+        Decode the numpy array of SpiNNaker values according to this type.
 
         :param ~numpy.ndarray(~numpy.uint32) array:
         :rtype: ~numpy.ndarray(~numpy.uint32 or ~numpy.float64)
@@ -451,7 +463,8 @@ class DataType(Enum):
         return array / float(self._scale)
 
     def decode_array(self, values):
-        """ Decodes a byte array into iterable of this type.
+        """
+        Decodes a byte array into iterable of this type.
 
         :param values: the bytes to decode into this given data type
         :rtype: numpy array

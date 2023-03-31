@@ -58,6 +58,7 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.config_holder</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">add_default_cfg</span><span class="p">,</span> <span class="n">clear_cfg_files</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_machine.config_setup</span> <span class="kn">import</span> <span class="n">add_spinn_machine_cfg</span>
+<span class="kn">from</span> <span class="nn">spinn_machine.data.machine_data_writer</span> <span class="kn">import</span> <span class="n">MachineDataWriter</span>
 
 <span class="n">BASE_CONFIG_FILE</span> <span class="o">=</span> <span class="s2">&quot;data_specification.cfg&quot;</span>
 
@@ -67,7 +68,8 @@
 <span class="sd">    Resets the configuration so only the local default config is included.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">clear_cfg_files</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">add_data_specification_cfg</span><span class="p">()</span></div>
+    <span class="n">add_data_specification_cfg</span><span class="p">()</span>
+    <span class="n">MachineDataWriter</span><span class="o">.</span><span class="n">mock</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="add_data_specification_cfg"><a class="viewcode-back" href="../../data_specification.html#data_specification.config_setup.add_data_specification_cfg">[docs]</a><span class="k">def</span> <span class="nf">add_data_specification_cfg</span><span class="p">():</span>

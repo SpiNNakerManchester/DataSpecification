@@ -16,7 +16,7 @@ import unittest
 import io
 import struct
 from tempfile import mktemp
-from spinn_machine import SDRAM
+from spinn_machine import Machine
 from data_specification.config_setup import unittest_setup
 from data_specification.enums import DataType
 from data_specification import (
@@ -31,9 +31,7 @@ class TestDataSpecExecutor(unittest.TestCase):
         unittest_setup()
 
     def test_simple_spec(self):
-
-        # Create a sdram just to set max chip size
-        SDRAM(1000)
+        Machine.set_max_sdram_found(1000)
         # Write a data spec to execute
         temp_spec = mktemp()
         spec_writer = io.FileIO(temp_spec, "w")
@@ -133,8 +131,8 @@ class TestDataSpecExecutor(unittest.TestCase):
             self.assertIsNone(executor.get_region(r))
 
     def test_complex_spec(self):
-        # Create a sdram just to set max chip size
-        SDRAM(1000)
+
+        Machine.set_max_sdram_found(1000)
         temp_spec = mktemp()
         spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
         spec.reserve_memory_region(0, 44)
@@ -169,8 +167,7 @@ class TestDataSpecExecutor(unittest.TestCase):
             "}\0\0\0" "\0\0\0\0" "\0\0\0\0".encode("ISO 8859-1")))
 
     def test_overwrite(self):
-        # Create a sdram just to set max chip size
-        SDRAM(1000)
+        Machine.set_max_sdram_found(1000)
         temp_spec = mktemp()
         spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
         spec.reserve_memory_region(0, 4)

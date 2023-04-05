@@ -17,7 +17,7 @@ import io
 import os
 import struct
 import tempfile
-from spinn_machine import Machine
+from spinn_machine.data.machine_data_writer import MachineDataWriter
 from data_specification import constants, DataSpecificationGenerator
 from data_specification.config_setup import unittest_setup
 from data_specification.exceptions import (
@@ -47,7 +47,8 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.report_reader = io.TextIOWrapper(io.FileIO(self.report_file, "r"))
         self.dsg = DataSpecificationGenerator(self.spec_writer,
                                               self.report_writer)
-        Machine.set_max_sdram_found(0)
+
+        MachineDataWriter.mock().set_max_sdram_found(0)
 
     def tearDown(self):
         self.spec_reader.close()
@@ -95,7 +96,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.spec_reader.read(1), b"")
 
     def test_reserve_memory_region(self):
-        Machine.set_max_sdram_found(100000)
+        MachineDataWriter.mock().set_max_sdram_found(100000)
         self.dsg.reserve_memory_region(1, 0x111)
         self.dsg.reserve_memory_region(2, 0x1122)
         self.dsg.reserve_memory_region(3, 0x1122, empty=True)
@@ -163,7 +164,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.dsg._mem_slots[2].empty, True)
 
     def test_free_memory_region(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         self.dsg.reserve_memory_region(1, 0x111)
         self.dsg.free_memory_region(1)
 
@@ -296,7 +297,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x067F3342)
 
     def test_align_write_pointer(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         # Test NoRegionSelectedException raise
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.align_write_pointer(1)
@@ -874,7 +875,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05600000)
 
     def test_end_conditional(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         with self.assertRaises(InvalidCommandException):
             self.dsg.end_conditional()
 
@@ -898,7 +899,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05700000)
 
     def test_switch_write_focus(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         self.dsg.reserve_memory_region(0, 100)
         self.dsg.reserve_memory_region(2, 100)
         self.dsg.reserve_memory_region(1, 100, empty=True)
@@ -921,7 +922,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x05000200)
 
     def test_save_write_pointer(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.save_write_pointer(0)
 
@@ -1054,7 +1055,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x06063200)
 
     def test_set_write_pointer(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.set_write_pointer(0x100)
 
@@ -1086,7 +1087,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x06420300)
 
     def test_write_value(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_value(0x0)
 
@@ -1132,7 +1133,7 @@ class TestDataSpecGeneration(unittest.TestCase):
                          [0x24213020, 0x00000123, 0x00000000])
 
     def test_write_structure(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         with self.assertRaises(NotAllocatedException):
             self.dsg.write_structure(0)
 
@@ -1172,7 +1173,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x04420F0A)
 
     def test_write_array(self):
-        Machine.set_max_sdram_found(1000)
+        MachineDataWriter.mock().set_max_sdram_found(1000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_array([0, 1, 2, 3], DataType.UINT8)
 
@@ -1450,7 +1451,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.assertEqual(self.get_next_word(), 0x04146002)
 
     def test_write_value_from_register(self):
-        Machine.set_max_sdram_found(10000)
+        MachineDataWriter.mock().set_max_sdram_found(10000)
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_value_from_register(0)
 

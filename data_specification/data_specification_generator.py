@@ -18,7 +18,7 @@ import logging
 import struct
 import numpy
 from spinn_utilities.log import FormatAdapter
-from spinn_machine import Machine
+from spinn_machine.data import MachineDataView
 from .constants import (
     MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,
     MAX_RNGS, MAX_STRUCT_ELEMENTS, MAX_STRUCT_SLOTS, LEN1, LEN2, LEN3, LEN4,
@@ -250,9 +250,8 @@ class DataSpecificationGenerator(object):
         """
         _bounds(Commands.RESERVE, "memory region identifier",
                 region, 0, MAX_MEM_REGIONS)
-        a = Machine.get_max_sdram_found()
         _bounds(Commands.RESERVE, "memory size",
-                size, 1, Machine.get_max_sdram_found())
+                size, 1, MachineDataView.get_max_sdram_found())
         if self._mem_slots[region] is not None:
             raise RegionInUseException(region, self._mem_slots[region].label)
 

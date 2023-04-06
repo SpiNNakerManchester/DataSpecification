@@ -46,7 +46,7 @@ run the following where the code has been extracted:
 
 To install as a development version for only yourself, run:
 
-    pip install -e .
+    pip install -e . --user
 
 To install as a development version in a `virtualenv`, with the `virutalenv`
 enabled, run:

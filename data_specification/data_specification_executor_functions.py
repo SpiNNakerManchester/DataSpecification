@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,8 +36,9 @@ _ONE_SIGNED_INT = struct.Struct("<i")
 
 
 class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
-    """ This class includes the function related to each of the commands\
-        of the data specification file.
+    """
+    This class includes the function related to each of the commands
+    of the data specification file.
 
     .. note::
         DSG operations not mentioned in this class will cause an error during
@@ -100,15 +101,17 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     @property
     def mem_regions(self):
-        """ The collection of memory regions that can be written to.
+        """
+        The collection of memory regions that can be written to.
 
         :rtype: MemoryRegionCollection
         """
         return self._mem_regions
 
     def __unpack_cmd(self, cmd):
-        """ Routine to unpack the command read from the data spec file. The\
-            parameters of the command are stored in the class data.
+        """
+        Routine to unpack the command read from the data spec file.
+        The parameters of the command are stored in the class data.
 
         :param int cmd: The command read form the data spec file
         """
@@ -143,7 +146,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     def execute_reserve(self, cmd):
         """
         :raise ParameterOutOfBoundsException:
-            If the requested size of the region is beyond the available\
+            If the requested size of the region is beyond the available
             memory space
         """
         self.__unpack_cmd(cmd)
@@ -154,15 +157,14 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         if not referenceable and self.__cmd_size != LEN2:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires one word as argument (total 2 words), "
-                "but the current encoding ({1:X}) is specified to be {2:d} "
-                "words long".format(
-                    "RESERVE", cmd, self.__cmd_size))
+                "Command RESERVE requires one word as argument (total 2 "
+                f"words), but the current encoding ({cmd:X}) is specified to "
+                f"be {self.__cmd_size:d} words long")
         if referenceable and self.__cmd_size != LEN3:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires two words as arguments (total 3 "
-                "words), but the current encoding ({1:X}) is specified to be "
-                "{2:d} words long".format("RESERVE", cmd, self.__cmd_size))
+                "Command RESERVE requires two words as arguments (total 3 "
+                f"words), but the current encoding ({cmd:X}) is specified to "
+                f"be {self.__cmd_size:d} words long")
 
         if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
@@ -189,7 +191,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
     def execute_reference(self, cmd):
         """
         :raise ParameterOutOfBoundsException:
-            If the requested size of the region is beyond the available\
+            If the requested size of the region is beyond the available
             memory space
         """
         self.__unpack_cmd(cmd)
@@ -197,9 +199,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         if self.__cmd_size != LEN2:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires one word as argument (total 2 words), "
-                "but the current encoding ({1:X}) is specified to be {2:d} "
-                "words long".format("REFERENCE", cmd, self.__cmd_size))
+                "Command REFERENCE requires one word as argument (total 2 "
+                f"words), but the current encoding ({cmd:X}) is specified to "
+                f"be {self.__cmd_size:d} words long")
 
         if not self._mem_regions.is_empty(region):
             raise RegionInUseException(region)
@@ -239,11 +241,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             value = _ONE_LONG.unpack(self._spec_reader.read(8))[0]
         else:
             raise DataSpecificationSyntaxError(
-                "Command {0:s} requires a value as an argument, but the "
-                "current encoding ({1:X}) is specified to be {2:d} words "
-                "long and the data length command argument is specified "
-                "to be {3:d} bytes long".format(
-                    "WRITE", cmd, self.__cmd_size, data_len))
+                "Command WRITE requires a value as an argument, but the "
+                f"current encoding ({cmd:X}) is specified to be "
+                f"{self.__cmd_size:d} words long and the data length command "
+                f"argument is specified to be {data_len:d} bytes long")
 
         # Perform the writes
         self._write_to_mem(value, data_len, n_repeats, "WRITE")
@@ -330,14 +331,15 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if value != -1:
             raise DataSpecificationSyntaxError(
                 "Command END_SPEC requires an argument equal to -1. The "
-                "current argument value is {0}".format(value))
+                f"current argument value is {value}")
         return END_SPEC_EXECUTOR
 
     def _write_to_mem(self, value, n_bytes, repeat, command):
-        """ Write the specified value to data memory the specified amount of\
-            times.
+        """
+        Write the specified value to data memory the specified amount of
+        times.
 
-            The selected memory region needs to be already allocated
+        The selected memory region needs to be already allocated.
 
         :param int value: the value to be written in the data memory region
         :param int n_bytes: number of bytes that represent the value
@@ -366,9 +368,10 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self._write_bytes_to_mem(encoder.pack(value) * repeat, command)
 
     def _write_bytes_to_mem(self, data, command):
-        """ Write raw bytes to data memory
+        """
+        Write raw bytes to data memory.
 
-            The selected memory region needs to be already allocated
+        The selected memory region needs to be already allocated.
 
         :param data: the value to be written in the data memory region
         :type data: bytes or bytearray
@@ -392,8 +395,9 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         self.__write_blob(data)
 
     def __write_blob(self, data):
-        """ Does the actual write to the region, enforcing that writes cannot\
-            go outside the region.
+        """
+        Does the actual write to the region, enforcing that writes cannot
+        go outside the region.
 
         :param data: The data to write
         :type data: bytes or bytearray
@@ -413,7 +417,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     @property
     def referenceable_regions(self):
-        """ The regions that can be referenced by others
+        """
+        The regions that can be referenced by others.
 
         :rtype: list(int)
         """
@@ -421,7 +426,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
     @property
     def references_to_fill(self):
-        """ The references that need to be filled
+        """
+        The references that need to be filled.
 
         :rtype: list(int)
         """

@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,8 @@
 
 
 class ReferenceContext(object):
-    """ Allows the generation of unique references within a context
+    """
+    Allows the generation of unique references within a context.
     """
 
     # Next available reference within the current context,
@@ -47,7 +48,10 @@ class ReferenceContext(object):
 
     @classmethod
     def next(cls):
-        """ Get the next reference in the current context
+        """
+        Get the next reference ID in the current context.
+
+        :rtype: int
         """
         if cls.__next_reference is None:
             raise ValueError("Not currently in a reference context!")

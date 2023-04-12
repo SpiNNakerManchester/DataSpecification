@@ -19,6 +19,8 @@ DSG
 representability
 cmd
 
+struct
 io
 RawIOBase
 TextIOBase
+AbstractMemoryRegion

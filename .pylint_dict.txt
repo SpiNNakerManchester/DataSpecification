@@ -14,13 +14,12 @@
 
 # Our abbreviations/names
 DSE
-DSG
 
 representability
 cmd
 
 struct
-io
+
 RawIOBase
 TextIOBase
 AbstractMemoryRegion

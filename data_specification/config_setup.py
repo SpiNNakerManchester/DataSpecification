@@ -28,7 +28,8 @@ BASE_CONFIG_FILE = "data_specification.cfg"
 
 def unittest_setup():
     """
-    Resets the configuration so only the local default config is included.
+    Resets the configuration so only the local default configuration is
+    included.
     """
     clear_cfg_files(True)
     add_data_specification_cfg()
@@ -37,7 +38,7 @@ def unittest_setup():
 
 def add_data_specification_cfg():
     """
-    Add the local configuration and all dependent config files.
+    Add the local configuration and all dependent configuration files.
     """
     add_spinn_machine_cfg()  # This add its dependencies too
     add_default_cfg(os.path.join(os.path.dirname(__file__), BASE_CONFIG_FILE))

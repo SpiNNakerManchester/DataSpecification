@@ -51,13 +51,18 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 
+# Which version of other SpiNNaker docs do we refer to?
+spinnaker_doc_version = "latest"
+
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3.8', None),
     'numpy': ("https://numpy.org/doc/1.20/", None),
     'spinn_utilities': (
-        'https://spinnutils.readthedocs.io/en/latest/', None),
+        f'https://spinnutils.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
     'spinn_machine': (
-        'https://spinnmachine.readthedocs.io/en/latest/', None),
+        f'https://spinnmachine.readthedocs.io/en/{spinnaker_doc_version}/',
+        None),
 }
 
 # Add any paths that contain templates here, relative to this directory.

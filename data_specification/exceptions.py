@@ -205,7 +205,7 @@ class RNGInUseException(DataSpecificationException):
 
     def __init__(self, rng_id):
         """
-        :param int rng_id: The ID of the rng
+        :param int rng_id: The ID of the RNG
         """
         super().__init__(
             f"Random number generator {rng_id} is already defined")

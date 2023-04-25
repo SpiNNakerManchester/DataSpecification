@@ -2,3 +2,4 @@
 **/*.dia
 **/SpiNNUtils/**
 **/SpiNNMachine/**
+**/.nojekyll

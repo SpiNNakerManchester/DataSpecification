@@ -62,7 +62,5 @@ To be able to run the unitests add [Test] to the pip installs above
 Documentation
 =============
 [DataSpecification python documentation](http://dataspecification.readthedocs.io)
-<br>
-[Alternate location](https://spinnakermanchester.github.io/DataSpecification/)
 
 [Combined python documentation](http://spinnakermanchester.readthedocs.io)

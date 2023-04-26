@@ -16,44 +16,18 @@ name: Publish
 
 on:
   push:
-    branches: [ master ]
+    branches: [ doc_link ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.8
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Checkout SupportScripts
-      uses: actions/checkout@v3
-      with:
-        repository: SpiNNakerManchester/SupportScripts
-        path: support
-    - name: Install pip, etc
-      uses: ./support/actions/python-tools
-    - name: Install Spinnaker Dependencies
-      uses: ./support/actions/install-spinn-deps
-      with:
-        repositories: SpiNNUtils SpiNNMachine
-        install: true  
-    - name: Setup
-      uses: ./support/actions/run-install
-
-    - name: Build Python Documentation
-      uses: ./support/actions/sphinx
-      with:
-        directory: doc/source
-    - name: Hack for Github Pages
-      run: touch .nojekyll
-      working-directory: doc/source/_build/html
 
     - name: Deploy to GitHub Pages
       uses: JamesIves/github-pages-deploy-action@v4.4.1
       with:
         branch: gh-pages
-        folder: doc/source/_build/html
+        folder: doc/global

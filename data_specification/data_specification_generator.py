@@ -86,7 +86,7 @@ def _binencode(command, arguments):
     Encodes commands as binary words.
 
     :param Commands command: The code of the command being encoded.
-    :param  dict(_Field,int) arguments: How to parameterise the command.
+    :param  dict(_Field,int) arguments: How to parametrise the command.
     :return: the encoded command
     :rtype: bytearray
     """

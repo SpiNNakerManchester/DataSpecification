@@ -1,4 +1,4 @@
-# Copyright (c) 2020 The University of Manchester
+# Copyright (c) 2023 The University of Manchester
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,22 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Publish
+# Our abbreviations/names
+DSE
 
-on:
-  push:
-    branches: [ doc_link ]
+representability
+cmd
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+struct
 
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4.4.1
-      with:
-        branch: gh-pages
-        folder: doc/global
+RawIOBase
+TextIOBase
+AbstractMemoryRegion

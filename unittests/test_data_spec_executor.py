@@ -31,9 +31,7 @@ class TestDataSpecExecutor(unittest.TestCase):
 
     def test_simple_spec(self):
         # Write a data spec to execute
-        temp_spec = mktemp()
-        spec_writer = io.FileIO(temp_spec, "w")
-        spec = DataSpecificationGenerator(spec_writer)
+        spec = DataSpecificationGenerator()
         spec.reserve_memory_region(0, 100)
         spec.reserve_memory_region(1, 200, empty=True)
         spec.reserve_memory_region(2, 4)
@@ -49,8 +47,9 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.write_value(10)
         spec.end_specification()
 
+        spec_reader = io.BytesIO(spec.get_bytes_after_close())
+
         # Execute the spec
-        spec_reader = io.FileIO(temp_spec, "r")
         executor = DataSpecificationExecutor(spec_reader, 400)
         executor.execute()
 
@@ -119,18 +118,18 @@ class TestDataSpecExecutor(unittest.TestCase):
         self.assertEqual(header[1], constants.DSE_VERSION)
 
     def test_trivial_spec(self):
-        temp_spec = mktemp()
-        spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
+        spec = DataSpecificationGenerator()
         spec.end_specification()
 
-        executor = DataSpecificationExecutor(io.FileIO(temp_spec, "r"), 400)
+        spec_bytes = io.BytesIO(spec.get_bytes_after_close())
+
+        executor = DataSpecificationExecutor(spec_bytes, 400)
         executor.execute()
         for r in range(constants.MAX_MEM_REGIONS):
             self.assertIsNone(executor.get_region(r))
 
     def test_complex_spec(self):
-        temp_spec = mktemp()
-        spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
+        spec = DataSpecificationGenerator()
         spec.reserve_memory_region(0, 44)
         spec.switch_write_focus(0)
         spec.set_register_value(3, 0x31323341)
@@ -152,7 +151,9 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.write_value(0x7d, data_type=DataType.INT64)
         spec.end_specification()
 
-        executor = DataSpecificationExecutor(io.FileIO(temp_spec, "r"), 400)
+        spec_bytes = io.BytesIO(spec.get_bytes_after_close())
+
+        executor = DataSpecificationExecutor(spec_bytes, 400)
         executor.execute()
         r = executor.get_region(0)
         self.assertEqual(r.allocated_size, 44)
@@ -163,15 +164,16 @@ class TestDataSpecExecutor(unittest.TestCase):
             "}\0\0\0" "\0\0\0\0" "\0\0\0\0".encode("ISO 8859-1")))
 
     def test_overwrite(self):
-        temp_spec = mktemp()
-        spec = DataSpecificationGenerator(io.FileIO(temp_spec, "w"))
+        spec = DataSpecificationGenerator()
         spec.reserve_memory_region(0, 4)
         spec.switch_write_focus(0)
         spec.write_value(1)
         spec.write_value(2)
         spec.end_specification()
 
-        executor = DataSpecificationExecutor(io.FileIO(temp_spec, "r"), 400)
+        spec_bytes = io.BytesIO(spec.get_bytes_after_close())
+
+        executor = DataSpecificationExecutor(spec_bytes, 400)
         self.assertRaises(NoMoreException, executor.execute)
 
 

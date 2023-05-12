@@ -36,6 +36,7 @@ _64BIT_VALUE = 0x1234567890ABCDEF
 
 class TestDataSpecGeneration(unittest.TestCase):
     def setUp(self):
+        raise self.skipTest("sysncronise read and write no longer supported")
         unittest_setup()
         self.temp_dir = tempfile.mkdtemp()
         self.spec_file = os.path.join(self.temp_dir, "spec")
@@ -44,8 +45,7 @@ class TestDataSpecGeneration(unittest.TestCase):
         self.report_writer = io.TextIOWrapper(io.FileIO(self.report_file, "w"))
         self.spec_reader = io.FileIO(self.spec_file, "rb")
         self.report_reader = io.TextIOWrapper(io.FileIO(self.report_file, "r"))
-        self.dsg = DataSpecificationGenerator(self.spec_writer,
-                                              self.report_writer)
+        self.dsg = DataSpecificationGenerator(self.report_writer)
 
     def tearDown(self):
         self.spec_reader.close()

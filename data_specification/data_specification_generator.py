@@ -129,7 +129,8 @@ class DataSpecificationGenerator(object):
     # pylint: disable=too-many-arguments
 
     __slots__ = [
-        "_spec_writer",
+        "_bytes",
+        "_closed_bytes",
         "_report_writer",
         "_txt_indent",
         "_instruction_counter",
@@ -144,20 +145,18 @@ class DataSpecificationGenerator(object):
         "_ongoing_loop"
     ]
 
-    def __init__(self, spec_writer, report_writer=None):
+    def __init__(self, report_writer=None):
         """
-        :param ~io.RawIOBase spec_writer:
-            The object to write the specification to
         :param report_writer:
             Determines if a text version of the specification is to be
             written and, if so, where. No report is written if this is `None`.
         :type report_writer: ~io.TextIOBase or None
         :raise IOError: If a write to external storage fails
         """
-        if not isinstance(spec_writer, io.RawIOBase):
-            raise TypeError("spec_writer must be a RawIOBase")
-        #: The object to write the specification to
-        self._spec_writer = spec_writer
+        #: The object to write the specification to (before close)
+        self._bytes = bytearray()
+        #: The object to hold the data after close is called.
+        self._closed_bytes = None
         if report_writer is not None and not isinstance(
                 report_writer, io.TextIOBase):
             raise TypeError("report_writer must be a TextIOBase or None")
@@ -1263,7 +1262,7 @@ class DataSpecificationGenerator(object):
         cmd_string += str(list(array_values))
         arg_word = _ONE_WORD.pack(size // 4)
         self._write_command_to_files(cmd_word + arg_word, cmd_string)
-        self._spec_writer.write(data.tostring())
+        self._bytes += data.tostring()
 
     def switch_write_focus(self, region):
         """
@@ -2457,11 +2456,23 @@ class DataSpecificationGenerator(object):
         self._write_command_to_files(cmd_word + encoded_parameter, cmd_string)
 
         if close_writer:
-            self._spec_writer.close()
-            self._spec_writer = None
+            assert self._bytes is not None
+            self._closed_bytes = self._bytes
+            self._bytes = None
             if self._report_writer is not None:
                 self._report_writer.close()
                 self._report_writer = None
+
+    def get_bytes_after_close(self):
+        """
+        Returns the bytes but only after end_specification(True)
+
+        :return: Bytes written
+        :rtype: bytearray
+        """
+        assert self._closed_bytes is not None
+        return self._closed_bytes
+
 
     def _write_command_to_files(self, cmd_word_list, cmd_string, indent=False,
                                 outdent=False, no_instruction_number=False):
@@ -2486,11 +2497,7 @@ class DataSpecificationGenerator(object):
             If the binary specification file writer has not been initialised
         :raise IOError: If a write to external storage fails
         """
-        if self._spec_writer is None:
-            raise DataUndefinedWriterException(
-                "The spec file writer has not been initialised")
-        elif cmd_word_list:
-            self._spec_writer.write(cmd_word_list)
+        self._bytes += cmd_word_list
 
         if self._report_writer is not None:
             if outdent is True:

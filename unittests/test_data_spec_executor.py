@@ -15,7 +15,6 @@
 import unittest
 import io
 import struct
-from tempfile import mktemp
 from data_specification.config_setup import unittest_setup
 from data_specification.enums import DataType
 from data_specification import (

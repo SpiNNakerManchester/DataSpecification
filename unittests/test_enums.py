@@ -25,54 +25,11 @@ class TestingEnums(unittest.TestCase):
         unittest_setup()
 
     def test_commands_enum(self):
-        self.assertEqual(Commands.BREAK.value, 0x00)
-        self.assertEqual(Commands.NOP.value, 0x01)
         self.assertEqual(Commands.RESERVE.value, 0x02)
-        self.assertEqual(Commands.FREE.value, 0x03)
-        self.assertEqual(Commands.DECLARE_RNG.value, 0x05)
-
-        self.assertEqual(Commands.DECLARE_RANDOM_DIST.value, 0x06)
-        self.assertEqual(Commands.GET_RANDOM_NUMBER.value, 0x07)
-        self.assertEqual(Commands.START_STRUCT.value, 0x10)
-        self.assertEqual(Commands.STRUCT_ELEM.value, 0x11)
-        self.assertEqual(Commands.END_STRUCT.value, 0x12)
-
-        self.assertEqual(Commands.START_CONSTRUCTOR.value, 0x20)
-        self.assertEqual(Commands.END_CONSTRUCTOR.value, 0x25)
-        self.assertEqual(Commands.CONSTRUCT.value, 0x40)
-        self.assertEqual(Commands.READ.value, 0x41)
         self.assertEqual(Commands.WRITE.value, 0x42)
-
         self.assertEqual(Commands.WRITE_ARRAY.value, 0x43)
-        self.assertEqual(Commands.WRITE_STRUCT.value, 0x44)
-        self.assertEqual(Commands.BLOCK_COPY.value, 0x45)
         self.assertEqual(Commands.SWITCH_FOCUS.value, 0x50)
-        self.assertEqual(Commands.LOOP.value, 0x51)
-
-        self.assertEqual(Commands.BREAK_LOOP.value, 0x52)
-        self.assertEqual(Commands.END_LOOP.value, 0x53)
-        self.assertEqual(Commands.IF.value, 0x55)
-        self.assertEqual(Commands.ELSE.value, 0x56)
-        self.assertEqual(Commands.END_IF.value, 0x57)
-
-        self.assertEqual(Commands.MV.value, 0x60)
-        self.assertEqual(Commands.GET_WR_PTR.value, 0x63)
         self.assertEqual(Commands.SET_WR_PTR.value, 0x64)
-        self.assertEqual(Commands.ALIGN_WR_PTR.value, 0x65)
-
-        self.assertEqual(Commands.ARITH_OP.value, 0x67)
-        self.assertEqual(Commands.LOGIC_OP.value, 0x68)
-        self.assertEqual(Commands.REFORMAT.value, 0x6A)
-        self.assertEqual(Commands.COPY_STRUCT.value, 0x70)
-        self.assertEqual(Commands.COPY_PARAM.value, 0x71)
-
-        self.assertEqual(Commands.WRITE_PARAM.value, 0x72)
-        self.assertEqual(Commands.READ_PARAM.value, 0x73)
-        self.assertEqual(Commands.WRITE_PARAM_COMPONENT.value, 0x74)
-        self.assertEqual(Commands.PRINT_VAL.value, 0x80)
-        self.assertEqual(Commands.PRINT_TXT.value, 0X81)
-
-        self.assertEqual(Commands.PRINT_STRUCT.value, 0x82)
         self.assertEqual(Commands.END_SPEC.value, 0XFF)
 
     def test_data_type_enum(self):

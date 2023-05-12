@@ -34,8 +34,6 @@ MAX_REGISTERS = 16
 MAX_MEM_REGIONS = 32
 #: Maximum number of structure slots in DSG virtual machine.
 MAX_STRUCT_SLOTS = 16
-#: Maximum number of structure elements in DSG virtual machine.
-MAX_STRUCT_ELEMENTS = 255
 #: Maximum number of packing specification slots in DSG virtual machine.
 MAX_PACKSPEC_SLOTS = 16
 #: Maximum number of functions in DSG virtual machine.
@@ -67,14 +65,10 @@ APP_PTR_TABLE_BYTE_SIZE = (
 LEN1 = 0
 LEN2 = 1
 LEN3 = 2
-LEN4 = 3
 
 # Yes, this is naming for bit patterns
 NO_REGS = 0
-DEST_ONLY = 4
 SRC1_ONLY = 2
-SRC1_AND_SRC2 = 3
-DEST_AND_SRC1 = 6
 ALL_REGS = 7
 
 # return values from functions of the data spec executor

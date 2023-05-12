@@ -38,18 +38,6 @@ class RegionInUseException(DataSpecificationException):
         super().__init__(msg)
 
 
-class StructureInUseException(DataSpecificationException):
-    """
-    An exception that indicates that a structure has already been defined.
-    """
-
-    def __init__(self, structure):
-        """
-        :param int structure: The structure that was already allocated
-        """
-        super().__init__(f"Structure {structure} was already allocated")
-
-
 class RegionUnfilledException(DataSpecificationException):
     """
     An exception that indicates that a memory region is being used
@@ -178,81 +166,6 @@ class NoMoreException(DataSpecificationException):
             f"requested: {space_required} for region {region}.")
 
 
-class FunctionInUseException(DataSpecificationException):
-    """
-    An exception that indicates that a function is already defined.
-    """
-
-    def __init__(self, function_id):
-        """
-        :param int function_id: The ID of the function
-        """
-        super().__init__(f"Function {function_id} is already defined")
-
-
-class RNGInUseException(DataSpecificationException):
-    """
-    An exception that indicates that a random number generator is already
-    defined.
-    """
-
-    def __init__(self, rng_id):
-        """
-        :param int rng_id: The ID of the RNG
-        """
-        super().__init__(
-            f"Random number generator {rng_id} is already defined")
-
-
-class RandomNumberDistributionInUseException(DataSpecificationException):
-    """
-    An exception that indicates that a random number distribution is already
-    defined.
-    """
-
-    def __init__(self, rng_id):
-        """
-        :param int rng_id: The ID of the random number distribution
-        """
-        super().__init__(
-            f"Random number distribution {rng_id} is already defined")
-
-
-class WrongParameterNumberException(DataSpecificationException):
-    """
-    An exception that indicates that a function has been called with a
-    wrong number of parameters.
-    """
-
-    def __init__(self, function_id, no_of_parameters_required, parameters):
-        """
-        :param int function_id: The ID of the function
-        :param list parameters: The parameters used in the function call
-        :param int no_of_parameters_required:
-            The number of parameters required by the function
-        """
-        super().__init__(
-            f"Function {function_id} that requires {no_of_parameters_required}"
-            " parameters has been called with the following "
-            f"parameters: {parameters}")
-
-
-class DuplicateParameterException(DataSpecificationException):
-    """
-    An exception that indicates that a command has been called with a
-    duplicate parameter, which shouldn't be allowed.
-    """
-
-    def __init__(self, command, parameters):
-        """
-        :param int command: The command called with duplicate parameters
-        :param list parameters: The parameters used to call the function
-        """
-        super().__init__(
-            f"The command {command} has been called with duplicate "
-            f"parameters: {repr(parameters)}")
-
-
 class NestedFunctionException(DataSpecificationException):
     """
     An exception that indicates that a function is being defined within
@@ -321,56 +234,6 @@ class InvalidSizeException(DataSpecificationException):
         super().__init__(
             f"Invalid size {type_size} of the requested type {type_name} "
             f"during command {command}")
-
-
-class InvalidCommandException(DataSpecificationException):
-    """
-    An exception that indicates that the command being requested cannot
-    be executed at this point in the specification.
-    """
-
-    def __init__(self, command):
-        """
-        :param str command: The command being executed
-        """
-        super().__init__(
-            f"The requested command {command} cannot be executed at this "
-            "point in the specification")
-
-
-class UnknownConditionException(DataSpecificationException):
-    """
-    An exception which is triggered in case the condition in an IF test
-    does not exist in the list of possible conditions.
-    """
-
-    def __init__(self, condition_id, command):
-        """
-        :param int condition_id: ID of the condition being requested
-        :param str command: The command being executed
-        """
-        super().__init__(
-            f"The requested condition with ID {condition_id} does not belong "
-            f"to the list of possible tests during command {command}")
-
-
-class InvalidOperationException(DataSpecificationException):
-    """
-    An exception that indicates that the operation of the type given type
-    is not available.
-    """
-
-    def __init__(self, operation_type, requested_operation_id, command):
-        """
-        :param str operation_type:
-            The type of operation requested (i.e. arithmetic or logic)
-        :param int requested_operation_id: The ID of the requested operation
-        :param str command: The command being executed
-        """
-        super().__init__(
-            f"The {operation_type} operation requested with ID "
-            f"{requested_operation_id} does not match the possible operations "
-            f"available during command {command}")
 
 
 class ExecuteBreakInstruction(DataSpecificationException):

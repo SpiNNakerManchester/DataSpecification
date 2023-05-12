@@ -16,38 +16,13 @@ import unittest
 import decimal
 from data_specification.config_setup import unittest_setup
 from data_specification.enums import (
-    ArithmeticOperation, Commands, Condition, DataType, LogicOperation,
-    RandomNumberGenerator)
+    Commands, DataType)
 
 
 class TestingEnums(unittest.TestCase):
 
     def setUp(self):
         unittest_setup()
-
-    def test_arithmetic_operation_enum(self):
-        self.assertEqual(ArithmeticOperation.ADD.value, 0)
-        self.assertEqual(ArithmeticOperation.SUBTRACT.value, 1)
-        self.assertEqual(ArithmeticOperation.MULTIPLY.value, 2)
-
-    def test_condition_enum(self):
-        self.assertEqual(Condition.EQUAL.value, 0)
-        self.assertEqual(Condition.NOT_EQUAL.value, 1)
-        self.assertEqual(Condition.LESS_THAN_OR_EQUAL.value, 2)
-        self.assertEqual(Condition.LESS_THAN.value, 3)
-        self.assertEqual(Condition.GREATER_THAN_OR_EQUAL.value, 4)
-        self.assertEqual(Condition.GREATER_THAN.value, 5)
-
-    def test_rng_enum(self):
-        self.assertEqual(RandomNumberGenerator.MERSENNE_TWISTER.value, 0)
-
-    def test_logic_operation_enum(self):
-        self.assertEqual(LogicOperation.LEFT_SHIFT.value, 0)
-        self.assertEqual(LogicOperation.RIGHT_SHIFT.value, 1)
-        self.assertEqual(LogicOperation.OR.value, 2)
-        self.assertEqual(LogicOperation.AND.value, 3)
-        self.assertEqual(LogicOperation.XOR.value, 4)
-        self.assertEqual(LogicOperation.NOT.value, 5)
 
     def test_commands_enum(self):
         self.assertEqual(Commands.BREAK.value, 0x00)

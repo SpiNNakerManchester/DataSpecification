@@ -20,8 +20,7 @@ import tempfile
 from data_specification import constants, DataSpecificationGenerator
 from data_specification.config_setup import unittest_setup
 from data_specification.exceptions import (
-    TypeMismatchException, ParameterOutOfBoundsException,
-    RegionInUseException, NotAllocatedException,
+    ParameterOutOfBoundsException, RegionInUseException, NotAllocatedException,
     NoRegionSelectedException, RegionUnfilledException)
 from data_specification.enums import DataType
 
@@ -30,7 +29,6 @@ _64BIT_VALUE = 0x1234567890ABCDEF
 
 class TestDataSpecGeneration(unittest.TestCase):
     def setUp(self):
-        #raise self.skipTest("sysncronise read and write no longer supported")
         unittest_setup()
         self.temp_dir = tempfile.mkdtemp()
         self.spec_file = os.path.join(self.temp_dir, "spec")
@@ -86,15 +84,15 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.reserve_memory_region(1, 0x100)
 
         # RESERVE for memory region 1
-        #self.assertEqual(self.get_next_word(2), [0x10200001, 0x111])
+        # self.assertEqual(self.get_next_word(2), [0x10200001, 0x111])
         # RESERVE for memory region 2
-        #self.assertEqual(self.get_next_word(2), [0x10200002, 0x1122])
+        # self.assertEqual(self.get_next_word(2), [0x10200002, 0x1122])
         # RESERVE for memory region 3
-        #self.assertEqual(self.get_next_word(2), [0x10200083, 0x1122])
+        # self.assertEqual(self.get_next_word(2), [0x10200083, 0x1122])
         # RESERVE for memory region 4
-        #self.assertEqual(self.get_next_word(2), [0x10200004, 0x3344])
+        # self.assertEqual(self.get_next_word(2), [0x10200004, 0x3344])
         # RESERVE for memory region 5
-        #self.assertEqual(self.get_next_word(3), [0x20200045, 0x5564, 1])
+        # self.assertEqual(self.get_next_word(3), [0x20200045, 0x5564, 1])
         # Memory region 1 DSG data wrong
         self.assertEqual(self.dsg._mem_slots[1].size, 0x114)
         self.assertIsNone(self.dsg._mem_slots[1].label)
@@ -126,9 +124,9 @@ class TestDataSpecGeneration(unittest.TestCase):
             self.dsg.reference_memory_region(constants.MAX_MEM_REGIONS, 0)
 
         # REFERENCE for memory region 1
-        #self.assertEqual(self.get_next_word(2), [0x10400001, 1])
+        # self.assertEqual(self.get_next_word(2), [0x10400001, 1])
         # REFERENCE for memory region 2
-        #self.assertEqual(self.get_next_word(2), [0x10400002, 2])
+        # self.assertEqual(self.get_next_word(2), [0x10400002, 2])
 
         self.assertEqual(self.dsg._mem_slots[1].size, 0)
         self.assertIsNone(self.dsg._mem_slots[1].label)
@@ -165,8 +163,8 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(6)
         # SWITCH_FOCUS
-        #self.assertEqual(self.get_next_word(), 0x05000000)
-        #self.assertEqual(self.get_next_word(), 0x05000200)
+        # self.assertEqual(self.get_next_word(), 0x05000000)
+        # self.assertEqual(self.get_next_word(), 0x05000200)
 
     def test_set_write_pointer(self):
         with self.assertRaises(NoRegionSelectedException):
@@ -192,12 +190,12 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # SET_WR_PTR
-        #self.assertEqual(self.get_next_word(2), [0x16400000, 0x12345678])
-        #self.assertEqual(self.get_next_word(2), [0x16400000, 0x00000078])
-        #self.assertEqual(self.get_next_word(2), [0x16400001, 0x00000012])
-        #self.assertEqual(self.get_next_word(2), [0x16400001, 0xFFFFFFF4])
-        #self.assertEqual(self.get_next_word(), 0x06420101)
-        #self.assertEqual(self.get_next_word(), 0x06420300)
+        # self.assertEqual(self.get_next_word(2), [0x16400000, 0x12345678])
+        # self.assertEqual(self.get_next_word(2), [0x16400000, 0x00000078])
+        # self.assertEqual(self.get_next_word(2), [0x16400001, 0x00000012])
+        # self.assertEqual(self.get_next_word(2), [0x16400001, 0xFFFFFFF4])
+        # self.assertEqual(self.get_next_word(), 0x06420101)
+        # self.assertEqual(self.get_next_word(), 0x06420300)
 
     def test_write_value(self):
         with self.assertRaises(NoRegionSelectedException):
@@ -212,18 +210,18 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # WRITE
-        #self.assertEqual(self.get_next_word(2), [0x14202001, 0x00000000])
-        #self.assertEqual(self.get_next_word(2), [0x14202001, 0x00000012])
-        #self.assertEqual(self.get_next_word(2), [0x14202001, 0x12345678])
-        #self.assertEqual(self.get_next_word(2), [0x14202002, 0x12345678])
-        #self.assertEqual(self.get_next_word(2), [0x1420200C, 0x00000012])
-        #self.assertEqual(self.get_next_word(2), [0x142000FF, 0x00000012])
-        #self.assertEqual(self.get_next_word(2), [0x14201005, 0x00000012])
-        #self.assertEqual(self.get_next_word(3),
+        # self.assertEqual(self.get_next_word(2), [0x14202001, 0x00000000])
+        # self.assertEqual(self.get_next_word(2), [0x14202001, 0x00000012])
+        # self.assertEqual(self.get_next_word(2), [0x14202001, 0x12345678])
+        # self.assertEqual(self.get_next_word(2), [0x14202002, 0x12345678])
+        # self.assertEqual(self.get_next_word(2), [0x1420200C, 0x00000012])
+        # self.assertEqual(self.get_next_word(2), [0x142000FF, 0x00000012])
+        # self.assertEqual(self.get_next_word(2), [0x14201005, 0x00000012])
+        # self.assertEqual(self.get_next_word(3),
         #                 [0x24203005, 0x90ABCDEF, 0x12345678])
-        #self.assertEqual(self.get_next_word(3),
+        # self.assertEqual(self.get_next_word(3),
         #                 [0x24213050, 0x90ABCDEF, 0x12345678])
-        #self.assertEqual(self.get_next_word(3),
+        # self.assertEqual(self.get_next_word(3),
         #                 [0x24213020, 0x00000123, 0x00000000])
 
     def test_write_array(self):
@@ -243,25 +241,25 @@ class TestDataSpecGeneration(unittest.TestCase):
 
         self.skip_words(3)
         # WRITE_ARRAY
-        #self.assertEqual(self.get_next_word(2), [0x14300001, 0])
-        #self.assertEqual(self.get_next_word(2), [0x14300004, 0])
-        #self.assertEqual(self.get_next_word(3), [0x14300001, 1, 0x03020100])
-        #self.assertEqual(self.get_next_word(4),
+        # self.assertEqual(self.get_next_word(2), [0x14300001, 0])
+        # self.assertEqual(self.get_next_word(2), [0x14300004, 0])
+        # self.assertEqual(self.get_next_word(3), [0x14300001, 1, 0x03020100])
+        # self.assertEqual(self.get_next_word(4),
         #                 [0x14300002, 2, 0x00010000, 0x00030002])
-        #self.assertEqual(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
-        #self.assertEqual(self.get_next_word(5),
+        # self.assertEqual(self.get_next_word(6), [0x14300004, 4, 0, 1, 2, 3])
+        # self.assertEqual(self.get_next_word(5),
         #                 [0x14300002, 3, 0x00010000, 0x00030002, 0x00050004])
-        #self.assertEqual(self.get_next_word(4),
+        # self.assertEqual(self.get_next_word(4),
         #                [0x14300001, 2, 0x03020100, 0x07060504])
 
     def test_end_specification(self):
         self.dsg.end_specification(False)
 
         # END_SPEC
-        #self.assertEqual(self.get_next_word(), 0x0FF00000)
+        # self.assertEqual(self.get_next_word(), 0x0FF00000)
 
         self.dsg.end_specification()
-        #with self.assertRaises(ValueError):
+        # with self.assertRaises(ValueError):
         #    self.get_next_word()
 
 

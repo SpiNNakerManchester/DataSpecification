@@ -20,13 +20,6 @@ class DataSpecificationException(Exception):
     """
 
 
-class DataUndefinedWriterException(Exception):
-    """
-    An exception that indicates that the file data writer has not been
-    initialised.
-    """
-
-
 class RegionInUseException(DataSpecificationException):
     """
     An exception that indicates that a region has already been allocated.

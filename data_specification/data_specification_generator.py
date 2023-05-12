@@ -25,7 +25,7 @@ from .constants import (
     NO_REGS, DEST_AND_SRC1, DEST_ONLY, SRC1_ONLY, SRC1_AND_SRC2,
     BYTES_PER_WORD)
 from .exceptions import (
-    DataUndefinedWriterException, DuplicateParameterException,
+    DuplicateParameterException,
     FunctionInUseException, InvalidCommandException,
     InvalidOperationException, InvalidSizeException, NotAllocatedException,
     NoRegionSelectedException, ParameterOutOfBoundsException,
@@ -151,7 +151,6 @@ class DataSpecificationGenerator(object):
             Determines if a text version of the specification is to be
             written and, if so, where. No report is written if this is `None`.
         :type report_writer: ~io.TextIOBase or None
-        :raise IOError: If a write to external storage fails
         """
         #: The object to write the specification to (before close)
         self._bytes = bytearray()
@@ -193,9 +192,6 @@ class DataSpecificationGenerator(object):
             This is ignored by the binary file.
 
         :param str comment: The comment to write
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         """
         self._write_command_to_files(
             bytearray(), comment, no_instruction_number=True)
@@ -204,9 +200,6 @@ class DataSpecificationGenerator(object):
         """
         Insert command to stop execution with an exception (for debugging).
 
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         """
         cmd_word = _binencode(Commands.BREAK, {
             _Field.LENGTH: LEN1})
@@ -217,9 +210,6 @@ class DataSpecificationGenerator(object):
         """
         Insert command to execute nothing.
 
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         """
         cmd_word = _binencode(Commands.NOP, {
             _Field.LENGTH: LEN1})
@@ -239,9 +229,6 @@ class DataSpecificationGenerator(object):
         :param bool empty: Specifies if the region will be left empty
         :param reference: A globally unique reference for this region
         :type reference: int or None
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise RegionInUseException: If the ``region`` was already reserved
         :raise ParameterOutOfBoundsException:
             If the ``region`` requested was out of the allowed range, or the
@@ -287,9 +274,6 @@ class DataSpecificationGenerator(object):
         :param int ref: The identifier of the region to reference
         :param label: An optional label for the region
         :type label: str or None
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise RegionInUseException: If the ``region`` was already reserved
         :raise ParameterOutOfBoundsException:
             If the ``region`` requested was out of the allowed range, or the
@@ -319,9 +303,6 @@ class DataSpecificationGenerator(object):
         Insert command to free a previously reserved memory region.
 
         :param int region: The number of the region to free, from 0 to 15
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise NotAllocatedException: If the region was not reserved
         :raise ParameterOutOfBoundsException:
             If the ``region`` requested was out of the allowed range
@@ -352,9 +333,6 @@ class DataSpecificationGenerator(object):
         :param RandomNumberGenerator rng_type:
             The type of the random number generator
         :param int seed: The seed of the random number generator >= 0
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise UnknownTypeException:
             If the ``rng_type`` is not one of the allowed values
         :raise ParameterOutOfBoundsException:
@@ -401,9 +379,6 @@ class DataSpecificationGenerator(object):
             the distribution between -32768.0 and max_value
         :param float max_value: The maximum value that should be returned from
             the distribution between min_value and 32767.9999847
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise NoMoreException:
             If there is no more space for a new random distribution
         :raise NotAllocatedException:
@@ -460,9 +435,6 @@ class DataSpecificationGenerator(object):
             The ID of the random distribution to call between 0 and 63
         :param int register_id:
             The ID of the register to store the result in between 0 and 15
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise NotAllocatedException:
             If the random distribution ID was not previously declared
         :raise ParameterOutOfBoundsException:
@@ -502,9 +474,6 @@ class DataSpecificationGenerator(object):
             * `value` is the value of the element, or `None` if no value is to
                be assigned
         :type parameters: list(tuple(str, DataType, float))
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise NoMoreException:
             If there are no more spaces for new structures
         :raise ParameterOutOfBoundsException:
@@ -593,9 +562,6 @@ class DataSpecificationGenerator(object):
         :param bool parameter_index_is_register:
             True if ``parameter_index`` is a register ID containing the ID of
             the parameter/element to copy
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``structure_id`` is not in the allowed range
             * If ``parameter_index`` is larger than the number of parameters
@@ -671,9 +637,6 @@ class DataSpecificationGenerator(object):
             this variable is disregarded
         :param bool value_is_register:
             Identifies if value identifies a register
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``structure_id`` is not in the allowed range
             * If ``parameter_index`` is larger than the number of parameters
@@ -753,9 +716,6 @@ class DataSpecificationGenerator(object):
               write, between 0 and 255
         :param bool repeats_is_register:
             Whether ``repeats`` identifies a register
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``structure_id`` is not a valid structure ID
             * If ``repeats_is_register`` is False and ``repeats`` is not in
@@ -874,9 +834,6 @@ class DataSpecificationGenerator(object):
         :param structure_ids: A list of structure IDs that will be passed into
             the function, each between 0 and 15
         :type structure_ids: list(int)
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If the function ID is not valid
             * If any of the structure IDs are not valid
@@ -1032,9 +989,6 @@ class DataSpecificationGenerator(object):
         :param data: the data to write as a float.
         :type data: int or float
         :param DataType data_type: the type to convert ``data`` to
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``data_type`` is an integer type, and ``data`` has a
               fractional part
@@ -1060,7 +1014,6 @@ class DataSpecificationGenerator(object):
             the binary data specification file
         :param str cmd_string: string describing the command to be added to
             the report for the data specification file
-        :raise IOError: If a write to external storage fails
         :raise NoRegionSelectedException: If no region has been selected
         """
         if self._current_region is None:
@@ -1088,9 +1041,6 @@ class DataSpecificationGenerator(object):
             Indicates if the parameter ``repeats`` identifies the register
             containing the number of repeats of the value to write
         :param DataType data_type: the type to convert data to
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``repeats_is_register`` is False, and ``repeats`` is out of
               range
@@ -1170,9 +1120,6 @@ class DataSpecificationGenerator(object):
         :param bool repeats_is_register: Identifies if ``repeats`` is the
             register containing the number of repeats of the value to write
         :param DataType data_type: the type of the data held in the register
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``repeats_is_register`` is False, and ``repeats`` is out of
               range
@@ -1238,9 +1185,6 @@ class DataSpecificationGenerator(object):
         :param array_values: An array of words to be written
         :type array_values: list(int) or list(float) or ~numpy.ndarray
         :param DataType data_type: Type of data contained in the array
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise NoRegionSelectedException: If no region has been selected
         """
         if data_type.numpy_typename is None:
@@ -1269,9 +1213,6 @@ class DataSpecificationGenerator(object):
         Insert command to switch the region being written to.
 
         :param int region: The ID of the region to switch to, between 0 and 15
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             If the region identifier is not valid
         :raise NotAllocatedException: If the region has not been allocated
@@ -1326,9 +1267,6 @@ class DataSpecificationGenerator(object):
         :param bool end_is_register: Indicates if ``end`` is a register ID
         :param bool increment_is_register:
             Indicates if ``increment`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``counter_register_id`` is not a valid register ID
             * If ``start_is_register`` is True and ``start`` is not a valid
@@ -1402,9 +1340,6 @@ class DataSpecificationGenerator(object):
         """
         Insert command to break out of a loop before it has completed.
 
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise InvalidCommandException:
             If there is no loop in operation at this point
         """
@@ -1422,9 +1357,6 @@ class DataSpecificationGenerator(object):
         Commands between the start of the loop and this command will be
         repeated.
 
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise InvalidCommandException:
             If there is no loop in operation at this point
         """
@@ -1453,9 +1385,6 @@ class DataSpecificationGenerator(object):
             * If ``value_is_register`` is True, the ID of the register
               containing the value to compare, between 0 and 15
         :param bool value_is_register: Indicates if ``value`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * if ``value_is_register`` is True and ``value`` is not a valid
@@ -1502,9 +1431,6 @@ class DataSpecificationGenerator(object):
         and the statements from this point until the end of the conditional
         are executed.
 
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise InvalidCommandException:
             If there is no conditional in operation at this point
         """
@@ -1524,9 +1450,6 @@ class DataSpecificationGenerator(object):
         """
         Insert command to mark the end of an if...then...else construct
 
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise InvalidCommandException:
             If there is no conditional in operation at this point
         """
@@ -1554,9 +1477,6 @@ class DataSpecificationGenerator(object):
         :type data: int or float
         :param bool data_is_register: Indicates if ``data`` is a register ID
         :param DataType data_type: The type of the data to be assigned
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``data_is_register`` is True, and ``data`` is not a valid
@@ -1603,9 +1523,6 @@ class DataSpecificationGenerator(object):
 
         :param int register_id:
             The ID of the register to assign, between 0 and 15
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             If the ``register_id`` is not a valid register ID
         :raise NoRegionSelectedException: If no region has been selected
@@ -1641,9 +1558,6 @@ class DataSpecificationGenerator(object):
             when ``address_is_register`` is True) is to be added to the
             current address, or used as an absolute address from the start
             of the current region
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             If the ``address_is_register`` is True and ``address`` is not a
             valid register ID
@@ -1702,9 +1616,6 @@ class DataSpecificationGenerator(object):
             pointer will be written to once it has been updated, between
             0 and 15, or `None` if no such writing is to be done
         :type return_register_id: int or None
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``log_block_size_is_register`` is False, and
               ``log_block_size`` is not within the allowed range
@@ -1774,9 +1685,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``operand_1`` is a register ID
         :param bool operand_2_is_register:
             Indicates if ``operand_2`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_1_is_register`` is True and ``operand_1`` is not a
@@ -1870,9 +1778,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``operand_1`` is a register ID
         :param bool operand_2_is_register:
             Indicates if ``operand_2`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_1_is_register`` is True and ``operand_1`` is not a
@@ -1902,9 +1807,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``operand_1`` is a register ID
         :param bool operand_2_is_register:
             Indicates if ``operand_2`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_1_is_register`` is True and ``operand_1`` is not a
@@ -1935,9 +1837,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``operand_1`` is a register ID
         :param bool operand_2_is_register:
             Indicates if ``operand_2`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_1_is_register`` is True and ``operand_1`` is not a
@@ -1968,9 +1867,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``operand_1`` is a register ID
         :param bool operand_2_is_register:
             Indicates if ``operand_2`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_1_is_register`` is True and ``operand_1`` is not a
@@ -2000,9 +1896,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``operand_1`` is a register ID
         :param bool operand_2_is_register:
             Indicates if ``operand_2`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_1_is_register`` is True and ``operand_1`` is not a
@@ -2025,9 +1918,6 @@ class DataSpecificationGenerator(object):
             * If ``operand_is_register`` is False, a 32-bit value
         :param bool operand_is_register:
             Indicates if ``operand`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_is_register`` is True and ``operand`` is not a
@@ -2058,9 +1948,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``operand_1`` is a register ID
         :param bool operand_2_is_register:
             Indicates if ``operand_2`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``register_id`` is not a valid register ID
             * If ``operand_1_is_register`` is True and ``operand_1`` is not a
@@ -2144,9 +2031,6 @@ class DataSpecificationGenerator(object):
             Indicates if ``source_structure_id`` is a register ID
         :param bool destination_id_is_register:
             Indicates if ``destination_structure_id`` is a register ID
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``source_id_is_register`` is True and
               ``source_structure_id`` is not a valid register ID
@@ -2218,9 +2102,6 @@ class DataSpecificationGenerator(object):
             the destination structure. Ignored when writing to a register.
         :param bool destination_is_register:
             Indicates whether the destination is a structure or a register.
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``source_structure_id`` is not a valid structure ID
             * If ``destination_id`` is not a valid structure ID
@@ -2319,9 +2200,6 @@ class DataSpecificationGenerator(object):
         :type value: float or int
         :param bool value_is_register: Indicates if ``value`` is a register
         :param DataType data_type: The type of the data to be printed
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``value_is_register`` is True and ``value`` is not a valid
               register ID
@@ -2362,9 +2240,6 @@ class DataSpecificationGenerator(object):
         :param str text: The text to write (max 12 *bytes* once encoded)
         :param str encoding:
             The character encoding to use for the string. Defaults to ASCII.
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         """
         text_encoded = bytearray(text.encode(encoding=encoding))
         text_len = len(text_encoded)
@@ -2399,9 +2274,6 @@ class DataSpecificationGenerator(object):
               structure to print, between 0 and 15
         :param bool structure_id_is_register:
             Indicates if the ``structure_id`` is a register
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         :raise ParameterOutOfBoundsException:
             * If ``structure_id_is_register`` is True and ``structure_id`` is
               not a valid register ID
@@ -2443,9 +2315,6 @@ class DataSpecificationGenerator(object):
 
         :param bool close_writer:
             Indicates whether to close the underlying writer(s)
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         """
         self.comment("\nEnd of specification:")
 
@@ -2493,9 +2362,6 @@ class DataSpecificationGenerator(object):
         :param bool outdent: if the following lines need to be out-dented
         :param bool no_instruction_number: if each report line should include
             also the address of the command in the file
-        :raise DataUndefinedWriterException:
-            If the binary specification file writer has not been initialised
-        :raise IOError: If a write to external storage fails
         """
         self._bytes += cmd_word_list
 

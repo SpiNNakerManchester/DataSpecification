@@ -2342,7 +2342,6 @@ class DataSpecificationGenerator(object):
         assert self._closed_bytes is not None
         return self._closed_bytes
 
-
     def _write_command_to_files(self, cmd_word_list, cmd_string, indent=False,
                                 outdent=False, no_instruction_number=False):
         """

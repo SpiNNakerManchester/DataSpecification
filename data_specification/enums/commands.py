@@ -51,18 +51,6 @@ class Commands(Enum):
         "Move the write pointer to a new location, either relative to the"
         " start of this reserved memory area or relative to the current"
         " write pointer")
-    READ_PARAM = (
-        0x73, DataSpecificationExecutorFunctions.execute_read_param,
-        "Load the value of a structure parameter in a register")
-    WRITE_PARAM_COMPONENT = (
-        0x74, DataSpecificationExecutorFunctions.execute_write_param_component,
-        "Modify a single parameter in a structure")
-    PRINT_VAL = (
-        0x80, DataSpecificationExecutorFunctions.execute_print_val,
-        "Output the value of a register to the screen")
-    PRINT_TXT = (
-        0X81, DataSpecificationExecutorFunctions.execute_print_txt,
-        "Print a text string to the screen")
     END_SPEC = (
         0XFF, DataSpecificationExecutorFunctions.execute_end_spec,
         "Cleanly ends the parsing of the data specs")

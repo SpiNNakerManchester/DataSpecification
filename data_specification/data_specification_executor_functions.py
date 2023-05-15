@@ -49,16 +49,12 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         "_memory_space",
         "_space_allocated",
         "_current_region",
-        "_registers",
         "_mem_regions",
         "_referenceable_regions",
         "_references_to_fill",
 
         # Decodings of the current command
         "__cmd_size",
-        "__dest_reg",
-        "__src1_reg",
-        "__src2_reg",
         "__data_len"]
 
     def __init__(self, spec_reader, memory_space):
@@ -78,8 +74,6 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         #: What is the current region that we're writing to
         self._current_region = None
 
-        #: The model registers, a list of 16 ints
-        self._registers = [0] * MAX_REGISTERS
         #: The collection of memory regions that can be written to
         self._mem_regions = MemoryRegionCollection(MAX_MEM_REGIONS)
         #: The indices of regions that are marked as referenceable
@@ -89,12 +83,6 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
 
         #: Decoded from command: size in words
         self.__cmd_size = None
-        #: Decoded from command: destination register or None
-        self.__dest_reg = None
-        #: Decoded from command: first source register or None
-        self.__src1_reg = None
-        #: Decoded from command: second source register or None
-        self.__src2_reg = None
         #: Decoded from command: data length
         self.__data_len = None
 
@@ -115,18 +103,6 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         :param int cmd: The command read form the data spec file
         """
         self.__cmd_size = (cmd >> 28) & 0x3
-        use_dest_reg = (cmd >> 18) & 0x1 == 0x1
-        use_src1_reg = (cmd >> 17) & 0x1 == 0x1
-        use_src2_reg = (cmd >> 16) & 0x1 == 0x1
-        if use_dest_reg:
-            pop1 = 1/0
-        if use_src1_reg:
-            pop2 = 1/0
-        if use_src2_reg:
-            pop3 = 1/0
-        self.__dest_reg = (cmd >> 12) & 0xF if use_dest_reg else None
-        self.__src1_reg = (cmd >> 8) & 0xF if use_src1_reg else None
-        self.__src2_reg = (cmd >> 4) & 0xF if use_src2_reg else None
         self.__data_len = (cmd >> 12) & 0x3
 
     @property
@@ -218,17 +194,12 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         """
         self.__unpack_cmd(cmd)
 
-        if self.__src2_reg is not None:
-            n_repeats = self._registers[self.__src2_reg]
-        else:
-            n_repeats = cmd & 0xFF
+        n_repeats = cmd & 0xFF
 
         # Convert data length to bytes
         data_len = 1 << self.__data_len
 
-        if self.__src1_reg is not None:
-            value = self._registers[self.__src1_reg]
-        elif self.__cmd_size == LEN2 and data_len != 8:
+        if self.__cmd_size == LEN2 and data_len != 8:
             value = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
         elif self.__cmd_size == LEN3 and data_len == 8:
             value = _ONE_LONG.unpack(self._spec_reader.read(8))[0]
@@ -266,10 +237,7 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         """
         self.__unpack_cmd(cmd)
 
-        if self.__src1_reg is not None:
-            region = self._registers[self.__src1_reg]
-        else:
-            region = (cmd >> 8) & 0x1F
+        region = (cmd >> 8) & 0x1F
 
         if self._mem_regions.is_empty(region):
             raise RegionUnfilledException(region, "SWITCH_FOCUS")
@@ -282,12 +250,8 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
             If there is no memory region selected for the set-ptr operation
         """
         self.__unpack_cmd(cmd)
-        if self.__src1_reg is not None:
-            # the data is a register
-            future_address = self._registers[self.__src1_reg]
-        else:
-            # the data is a raw address
-            future_address = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
+        # the data is a raw address
+        future_address = _ONE_WORD.unpack(self._spec_reader.read(4))[0]
 
         # check that the address is relative or absolute
         if cmd & 0x1 == 1:

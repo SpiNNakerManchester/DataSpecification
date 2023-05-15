@@ -236,23 +236,6 @@ class InvalidSizeException(DataSpecificationException):
             f"during command {command}")
 
 
-class ExecuteBreakInstruction(DataSpecificationException):
-    """
-    An exception which occurs when a `BREAK` instruction is found in the
-    data specification.
-    """
-
-    def __init__(self, address, filename):
-        """
-        :param int address: address of the data specification being executed
-            at the time of breakpoint
-        :param str filename: file being parsed
-        """
-        super().__init__(
-            f"Executing BREAK instruction at address {address} of "
-            f"file {filename}")
-
-
 class DataSpecificationSyntaxError(DataSpecificationException):
     """
     An exception which occurs when a command read from the data

@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import io
 import struct
 from spinn_utilities.overrides import overrides
 from .constants import (
     END_SPEC_EXECUTOR, LEN2, LEN3, MAX_MEM_REGIONS, MAX_REGISTERS)
 from .exceptions import (
-    DataSpecificationSyntaxError, ExecuteBreakInstruction, NoMoreException,
+    DataSpecificationSyntaxError, NoMoreException,
     NoRegionSelectedException, ParameterOutOfBoundsException,
     RegionInUseException, RegionNotAllocatedException,
     RegionUnfilledException, UnknownTypeLengthException)
@@ -129,18 +128,6 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self._current_region is None:
             return None
         return self._mem_regions[self._current_region]
-
-    @overrides(AbstractExecutorFunctions.execute_break)
-    def execute_break(self, cmd):
-        """
-        :raise ExecuteBreakInstruction:
-            Raises the exception to break the execution of the DSE
-        """
-        if isinstance(self._spec_reader, io.FileIO):
-            name = self._spec_reader.name
-        else:
-            name = "<stream>"
-        raise ExecuteBreakInstruction(self._spec_reader.tell(), name)
 
     @overrides(AbstractExecutorFunctions.execute_reserve)
     def execute_reserve(self, cmd):
@@ -281,19 +268,6 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         if self._mem_regions.is_empty(region):
             raise RegionUnfilledException(region, "SWITCH_FOCUS")
         self._current_region = region
-
-    @overrides(AbstractExecutorFunctions.execute_mv)
-    def execute_mv(self, cmd):
-        self.__unpack_cmd(cmd)
-        if self.__dest_reg is None:
-            raise DataSpecificationSyntaxError(
-                "Destination register not correctly specified")
-
-        if self.__src1_reg is not None:
-            self._registers[self.__dest_reg] = self._registers[self.__src1_reg]
-        else:
-            self._registers[self.__dest_reg] = \
-                _ONE_WORD.unpack(self._spec_reader.read(4))[0]
 
     @overrides(AbstractExecutorFunctions.execute_set_wr_ptr)
     def execute_set_wr_ptr(self, cmd):

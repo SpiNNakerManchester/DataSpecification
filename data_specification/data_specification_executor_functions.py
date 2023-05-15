@@ -118,6 +118,12 @@ class DataSpecificationExecutorFunctions(AbstractExecutorFunctions):
         use_dest_reg = (cmd >> 18) & 0x1 == 0x1
         use_src1_reg = (cmd >> 17) & 0x1 == 0x1
         use_src2_reg = (cmd >> 16) & 0x1 == 0x1
+        if use_dest_reg:
+            pop1 = 1/0
+        if use_src1_reg:
+            pop2 = 1/0
+        if use_src2_reg:
+            pop3 = 1/0
         self.__dest_reg = (cmd >> 12) & 0xF if use_dest_reg else None
         self.__src1_reg = (cmd >> 8) & 0xF if use_src1_reg else None
         self.__src2_reg = (cmd >> 4) & 0xF if use_src2_reg else None

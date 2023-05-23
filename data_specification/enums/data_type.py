@@ -327,11 +327,12 @@ class DataType(Enum):
         obj._numpy_typename = numpy_typename
         obj._apply_scale = apply_scale
         obj._force_cast = force_cast
+        obj._struct = struct.Struct("<" + struct_encoding)
         if size == 1:
             struct_encoding += "xxx"
         elif size == 2:
             struct_encoding += "xx"
-        obj._struct = struct.Struct("<" + struct_encoding)
+        obj._padded_struct = struct.Struct("<" + struct_encoding)
         return obj
 
     @property
@@ -445,7 +446,17 @@ class DataType(Enum):
 
     def encode(self, value):
         """
-        Encode the Python value for SpiNNaker according to this type.
+        Encode the Padded Python value for SpiNNaker according to this type.
+
+        :param value:
+        :type value: float or int
+        :rtype: bytes
+        """
+        return self._padded_struct.pack(self.encode_as_int(value))
+
+    def as_bytes(self, value):
+        """
+        Encode the Python value as bytes with NO padding.
 
         :param value:
         :type value: float or int

@@ -362,6 +362,22 @@ class DataType(Enum):
         """
         return self._max
 
+    def check_value(self, value):
+        """
+        Check the value against the allowed min and max
+
+        :type value: float or int
+        :raises ValueError: If the value is outside of min to max
+        """
+        if value < self._min:
+            raise ValueError(
+                f"Value {value} is smaller than the minimum {self._min} "
+                f"allowed for a {self}")
+        if value > self._max:
+            raise ValueError(
+                f"Value {value} is greater than the maximum {self._max} "
+                f"allowed for a {self}")
+
     @property
     def scale(self):
         """

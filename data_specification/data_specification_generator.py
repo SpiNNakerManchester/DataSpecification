@@ -420,62 +420,6 @@ class DataSpecificationGenerator(object):
             _Field.SOURCE_1: region})
         self._write_command_to_files(cmd_word, cmd_string)
 
-    def set_write_pointer(self, address, address_is_register=False,
-                          relative_to_current=False):
-        """
-        Insert command to set the position of the write pointer within the
-        current region.
-
-        :param int address:
-            * If ``address_is_register`` is True, the ID of the register
-              containing the address to move to
-            * If ``address_is_register`` is False, the address to move the
-              write pointer to
-        :param bool address_is_register:
-            Indicates if ``address`` is a register ID
-        :param bool relative_to_current:
-            Indicates if ``address`` (or the value read from that register
-            when ``address_is_register`` is True) is to be added to the
-            current address, or used as an absolute address from the start
-            of the current region
-        :raise ParameterOutOfBoundsException:
-            If the ``address_is_register`` is True and ``address`` is not a
-            valid register ID
-        :raise NoRegionSelectedException: If no region has been selected
-        """
-        if self._current_region is None:
-            raise NoRegionSelectedException(Commands.SET_WR_PTR.name)
-        relative = bool(relative_to_current)
-        relative_string = "RELATIVE" if relative else "ABSOLUTE"
-
-        data_encoded = bytearray()
-        cmd_string = Commands.SET_WR_PTR.name
-        if address_is_register:
-            _bounds(Commands.SET_WR_PTR, "address", address, 0, MAX_REGISTERS)
-            cmd_word = _binencode(Commands.SET_WR_PTR, {
-                _Field.LENGTH: LEN1,
-                _Field.USAGE: SRC1_ONLY,
-                _Field.SOURCE_1: address,
-                _Field.IMMEDIATE: relative})
-            cmd_string += f" reg[{address:d}] {relative_string}"
-        else:
-            if not relative_to_current:
-                _typebounds(Commands.SET_WR_PTR, "address",
-                            address, DataType.UINT32)
-                data_encoded += _ONE_WORD.pack(address)
-            else:
-                _typebounds(Commands.SET_WR_PTR, "address",
-                            address, DataType.INT32)
-                data_encoded += _ONE_SIGNED_INT.pack(address)
-
-            cmd_word = _binencode(Commands.SET_WR_PTR, {
-                _Field.LENGTH: LEN2,
-                _Field.USAGE: NO_REGS,
-                _Field.IMMEDIATE: relative})
-            cmd_string += f" {address:d} {relative_string}"
-
-        self._write_command_to_files(cmd_word + data_encoded, cmd_string)
-
     def end_specification(self, close_writer=True):
         """
         Insert a command to indicate that the specification has finished

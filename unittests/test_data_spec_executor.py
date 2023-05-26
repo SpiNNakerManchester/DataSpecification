@@ -37,11 +37,9 @@ class TestDataSpecExecutor(unittest.TestCase):
         spec.reference_memory_region(4, 2)
         spec.switch_write_focus(0)
         spec.write_array([0, 1, 2])
-        spec.set_write_pointer(20)
+        spec.write_array([0, 0])
         spec.write_value(4)
         spec.switch_write_focus(2)
-        spec.write_value(3)
-        spec.set_write_pointer(0)
         spec.write_value(10)
         spec.end_specification()
 

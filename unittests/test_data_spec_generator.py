@@ -166,37 +166,6 @@ class TestDataSpecGeneration(unittest.TestCase):
         # self.assertEqual(self.get_next_word(), 0x05000000)
         # self.assertEqual(self.get_next_word(), 0x05000200)
 
-    def test_set_write_pointer(self):
-        with self.assertRaises(NoRegionSelectedException):
-            self.dsg.set_write_pointer(0x100)
-
-        # Define a memory region and switch focus to it
-        self.dsg.reserve_memory_region(1, 100)
-        self.dsg.switch_write_focus(1)
-
-        self.dsg.set_write_pointer(0x12345678, False, False)
-        self.dsg.set_write_pointer(0x00000078, False, False)
-        self.dsg.set_write_pointer(0x12, False, True)
-        self.dsg.set_write_pointer(-12, False, True)
-        self.dsg.set_write_pointer(1, True, True)
-        self.dsg.set_write_pointer(3, True, False)
-
-        with self.assertRaises(ParameterOutOfBoundsException):
-            self.dsg.set_write_pointer(-1, True)
-        with self.assertRaises(ParameterOutOfBoundsException):
-            self.dsg.set_write_pointer(constants.MAX_REGISTERS, True)
-        with self.assertRaises(ParameterOutOfBoundsException):
-            self.dsg.set_write_pointer(0x123456789, False)
-
-        self.skip_words(3)
-        # SET_WR_PTR
-        # self.assertEqual(self.get_next_word(2), [0x16400000, 0x12345678])
-        # self.assertEqual(self.get_next_word(2), [0x16400000, 0x00000078])
-        # self.assertEqual(self.get_next_word(2), [0x16400001, 0x00000012])
-        # self.assertEqual(self.get_next_word(2), [0x16400001, 0xFFFFFFF4])
-        # self.assertEqual(self.get_next_word(), 0x06420101)
-        # self.assertEqual(self.get_next_word(), 0x06420300)
-
     def test_write_value(self):
         with self.assertRaises(NoRegionSelectedException):
             self.dsg.write_value(0x0)

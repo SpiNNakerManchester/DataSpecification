@@ -15,7 +15,7 @@
 import struct
 from spinn_utilities.overrides import overrides
 from .constants import (
-    END_SPEC_EXECUTOR, LEN2, LEN3, MAX_MEM_REGIONS, MAX_REGISTERS)
+    END_SPEC_EXECUTOR, LEN2, LEN3, MAX_MEM_REGIONS)
 from .exceptions import (
     DataSpecificationSyntaxError, NoMoreException,
     NoRegionSelectedException, ParameterOutOfBoundsException,

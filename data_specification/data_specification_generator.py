@@ -20,9 +20,8 @@ import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import Machine
 from .constants import (
-    MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,
-    MAX_RNGS, MAX_STRUCT_SLOTS, LEN1, LEN2, LEN3,
-    NO_REGS, SRC1_ONLY, BYTES_PER_WORD)
+    MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_RNGS,
+    MAX_STRUCT_SLOTS, LEN1, LEN2, LEN3, NO_REGS, BYTES_PER_WORD)
 from .exceptions import (
     InvalidSizeException, NotAllocatedException,
     NoRegionSelectedException, ParameterOutOfBoundsException,
@@ -270,7 +269,7 @@ class DataSpecificationGenerator(object):
 
         self._write_command_to_files(cmd_word + encoded_args, cmd_string)
 
-    def create_cmd(self, data, data_type=DataType.UINT32):
+    def _create_cmd(self, data, data_type=DataType.UINT32):
         """
         Creates command to write a value to the current write pointer, causing
         the write pointer to move on by the number of bytes required to
@@ -357,7 +356,7 @@ class DataSpecificationGenerator(object):
         """
         if self._current_region is None:
             raise NoRegionSelectedException(Commands.WRITE.name)
-        cmd_word_list, cmd_string = self.create_cmd(data, data_type)
+        cmd_word_list, cmd_string = self._create_cmd(data, data_type)
         self._write_command_to_files(cmd_word_list, cmd_string)
 
     def write_array(self, array_values, data_type=DataType.UINT32):
@@ -419,62 +418,6 @@ class DataSpecificationGenerator(object):
             _Field.USAGE: 0x0,
             _Field.SOURCE_1: region})
         self._write_command_to_files(cmd_word, cmd_string)
-
-    def set_write_pointer(self, address, address_is_register=False,
-                          relative_to_current=False):
-        """
-        Insert command to set the position of the write pointer within the
-        current region.
-
-        :param int address:
-            * If ``address_is_register`` is True, the ID of the register
-              containing the address to move to
-            * If ``address_is_register`` is False, the address to move the
-              write pointer to
-        :param bool address_is_register:
-            Indicates if ``address`` is a register ID
-        :param bool relative_to_current:
-            Indicates if ``address`` (or the value read from that register
-            when ``address_is_register`` is True) is to be added to the
-            current address, or used as an absolute address from the start
-            of the current region
-        :raise ParameterOutOfBoundsException:
-            If the ``address_is_register`` is True and ``address`` is not a
-            valid register ID
-        :raise NoRegionSelectedException: If no region has been selected
-        """
-        if self._current_region is None:
-            raise NoRegionSelectedException(Commands.SET_WR_PTR.name)
-        relative = bool(relative_to_current)
-        relative_string = "RELATIVE" if relative else "ABSOLUTE"
-
-        data_encoded = bytearray()
-        cmd_string = Commands.SET_WR_PTR.name
-        if address_is_register:
-            _bounds(Commands.SET_WR_PTR, "address", address, 0, MAX_REGISTERS)
-            cmd_word = _binencode(Commands.SET_WR_PTR, {
-                _Field.LENGTH: LEN1,
-                _Field.USAGE: SRC1_ONLY,
-                _Field.SOURCE_1: address,
-                _Field.IMMEDIATE: relative})
-            cmd_string += f" reg[{address:d}] {relative_string}"
-        else:
-            if not relative_to_current:
-                _typebounds(Commands.SET_WR_PTR, "address",
-                            address, DataType.UINT32)
-                data_encoded += _ONE_WORD.pack(address)
-            else:
-                _typebounds(Commands.SET_WR_PTR, "address",
-                            address, DataType.INT32)
-                data_encoded += _ONE_SIGNED_INT.pack(address)
-
-            cmd_word = _binencode(Commands.SET_WR_PTR, {
-                _Field.LENGTH: LEN2,
-                _Field.USAGE: NO_REGS,
-                _Field.IMMEDIATE: relative})
-            cmd_string += f" {address:d} {relative_string}"
-
-        self._write_command_to_files(cmd_word + data_encoded, cmd_string)
 
     def end_specification(self, close_writer=True):
         """

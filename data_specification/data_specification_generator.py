@@ -20,9 +20,8 @@ import numpy
 from spinn_utilities.log import FormatAdapter
 from spinn_machine import Machine
 from .constants import (
-    MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_REGISTERS,
-    MAX_RNGS, MAX_STRUCT_SLOTS, LEN1, LEN2, LEN3,
-    NO_REGS, SRC1_ONLY, BYTES_PER_WORD)
+    MAX_CONSTRUCTORS, MAX_MEM_REGIONS, MAX_RANDOM_DISTS, MAX_RNGS,
+    MAX_STRUCT_SLOTS, LEN1, LEN2, LEN3, NO_REGS, BYTES_PER_WORD)
 from .exceptions import (
     InvalidSizeException, NotAllocatedException,
     NoRegionSelectedException, ParameterOutOfBoundsException,

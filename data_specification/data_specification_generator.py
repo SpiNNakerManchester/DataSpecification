@@ -270,7 +270,7 @@ class DataSpecificationGenerator(object):
 
         self._write_command_to_files(cmd_word + encoded_args, cmd_string)
 
-    def create_cmd(self, data, data_type=DataType.UINT32):
+    def _create_cmd(self, data, data_type=DataType.UINT32):
         """
         Creates command to write a value to the current write pointer, causing
         the write pointer to move on by the number of bytes required to
@@ -357,7 +357,7 @@ class DataSpecificationGenerator(object):
         """
         if self._current_region is None:
             raise NoRegionSelectedException(Commands.WRITE.name)
-        cmd_word_list, cmd_string = self.create_cmd(data, data_type)
+        cmd_word_list, cmd_string = self._create_cmd(data, data_type)
         self._write_command_to_files(cmd_word_list, cmd_string)
 
     def write_array(self, array_values, data_type=DataType.UINT32):

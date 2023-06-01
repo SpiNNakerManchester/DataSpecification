@@ -14,23 +14,10 @@
 
 import unittest
 import decimal
-from data_specification.config_setup import unittest_setup
-from data_specification.enums import (
-    Commands, DataType)
+from data_specification.enums import (DataType)
 
 
 class TestingEnums(unittest.TestCase):
-
-    def setUp(self):
-        unittest_setup()
-
-    def test_commands_enum(self):
-        self.assertEqual(Commands.RESERVE.value, 0x02)
-        self.assertEqual(Commands.WRITE.value, 0x42)
-        self.assertEqual(Commands.WRITE_ARRAY.value, 0x43)
-        self.assertEqual(Commands.SWITCH_FOCUS.value, 0x50)
-        self.assertEqual(Commands.SET_WR_PTR.value, 0x64)
-        self.assertEqual(Commands.END_SPEC.value, 0XFF)
 
     def test_data_type_enum(self):
         self.assertEqual(DataType.UINT8.value, 0)

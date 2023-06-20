@@ -16,15 +16,11 @@ import unittest
 import spinn_utilities
 import spinn_machine
 import data_specification
-from data_specification.config_setup import unittest_setup
 
 
 class Test(unittest.TestCase):
     """ Tests for the SCAMP version comparison
     """
-
-    def setUp(self):
-        unittest_setup()
 
     def test_compare_versions(self):
         spinn_utilities_parts = spinn_utilities.__version__.split('.')

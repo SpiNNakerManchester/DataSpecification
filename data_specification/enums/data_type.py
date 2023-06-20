@@ -327,11 +327,11 @@ class DataType(Enum):
         obj._numpy_typename = numpy_typename
         obj._apply_scale = apply_scale
         obj._force_cast = force_cast
+        obj._struct = struct.Struct("<" + struct_encoding)
         if size == 1:
             struct_encoding += "xxx"
         elif size == 2:
             struct_encoding += "xx"
-        obj._struct = struct.Struct("<" + struct_encoding)
         return obj
 
     @property
@@ -360,6 +360,22 @@ class DataType(Enum):
         :rtype: ~decimal.Decimal
         """
         return self._max
+
+    def check_value(self, value):
+        """
+        Check the value against the allowed min and max
+
+        :type value: float or int
+        :raises ValueError: If the value is outside of min to max
+        """
+        if value < self._min:
+            raise ValueError(
+                f"Value {value} is smaller than the minimum {self._min} "
+                f"allowed for a {self}")
+        if value > self._max:
+            raise ValueError(
+                f"Value {value} is greater than the maximum {self._max} "
+                f"allowed for a {self}")
 
     @property
     def scale(self):
@@ -443,9 +459,9 @@ class DataType(Enum):
                 "uint32")
         return np.array(array)
 
-    def encode(self, value):
+    def as_bytes(self, value):
         """
-        Encode the Python value for SpiNNaker according to this type.
+        Encode the Python value as bytes with NO padding.
 
         :param value:
         :type value: float or int

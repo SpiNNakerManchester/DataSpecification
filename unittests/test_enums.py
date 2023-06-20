@@ -88,6 +88,11 @@ class TestingEnums(unittest.TestCase):
         self.assertEqual(
             DataType.S1615.max, decimal.Decimal("65535.999969482421875"))
 
+        self.assertEqual(
+            DataType.S1615.closest_representable_value(1.00001), 1.0)
+        self.assertEqual(
+            DataType.S1615.closest_representable_value_above(0.99997), 1.0)
+
         self.assertEqual(DataType.S3231.value, 13)
         self.assertEqual(DataType.S3231.size, 8)
         self.assertEqual(DataType.S3231.min, decimal.Decimal("-4294967296"))
